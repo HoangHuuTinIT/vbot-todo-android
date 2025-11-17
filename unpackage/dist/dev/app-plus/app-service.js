@@ -51,8 +51,64 @@ if (uni.restoreGlobal) {
   const AUTH_TOKEN = "p9M9bJ7sW1m_2ykKdzoUW0jgsP-Co6GU4AeLCbEJPPoqIBUtUd6OSq53HFWMol_Pw0ENa772ir2mgdQvnc4VdEpilYI5KFlUb8r6E_ZQLtqGYTHL3NpPAIJU-PzpsQC8L0pwcBsbb3MrfsSU0icDWlu5MCtLLF9Vua_YjyjOg9PQf5Z6lEG0Z8-fKHl2I1-HzWpj6BbhLZ3dkN9ybneoYOdSS6yRh-LhtyQJggbnFbS0Aa48Jujx5RaC9HbGGI3DH3XMYv_Ph0BQG7gmU31jZJ2Q2pWeE7Gw3-PWCSRKYlQSJb51Iki0iLAzJwsQBEqjzal7H-4ZhJ95N0zYfVuE2l3ik64k2w7UscSzu-_wPBBAm-9JFapMVdK8VO_jM45unWQWR7_I8lqtfJYBjy_HRh41QwVDCFF_tQdb0J1zhUTYq3FjNPG1EclZ7p6hTASNmkMUoi1RhO5k7vfTtM9CC-i2O6WGLuFKHV44q24gQgoBTfP0jXYzP4UDknEF0lPdbbqGdB-4FjY3EYB9LNJD0w";
   const PROJECT_CODE = "PR202511170947436134";
   const UID = "77b7675d29d74cafa23771e46881db7c";
-  const INITIAL_TOKEN = AUTH_TOKEN;
   const FULL_API_URL = `${BASE_URL}?projectCode=${PROJECT_CODE}&uid=${UID}&type=TODO&source=Desktop-RTC`;
+  const request = (options) => {
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: options.url,
+        method: options.method || "GET",
+        data: options.data || {},
+        header: {
+          "Authorization": `Bearer ${AUTH_TOKEN}`,
+          // Dùng token cứng từ config
+          "Content-Type": "application/json",
+          ...options.header
+        },
+        success: (res) => {
+          var _a;
+          if (res.statusCode === 200 && ((_a = res.data) == null ? void 0 : _a.errorCode) === 0) {
+            resolve(res.data.data);
+          } else {
+            formatAppLog("error", "at utils/request.js:20", `[API Error] ${options.url}:`, res.data);
+            reject(res.data);
+          }
+        },
+        fail: (err) => {
+          formatAppLog("error", "at utils/request.js:25", "[Network Error]:", err);
+          reject(err);
+        }
+      });
+    });
+  };
+  const API_TODO_URL = "https://api-staging.vbot.vn/v1.0/api/module-todo/todo";
+  const getTodos = (params) => {
+    return request({
+      url: `${API_TODO_URL}/getAll`,
+      method: "GET",
+      data: {
+        projectCode: PROJECT_CODE,
+        pageNo: 1,
+        pageSize: 20,
+        ...params
+        // Truyền filter vào đây
+      }
+    });
+  };
+  const TODO_STATUS = {
+    NEW: "TO_DO",
+    IN_PROGRESS: "IN_PROGRESS",
+    DONE: "DONE"
+  };
+  const STATUS_LABELS = {
+    [TODO_STATUS.NEW]: "Mới",
+    [TODO_STATUS.IN_PROGRESS]: "Đang làm",
+    [TODO_STATUS.DONE]: "Xong"
+  };
+  const STATUS_COLORS = {
+    [TODO_STATUS.DONE]: "bg-green",
+    [TODO_STATUS.IN_PROGRESS]: "bg-blue",
+    [TODO_STATUS.NEW]: "bg-orange"
+  };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
     for (const [key, val] of props) {
@@ -67,39 +123,38 @@ if (uni.restoreGlobal) {
       const todos = vue.ref([]);
       const isLoading = vue.ref(false);
       const isFilterOpen = vue.ref(false);
-      const statusOptions = ["Tất cả", "Chưa xử lý", "Đang xử lý", "Hoàn thành"];
-      const statusValues = ["", "TO_DO", "IN_PROGRESS", "DONE"];
+      const statusOptions = ["Tất cả", STATUS_LABELS[TODO_STATUS.NEW], STATUS_LABELS[TODO_STATUS.IN_PROGRESS], STATUS_LABELS[TODO_STATUS.DONE]];
+      const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
       const statusIndex = vue.ref(0);
-      const filter = vue.ref({ title: "", jobCode: "", createdFrom: "", createdTo: "", dueFrom: "", dueTo: "" });
+      const filter = vue.ref({ title: "", jobCode: "", createdFrom: "", createdTo: "" });
       onShow(() => {
         getTodoList();
       });
       const dateToTimestamp = (dateStr) => !dateStr ? -1 : new Date(dateStr).getTime();
       const formatTimeShort = (timestamp) => {
-        if (!timestamp || timestamp === -1)
-          return "";
-        const date = new Date(timestamp);
-        const d = date.getDate();
-        const m = date.getMonth() + 1;
-        const h = date.getHours().toString().padStart(2, "0");
-        const min = date.getMinutes().toString().padStart(2, "0");
-        return `${h}:${min}, ${d} thg ${m}`;
       };
-      const getStatusLabel = (code) => {
-        const map = { "TO_DO": "Mới", "IN_PROGRESS": "Đang làm", "DONE": "Xong" };
-        return map[code] || code;
-      };
-      const getStatusColorClass = (code) => {
-        if (code === "DONE")
-          return "bg-green";
-        if (code === "IN_PROGRESS")
-          return "bg-blue";
-        return "bg-orange";
-      };
-      const getAvatarText = (title) => {
-        if (!title)
-          return "NA";
-        return title.substring(0, 2).toUpperCase();
+      const getStatusLabel = (code) => STATUS_LABELS[code] || code;
+      const getStatusColorClass = (code) => STATUS_COLORS[code] || "bg-orange";
+      const getAvatarText = (title) => title ? title.substring(0, 2).toUpperCase() : "NA";
+      const getTodoList = async () => {
+        isLoading.value = true;
+        try {
+          const data = await getTodos({
+            keySearch: filter.value.title || "",
+            code: filter.value.jobCode || "",
+            status: statusValues[statusIndex.value],
+            startDate: dateToTimestamp(filter.value.createdFrom),
+            endDate: dateToTimestamp(filter.value.createdTo),
+            // Các params mặc định khác nếu cần
+            dueDateFrom: -1,
+            dueDateTo: -1
+          });
+          todos.value = data || [];
+        } catch (error) {
+          uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
+        } finally {
+          isLoading.value = false;
+        }
       };
       const addNewTask = () => {
         uni.navigateTo({ url: "/pages/todo/create_todo" });
@@ -114,309 +169,29 @@ if (uni.restoreGlobal) {
         statusIndex.value = e.detail.value;
       };
       const resetFilter = () => {
-        filter.value = { title: "", jobCode: "", createdFrom: "", createdTo: "", dueFrom: "", dueTo: "" };
+        filter.value = { title: "", jobCode: "", createdFrom: "", createdTo: "" };
         statusIndex.value = 0;
       };
       const applyFilter = () => {
         closeFilter();
         getTodoList();
       };
-      const getTodoList = () => {
-        const token = uni.getStorageSync("user_token") || uni.getStorageSync("vbot_token");
-        if (!token)
-          return;
-        isLoading.value = true;
-        const params = {
-          projectCode: PROJECT_CODE,
-          keySearch: filter.value.title || "",
-          code: filter.value.jobCode || "",
-          status: statusValues[statusIndex.value],
-          customerCode: "",
-          groupId: "",
-          transId: "",
-          createdBy: "",
-          assigneeId: "",
-          pluginType: "",
-          links: "",
-          startDate: dateToTimestamp(filter.value.createdFrom),
-          endDate: dateToTimestamp(filter.value.createdTo),
-          dueDateFrom: -1,
-          dueDateTo: -1,
-          pageNo: 1,
-          pageSize: 20
-        };
-        uni.request({
-          url: "https://api-staging.vbot.vn/v1.0/api/module-todo/todo/getAll",
-          method: "GET",
-          data: params,
-          header: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-          success: (res) => {
-            var _a;
-            if (res.statusCode === 200 && ((_a = res.data) == null ? void 0 : _a.errorCode) === 0) {
-              todos.value = res.data.data || [];
-            } else {
-              uni.showToast({ title: "Lỗi tải", icon: "none" });
-            }
-          },
-          complete: () => {
-            isLoading.value = false;
-          }
-        });
-      };
-      const __returned__ = { todos, isLoading, isFilterOpen, statusOptions, statusValues, statusIndex, filter, dateToTimestamp, formatTimeShort, getStatusLabel, getStatusColorClass, getAvatarText, addNewTask, openFilter, closeFilter, onStatusChange, resetFilter, applyFilter, getTodoList, ref: vue.ref, get onShow() {
+      const __returned__ = { todos, isLoading, isFilterOpen, statusOptions, statusValues, statusIndex, filter, dateToTimestamp, formatTimeShort, getStatusLabel, getStatusColorClass, getAvatarText, getTodoList, addNewTask, openFilter, closeFilter, onStatusChange, resetFilter, applyFilter, ref: vue.ref, get onShow() {
         return onShow;
-      }, get PROJECT_CODE() {
-        return PROJECT_CODE;
+      }, get getTodos() {
+        return getTodos;
+      }, get TODO_STATUS() {
+        return TODO_STATUS;
+      }, get STATUS_LABELS() {
+        return STATUS_LABELS;
+      }, get STATUS_COLORS() {
+        return STATUS_COLORS;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   };
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createElementVNode("view", { class: "header" }, [
-        vue.createElementVNode("view", { class: "header-left" }),
-        vue.createElementVNode("text", { class: "header-title" }, "Công việc"),
-        vue.createElementVNode("view", {
-          class: "header-right",
-          onClick: $setup.openFilter
-        }, [
-          vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios-filled/50/333333/filter--v1.png",
-            class: "filter-icon"
-          })
-        ])
-      ]),
-      vue.createElementVNode("view", { class: "content" }, [
-        vue.createElementVNode("view", { class: "list-container" }, [
-          $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "loading-state"
-          }, [
-            vue.createElementVNode("text", null, "Đang tải dữ liệu...")
-          ])) : $setup.todos.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 1,
-            class: "empty-state"
-          }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/100/cccccc/empty-box.png",
-              mode: "aspectFit",
-              class: "empty-icon"
-            }),
-            vue.createElementVNode("text", { class: "empty-text" }, "Chưa có dữ liệu")
-          ])) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
-            key: 2,
-            "scroll-y": "true",
-            class: "list-view"
-          }, [
-            (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.todos, (item, index) => {
-                return vue.openBlock(), vue.createElementBlock("view", {
-                  key: item.id || index,
-                  class: "card-item"
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    {
-                      class: vue.normalizeClass(["status-bar", $setup.getStatusColorClass(item.status)])
-                    },
-                    null,
-                    2
-                    /* CLASS */
-                  ),
-                  vue.createElementVNode("view", { class: "card-body" }, [
-                    vue.createElementVNode("view", { class: "card-row top-row" }, [
-                      vue.createElementVNode("view", { class: "circle-checkbox" }),
-                      vue.createElementVNode(
-                        "text",
-                        { class: "card-title" },
-                        vue.toDisplayString(item.title),
-                        1
-                        /* TEXT */
-                      )
-                    ]),
-                    vue.createElementVNode("view", { class: "card-row mid-row" }, [
-                      vue.createElementVNode("image", {
-                        src: "https://img.icons8.com/ios/50/666666/time.png",
-                        class: "icon-small"
-                      }),
-                      vue.createElementVNode(
-                        "text",
-                        { class: "card-date" },
-                        "Tạo lúc: " + vue.toDisplayString($setup.formatTimeShort(item.createdAt)),
-                        1
-                        /* TEXT */
-                      )
-                    ]),
-                    vue.createElementVNode("view", { class: "card-row bot-row" }, [
-                      vue.createElementVNode("view", { class: "badge-yellow" }, [
-                        vue.createElementVNode("image", {
-                          src: "https://img.icons8.com/ios-filled/50/997b00/clock--v1.png",
-                          class: "icon-tiny"
-                        }),
-                        vue.createElementVNode(
-                          "text",
-                          null,
-                          vue.toDisplayString(item.code),
-                          1
-                          /* TEXT */
-                        )
-                      ]),
-                      vue.createElementVNode(
-                        "view",
-                        { class: "status-text" },
-                        vue.toDisplayString($setup.getStatusLabel(item.status)),
-                        1
-                        /* TEXT */
-                      ),
-                      vue.createElementVNode(
-                        "view",
-                        {
-                          class: vue.normalizeClass(["avatar-circle", $setup.getStatusColorClass(item.status)])
-                        },
-                        vue.toDisplayString($setup.getAvatarText(item.title)),
-                        3
-                        /* TEXT, CLASS */
-                      )
-                    ])
-                  ])
-                ]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            )),
-            vue.createElementVNode("view", { style: { "height": "20px" } })
-          ]))
-        ]),
-        vue.createElementVNode("view", { class: "fixed-footer" }, [
-          vue.createElementVNode("button", {
-            class: "btn-add-more",
-            onClick: $setup.addNewTask
-          }, "+ Thêm công việc")
-        ])
-      ]),
-      $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 0,
-        class: "filter-overlay",
-        onClick: vue.withModifiers($setup.closeFilter, ["stop"])
-      }, [
-        vue.createElementVNode("view", {
-          class: "filter-panel",
-          onClick: _cache[4] || (_cache[4] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }, [
-          vue.createElementVNode("view", { class: "filter-header" }, [
-            vue.createElementVNode("text", { class: "filter-title" }, "Bộ lọc tìm kiếm"),
-            vue.createElementVNode("text", {
-              class: "close-btn",
-              onClick: $setup.closeFilter
-            }, "✕")
-          ]),
-          vue.createElementVNode("scroll-view", {
-            "scroll-y": "true",
-            class: "filter-body"
-          }, [
-            vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Tiêu đề / Từ khóa"),
-              vue.withDirectives(vue.createElementVNode(
-                "input",
-                {
-                  class: "f-input",
-                  "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.title = $event),
-                  placeholder: "Nhập từ khóa..."
-                },
-                null,
-                512
-                /* NEED_PATCH */
-              ), [
-                [vue.vModelText, $setup.filter.title]
-              ])
-            ]),
-            vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Mã công việc"),
-              vue.withDirectives(vue.createElementVNode(
-                "input",
-                {
-                  class: "f-input",
-                  "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.jobCode = $event),
-                  placeholder: "Ví dụ: TODO-08"
-                },
-                null,
-                512
-                /* NEED_PATCH */
-              ), [
-                [vue.vModelText, $setup.filter.jobCode]
-              ])
-            ]),
-            vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Trạng thái"),
-              vue.createElementVNode("picker", {
-                mode: "selector",
-                range: $setup.statusOptions,
-                value: $setup.statusIndex,
-                onChange: $setup.onStatusChange
-              }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.statusIndex]),
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["value"])
-            ]),
-            vue.createElementVNode("view", { class: "f-section-title" }, "Thời gian tạo"),
-            vue.createElementVNode("view", { class: "f-row" }, [
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.createdFrom,
-                  onChange: _cache[2] || (_cache[2] = (e) => $setup.filter.createdFrom = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.createdFrom || "Từ ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ]),
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.createdTo,
-                  onChange: _cache[3] || (_cache[3] = (e) => $setup.filter.createdTo = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.createdTo || "Đến ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ])
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "filter-footer" }, [
-            vue.createElementVNode("button", {
-              class: "btn-reset",
-              onClick: $setup.resetFilter
-            }, "Đặt lại"),
-            vue.createElementVNode("button", {
-              class: "btn-apply",
-              onClick: $setup.applyFilter
-            }, "Áp dụng")
-          ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true)
-    ]);
-  }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot_todo/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__file", "D:/uni_app/vbot_todo/pages/todo/list_todo.vue"]]);
   const _sfc_main$2 = {
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
@@ -1053,32 +828,22 @@ if (uni.restoreGlobal) {
   __definePage("pages/index/index", PagesIndexIndex);
   const fetchAppToken = () => {
     return new Promise((resolve, reject) => {
-      formatAppLog("log", "at api/auth.js:8", "--------------------------------");
-      formatAppLog("log", "at api/auth.js:9", "🔍 DEBUG REQUEST AUTH:");
-      formatAppLog("log", "at api/auth.js:10", "1. URL:", FULL_API_URL);
-      formatAppLog("log", "at api/auth.js:11", "2. Token Config (ENV):", INITIAL_TOKEN);
-      formatAppLog("log", "at api/auth.js:12", "3. Header gửi đi:", `Bearer ${INITIAL_TOKEN}`);
-      formatAppLog("log", "at api/auth.js:13", "--------------------------------");
       uni.request({
         url: FULL_API_URL,
         method: "GET",
         header: {
-          "Authorization": `Bearer ${INITIAL_TOKEN}`,
-          // Đảm bảo có khoảng trắng sau Bearer
+          "Authorization": `Bearer ${AUTH_TOKEN}`,
           "Content-Type": "application/json"
         },
         success: (res) => {
           var _a;
-          formatAppLog("log", "at api/auth.js:25", "📡 API Response Status:", res.statusCode);
           if (res.statusCode === 200 && ((_a = res.data) == null ? void 0 : _a.status) === 1) {
             resolve(res.data.data);
           } else {
-            formatAppLog("error", "at api/auth.js:30", "❌ Server từ chối:", res.data);
-            reject(res);
+            reject(res.data);
           }
         },
         fail: (err) => {
-          formatAppLog("error", "at api/auth.js:35", "❌ Lỗi mạng (Network Error):", err);
           reject(err);
         }
       });
