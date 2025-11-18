@@ -47,40 +47,39 @@ if (uni.restoreGlobal) {
     1 | 2
     /* HookFlags.PAGE */
   );
-  const BASE_URL = "https://api-staging.vbot.vn/v1.0/api/module-crm/token";
-  const AUTH_TOKEN = "1OFf6XzspVqYDibjBJaNaj1xYVjKcVIL-Js57nv9J7JfpSvyQJZJ5r3ARNGt25KlXj-cAq4E2gGl7WAdD0HYH053Nk38gOF7EBg7kVmsql3FML7DC83tF2wPgVhAvr1-nj7r3vTRJwaOXrsnre3wIK3DbIPexkNhz-mCHOGctHx5JJMlTReR-koA3Pv24nixrUgX2tIuR3t0Yanhdbo_pna-Jph4Vfco1HnnHcJxpeK1gxhgzyepmYx5lNIGKtWdzf6pPlzKSb2fbVCoHPbVeuChUCN6-ygMSLl6FJetx5EwInmvExaGiSRfEfMCFOlz0aXsHA0me-qcoMI1IJDam9-1fGT0IyKv4NalHUvTEl9NHIsnQ9WY3EE2gSERQM8-AG5ikVoIeGzFUE9Eha8XLUAzD2VsRMJAi-KRgTDA9DA1ZocK8sBqzXshYhZczo6f0j7Hj0bh-lZy6Sdn5oOaT8UcXCUtFZ5-kiqNM-eS2eWvEoSK4TzaKuAb0yVdS8gwCKS1odDneQiNm_FNC803Qw";
-  const PROJECT_CODE = "PR202511170947436134";
-  const UID = "77b7675d29d74cafa23771e46881db7c";
-  const FULL_API_URL = `${BASE_URL}?projectCode=${PROJECT_CODE}&uid=${UID}&type=TODO&source=Desktop-RTC`;
   const request = (options) => {
     return new Promise((resolve, reject) => {
-      const dynamicToken = uni.getStorageSync("vbot_token");
-      const finalToken = dynamicToken || AUTH_TOKEN;
+      const todoToken = uni.getStorageSync("todo_access_token");
+      const rootToken = uni.getStorageSync("vbot_root_token");
+      const finalToken = todoToken || rootToken;
+      if (!finalToken) {
+        formatAppLog("warn", "at utils/request.js:14", "Chưa có Token nào cả!");
+      }
       uni.request({
         url: options.url,
         method: options.method || "GET",
         data: options.data || {},
         header: {
           "Authorization": `Bearer ${finalToken}`,
+          // Luôn gửi kèm Token
           "Content-Type": "application/json",
           ...options.header
         },
         success: (res) => {
-          var _a;
-          if (res.statusCode === 200 && ((_a = res.data) == null ? void 0 : _a.errorCode) === 0) {
+          if (res.statusCode === 200) {
             resolve(res.data.data);
           } else {
-            formatAppLog("error", "at utils/request.js:23", `[API Error] ${options.url}:`, res.data);
             reject(res.data);
           }
         },
         fail: (err) => {
-          formatAppLog("error", "at utils/request.js:28", "[Network Error]:", err);
           reject(err);
         }
       });
     });
   };
+  const PROJECT_CODE = "PR202511170947436134";
+  const UID = "77b7675d29d74cafa23771e46881db7c";
   const TODO_STATUS = {
     NEW: "TO_DO",
     IN_PROGRESS: "IN_PROGRESS",
@@ -896,16 +895,16 @@ if (uni.restoreGlobal) {
       status: "TO_DO",
       // 3. Enum & Loại
       links: "CALL",
-      pluginType: "test1",
+      pluginType: "",
       // 4. Các trường Optional
-      customerCode: form.customer || "test1",
-      assigneeId: form.assignee || "test1",
-      groupId: "test1",
-      transId: "test1",
-      tagCodes: "test1",
-      groupMemberUid: "test1",
+      customerCode: form.customer || "",
+      assigneeId: form.assignee || "",
+      groupId: "",
+      transId: "",
+      tagCodes: "",
+      groupMemberUid: "",
       files: "",
-      phone: "072836272322",
+      phone: "",
       // 5. Các trường Thời gian (Đã xử lý ghép chuỗi ở trên)
       dueDate: dateToTimestamp(fullDueDate),
       notificationReceivedAt: dateToTimestamp(fullNotifyDateTime)
@@ -1697,44 +1696,107 @@ if (uni.restoreGlobal) {
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
   __definePage("pages/todo/create_todo", PagesTodoCreateTodo);
   __definePage("pages/index/index", PagesIndexIndex);
-  const fetchAppToken = () => {
+  const systemLogin = (username, password) => {
     return new Promise((resolve, reject) => {
       uni.request({
-        url: FULL_API_URL,
-        method: "GET",
-        header: {
-          "Authorization": `Bearer ${AUTH_TOKEN}`,
-          "Content-Type": "application/json"
+        url: "https://api-staging.vbot.vn/v1.0/token",
+        // API Auth gốc
+        method: "POST",
+        header: { "Content-Type": "application/x-www-form-urlencoded" },
+        // API token thường dùng form-urlencoded
+        data: {
+          username,
+          password,
+          grant_type: "password",
+          type_account: 0,
+          // Hoặc giá trị mặc định của bạn
+          source: "Desktop-RTC"
+          // Các field khác nếu cần fix cứng: firebase_token, token_call...
         },
         success: (res) => {
-          var _a;
-          if (res.statusCode === 200 && ((_a = res.data) == null ? void 0 : _a.status) === 1) {
-            resolve(res.data.data);
+          if (res.statusCode === 200 && res.data.access_token) {
+            resolve(res.data);
           } else {
             reject(res.data);
           }
         },
-        fail: (err) => {
-          reject(err);
-        }
+        fail: (err) => reject(err)
+      });
+    });
+  };
+  const getTodoToken = (rootToken, projectCode, uid) => {
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: `https://api-staging.vbot.vn/v1.0/api/module-crm/token`,
+        method: "GET",
+        data: {
+          projectCode,
+          uid,
+          type: "TODO",
+          source: "Desktop-RTC"
+        },
+        header: {
+          // QUAN TRỌNG: Dùng Token Gốc để xin Token Con
+          "Authorization": `Bearer ${rootToken}`
+        },
+        success: (res) => {
+          if (res.data && res.data.data && res.data.data.token) {
+            resolve(res.data.data.token);
+          } else {
+            reject(res.data);
+          }
+        },
+        fail: (err) => reject(err)
       });
     });
   };
   const _sfc_main = {
-    onLaunch: function() {
-      formatAppLog("log", "at App.vue:7", "App Launch");
-      fetchAppToken().then((data) => {
-        formatAppLog("log", "at App.vue:11", "Token mới nhất là:", data.token);
-        uni.setStorageSync("vbot_token", data.token);
-      }).catch((err) => {
-        formatAppLog("error", "at App.vue:17", "Lỗi lấy token:", err);
-      });
+    onLaunch: async function(options) {
+      formatAppLog("log", "at App.vue:6", "--- App Launching ---");
+      if (options && options.query && options.query.token) {
+        formatAppLog("log", "at App.vue:11", ">> Mode: Production (Cập nhật Token từ URL)");
+        const rootToken = options.query.token || options.query.access_token;
+        const uid2 = options.query.uid;
+        const projectCode2 = options.query.projectCode;
+        await this.handleGetTodoToken(rootToken, projectCode2, uid2);
+        return;
+      }
+      formatAppLog("log", "at App.vue:21", ">> Mode: Development");
+      const storedTodoToken = uni.getStorageSync("todo_access_token");
+      const tokenExpiryTime = uni.getStorageSync("token_expiry_time");
+      const now = Date.now();
+      if (storedTodoToken && tokenExpiryTime && now < tokenExpiryTime) {
+        formatAppLog("log", "at App.vue:30", ">> Token cũ vẫn còn hạn, không cần Login lại.");
+        return;
+      }
+      formatAppLog("log", "at App.vue:35", ">> Token hết hạn hoặc không có, đang Login lại...");
+      const devUser = "647890427";
+      const devPass = "53496785941d8dc2f5aa3e98e753eb3d0780de9fda3d9ac1761c47eaae28ae39";
+      const uid = "77b7675d29d74cafa23771e46881db7c";
+      const projectCode = "PR202511170947436134";
+      try {
+        const loginData = await systemLogin(devUser, devPass);
+        await this.handleGetTodoToken(loginData.access_token, projectCode, uid);
+      } catch (e) {
+        formatAppLog("error", "at App.vue:46", "Dev Login thất bại", e);
+      }
     },
-    onShow: function() {
-      formatAppLog("log", "at App.vue:21", "App Show");
-    },
-    onHide: function() {
-      formatAppLog("log", "at App.vue:24", "App Hide");
+    methods: {
+      // Tách hàm này ra để tái sử dụng
+      async handleGetTodoToken(rootToken, projectCode, uid) {
+        try {
+          uni.setStorageSync("vbot_root_token", rootToken);
+          uni.setStorageSync("vbot_uid", uid);
+          uni.setStorageSync("vbot_project_code", projectCode);
+          const todoToken = await getTodoToken(rootToken, projectCode, uid);
+          uni.setStorageSync("todo_access_token", todoToken);
+          const expiresIn = 3600 * 1e3;
+          uni.setStorageSync("token_expiry_time", Date.now() + expiresIn);
+          formatAppLog("log", "at App.vue:69", ">>> Đã cập nhật Todo Token mới.");
+        } catch (err) {
+          formatAppLog("error", "at App.vue:71", "Lỗi lấy Todo Token:", err);
+        }
+      }
     }
   };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot_todo/App.vue"]]);

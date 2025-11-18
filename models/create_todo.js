@@ -33,17 +33,17 @@ export const buildCreateTodoPayload = (form, config) => {
         
         // 3. Enum & Loại
         links: 'CALL', 
-        pluginType: 'test1', 
+        pluginType: '', 
         
         // 4. Các trường Optional
-        customerCode: form.customer || "test1", 
-        assigneeId: form.assignee || "test1",    
-        groupId: "test1",
-        transId: "test1",
-        tagCodes: "test1",
-        groupMemberUid: "test1",
+        customerCode: form.customer || "", 
+        assigneeId: form.assignee || "",    
+        groupId: "",
+        transId: "",
+        tagCodes: "",
+        groupMemberUid: "",
         files: "",
-        phone: "072836272322",
+        phone: "",
         
         // 5. Các trường Thời gian (Đã xử lý ghép chuỗi ở trên)
         dueDate: dateToTimestamp(fullDueDate),
