@@ -103,5 +103,6 @@
       "enable": false
     }
   },
-  "launch_path": "__uniappview.html"
+  "launch_path": "__uniappview.html",
+  "fallbackLocale": "en"
 }

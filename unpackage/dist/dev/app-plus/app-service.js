@@ -2115,7 +2115,7 @@ This will fail in production if not fixed.`);
     };
     const showActionMenu = (item) => {
       uni.showActionSheet({
-        itemList: ["Xóa công việc"],
+        itemList: ["Xóa"],
         itemColor: "#ff3b30",
         success: (res) => {
           if (res.tapIndex === 0)
@@ -2689,7 +2689,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot_todo/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot_todo_2/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
       return -1;
@@ -3244,7 +3244,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot_todo/components/Todo/TodoEditor.vue"]]);
+  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot_todo_2/components/Todo/TodoEditor.vue"]]);
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoDatePicker",
     props: {
@@ -3358,7 +3358,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot_todo/components/Todo/TodoDatePicker.vue"]]);
+  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot_todo_2/components/Todo/TodoDatePicker.vue"]]);
   const _sfc_main$2 = /* @__PURE__ */ vue.defineComponent({
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
@@ -3459,7 +3459,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "D:/uni_app/vbot_todo/pages/todo/create_todo.vue"]]);
+  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "D:/uni_app/vbot_todo_2/pages/todo/create_todo.vue"]]);
   const _imports_0 = "/static/logo.png";
   const _sfc_main$1 = {
     data() {
@@ -3488,7 +3488,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "D:/uni_app/vbot_todo/pages/index/index.vue"]]);
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "D:/uni_app/vbot_todo_2/pages/index/index.vue"]]);
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
   __definePage("pages/todo/create_todo", PagesTodoCreateTodo);
   __definePage("pages/index/index", PagesIndexIndex);
@@ -3520,7 +3520,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot_todo/App.vue"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot_todo_2/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());

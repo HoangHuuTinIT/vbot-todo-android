@@ -121,7 +121,7 @@ export const useListTodoController = () => {
 
     const showActionMenu = (item: TodoItem) => {
         uni.showActionSheet({
-            itemList: ['Xóa công việc'],
+            itemList: ['Xóa'],
             itemColor: '#ff3b30',
             success: (res) => {
                 if (res.tapIndex === 0) onRequestDelete(item);

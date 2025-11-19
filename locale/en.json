@@ -2,5 +2,6 @@
   "app_name": "VBot To-Do",
   "common_save": "Save",
   "common_cancel": "Cancel",
-  "todo_name_placeholder": "Enter task name"
+  "todo_name_placeholder": "Enter task name",
+  "uni.showActionSheet.cancel": "Cancel"
 }
