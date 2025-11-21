@@ -1939,6 +1939,24 @@ This will fail in production if not fixed.`);
     [TODO_STATUS.IN_PROGRESS]: "bg-orange",
     [TODO_STATUS.NEW]: "bg-gray"
   };
+  const TIMELINE_TYPE_MAP = {
+    "HISTORY_CALL_IN": "Cuộc gọi đến",
+    "HISTORY_CALL_OUT": "Cuộc gọi đi",
+    "HISTORY_MISS_CALL": "Cuộc gọi nhỡ",
+    "NEW_TICKET": "Tạo mới ticket",
+    "REOPEN_TICKET": "Mở lại ticket",
+    "NEW_SUB_TICKET": "Tạo ticket con",
+    "UPDATE_STATUS_TICKET": "Cập nhật trạng thái ticket",
+    "UPDATE_ASSIGNEE_TICKET": "Đổi người xử lý ticket",
+    "NEW_TODO": "Tạo mới công việc",
+    "REOPEN_TODO": "Mở lại công việc",
+    "UPDATE_STATUS_TODO": "Cập nhật trạng thái công việc",
+    "UPDATE_ASSIGNEE_TODO": "Đổi người thực hiện công việc",
+    "CUSTOMER_UPDATE": "Cập nhật thông tin khách hàng",
+    "NOTE_INSERT": "Thêm ghi chú",
+    "NOTE_UPDATE": "Sửa ghi chú",
+    "NOTE_DELETE": "Xóa ghi chú"
+  };
   const formatFullDateTime = (timestamp) => {
     if (!timestamp || timestamp === -1 || timestamp === 0)
       return "";
@@ -2868,6 +2886,17 @@ This will fail in production if not fixed.`);
       header: {
         "Authorization": `Bearer ${crmToken}`
         // Dùng token CRM vừa lấy được
+      }
+    });
+  };
+  const getCrmActionTimeline = (crmToken, customerUid) => {
+    return request({
+      // Ghép chuỗi URL với các tham số cố định như bạn yêu cầu
+      url: `${CRM_API_URL}/ActionTimeline/getAll?from=-1&to=-1&customerUid=${customerUid}&type=ALL&page=1&size=10&memberUid=&projectCode=`,
+      method: "GET",
+      header: {
+        "Authorization": `Bearer ${crmToken}`
+        // Dùng token CRM
       }
     });
   };
@@ -4033,7 +4062,10 @@ This will fail in production if not fixed.`);
   const useTodoDetailController = () => {
     const isLoading = vue.ref(false);
     const isLoadingCustomer = vue.ref(false);
+    const isLoadingHistory = vue.ref(false);
+    const historyList = vue.ref([]);
     const form = vue.ref({
+      // ... giữ nguyên
       id: "",
       title: "",
       code: "Loading...",
@@ -4047,8 +4079,11 @@ This will fail in production if not fixed.`);
       notifyTime: "",
       customerCode: "",
       customerName: "",
+      customerNameLabel: "",
       customerPhone: "",
-      customerManagerName: ""
+      customerPhoneLabel: "",
+      customerManagerName: "",
+      customerManagerLabel: ""
     });
     const statusOptions = ["Chưa xử lý", "Đang xử lý", "Hoàn thành"];
     const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
@@ -4066,7 +4101,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:44", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:57", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4084,10 +4119,11 @@ This will fail in production if not fixed.`);
           }
           if (form.value.customerCode) {
             await fetchCustomerInfo(form.value.customerCode);
+            fetchHistoryLog(form.value.customerCode);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:73", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:87", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -4118,9 +4154,44 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:123", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:137", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
+      }
+    };
+    const fetchHistoryLog = async (customerUid) => {
+      isLoadingHistory.value = true;
+      try {
+        const crmToken = await getCrmToken(PROJECT_CODE, UID);
+        const rawHistory = await getCrmActionTimeline(crmToken, customerUid);
+        if (Array.isArray(rawHistory)) {
+          historyList.value = rawHistory.map((item) => {
+            const date = new Date(item.createAt);
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const year = date.getFullYear();
+            const timeStr = `${day}/${month}/${year}`;
+            let actorName = "Hệ thống";
+            if (item.memberUid) {
+              const foundMember = memberList.value.find((m) => m.memberUID === item.memberUid);
+              if (foundMember) {
+                actorName = foundMember.UserName;
+              }
+            }
+            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || "Tương tác khác";
+            return {
+              id: item.id,
+              timeStr,
+              content,
+              actorName,
+              originalType: item.typeSub
+            };
+          });
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:188", "Lỗi lấy lịch sử:", error);
+      } finally {
+        isLoadingHistory.value = false;
       }
     };
     const onStatusChange = (e) => {
@@ -4140,12 +4211,14 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:141", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:205", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
       isLoading,
       isLoadingCustomer,
+      isLoadingHistory,
+      historyList,
       // Trả về thêm biến này
       form,
       statusOptions,
@@ -4166,6 +4239,8 @@ This will fail in production if not fixed.`);
         isLoading,
         isLoadingCustomer,
         // Lấy thêm isLoading
+        isLoadingHistory,
+        historyList,
         form,
         statusOptions,
         sourceOptions,
@@ -4175,7 +4250,7 @@ This will fail in production if not fixed.`);
         onAssigneeChange,
         saveTodo
       } = useTodoDetailController();
-      const __returned__ = { isLoading, isLoadingCustomer, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4390,6 +4465,67 @@ This will fail in production if not fixed.`);
                 /* TEXT */
               )
             ])
+          ]))
+        ]),
+        vue.createElementVNode("view", { class: "section-title" }, "Lịch sử tương tác"),
+        vue.createElementVNode("view", { class: "history-container" }, [
+          $setup.isLoadingHistory ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "loading-row"
+          }, [
+            vue.createElementVNode("text", { class: "loading-text" }, "Đang tải lịch sử...")
+          ])) : $setup.historyList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "empty-row"
+          }, [
+            vue.createElementVNode("text", null, "(Chưa có lịch sử tương tác nào)")
+          ])) : (vue.openBlock(), vue.createElementBlock("view", {
+            key: 2,
+            class: "timeline-list"
+          }, [
+            (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($setup.historyList, (item, index) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  key: item.id,
+                  class: "timeline-item"
+                }, [
+                  index !== $setup.historyList.length - 1 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "timeline-line"
+                  })) : vue.createCommentVNode("v-if", true),
+                  vue.createElementVNode("view", { class: "timeline-dot" }),
+                  vue.createElementVNode("view", { class: "timeline-content" }, [
+                    vue.createElementVNode("view", { class: "timeline-header" }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "t-actor" },
+                        vue.toDisplayString(item.actorName),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "t-time" },
+                        vue.toDisplayString(item.timeStr),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode(
+                      "text",
+                      { class: "t-action" },
+                      vue.toDisplayString(item.content),
+                      1
+                      /* TEXT */
+                    )
+                  ])
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
           ]))
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })

@@ -3,21 +3,34 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { getTodoDetail } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
-import { getCrmToken, getCrmCustomerDetail } from '@/api/crm'; // Import API CRM
+import { getCrmToken, getCrmCustomerDetail , getCrmActionTimeline} from '@/api/crm'; // Import API CRM
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
 import { PROJECT_CODE, UID } from '@/utils/config';
-
+import { TIMELINE_TYPE_MAP } from '@/utils/constants';
+interface HistoryItem {
+    id: number;
+    timeStr: string;      // Giờ hiển thị (VD: 10:30 21/11)
+    content: string;      // Nội dung tương tác (Tiếng Việt)
+    actorName: string;    // Tên người thực hiện
+    originalType: string; // Lưu loại gốc để icon nếu cần
+}
 export const useTodoDetailController = () => {
     const isLoading = ref(false);
     // State loading riêng cho phần khách hàng để UI mượt hơn
     const isLoadingCustomer = ref(false); 
 
-    const form = ref<TodoDetailForm>({
-        id: '', title: '', code: 'Loading...', desc: '',
-        statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
-        dueDate: '', notifyDate: '', notifyTime: '',
-        customerCode: '', customerName: '', customerPhone: '', customerManagerName: ''
-    });
+    const isLoadingHistory = ref(false);
+        const historyList = ref<HistoryItem[]>([]);
+    
+        const form = ref<TodoDetailForm>({
+            // ... giữ nguyên
+            id: '', title: '', code: 'Loading...', desc: '',
+            statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
+            dueDate: '', notifyDate: '', notifyTime: '',
+            customerCode: '', customerName: '', customerNameLabel: '',
+            customerPhone: '', customerPhoneLabel: '', 
+            customerManagerName: '', customerManagerLabel: ''
+        });
 
     const statusOptions = ['Chưa xử lý', 'Đang xử lý', 'Hoàn thành'];
     const sourceOptions = ['Cuộc gọi', 'Khách hàng', 'Hội thoại', 'Tin nhắn'];
@@ -67,6 +80,7 @@ export const useTodoDetailController = () => {
                 // [QUAN TRỌNG] Nếu có mã khách hàng -> Gọi tiếp API CRM
                 if (form.value.customerCode) {
                     await fetchCustomerInfo(form.value.customerCode);
+					fetchHistoryLog(form.value.customerCode);
                 }
             }
         } catch (error) {
@@ -125,7 +139,57 @@ export const useTodoDetailController = () => {
                 isLoadingCustomer.value = false;
             }
         };
+const fetchHistoryLog = async (customerUid: string) => {
+        isLoadingHistory.value = true;
+        try {
+            // B1. Lấy token
+            const crmToken = await getCrmToken(PROJECT_CODE, UID);
+            
+            // B2. Gọi API
+            const rawHistory = await getCrmActionTimeline(crmToken, customerUid);
+            
+            // B3. Xử lý dữ liệu (Map)
+            if (Array.isArray(rawHistory)) {
+                historyList.value = rawHistory.map((item: any) => {
+                    // 1. Xử lý thời gian (createAt)
+                    const date = new Date(item.createAt);
+                                        const day = date.getDate().toString().padStart(2, '0');
+                                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                                        const year = date.getFullYear();
+                                        
+                                        // Format mới: dd/mm/yyyy (VD: 21/11/2025)
+                                        const timeStr = `${day}/${month}/${year}`;
 
+                    // 2. Xử lý Tên người tương tác (memberUid)
+                    let actorName = 'Hệ thống';
+                    if (item.memberUid) {
+                        // So sánh memberUid từ API Timeline với memberUID trong danh sách Member
+                        const foundMember = memberList.value.find(m => m.memberUID === item.memberUid);
+                        if (foundMember) {
+                            actorName = foundMember.UserName;
+                        }
+                    }
+
+                    // 3. Xử lý Nội dung tương tác (typeSub)
+                    // Nếu typeSub có trong map thì lấy tiếng Việt, không thì lấy chính nó
+                    const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || 'Tương tác khác';
+
+                    return {
+                        id: item.id,
+                        timeStr,
+                        content,
+                        actorName,
+                        originalType: item.typeSub
+                    };
+                });
+            }
+
+        } catch (error) {
+            console.error("Lỗi lấy lịch sử:", error);
+        } finally {
+            isLoadingHistory.value = false;
+        }
+    };
     // ... (Giữ nguyên các event handler cũ: onStatusChange, saveTodo...)
     const onStatusChange = (e: any) => { form.value.statusIndex = e.detail.value; };
     const onSourceChange = (e: any) => { form.value.sourceIndex = e.detail.value; };
@@ -143,7 +207,8 @@ export const useTodoDetailController = () => {
     };
 
     return {
-        isLoading, isLoadingCustomer, // Trả về thêm biến này
+        isLoading, isLoadingCustomer,
+		 isLoadingHistory, historyList,// Trả về thêm biến này
         form,
         statusOptions, sourceOptions, assigneeOptions,
         onStatusChange, onSourceChange, onAssigneeChange,

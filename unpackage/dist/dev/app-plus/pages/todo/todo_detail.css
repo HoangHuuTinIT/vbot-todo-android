@@ -527,6 +527,69 @@ to {
 }
 
 /* Thêm CSS cho Loading */
+.history-container[data-v-9f96c8fe] {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.timeline-list[data-v-9f96c8fe] {
+  position: relative;
+}
+.timeline-item[data-v-9f96c8fe] {
+  display: flex;
+  position: relative;
+  padding-bottom: 25px;
+  /* Khoảng cách giữa các item */
+}
+.timeline-item[data-v-9f96c8fe]:last-child {
+  padding-bottom: 0;
+}
+.timeline-dot[data-v-9f96c8fe] {
+  width: 10px;
+  height: 10px;
+  background-color: #007aff;
+  /* Màu xanh chủ đạo */
+  border-radius: 50%;
+  margin-top: 5px;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.timeline-line[data-v-9f96c8fe] {
+  position: absolute;
+  left: 4px;
+  /* Canh giữa dot (10px/2 - 1px) */
+  top: 15px;
+  /* Bắt đầu từ dưới dot */
+  bottom: 0;
+  width: 2px;
+  background-color: #e5e5ea;
+  z-index: 1;
+}
+.timeline-content[data-v-9f96c8fe] {
+  margin-left: 15px;
+  flex: 1;
+}
+.timeline-header[data-v-9f96c8fe] {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.t-actor[data-v-9f96c8fe] {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+}
+.t-time[data-v-9f96c8fe] {
+  font-size: 12px;
+  color: #999;
+}
+.t-action[data-v-9f96c8fe] {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
 .loading-overlay[data-v-9f96c8fe] {
   position: fixed;
   top: 0;

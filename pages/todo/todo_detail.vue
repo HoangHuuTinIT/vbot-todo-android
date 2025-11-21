@@ -8,7 +8,7 @@
             <view class="header-top">
                 <text class="header-code">#{{ form.code }}</text>
                 <view class="header-actions">
-                   <text class="btn-text" @click="saveTodo">Lưu</text>
+                    <text class="btn-text" @click="saveTodo">Lưu</text>
                 </view>
             </view>
             <input class="header-title-input" v-model="form.title" placeholder="Tên công việc" />
@@ -22,7 +22,6 @@
 
             <view class="section-title">Thông tin công việc</view>
             <view class="info-group">
-                
                 <view class="flat-item">
                     <view class="item-left">
                         <image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon"></image>
@@ -73,49 +72,75 @@
             </view>
 
             <view class="section-title">Thông tin khách hàng</view>
-                        <view class="info-group customer-block">
-                            
-                            <view v-if="isLoadingCustomer" class="loading-row">
-                                <text class="loading-text">Đang tải thông tin từ CRM...</text>
-                            </view>
-            
-                            <view v-else-if="!form.customerCode" class="empty-row">
-                                <text>(Công việc này chưa gắn với khách hàng nào)</text>
-                            </view>
-            
-                            <view v-else>
-                                <view class="flat-item">
-                                    <view class="item-left">
-                                        <image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
-                                        <text class="item-label">{{ form.customerNameLabel }}</text>
-                                    </view>
-                                    <view class="item-right-text">{{ form.customerName }}</view>
-                                </view>
-            
-                                <view class="flat-item">
-                                    <view class="item-left">
-                                        <image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
-                                        <text class="item-label">{{ form.customerPhoneLabel }}</text>
-                                    </view>
-                                    <view class="item-right-text phone-text">{{ form.customerPhone }}</view>
-                                </view>
-            
-                                <view class="flat-item">
-                                    <view class="item-left">
-                                        <image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
-                                        <text class="item-label">{{ form.customerManagerLabel }}</text>
-                                    </view>
-                                    <view class="item-right-text highlight-text">
-                                        {{ form.customerManagerName || '(Chưa có)' }}
-                                    </view>
-                                </view>
-                            </view>
-            
+            <view class="info-group customer-block">
+                <view v-if="isLoadingCustomer" class="loading-row">
+                    <text class="loading-text">Đang tải thông tin từ CRM...</text>
+                </view>
+                
+                <view v-else-if="!form.customerCode" class="empty-row">
+                    <text>(Công việc này chưa gắn với khách hàng nào)</text>
+                </view>
+                
+                <view v-else>
+                    <view class="flat-item">
+                        <view class="item-left">
+                            <image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
+                            <text class="item-label">{{ form.customerNameLabel }}</text>
                         </view>
-            
-                        <view style="height: 50px;"></view>
-        </scroll-view>
-    </view>
+                        <view class="item-right-text">{{ form.customerName }}</view>
+                    </view>
+                    
+                    <view class="flat-item">
+                        <view class="item-left">
+                            <image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
+                            <text class="item-label">{{ form.customerPhoneLabel }}</text>
+                        </view>
+                        <view class="item-right-text phone-text">{{ form.customerPhone }}</view>
+                    </view>
+                    
+                    <view class="flat-item">
+                        <view class="item-left">
+                            <image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
+                            <text class="item-label">{{ form.customerManagerLabel }}</text>
+                        </view>
+                        <view class="item-right-text highlight-text">
+                            {{ form.customerManagerName || '(Chưa có)' }}
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <view class="section-title">Lịch sử tương tác</view>
+            <view class="history-container">
+                
+                <view v-if="isLoadingHistory" class="loading-row">
+                    <text class="loading-text">Đang tải lịch sử...</text>
+                </view>
+
+                <view v-else-if="historyList.length === 0" class="empty-row">
+                    <text>(Chưa có lịch sử tương tác nào)</text>
+                </view>
+
+                <view v-else class="timeline-list">
+                    <view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
+                        <view class="timeline-line" v-if="index !== historyList.length - 1"></view>
+                        
+                        <view class="timeline-dot"></view>
+
+                        <view class="timeline-content">
+                            <view class="timeline-header">
+                                <text class="t-actor">{{ item.actorName }}</text>
+                                <text class="t-time">{{ item.timeStr }}</text>
+                            </view>
+                            <text class="t-action">{{ item.content }}</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <view style="height: 50px;"></view>
+
+        </scroll-view> </view>
 </template>
 
 <script setup lang="ts">
@@ -126,6 +151,7 @@
 
     const { 
         isLoading,isLoadingCustomer, // Lấy thêm isLoading
+		isLoadingHistory, historyList,
         form, 
         statusOptions, sourceOptions, assigneeOptions,
         onStatusChange, onSourceChange, onAssigneeChange,
@@ -158,5 +184,75 @@
         .highlight-text { color: #ff9500; font-weight: bold; } /* Màu cam cho quản lý */
 		.loading-row, .empty-row { padding: 20px; text-align: center; color: #999; font-size: 14px; font-style: italic;}
     /* Thêm CSS cho Loading */
+	
+	.history-container {
+	        background-color: #fff;
+	        border-radius: 8px;
+	        padding: 20px 15px;
+	        margin-bottom: 20px;
+	        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+	    }
+	
+	    .timeline-list {
+	        position: relative;
+	    }
+	
+	    .timeline-item {
+	        display: flex;
+	        position: relative;
+	        padding-bottom: 25px; /* Khoảng cách giữa các item */
+	    }
+	    .timeline-item:last-child {
+	        padding-bottom: 0;
+	    }
+	
+	    .timeline-dot {
+	        width: 10px;
+	        height: 10px;
+	        background-color: #007aff; /* Màu xanh chủ đạo */
+	        border-radius: 50%;
+	        margin-top: 5px;
+	        z-index: 2;
+	        flex-shrink: 0;
+	    }
+	
+	    .timeline-line {
+	        position: absolute;
+	        left: 4px; /* Canh giữa dot (10px/2 - 1px) */
+	        top: 15px; /* Bắt đầu từ dưới dot */
+	        bottom: 0;
+	        width: 2px;
+	        background-color: #e5e5ea;
+	        z-index: 1;
+	    }
+	
+	    .timeline-content {
+	        margin-left: 15px;
+	        flex: 1;
+	    }
+	
+	    .timeline-header {
+	        display: flex;
+	        justify-content: space-between;
+	        margin-bottom: 4px;
+	    }
+	
+	    .t-actor {
+	        font-size: 15px;
+	        font-weight: bold;
+	        color: #333;
+	    }
+	
+	    .t-time {
+	        font-size: 12px;
+	        color: #999;
+	    }
+	
+	    .t-action {
+	        font-size: 14px;
+	        color: #555;
+	        line-height: 1.4;
+	    }
+		
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
 </style>
