@@ -500,6 +500,31 @@ to {
   min-height: 80px;
   background: #fff;
 }
+.item-right-text[data-v-9f96c8fe] {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  text-align: right;
+  flex: 1;
+}
+.phone-text[data-v-9f96c8fe] {
+  color: #007aff;
+}
+
+/* Màu xanh cho SĐT */
+.highlight-text[data-v-9f96c8fe] {
+  color: #ff9500;
+  font-weight: bold;
+}
+
+/* Màu cam cho quản lý */
+.loading-row[data-v-9f96c8fe], .empty-row[data-v-9f96c8fe] {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  font-style: italic;
+}
 
 /* Thêm CSS cho Loading */
 .loading-overlay[data-v-9f96c8fe] {

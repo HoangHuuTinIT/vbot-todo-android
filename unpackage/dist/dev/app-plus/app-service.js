@@ -2856,6 +2856,21 @@ This will fail in production if not fixed.`);
       });
     });
   };
+  const getCrmCustomerDetail = (crmToken, customerUid) => {
+    return request({
+      url: `${CRM_API_URL}/Customer/getDetail`,
+      method: "GET",
+      // Thường getDetail là GET, nếu server bắt POST thì đổi lại
+      data: {
+        uid: customerUid
+        // Param là uid như bạn mô tả
+      },
+      header: {
+        "Authorization": `Bearer ${crmToken}`
+        // Dùng token CRM vừa lấy được
+      }
+    });
+  };
   const useCreateTodoController = () => {
     const pad = (n) => n.toString().padStart(2, "0");
     const getTodayISO = () => {
@@ -4007,11 +4022,17 @@ This will fail in production if not fixed.`);
       assigneeId: apiData.assigneeId || "",
       dueDate: timestampToDateStr(apiData.dueDate),
       notifyDate: timestampToDateStr(notiTimestamp),
-      notifyTime: timestampToTimeStr(notiTimestamp)
+      notifyTime: timestampToTimeStr(notiTimestamp),
+      customerCode: apiData.customerCode || "",
+      customerName: "",
+      // Sẽ điền sau khi gọi API CRM
+      customerPhone: "",
+      customerManagerName: ""
     };
   };
   const useTodoDetailController = () => {
     const isLoading = vue.ref(false);
+    const isLoadingCustomer = vue.ref(false);
     const form = vue.ref({
       id: "",
       title: "",
@@ -4023,7 +4044,11 @@ This will fail in production if not fixed.`);
       assigneeId: "",
       dueDate: "",
       notifyDate: "",
-      notifyTime: ""
+      notifyTime: "",
+      customerCode: "",
+      customerName: "",
+      customerPhone: "",
+      customerManagerName: ""
     });
     const statusOptions = ["Chưa xử lý", "Đang xử lý", "Hoàn thành"];
     const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
@@ -4041,8 +4066,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:41", "Lỗi lấy members", e);
-        assigneeOptions.value = ["Không tải được danh sách"];
+        formatAppLog("error", "at controllers/todo_detail.ts:44", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4055,18 +4079,48 @@ This will fail in production if not fixed.`);
           form.value = mappedData;
           if (form.value.assigneeId && memberList.value.length > 0) {
             const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
-            if (index !== -1) {
+            if (index !== -1)
               form.value.assigneeIndex = index;
-            } else {
-              form.value.assigneeIndex = -1;
-            }
+          }
+          if (form.value.customerCode) {
+            await fetchCustomerInfo(form.value.customerCode);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:75", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:73", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
+      }
+    };
+    const fetchCustomerInfo = async (customerUid) => {
+      var _a;
+      isLoadingCustomer.value = true;
+      try {
+        const crmToken = await getCrmToken(PROJECT_CODE, UID);
+        const res = await getCrmCustomerDetail(crmToken, customerUid);
+        const fields = res.fields || ((_a = res.data) == null ? void 0 : _a.fields) || [];
+        const nameField = fields.find((f) => f.code === "name");
+        const phoneField = fields.find((f) => f.code === "phone");
+        const managerField = fields.find((f) => f.code === "member_no");
+        if (nameField) {
+          form.value.customerName = nameField.value;
+          form.value.customerNameLabel = nameField.name;
+        }
+        if (phoneField) {
+          form.value.customerPhone = phoneField.value;
+          form.value.customerPhoneLabel = phoneField.name;
+        }
+        if (managerField) {
+          form.value.customerManagerLabel = managerField.name;
+          const managerUid = managerField.value;
+          const manager = memberList.value.find((m) => m.memberUID === managerUid);
+          form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:123", "Lỗi CRM:", error);
+      } finally {
+        isLoadingCustomer.value = false;
       }
     };
     const onStatusChange = (e) => {
@@ -4086,16 +4140,17 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:100", "Lưu:", form.value);
-      uni.showToast({ title: "Đã lưu (Demo)", icon: "success" });
+      formatAppLog("log", "at controllers/todo_detail.ts:141", "Lưu:", form.value);
+      uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
       isLoading,
+      isLoadingCustomer,
+      // Trả về thêm biến này
       form,
       statusOptions,
       sourceOptions,
       assigneeOptions,
-      // [MỚI] Trả về options động
       onStatusChange,
       onSourceChange,
       onAssigneeChange,
@@ -4109,6 +4164,7 @@ This will fail in production if not fixed.`);
       __expose();
       const {
         isLoading,
+        isLoadingCustomer,
         // Lấy thêm isLoading
         form,
         statusOptions,
@@ -4119,7 +4175,7 @@ This will fail in production if not fixed.`);
         onAssigneeChange,
         saveTodo
       } = useTodoDetailController();
-      const __returned__ = { isLoading, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4257,7 +4313,84 @@ This will fail in production if not fixed.`);
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin khách hàng"),
         vue.createElementVNode("view", { class: "info-group customer-block" }, [
-          vue.createElementVNode("text", { style: { "color": "#999", "font-size": "14px", "padding": "15px", "display": "block" } }, " (Chưa có thông tin - API chưa hỗ trợ) ")
+          $setup.isLoadingCustomer ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "loading-row"
+          }, [
+            vue.createElementVNode("text", { class: "loading-text" }, "Đang tải thông tin từ CRM...")
+          ])) : !$setup.form.customerCode ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "empty-row"
+          }, [
+            vue.createElementVNode("text", null, "(Công việc này chưa gắn với khách hàng nào)")
+          ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
+            vue.createElementVNode("view", { class: "flat-item" }, [
+              vue.createElementVNode("view", { class: "item-left" }, [
+                vue.createElementVNode("image", {
+                  src: "https://img.icons8.com/ios/50/666666/user-male-circle.png",
+                  class: "item-icon"
+                }),
+                vue.createElementVNode(
+                  "text",
+                  { class: "item-label" },
+                  vue.toDisplayString($setup.form.customerNameLabel),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode(
+                "view",
+                { class: "item-right-text" },
+                vue.toDisplayString($setup.form.customerName),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "flat-item" }, [
+              vue.createElementVNode("view", { class: "item-left" }, [
+                vue.createElementVNode("image", {
+                  src: "https://img.icons8.com/ios/50/666666/phone.png",
+                  class: "item-icon"
+                }),
+                vue.createElementVNode(
+                  "text",
+                  { class: "item-label" },
+                  vue.toDisplayString($setup.form.customerPhoneLabel),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode(
+                "view",
+                { class: "item-right-text phone-text" },
+                vue.toDisplayString($setup.form.customerPhone),
+                1
+                /* TEXT */
+              )
+            ]),
+            vue.createElementVNode("view", { class: "flat-item" }, [
+              vue.createElementVNode("view", { class: "item-left" }, [
+                vue.createElementVNode("image", {
+                  src: "https://img.icons8.com/ios/50/666666/manager.png",
+                  class: "item-icon"
+                }),
+                vue.createElementVNode(
+                  "text",
+                  { class: "item-label" },
+                  vue.toDisplayString($setup.form.customerManagerLabel),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode(
+                "view",
+                { class: "item-right-text highlight-text" },
+                vue.toDisplayString($setup.form.customerManagerName || "(Chưa có)"),
+                1
+                /* TEXT */
+              )
+            ])
+          ]))
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })
       ])

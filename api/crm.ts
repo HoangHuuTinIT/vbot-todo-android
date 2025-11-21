@@ -75,3 +75,16 @@ export const getCrmCustomers = (crmToken: string, body: any): Promise<any[]> => 
         });
     });
 };
+
+export const getCrmCustomerDetail = (crmToken: string, customerUid: string): Promise<any> => {
+    return request({
+        url: `${CRM_API_URL}/Customer/getDetail`,
+        method: 'GET', // Thường getDetail là GET, nếu server bắt POST thì đổi lại
+        data: {
+            uid: customerUid // Param là uid như bạn mô tả
+        },
+        header: {
+            'Authorization': `Bearer ${crmToken}` // Dùng token CRM vừa lấy được
+        }
+    });
+};

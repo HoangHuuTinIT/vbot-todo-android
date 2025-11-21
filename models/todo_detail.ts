@@ -15,6 +15,13 @@ export interface TodoDetailForm {
     dueDate: string;     // YYYY-MM-DD
     notifyDate: string;  // YYYY-MM-DD
     notifyTime: string;  // HH:mm
+	customerCode: string;       // Lưu lại để gọi API
+	customerName: string;
+	customerNameLabel: string
+	customerPhone: string;
+	customerPhoneLabel: string;
+	customerManagerName: string;
+	customerManagerLabel: string;
 }
 
 // --- HELPER: Xử lý ngày tháng nội bộ cho file này ---
@@ -72,6 +79,10 @@ export const mapTodoDetailToForm = (apiData: any): TodoDetailForm | null => {
 		assigneeId: apiData.assigneeId || '',
         dueDate: timestampToDateStr(apiData.dueDate),
         notifyDate: timestampToDateStr(notiTimestamp),
-        notifyTime: timestampToTimeStr(notiTimestamp)
+        notifyTime: timestampToTimeStr(notiTimestamp),
+		customerCode: apiData.customerCode || '', 
+		customerName: '', // Sẽ điền sau khi gọi API CRM
+		customerPhone: '',
+		customerManagerName: ''
     };
 };

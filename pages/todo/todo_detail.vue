@@ -73,13 +73,47 @@
             </view>
 
             <view class="section-title">Thông tin khách hàng</view>
-            <view class="info-group customer-block">
-                <text style="color: #999; font-size: 14px; padding: 15px; display: block;">
-                    (Chưa có thông tin - API chưa hỗ trợ)
-                </text>
-            </view>
-
-            <view style="height: 50px;"></view>
+                        <view class="info-group customer-block">
+                            
+                            <view v-if="isLoadingCustomer" class="loading-row">
+                                <text class="loading-text">Đang tải thông tin từ CRM...</text>
+                            </view>
+            
+                            <view v-else-if="!form.customerCode" class="empty-row">
+                                <text>(Công việc này chưa gắn với khách hàng nào)</text>
+                            </view>
+            
+                            <view v-else>
+                                <view class="flat-item">
+                                    <view class="item-left">
+                                        <image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
+                                        <text class="item-label">{{ form.customerNameLabel }}</text>
+                                    </view>
+                                    <view class="item-right-text">{{ form.customerName }}</view>
+                                </view>
+            
+                                <view class="flat-item">
+                                    <view class="item-left">
+                                        <image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
+                                        <text class="item-label">{{ form.customerPhoneLabel }}</text>
+                                    </view>
+                                    <view class="item-right-text phone-text">{{ form.customerPhone }}</view>
+                                </view>
+            
+                                <view class="flat-item">
+                                    <view class="item-left">
+                                        <image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
+                                        <text class="item-label">{{ form.customerManagerLabel }}</text>
+                                    </view>
+                                    <view class="item-right-text highlight-text">
+                                        {{ form.customerManagerName || '(Chưa có)' }}
+                                    </view>
+                                </view>
+                            </view>
+            
+                        </view>
+            
+                        <view style="height: 50px;"></view>
         </scroll-view>
     </view>
 </template>
@@ -91,7 +125,7 @@
     import TodoDatePicker from '@/components/Todo/TodoDatePicker.vue';
 
     const { 
-        isLoading, // Lấy thêm isLoading
+        isLoading,isLoadingCustomer, // Lấy thêm isLoading
         form, 
         statusOptions, sourceOptions, assigneeOptions,
         onStatusChange, onSourceChange, onAssigneeChange,
@@ -119,7 +153,10 @@
     .item-picker-box { flex: 1; text-align: right; }
     .picker-text { font-size: 15px; color: #007aff; font-weight: 500; }
     .customer-block { min-height: 80px; background: #fff; }
-    
+    .item-right-text { font-size: 15px; color: #333; font-weight: 500; text-align: right; flex: 1; }
+        .phone-text { color: #007aff; } /* Màu xanh cho SĐT */
+        .highlight-text { color: #ff9500; font-weight: bold; } /* Màu cam cho quản lý */
+		.loading-row, .empty-row { padding: 20px; text-align: center; color: #999; font-size: 14px; font-style: italic;}
     /* Thêm CSS cho Loading */
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
 </style>
