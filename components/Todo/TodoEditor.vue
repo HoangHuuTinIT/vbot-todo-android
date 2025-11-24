@@ -71,9 +71,9 @@
         </view>
         
         <editor 
-                    id="editor" 
+                    :id="editorId" 
                     class="ql-container" 
-                    placeholder="Nhập mô tả..." 
+                    :placeholder="placeholder || 'Nhập nội dung...'" 
                     :show-img-size="true" 
                     :show-img-toolbar="true" 
                     :show-img-resize="true"
@@ -142,7 +142,7 @@ interface EditorProps {
 
 const props = defineProps<EditorProps>();
 const emit = defineEmits(['update:modelValue']);
-
+const editorId = ref(`editor-${Math.random().toString(36).substring(2, 9)}`);
 // State riêng của Editor
 const editorCtx = ref(null);
 const formats = ref({});
@@ -181,11 +181,18 @@ const selectAlign = (alignType) => {
 // --- METHODS ---
 
 const onEditorReady = () => {
-    // Lưu ý: Trong component phải dùng instance.proxy hoặc gọi 'in(this)'
-    uni.createSelectorQuery().in(instance.proxy).select('#editor').context((res) => {
-        editorCtx.value = res.context;
-        if (props.modelValue) {
-            editorCtx.value.setContents({ html: props.modelValue });
+    // [SỬA 3]: Select theo ID động thay vì cứng '#editor'
+    const queryId = `#${editorId.value}`;
+    
+    uni.createSelectorQuery().in(instance.proxy).select(queryId).context((res) => {
+        // Kiểm tra kỹ context trả về
+        if (res && res.context) {
+            editorCtx.value = res.context;
+            if (props.modelValue) {
+                editorCtx.value.setContents({ html: props.modelValue });
+            }
+        } else {
+            console.error(`Không tìm thấy Editor Context cho ID: ${queryId}`);
         }
     }).exec();
 };

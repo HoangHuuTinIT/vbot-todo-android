@@ -1,7 +1,7 @@
 // src/controllers/todo_detail.ts
-import { ref } from 'vue';
+import { ref , nextTick } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage} from '@/api/todo';
+import { getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage , getTodoMessageDetail, updateTodoMessage,} from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import {  getCrmCustomerDetail , getCrmActionTimeline} from '@/api/crm'; // Import API CRM
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
@@ -48,6 +48,15 @@ export const useTodoDetailController = () => {
 	
 	const isConfirmDeleteCommentOpen = ref(false);
 	const commentToDeleteId = ref<number | null>(null);
+	
+	const isEditingComment = ref(false); // Đang ở chế độ sửa hay không
+	    const isConfirmCancelEditOpen = ref(false); // Modal xác nhận hủy sửa
+	    // Lưu tạm thông tin bình luận đang sửa để lát gửi lại API update
+	    const editingCommentData = ref<{
+	        id: number;
+	        todoId: number;
+	        senderId: string;
+	    } | null>(null);
        const historyFilterIndex = ref(0); // Vị trí đang chọn (0 là Tất cả)
            
            // 1. Danh sách hiển thị (UI)
@@ -83,6 +92,121 @@ export const useTodoDetailController = () => {
     const memberList = ref<any[]>([]); 
     const assigneeOptions = ref<string[]>([]);
 	
+	const onRequestEditComment = async (commentId: number) => {
+	        const todoId = form.value.id; 
+	        if (!todoId) return;
+	
+	        uni.showLoading({ title: 'Đang tải...' });
+	        
+	        try {
+	            // Gọi API lấy chi tiết
+	            const res = await getTodoMessageDetail(commentId, todoId);
+	            
+	            console.log("API Response Detail:", res); // In ra để kiểm tra cấu trúc thực tế
+	
+	            if (res) {
+	                // [QUAN TRỌNG] Xử lý lấy dữ liệu đúng cấp độ
+	                // Kiểm tra xem dữ liệu nằm trực tiếp ở res hay nằm trong res.data
+	                // Dựa theo JSON bạn gửi thì dữ liệu nằm trong 'data'
+	                const dataDetail = res.data || res; 
+	
+	                editingCommentData.value = {
+	                    id: dataDetail.id,
+	                    todoId: dataDetail.todoId,
+	                    senderId: dataDetail.senderId
+	                };
+	
+	                // Lấy message từ dataDetail (chứ không phải từ res cấp ngoài cùng)
+	                const content = dataDetail.message || '';
+	                
+	                console.log("Nội dung edit:", content);
+	
+	                // 1. Bật chế độ Edit để giao diện đổi sang input
+	                isEditingComment.value = true;
+	
+	                // 2. Đợi Vue cập nhật DOM xong mới gán giá trị vào Editor
+	                await nextTick();
+	                
+	                // 3. Gán giá trị
+	                newCommentText.value = content;
+	            }
+	        } catch (error) {
+	            console.error("Lỗi lấy chi tiết bình luận:", error);
+	            uni.showToast({ title: 'Lỗi tải dữ liệu', icon: 'none' });
+	        } finally {
+	            uni.hideLoading();
+	        }
+	    };
+		
+	const submitUpdateComment = async () => {
+	        if (!editingCommentData.value) return;
+	        if (!newCommentText.value || !newCommentText.value.trim()) {
+	            uni.showToast({ title: 'Nội dung không được để trống', icon: 'none' });
+	            return;
+	        }
+	
+	        isSubmittingComment.value = true;
+	
+	        try {
+	            // Chuẩn bị payload theo yêu cầu
+	            const payload = {
+	                id: editingCommentData.value.id,
+	                todoId: editingCommentData.value.todoId,
+	                senderId: editingCommentData.value.senderId,
+	                message: newCommentText.value,
+	                files: "" // Tạm để trống
+	            };
+	
+	            console.log("Payload Update:", payload);
+	
+	            // Gọi API Update
+	            await updateTodoMessage(payload);
+	
+	            uni.showToast({ title: 'Đã cập nhật', icon: 'success' });
+	
+	            // Reset trạng thái về ban đầu
+	            resetEditState();
+	            
+	            // Load lại danh sách
+	            await fetchComments(form.value.id);
+	
+	        } catch (error) {
+	            console.error("Lỗi cập nhật:", error);
+	            uni.showToast({ title: 'Cập nhật thất bại', icon: 'none' });
+	        } finally {
+	            isSubmittingComment.value = false;
+	        }
+	    };
+	
+	    // 3. Nhấn "Hủy" -> Hiện Modal xác nhận
+	    const onCancelEditComment = () => {
+	        isConfirmCancelEditOpen.value = true;
+	    };
+	
+	    // 4. Trong Modal hủy: Nhấn "Tiếp tục chỉnh sửa"
+	    const continueEditing = () => {
+	        isConfirmCancelEditOpen.value = false;
+	    };
+	
+	    // 5. Trong Modal hủy: Nhấn "Có, hủy bỏ"
+	    const confirmCancelEdit = async () => {
+	        isConfirmCancelEditOpen.value = false;
+	        
+	        // Reset trạng thái
+	        resetEditState();
+	
+	        // Gọi lại API list theo yêu cầu
+	        if (form.value.id) {
+	             await fetchComments(form.value.id);
+	        }
+	    };
+	
+	    // Hàm phụ: Reset state edit
+	    const resetEditState = () => {
+	        isEditingComment.value = false;
+	        editingCommentData.value = null;
+	        newCommentText.value = ''; // Xóa ô nhập
+	    };
 	const onRequestDeleteComment = (commentId: number) => {
 	        commentToDeleteId.value = commentId;
 	        isConfirmDeleteCommentOpen.value = true;
@@ -426,5 +550,13 @@ const fetchHistoryLog = async (customerUid: string) => {
 		confirmDeleteComment,
 		cancelDeleteComment,
 		currentUserId,
+		
+		isEditingComment,
+		onRequestEditComment,
+		submitUpdateComment,
+		onCancelEditComment,
+		isConfirmCancelEditOpen,
+		continueEditing,
+		confirmCancelEdit,
     };
 };

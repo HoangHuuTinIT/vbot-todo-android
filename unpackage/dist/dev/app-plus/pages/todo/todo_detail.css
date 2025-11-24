@@ -881,6 +881,42 @@ to {
   color: #ff3b30;
   font-weight: bold;
 }
+.edit-actions-row[data-v-9f96c8fe] {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.btn-cancel-edit[data-v-9f96c8fe] {
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 0 15px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 16px;
+  border: 1px solid #ddd;
+}
+.action-buttons-container[data-v-9f96c8fe] {
+  display: flex;
+  gap: 15px;
+  /* Khoảng cách giữa bút và thùng rác */
+}
+.btn-icon-action[data-v-9f96c8fe] {
+  padding: 4px;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icon-action[data-v-9f96c8fe]:active {
+  opacity: 1;
+}
+.icon-action[data-v-9f96c8fe] {
+  width: 18px;
+  /* Kích thước icon */
+  height: 18px;
+}
 .loading-overlay[data-v-9f96c8fe] {
   position: fixed;
   top: 0;

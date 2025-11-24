@@ -2086,6 +2086,23 @@ This will fail in production if not fixed.`);
       data: { id }
     });
   };
+  const getTodoMessageDetail = (id, todoId) => {
+    return request({
+      url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getDetail`,
+      method: "GET",
+      data: {
+        id,
+        todoId
+      }
+    });
+  };
+  const updateTodoMessage = (data) => {
+    return request({
+      url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/update`,
+      method: "POST",
+      data
+    });
+  };
   const useListTodoController = () => {
     const todos = vue.ref([]);
     const isLoading = vue.ref(false);
@@ -3099,6 +3116,7 @@ This will fail in production if not fixed.`);
       __expose();
       const props = __props;
       const emit = __emit;
+      const editorId = vue.ref(`editor-${Math.random().toString(36).substring(2, 9)}`);
       const editorCtx = vue.ref(null);
       const formats = vue.ref({});
       const instance = vue.getCurrentInstance();
@@ -3124,10 +3142,15 @@ This will fail in production if not fixed.`);
         showAlignPopup.value = false;
       };
       const onEditorReady = () => {
-        uni.createSelectorQuery().in(instance.proxy).select("#editor").context((res) => {
-          editorCtx.value = res.context;
-          if (props.modelValue) {
-            editorCtx.value.setContents({ html: props.modelValue });
+        const queryId = `#${editorId.value}`;
+        uni.createSelectorQuery().in(instance.proxy).select(queryId).context((res) => {
+          if (res && res.context) {
+            editorCtx.value = res.context;
+            if (props.modelValue) {
+              editorCtx.value.setContents({ html: props.modelValue });
+            }
+          } else {
+            formatAppLog("error", "at components/Todo/TodoEditor.vue:195", `Không tìm thấy Editor Context cho ID: ${queryId}`);
           }
         }).exec();
       };
@@ -3249,7 +3272,7 @@ This will fail in production if not fixed.`);
       const insertVideo = () => {
         uni.chooseVideo({ count: 1, success: (r) => editorCtx.value.insertVideo({ src: r.tempFilePath, width: "80%" }) });
       };
-      const __returned__ = { props, emit, editorCtx, formats, instance, isTyping, showLinkPopup, linkUrl, linkText, canInsertLink, isLinkSelected, focusLinkInput, showColorPopup, colorType, currentColor, currentBgColor, currentHeader, colorList, headerOptions, alignIcon, showAlignPopup, isPopupOpen, selectAlign, onEditorReady, lastEmittedValue, onEditorInput, onStatusChange, format, handleLinkBtn, closeLinkPopup, confirmLink, removeLink, onHeaderChange, toggleAlign, openColorPicker, closeColorPopup, selectColor, insertImage, insertVideo };
+      const __returned__ = { props, emit, editorId, editorCtx, formats, instance, isTyping, showLinkPopup, linkUrl, linkText, canInsertLink, isLinkSelected, focusLinkInput, showColorPopup, colorType, currentColor, currentBgColor, currentHeader, colorList, headerOptions, alignIcon, showAlignPopup, isPopupOpen, selectAlign, onEditorReady, lastEmittedValue, onEditorInput, onStatusChange, format, handleLinkBtn, closeLinkPopup, confirmLink, removeLink, onHeaderChange, toggleAlign, openColorPicker, closeColorPopup, selectColor, insertImage, insertVideo };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3460,23 +3483,17 @@ This will fail in production if not fixed.`);
           nodes: $props.modelValue || "<p style='color:#999'>Nhập mô tả...</p>"
         }, null, 8, ["nodes"])
       ])) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode(
-        "editor",
-        {
-          id: "editor",
-          class: "ql-container",
-          placeholder: "Nhập mô tả...",
-          "show-img-size": true,
-          "show-img-toolbar": true,
-          "show-img-resize": true,
-          onReady: $setup.onEditorReady,
-          onInput: $setup.onEditorInput,
-          onStatuschange: $setup.onStatusChange
-        },
-        null,
-        32
-        /* NEED_HYDRATION */
-      ),
+      vue.createElementVNode("editor", {
+        id: $setup.editorId,
+        class: "ql-container",
+        placeholder: $props.placeholder || "Nhập nội dung...",
+        "show-img-size": true,
+        "show-img-toolbar": true,
+        "show-img-resize": true,
+        onReady: $setup.onEditorReady,
+        onInput: $setup.onEditorInput,
+        onStatuschange: $setup.onStatusChange
+      }, null, 40, ["id", "placeholder"]),
       $setup.showColorPopup ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "color-popup-overlay",
@@ -4115,6 +4132,9 @@ This will fail in production if not fixed.`);
     const isSubmittingComment = vue.ref(false);
     const isConfirmDeleteCommentOpen = vue.ref(false);
     const commentToDeleteId = vue.ref(null);
+    const isEditingComment = vue.ref(false);
+    const isConfirmCancelEditOpen = vue.ref(false);
+    const editingCommentData = vue.ref(null);
     const historyFilterIndex = vue.ref(0);
     const historyFilterOptions = [
       "Tất cả",
@@ -4163,6 +4183,81 @@ This will fail in production if not fixed.`);
     const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
     const memberList = vue.ref([]);
     const assigneeOptions = vue.ref([]);
+    const onRequestEditComment = async (commentId) => {
+      const todoId = form.value.id;
+      if (!todoId)
+        return;
+      uni.showLoading({ title: "Đang tải..." });
+      try {
+        const res = await getTodoMessageDetail(commentId, todoId);
+        formatAppLog("log", "at controllers/todo_detail.ts:105", "API Response Detail:", res);
+        if (res) {
+          const dataDetail = res.data || res;
+          editingCommentData.value = {
+            id: dataDetail.id,
+            todoId: dataDetail.todoId,
+            senderId: dataDetail.senderId
+          };
+          const content = dataDetail.message || "";
+          formatAppLog("log", "at controllers/todo_detail.ts:122", "Nội dung edit:", content);
+          isEditingComment.value = true;
+          await vue.nextTick();
+          newCommentText.value = content;
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:134", "Lỗi lấy chi tiết bình luận:", error);
+        uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
+      } finally {
+        uni.hideLoading();
+      }
+    };
+    const submitUpdateComment = async () => {
+      if (!editingCommentData.value)
+        return;
+      if (!newCommentText.value || !newCommentText.value.trim()) {
+        uni.showToast({ title: "Nội dung không được để trống", icon: "none" });
+        return;
+      }
+      isSubmittingComment.value = true;
+      try {
+        const payload = {
+          id: editingCommentData.value.id,
+          todoId: editingCommentData.value.todoId,
+          senderId: editingCommentData.value.senderId,
+          message: newCommentText.value,
+          files: ""
+          // Tạm để trống
+        };
+        formatAppLog("log", "at controllers/todo_detail.ts:160", "Payload Update:", payload);
+        await updateTodoMessage(payload);
+        uni.showToast({ title: "Đã cập nhật", icon: "success" });
+        resetEditState();
+        await fetchComments(form.value.id);
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:174", "Lỗi cập nhật:", error);
+        uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
+      } finally {
+        isSubmittingComment.value = false;
+      }
+    };
+    const onCancelEditComment = () => {
+      isConfirmCancelEditOpen.value = true;
+    };
+    const continueEditing = () => {
+      isConfirmCancelEditOpen.value = false;
+    };
+    const confirmCancelEdit = async () => {
+      isConfirmCancelEditOpen.value = false;
+      resetEditState();
+      if (form.value.id) {
+        await fetchComments(form.value.id);
+      }
+    };
+    const resetEditState = () => {
+      isEditingComment.value = false;
+      editingCommentData.value = null;
+      newCommentText.value = "";
+    };
     const onRequestDeleteComment = (commentId) => {
       commentToDeleteId.value = commentId;
       isConfirmDeleteCommentOpen.value = true;
@@ -4178,7 +4273,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:105", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:229", "Lỗi xóa bình luận:", error);
         uni.showToast({ title: "Xóa thất bại", icon: "none" });
       } finally {
         commentToDeleteId.value = null;
@@ -4207,7 +4302,7 @@ This will fail in production if not fixed.`);
           parentId: -1
           // Mặc định là comment cha
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:143", "Đang gửi bình luận:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:267", "Đang gửi bình luận:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
           uni.showToast({ title: "Đã gửi bình luận", icon: "success" });
@@ -4215,7 +4310,7 @@ This will fail in production if not fixed.`);
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:161", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:285", "Lỗi gửi bình luận:", error);
         uni.showToast({ title: "Gửi thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4233,7 +4328,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:184", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:308", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4256,7 +4351,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:214", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:338", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -4308,7 +4403,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:276", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:400", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -4340,7 +4435,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:325", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:449", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4351,7 +4446,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:337", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:461", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4380,7 +4475,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:380", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:504", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -4408,7 +4503,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:406", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:530", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
@@ -4438,7 +4533,14 @@ This will fail in production if not fixed.`);
       onRequestDeleteComment,
       confirmDeleteComment,
       cancelDeleteComment,
-      currentUserId
+      currentUserId,
+      isEditingComment,
+      onRequestEditComment,
+      submitUpdateComment,
+      onCancelEditComment,
+      isConfirmCancelEditOpen,
+      continueEditing,
+      confirmCancelEdit
     };
   };
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
@@ -4471,9 +4573,16 @@ This will fail in production if not fixed.`);
         onRequestDeleteComment,
         confirmDeleteComment,
         cancelDeleteComment,
-        currentUserId
+        currentUserId,
+        isEditingComment,
+        onRequestEditComment,
+        submitUpdateComment,
+        onCancelEditComment,
+        isConfirmCancelEditOpen,
+        continueEditing,
+        confirmCancelEdit
       } = useTodoDetailController();
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4535,15 +4644,30 @@ This will fail in production if not fixed.`);
               vue.createVNode($setup["TodoEditor"], {
                 modelValue: $setup.newCommentText,
                 "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.newCommentText = $event),
-                placeholder: "Viết bình luận"
-              }, null, 8, ["modelValue"])
+                placeholder: $setup.isEditingComment ? "Đang chỉnh sửa bình luận..." : "Viết bình luận"
+              }, null, 8, ["modelValue", "placeholder"])
             ]),
             vue.createElementVNode("view", { class: "input-actions" }, [
-              vue.createElementVNode("button", {
+              !$setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("button", {
+                key: 0,
                 class: "btn-save-comment",
                 disabled: $setup.isSubmittingComment,
                 onClick: _cache[4] || (_cache[4] = (...args) => $setup.submitComment && $setup.submitComment(...args))
-              }, vue.toDisplayString($setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])
+              }, vue.toDisplayString($setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])) : (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "edit-actions-row"
+              }, [
+                vue.createElementVNode("button", {
+                  class: "btn-cancel-edit",
+                  disabled: $setup.isSubmittingComment,
+                  onClick: _cache[5] || (_cache[5] = (...args) => $setup.onCancelEditComment && $setup.onCancelEditComment(...args))
+                }, " Hủy ", 8, ["disabled"]),
+                vue.createElementVNode("button", {
+                  class: "btn-save-comment",
+                  disabled: $setup.isSubmittingComment,
+                  onClick: _cache[6] || (_cache[6] = (...args) => $setup.submitUpdateComment && $setup.submitUpdateComment(...args))
+                }, vue.toDisplayString($setup.isSubmittingComment ? "Đang cập nhật..." : "Cập nhật bình luận"), 9, ["disabled"])
+              ]))
             ])
           ]),
           vue.createElementVNode("view", { class: "divider-line" }),
@@ -4611,7 +4735,10 @@ This will fail in production if not fixed.`);
                       ]),
                       vue.createElementVNode("view", { class: "c-footer-actions" }, [
                         vue.createElementVNode("view", { class: "reaction-row" }, [
-                          item.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+                          item.reactions && item.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                            key: 0,
+                            style: { "display": "flex", "gap": "5px" }
+                          }, [
                             (vue.openBlock(true), vue.createElementBlock(
                               vue.Fragment,
                               null,
@@ -4634,14 +4761,27 @@ This will fail in production if not fixed.`);
                         ]),
                         item.id && String(item.senderId) === String($setup.currentUserId) ? (vue.openBlock(), vue.createElementBlock("view", {
                           key: 0,
-                          class: "btn-delete",
-                          onClick: ($event) => $setup.onRequestDeleteComment(item.id)
+                          class: "action-buttons-container"
                         }, [
-                          vue.createElementVNode("image", {
-                            src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
-                            class: "icon-trash"
-                          })
-                        ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true)
+                          vue.createElementVNode("view", {
+                            class: "btn-icon-action",
+                            onClick: ($event) => $setup.onRequestEditComment(item.id)
+                          }, [
+                            vue.createElementVNode("image", {
+                              src: "https://img.icons8.com/ios/50/999999/create-new.png",
+                              class: "icon-action"
+                            })
+                          ], 8, ["onClick"]),
+                          vue.createElementVNode("view", {
+                            class: "btn-icon-action",
+                            onClick: ($event) => $setup.onRequestDeleteComment(item.id)
+                          }, [
+                            vue.createElementVNode("image", {
+                              src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
+                              class: "icon-action"
+                            })
+                          ], 8, ["onClick"])
+                        ])) : vue.createCommentVNode("v-if", true)
                       ])
                     ])
                   ]),
@@ -4694,7 +4834,10 @@ This will fail in production if not fixed.`);
                             ]),
                             vue.createElementVNode("view", { class: "c-footer-actions" }, [
                               vue.createElementVNode("view", { class: "reaction-row" }, [
-                                child.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+                                child.reactions && child.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                                  key: 0,
+                                  style: { "display": "flex", "gap": "5px" }
+                                }, [
                                   (vue.openBlock(true), vue.createElementBlock(
                                     vue.Fragment,
                                     null,
@@ -4717,14 +4860,27 @@ This will fail in production if not fixed.`);
                               ]),
                               child.id && String(child.senderId) === String($setup.currentUserId) ? (vue.openBlock(), vue.createElementBlock("view", {
                                 key: 0,
-                                class: "btn-delete",
-                                onClick: ($event) => $setup.onRequestDeleteComment(child.id)
+                                class: "action-buttons-container"
                               }, [
-                                vue.createElementVNode("image", {
-                                  src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
-                                  class: "icon-trash"
-                                })
-                              ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true)
+                                vue.createElementVNode("view", {
+                                  class: "btn-icon-action",
+                                  onClick: ($event) => $setup.onRequestEditComment(child.id)
+                                }, [
+                                  vue.createElementVNode("image", {
+                                    src: "https://img.icons8.com/ios/50/999999/create-new.png",
+                                    class: "icon-action"
+                                  })
+                                ], 8, ["onClick"]),
+                                vue.createElementVNode("view", {
+                                  class: "btn-icon-action",
+                                  onClick: ($event) => $setup.onRequestDeleteComment(child.id)
+                                }, [
+                                  vue.createElementVNode("image", {
+                                    src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
+                                    class: "icon-action"
+                                  })
+                                ], 8, ["onClick"])
+                              ])) : vue.createCommentVNode("v-if", true)
                             ])
                           ])
                         ]);
@@ -4740,6 +4896,56 @@ This will fail in production if not fixed.`);
             ))
           ]))
         ]),
+        $setup.isConfirmCancelEditOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 0,
+          class: "modal-overlay",
+          onClick: _cache[9] || (_cache[9] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("view", { class: "modal-container" }, [
+            vue.createElementVNode("view", { class: "modal-header" }, [
+              vue.createElementVNode("text", { class: "modal-title" }, "Xác nhận hủy")
+            ]),
+            vue.createElementVNode("view", { class: "modal-body" }, [
+              vue.createElementVNode("text", null, "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.")
+            ]),
+            vue.createElementVNode("view", { class: "modal-footer" }, [
+              vue.createElementVNode("button", {
+                class: "modal-btn cancel",
+                onClick: _cache[7] || (_cache[7] = (...args) => $setup.continueEditing && $setup.continueEditing(...args))
+              }, "Tiếp tục chỉnh sửa"),
+              vue.createElementVNode("button", {
+                class: "modal-btn confirm",
+                onClick: _cache[8] || (_cache[8] = (...args) => $setup.confirmCancelEdit && $setup.confirmCancelEdit(...args))
+              }, "Có, hủy bỏ")
+            ])
+          ])
+        ])) : vue.createCommentVNode("v-if", true),
+        $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 1,
+          class: "modal-overlay",
+          onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("view", { class: "modal-container" }, [
+            vue.createElementVNode("view", { class: "modal-header" }, [
+              vue.createElementVNode("text", { class: "modal-title" }, "Xác nhận xóa")
+            ]),
+            vue.createElementVNode("view", { class: "modal-body" }, [
+              vue.createElementVNode("text", null, "Bạn có chắc muốn xóa bình luận này không?")
+            ]),
+            vue.createElementVNode("view", { class: "modal-footer" }, [
+              vue.createElementVNode("button", {
+                class: "modal-btn cancel",
+                onClick: _cache[10] || (_cache[10] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
+              }, "Hủy"),
+              vue.createElementVNode("button", {
+                class: "modal-btn confirm",
+                onClick: _cache[11] || (_cache[11] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
+              }, "Xác nhận")
+            ])
+          ])
+        ])) : vue.createCommentVNode("v-if", true),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin công việc"),
         vue.createElementVNode("view", { class: "info-group" }, [
           vue.createElementVNode("view", { class: "flat-item" }, [
@@ -4754,7 +4960,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.statusOptions,
               value: $setup.form.statusIndex,
-              onChange: _cache[5] || (_cache[5] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
+              onChange: _cache[13] || (_cache[13] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4778,7 +4984,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.sourceOptions,
               value: $setup.form.sourceIndex,
-              onChange: _cache[6] || (_cache[6] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
+              onChange: _cache[14] || (_cache[14] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4802,7 +5008,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.assigneeOptions,
               value: $setup.form.assigneeIndex,
-              onChange: _cache[7] || (_cache[7] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
+              onChange: _cache[15] || (_cache[15] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4816,11 +5022,11 @@ This will fail in production if not fixed.`);
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[8] || (_cache[8] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[16] || (_cache[16] = ($event) => $setup.form.dueDate = $event),
             notifyDate: $setup.form.notifyDate,
-            "onUpdate:notifyDate": _cache[9] || (_cache[9] = ($event) => $setup.form.notifyDate = $event),
+            "onUpdate:notifyDate": _cache[17] || (_cache[17] = ($event) => $setup.form.notifyDate = $event),
             notifyTime: $setup.form.notifyTime,
-            "onUpdate:notifyTime": _cache[10] || (_cache[10] = ($event) => $setup.form.notifyTime = $event)
+            "onUpdate:notifyTime": _cache[18] || (_cache[18] = ($event) => $setup.form.notifyTime = $event)
           }, null, 8, ["dueDate", "notifyDate", "notifyTime"])
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin khách hàng"),
@@ -4910,7 +5116,7 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onChange: _cache[11] || (_cache[11] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[19] || (_cache[19] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -4986,7 +5192,7 @@ This will fail in production if not fixed.`);
       $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[14] || (_cache[14] = vue.withModifiers(() => {
+        onClick: _cache[22] || (_cache[22] = vue.withModifiers(() => {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-container" }, [
@@ -4999,11 +5205,11 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "modal-footer" }, [
             vue.createElementVNode("button", {
               class: "modal-btn cancel",
-              onClick: _cache[12] || (_cache[12] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
+              onClick: _cache[20] || (_cache[20] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
             }, "Hủy"),
             vue.createElementVNode("button", {
               class: "modal-btn confirm",
-              onClick: _cache[13] || (_cache[13] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
+              onClick: _cache[21] || (_cache[21] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
             }, "Xác nhận")
           ])
         ])

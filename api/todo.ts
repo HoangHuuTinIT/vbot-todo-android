@@ -103,3 +103,22 @@ export const deleteTodoMessage = (id: number | string): Promise<any> => {
         data: { id: id }
     });
 };
+
+export const getTodoMessageDetail = (id: number | string, todoId: number | string): Promise<any> => {
+    return request({
+        url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getDetail`,
+        method: 'GET',
+        data: {
+            id: id,
+            todoId: todoId
+        }
+    });
+};
+
+export const updateTodoMessage = (data: any): Promise<any> => {
+    return request({
+        url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/update`,
+        method: 'POST',
+        data: data
+    });
+};
