@@ -2061,6 +2061,17 @@ This will fail in production if not fixed.`);
       }
     });
   };
+  const getTodoMessages = (todoId) => {
+    return request({
+      // Lưu ý: Đường dẫn khác với TODO_API_URL nên ta ghép từ SERVER_BASE_URL
+      url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getAllNoPageWithReact`,
+      method: "GET",
+      data: {
+        todoId,
+        keySearch: ""
+      }
+    });
+  };
   const useListTodoController = () => {
     const todos = vue.ref([]);
     const isLoading = vue.ref(false);
@@ -4062,12 +4073,37 @@ This will fail in production if not fixed.`);
       customerManagerName: ""
     };
   };
+  const formatRelativeTime = (timestamp) => {
+    if (!timestamp)
+      return "";
+    const now2 = Date.now();
+    const diff = now2 - timestamp;
+    if (diff < 6e4)
+      return "Vừa xong";
+    if (diff < 36e5) {
+      const minutes = Math.floor(diff / 6e4);
+      return `${minutes} phút trước`;
+    }
+    if (diff < 864e5) {
+      const hours = Math.floor(diff / 36e5);
+      return `${hours} giờ trước`;
+    }
+    const date = new Date(timestamp);
+    const d = date.getDate().toString().padStart(2, "0");
+    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const y = date.getFullYear();
+    const h = date.getHours().toString().padStart(2, "0");
+    const min = date.getMinutes().toString().padStart(2, "0");
+    return `${d}/${m}/${y} ${h}:${min}`;
+  };
   const useTodoDetailController = () => {
     const authStore = useAuthStore();
     const isLoading = vue.ref(false);
     const isLoadingCustomer = vue.ref(false);
     const isLoadingHistory = vue.ref(false);
     const historyList = vue.ref([]);
+    const comments = vue.ref([]);
+    const isLoadingComments = vue.ref(false);
     const historyFilterIndex = vue.ref(0);
     const historyFilterOptions = [
       "Tất cả",
@@ -4128,7 +4164,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:77", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:94", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4139,6 +4175,7 @@ This will fail in production if not fixed.`);
         const mappedData = mapTodoDetailToForm(realData);
         if (mappedData) {
           form.value = mappedData;
+          fetchComments(id);
           if (form.value.assigneeId && memberList.value.length > 0) {
             const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
             if (index !== -1)
@@ -4150,10 +4187,60 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:107", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:124", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
+      }
+    };
+    const processCommentData = (item) => {
+      var _a;
+      let senderName = "Người dùng ẩn";
+      let avatarChar = "?";
+      if (item.senderId) {
+        const member = memberList.value.find((m) => m.UID === item.senderId || m.memberUID === item.senderId);
+        if (member) {
+          senderName = member.UserName;
+        }
+      }
+      avatarChar = senderName.charAt(0).toUpperCase();
+      let actionText = "";
+      if (item.type === "COMMENT")
+        actionText = "đã thêm một bình luận";
+      else if (item.type === "LOG")
+        actionText = "đã cập nhật hoạt động";
+      const reactionList = ((_a = item.reactions) == null ? void 0 : _a.details) || [];
+      return {
+        id: item.id,
+        senderName,
+        senderAvatarChar: avatarChar,
+        message: item.message || "",
+        timeDisplay: formatRelativeTime(item.createdAt),
+        actionText,
+        isEdited: !!item.updatedAt,
+        // Nếu có updatedAt thì là đã sửa
+        reactions: reactionList,
+        children: []
+        // Sẽ map đệ quy nếu cần
+      };
+    };
+    const fetchComments = async (todoId) => {
+      isLoadingComments.value = true;
+      try {
+        const rawData = await getTodoMessages(todoId);
+        if (Array.isArray(rawData)) {
+          comments.value = rawData.map((parent) => {
+            const parentComment = processCommentData(parent);
+            if (parent.replies && parent.replies.length > 0) {
+              parentComment.children = parent.replies.map((child) => processCommentData(child));
+            }
+            return parentComment;
+          });
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:185", "Lỗi lấy bình luận:", error);
+      } finally {
+        isLoadingComments.value = false;
       }
     };
     const fetchCustomerInfo = async (customerUid) => {
@@ -4183,7 +4270,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:158", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:234", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4194,7 +4281,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:170", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:246", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4223,7 +4310,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:213", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:289", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -4251,7 +4338,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:239", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:315", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
@@ -4271,7 +4358,9 @@ This will fail in production if not fixed.`);
       saveTodo,
       historyFilterOptions,
       historyFilterIndex,
-      onHistoryFilterChange
+      onHistoryFilterChange,
+      comments,
+      isLoadingComments
     };
   };
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
@@ -4294,9 +4383,11 @@ This will fail in production if not fixed.`);
         saveTodo,
         historyFilterOptions,
         historyFilterIndex,
-        onHistoryFilterChange
+        onHistoryFilterChange,
+        comments,
+        isLoadingComments
       } = useTodoDetailController();
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4348,6 +4439,179 @@ This will fail in production if not fixed.`);
             modelValue: $setup.form.desc,
             "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event)
           }, null, 8, ["modelValue"])
+        ]),
+        vue.createElementVNode("view", { class: "section-title" }, "Bình luận và hoạt động"),
+        vue.createElementVNode("view", { class: "comments-section" }, [
+          $setup.isLoadingComments ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "loading-row"
+          }, [
+            vue.createElementVNode("text", null, "Đang tải bình luận...")
+          ])) : $setup.comments.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "empty-row"
+          }, [
+            vue.createElementVNode("text", null, "Chưa có bình luận nào.")
+          ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
+            (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($setup.comments, (item) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  key: item.id,
+                  class: "comment-thread"
+                }, [
+                  vue.createElementVNode("view", { class: "comment-row" }, [
+                    vue.createElementVNode("view", { class: "c-avatar" }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "avatar-char" },
+                        vue.toDisplayString(item.senderAvatarChar),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode("view", { class: "c-content-block" }, [
+                      vue.createElementVNode("view", { class: "c-header" }, [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "c-name" },
+                          vue.toDisplayString(item.senderName),
+                          1
+                          /* TEXT */
+                        ),
+                        vue.createElementVNode(
+                          "text",
+                          { class: "c-time" },
+                          vue.toDisplayString(item.timeDisplay),
+                          1
+                          /* TEXT */
+                        ),
+                        item.isEdited ? (vue.openBlock(), vue.createElementBlock("text", {
+                          key: 0,
+                          class: "c-edited"
+                        }, " • Đã chỉnh sửa")) : vue.createCommentVNode("v-if", true)
+                      ]),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "c-action-row" },
+                        vue.toDisplayString(item.actionText),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode("view", { class: "c-message-box" }, [
+                        vue.createElementVNode("rich-text", {
+                          nodes: item.message
+                        }, null, 8, ["nodes"])
+                      ]),
+                      item.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                        key: 0,
+                        class: "reaction-row"
+                      }, [
+                        (vue.openBlock(true), vue.createElementBlock(
+                          vue.Fragment,
+                          null,
+                          vue.renderList(item.reactions, (react, rIdx) => {
+                            return vue.openBlock(), vue.createElementBlock(
+                              "view",
+                              {
+                                key: rIdx,
+                                class: "emoji-tag"
+                              },
+                              vue.toDisplayString(react.codeEmoji),
+                              1
+                              /* TEXT */
+                            );
+                          }),
+                          128
+                          /* KEYED_FRAGMENT */
+                        ))
+                      ])) : vue.createCommentVNode("v-if", true)
+                    ])
+                  ]),
+                  item.children.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "replies-wrapper"
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList(item.children, (child) => {
+                        return vue.openBlock(), vue.createElementBlock("view", {
+                          key: child.id,
+                          class: "comment-row child-row"
+                        }, [
+                          vue.createElementVNode("view", { class: "c-avatar small" }, [
+                            vue.createElementVNode(
+                              "text",
+                              { class: "avatar-char small-char" },
+                              vue.toDisplayString(child.senderAvatarChar),
+                              1
+                              /* TEXT */
+                            )
+                          ]),
+                          vue.createElementVNode("view", { class: "c-content-block" }, [
+                            vue.createElementVNode("view", { class: "c-header" }, [
+                              vue.createElementVNode(
+                                "text",
+                                { class: "c-name" },
+                                vue.toDisplayString(child.senderName),
+                                1
+                                /* TEXT */
+                              ),
+                              vue.createElementVNode(
+                                "text",
+                                { class: "c-time" },
+                                vue.toDisplayString(child.timeDisplay),
+                                1
+                                /* TEXT */
+                              ),
+                              child.isEdited ? (vue.openBlock(), vue.createElementBlock("text", {
+                                key: 0,
+                                class: "c-edited"
+                              }, " • Đã chỉnh sửa")) : vue.createCommentVNode("v-if", true)
+                            ]),
+                            vue.createElementVNode("view", { class: "c-message-box" }, [
+                              vue.createElementVNode("rich-text", {
+                                nodes: child.message
+                              }, null, 8, ["nodes"])
+                            ]),
+                            child.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                              key: 0,
+                              class: "reaction-row"
+                            }, [
+                              (vue.openBlock(true), vue.createElementBlock(
+                                vue.Fragment,
+                                null,
+                                vue.renderList(child.reactions, (rChild, rcIdx) => {
+                                  return vue.openBlock(), vue.createElementBlock(
+                                    "view",
+                                    {
+                                      key: rcIdx,
+                                      class: "emoji-tag"
+                                    },
+                                    vue.toDisplayString(rChild.codeEmoji),
+                                    1
+                                    /* TEXT */
+                                  );
+                                }),
+                                128
+                                /* KEYED_FRAGMENT */
+                              ))
+                            ])) : vue.createCommentVNode("v-if", true)
+                          ])
+                        ]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ])) : vue.createCommentVNode("v-if", true)
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ]))
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin công việc"),
         vue.createElementVNode("view", { class: "info-group" }, [

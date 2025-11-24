@@ -19,7 +19,71 @@
             <view class="section-block">
                 <TodoEditor v-model="form.desc" />
             </view>
-
+			
+			<view class="section-title">Bình luận và hoạt động</view>
+			            <view class="comments-section">
+			                
+			                <view v-if="isLoadingComments" class="loading-row">
+			                    <text>Đang tải bình luận...</text>
+			                </view>
+			
+			                <view v-else-if="comments.length === 0" class="empty-row">
+			                    <text>Chưa có bình luận nào.</text>
+			                </view>
+			
+			                <view v-else>
+			                    <view v-for="item in comments" :key="item.id" class="comment-thread">
+			                        <view class="comment-row">
+			                            <view class="c-avatar">
+			                                <text class="avatar-char">{{ item.senderAvatarChar }}</text>
+			                            </view>
+			                            
+			                            <view class="c-content-block">
+			                                <view class="c-header">
+			                                    <text class="c-name">{{ item.senderName }}</text>
+			                                    <text class="c-time">{{ item.timeDisplay }}</text>
+			                                    <text v-if="item.isEdited" class="c-edited"> • Đã chỉnh sửa</text>
+			                                </view>
+			                                <text class="c-action-row">{{ item.actionText }}</text>
+			
+			                                <view class="c-message-box">
+			                                    <rich-text :nodes="item.message"></rich-text>
+			                                </view>
+			
+			                                <view v-if="item.reactions.length > 0" class="reaction-row">
+			                                    <view v-for="(react, rIdx) in item.reactions" :key="rIdx" class="emoji-tag">
+			                                        {{ react.codeEmoji }}
+			                                    </view>
+			                                </view>
+			                            </view>
+			                        </view>
+			
+			                        <view v-if="item.children.length > 0" class="replies-wrapper">
+			                            <view v-for="child in item.children" :key="child.id" class="comment-row child-row">
+			                                <view class="c-avatar small">
+			                                    <text class="avatar-char small-char">{{ child.senderAvatarChar }}</text>
+			                                </view>
+			                                <view class="c-content-block">
+			                                    <view class="c-header">
+			                                        <text class="c-name">{{ child.senderName }}</text>
+			                                        <text class="c-time">{{ child.timeDisplay }}</text>
+			                                        <text v-if="child.isEdited" class="c-edited"> • Đã chỉnh sửa</text>
+			                                    </view>
+			                                    <view class="c-message-box">
+			                                        <rich-text :nodes="child.message"></rich-text>
+			                                    </view>
+			                                    <view v-if="child.reactions.length > 0" class="reaction-row">
+			                                        <view v-for="(rChild, rcIdx) in child.reactions" :key="rcIdx" class="emoji-tag">
+			                                            {{ rChild.codeEmoji }}
+			                                        </view>
+			                                    </view>
+			                                </view>
+			                            </view>
+			                        </view>
+			
+			                    </view>
+			                </view>
+			            </view>
             <view class="section-title">Thông tin công việc</view>
             <view class="info-group">
                 <view class="flat-item">
@@ -169,6 +233,7 @@
         onStatusChange, onSourceChange, onAssigneeChange,
         saveTodo,
 		historyFilterOptions, historyFilterIndex, onHistoryFilterChange,
+		comments, isLoadingComments,
     } = useTodoDetailController();
 </script>
 
@@ -288,5 +353,79 @@
 			        display: flex;
 			        align-items: center;
 			    }
+				
+				.comments-section {
+				        background-color: #fff;
+				        padding: 15px;
+				        margin-bottom: 20px;
+				        border-radius: 8px;
+				        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+				    }
+				
+				    .comment-thread {
+				        margin-bottom: 20px;
+				        border-bottom: 1px dashed #f0f0f0;
+				        padding-bottom: 15px;
+				    }
+				    .comment-thread:last-child {
+				        border-bottom: none;
+				        margin-bottom: 0;
+				    }
+				
+				    .comment-row {
+				        display: flex;
+				        align-items: flex-start;
+				    }
+				
+				    /* Avatar Styles */
+				    .c-avatar {
+				        width: 40px; height: 40px;
+				        background-color: #e3f2fd; /* Xanh nhạt */
+				        border-radius: 50%;
+				        display: flex; align-items: center; justify-content: center;
+				        margin-right: 12px;
+				        flex-shrink: 0;
+				    }
+				    .avatar-char { color: #1976d2; font-weight: bold; font-size: 18px; }
+				    
+				    /* Small Avatar for Replies */
+				    .c-avatar.small { width: 30px; height: 30px; margin-right: 10px; }
+				    .avatar-char.small-char { font-size: 14px; }
+				
+				    .c-content-block { flex: 1; }
+				
+				    /* Header Info */
+				    .c-header { display: flex; align-items: baseline; flex-wrap: wrap; margin-bottom: 2px; }
+				    .c-name { font-weight: 700; color: #333; font-size: 15px; margin-right: 8px; }
+				    .c-time { font-size: 12px; color: #999; margin-right: 5px; }
+				    .c-action { font-size: 13px; color: #666; }
+				    .c-edited { font-size: 11px; color: #aaa; font-style: italic; margin-left: 5px; }
+				    .c-action-row { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
+				
+				    /* Message Content */
+				    .c-message-box {
+				        font-size: 15px; color: #333; line-height: 1.5;
+				        background-color: #f9f9fa;
+				        padding: 8px 12px;
+				        border-radius: 8px;
+				        border-top-left-radius: 0; /* Tạo kiểu bong bóng chat */
+				        margin-top: 2px;
+				    }
+				
+				    /* Reactions */
+				    .reaction-row { display: flex; gap: 5px; margin-top: 5px; }
+				    .emoji-tag {
+				        background-color: #fff; border: 1px solid #eee;
+				        border-radius: 10px; padding: 2px 6px; font-size: 12px;
+				        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+				    }
+				
+				    /* Nested Replies */
+				    .replies-wrapper {
+				        margin-top: 12px;
+				        padding-left: 50px; /* Thụt đầu dòng */
+				        /* border-left: 2px solid #f0f0f0; */
+				    }
+				    .child-row { margin-bottom: 10px; }
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
 </style>

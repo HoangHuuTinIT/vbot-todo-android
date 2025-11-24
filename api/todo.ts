@@ -2,7 +2,7 @@
 import { request } from '@/utils/request';
 import { mapTodoFromApi } from '@/models/todo'; // Import mapper (File này vẫn là JS)
 import type { CreateTodoPayload } from '@/types/todo';
-import { PROJECT_CODE, TODO_API_URL } from '@/utils/config';
+import { PROJECT_CODE, TODO_API_URL ,SERVER_BASE_URL} from '@/utils/config';
 
 export const getTodos = async (params: any): Promise<any[]> => {
     const rawData = await request({
@@ -72,6 +72,18 @@ export const getTodoDetail = (id: string | number): Promise<any> => {
         data: {
             id: id,
             projectCode: PROJECT_CODE
+        }
+    });
+};
+
+export const getTodoMessages = (todoId: string | number): Promise<any[]> => {
+    return request({
+        // Lưu ý: Đường dẫn khác với TODO_API_URL nên ta ghép từ SERVER_BASE_URL
+        url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getAllNoPageWithReact`,
+        method: 'GET',
+        data: {
+            todoId: todoId,
+            keySearch: ''
         }
     });
 };

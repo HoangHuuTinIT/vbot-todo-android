@@ -1,13 +1,27 @@
 // src/controllers/todo_detail.ts
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getTodoDetail } from '@/api/todo';
+import { getTodoDetail , getTodoMessages } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import {  getCrmCustomerDetail , getCrmActionTimeline} from '@/api/crm'; // Import API CRM
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
 import { useAuthStore } from '@/stores/auth';
+import { formatRelativeTime } from '@/utils/dateUtils';
+
+interface CommentItem {
+    id: number;
+    senderName: string;
+    senderAvatarChar: string; // Chữ cái đầu
+    message: string; // HTML content
+    timeDisplay: string;
+    actionText: string; // "thêm 1 bình luận"
+    isEdited: boolean;
+    reactions: any[]; // Mảng emoji
+    children: CommentItem[]; // Bình luận con (Replies)
+}
+
 interface HistoryItem {
     id: number;
     timeStr: string;      // Giờ hiển thị (VD: 10:30 21/11)
@@ -20,9 +34,12 @@ export const useTodoDetailController = () => {
     const isLoading = ref(false);
     // State loading riêng cho phần khách hàng để UI mượt hơn
     const isLoadingCustomer = ref(false); 
-
     const isLoadingHistory = ref(false);
 	const historyList = ref<HistoryItem[]>([]);
+	
+	const comments = ref<CommentItem[]>([]);
+	const isLoadingComments = ref(false);
+	
        const historyFilterIndex = ref(0); // Vị trí đang chọn (0 là Tất cả)
            
            // 1. Danh sách hiển thị (UI)
@@ -90,7 +107,7 @@ export const useTodoDetailController = () => {
             
             if (mappedData) {
                 form.value = mappedData;
-
+				fetchComments(id);
                 // Map người được giao (Assignee)
                 if (form.value.assigneeId && memberList.value.length > 0) {
                     const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
@@ -110,7 +127,66 @@ export const useTodoDetailController = () => {
             isLoading.value = false;
         }
     };
+const processCommentData = (item: any): CommentItem => {
+        // 1. Map Sender Info
+        let senderName = 'Người dùng ẩn';
+        let avatarChar = '?';
+        
+        if (item.senderId) {
+            // Tìm trong memberList (đã load từ trước)
+            // Lưu ý: memberList API trả về UID, so sánh với senderId
+            const member = memberList.value.find(m => m.UID === item.senderId || m.memberUID === item.senderId);
+            if (member) {
+                senderName = member.UserName;
+            }
+        }
+        avatarChar = senderName.charAt(0).toUpperCase();
 
+        // 2. Xử lý hành động
+        let actionText = '';
+        if (item.type === 'COMMENT') actionText = 'đã thêm một bình luận';
+        else if (item.type === 'LOG') actionText = 'đã cập nhật hoạt động';
+        
+        // 3. Xử lý Reactions
+        const reactionList = item.reactions?.details || [];
+
+        return {
+            id: item.id,
+            senderName,
+            senderAvatarChar: avatarChar,
+            message: item.message || '',
+            timeDisplay: formatRelativeTime(item.createdAt),
+            actionText,
+            isEdited: !!item.updatedAt, // Nếu có updatedAt thì là đã sửa
+            reactions: reactionList,
+            children: [] // Sẽ map đệ quy nếu cần
+        };
+    };
+	
+	const fetchComments = async (todoId: string | number) => {
+	        isLoadingComments.value = true;
+	        try {
+	            const rawData = await getTodoMessages(todoId);
+	            
+	            if (Array.isArray(rawData)) {
+	                // Map dữ liệu cha và con
+	                comments.value = rawData.map((parent: any) => {
+	                    const parentComment = processCommentData(parent);
+	                    
+	                    // Xử lý replies (nếu có)
+	                    if (parent.replies && parent.replies.length > 0) {
+	                        parentComment.children = parent.replies.map((child: any) => processCommentData(child));
+	                    }
+	                    
+	                    return parentComment;
+	                });
+	            }
+	        } catch (error) {
+	            console.error("Lỗi lấy bình luận:", error);
+	        } finally {
+	            isLoadingComments.value = false;
+	        }
+	    };
     // [LOGIC MỚI] Hàm xử lý lấy thông tin khách hàng
     const fetchCustomerInfo = async (customerUid: string) => {
             isLoadingCustomer.value = true;
@@ -250,6 +326,8 @@ const fetchHistoryLog = async (customerUid: string) => {
 		
 		historyFilterOptions, 
 		historyFilterIndex, 
-		onHistoryFilterChange
+		onHistoryFilterChange,
+		
+		comments, isLoadingComments,
     };
 };
