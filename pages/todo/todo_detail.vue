@@ -30,7 +30,11 @@
 			                             :placeholder="isEditingComment ? 'Đang chỉnh sửa bình luận...' : 'Viết bình luận'" 
 			                         />
 			                     </view>
-			 
+			 <view v-if="isEditingComment" class="editing-alert">
+			         <text class="editing-text">
+			             Đang chỉnh sửa bình luận của {{ editingMemberName }}
+			         </text>
+			     </view>
 			                     <view class="input-actions">
 			                         <button 
 			                             v-if="!isEditingComment"
@@ -377,6 +381,7 @@
 		currentUserId,
 		isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment,
 		        isConfirmCancelEditOpen, continueEditing, confirmCancelEdit,
+				editingMemberName,
     } = useTodoDetailController();
 </script>
 
@@ -696,5 +701,17 @@
 	        width: 18px; /* Kích thước icon */
 	        height: 18px;
 	    }
+		.editing-alert {
+		    margin-bottom: 10px;
+		    padding: 8px 12px;
+		    background-color: #fff7e6; /* Màu nền vàng nhạt cảnh báo nhẹ */
+		    border-radius: 6px;
+		    border: 1px solid #ffd591;
+		}
+		
+		.editing-text {
+		    font-size: 13px;
+		    color: #d48806; /* Màu chữ cam đậm */
+		}
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
 </style>

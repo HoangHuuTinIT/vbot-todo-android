@@ -50,6 +50,7 @@ export const useTodoDetailController = () => {
 	const commentToDeleteId = ref<number | null>(null);
 	
 	const isEditingComment = ref(false); // Đang ở chế độ sửa hay không
+	const editingMemberName = ref('');
 	    const isConfirmCancelEditOpen = ref(false); // Modal xác nhận hủy sửa
 	    // Lưu tạm thông tin bình luận đang sửa để lát gửi lại API update
 	    const editingCommentData = ref<{
@@ -115,7 +116,18 @@ export const useTodoDetailController = () => {
 	                    todoId: dataDetail.todoId,
 	                    senderId: dataDetail.senderId
 	                };
-	
+					
+					const senderId = dataDetail.senderId;
+					                
+					                // Tìm trong memberList xem ai có UID trùng với senderId
+					                const foundMember = memberList.value.find(m => m.UID === senderId);
+					                
+					                if (foundMember) {
+					                    editingMemberName.value = foundMember.UserName;
+					                } else {
+					                    // Fallback nếu không tìm thấy (thường là chính mình)
+					                    editingMemberName.value = 'tôi'; 
+					                }
 	                // Lấy message từ dataDetail (chứ không phải từ res cấp ngoài cùng)
 	                const content = dataDetail.message || '';
 	                
@@ -203,10 +215,11 @@ export const useTodoDetailController = () => {
 	
 	    // Hàm phụ: Reset state edit
 	    const resetEditState = () => {
-	        isEditingComment.value = false;
-	        editingCommentData.value = null;
-	        newCommentText.value = ''; // Xóa ô nhập
-	    };
+	            isEditingComment.value = false;
+	            editingCommentData.value = null;
+	            newCommentText.value = ''; 
+	            editingMemberName.value = ''; // [MỚI] Reset tên
+	        };
 	const onRequestDeleteComment = (commentId: number) => {
 	        commentToDeleteId.value = commentId;
 	        isConfirmDeleteCommentOpen.value = true;
@@ -558,5 +571,6 @@ const fetchHistoryLog = async (customerUid: string) => {
 		isConfirmCancelEditOpen,
 		continueEditing,
 		confirmCancelEdit,
+		editingMemberName,
     };
 };

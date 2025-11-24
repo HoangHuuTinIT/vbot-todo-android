@@ -917,6 +917,19 @@ to {
   /* Kích thước icon */
   height: 18px;
 }
+.editing-alert[data-v-9f96c8fe] {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background-color: #fff7e6;
+  /* Màu nền vàng nhạt cảnh báo nhẹ */
+  border-radius: 6px;
+  border: 1px solid #ffd591;
+}
+.editing-text[data-v-9f96c8fe] {
+  font-size: 13px;
+  color: #d48806;
+  /* Màu chữ cam đậm */
+}
 .loading-overlay[data-v-9f96c8fe] {
   position: fixed;
   top: 0;

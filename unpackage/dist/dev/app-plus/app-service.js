@@ -4133,6 +4133,7 @@ This will fail in production if not fixed.`);
     const isConfirmDeleteCommentOpen = vue.ref(false);
     const commentToDeleteId = vue.ref(null);
     const isEditingComment = vue.ref(false);
+    const editingMemberName = vue.ref("");
     const isConfirmCancelEditOpen = vue.ref(false);
     const editingCommentData = vue.ref(null);
     const historyFilterIndex = vue.ref(0);
@@ -4190,7 +4191,7 @@ This will fail in production if not fixed.`);
       uni.showLoading({ title: "Đang tải..." });
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:105", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:106", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -4198,14 +4199,21 @@ This will fail in production if not fixed.`);
             todoId: dataDetail.todoId,
             senderId: dataDetail.senderId
           };
+          const senderId = dataDetail.senderId;
+          const foundMember = memberList.value.find((m) => m.UID === senderId);
+          if (foundMember) {
+            editingMemberName.value = foundMember.UserName;
+          } else {
+            editingMemberName.value = "tôi";
+          }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:122", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:134", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:134", "Lỗi lấy chi tiết bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:146", "Lỗi lấy chi tiết bình luận:", error);
         uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
       } finally {
         uni.hideLoading();
@@ -4228,13 +4236,13 @@ This will fail in production if not fixed.`);
           files: ""
           // Tạm để trống
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:160", "Payload Update:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:172", "Payload Update:", payload);
         await updateTodoMessage(payload);
         uni.showToast({ title: "Đã cập nhật", icon: "success" });
         resetEditState();
         await fetchComments(form.value.id);
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:174", "Lỗi cập nhật:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:186", "Lỗi cập nhật:", error);
         uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4257,6 +4265,7 @@ This will fail in production if not fixed.`);
       isEditingComment.value = false;
       editingCommentData.value = null;
       newCommentText.value = "";
+      editingMemberName.value = "";
     };
     const onRequestDeleteComment = (commentId) => {
       commentToDeleteId.value = commentId;
@@ -4273,7 +4282,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:229", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:242", "Lỗi xóa bình luận:", error);
         uni.showToast({ title: "Xóa thất bại", icon: "none" });
       } finally {
         commentToDeleteId.value = null;
@@ -4302,7 +4311,7 @@ This will fail in production if not fixed.`);
           parentId: -1
           // Mặc định là comment cha
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:267", "Đang gửi bình luận:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:280", "Đang gửi bình luận:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
           uni.showToast({ title: "Đã gửi bình luận", icon: "success" });
@@ -4310,7 +4319,7 @@ This will fail in production if not fixed.`);
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:285", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:298", "Lỗi gửi bình luận:", error);
         uni.showToast({ title: "Gửi thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4328,7 +4337,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:308", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:321", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4351,7 +4360,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:338", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:351", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -4403,7 +4412,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:400", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:413", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -4435,7 +4444,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:449", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:462", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4446,7 +4455,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:461", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:474", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4475,7 +4484,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:504", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:517", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -4503,7 +4512,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:530", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:543", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
@@ -4540,7 +4549,8 @@ This will fail in production if not fixed.`);
       onCancelEditComment,
       isConfirmCancelEditOpen,
       continueEditing,
-      confirmCancelEdit
+      confirmCancelEdit,
+      editingMemberName
     };
   };
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
@@ -4580,9 +4590,10 @@ This will fail in production if not fixed.`);
         onCancelEditComment,
         isConfirmCancelEditOpen,
         continueEditing,
-        confirmCancelEdit
+        confirmCancelEdit,
+        editingMemberName
       } = useTodoDetailController();
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4647,6 +4658,18 @@ This will fail in production if not fixed.`);
                 placeholder: $setup.isEditingComment ? "Đang chỉnh sửa bình luận..." : "Viết bình luận"
               }, null, 8, ["modelValue", "placeholder"])
             ]),
+            $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "editing-alert"
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "editing-text" },
+                " Đang chỉnh sửa bình luận của " + vue.toDisplayString($setup.editingMemberName),
+                1
+                /* TEXT */
+              )
+            ])) : vue.createCommentVNode("v-if", true),
             vue.createElementVNode("view", { class: "input-actions" }, [
               !$setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("button", {
                 key: 0,
