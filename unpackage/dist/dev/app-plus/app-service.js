@@ -2072,6 +2072,20 @@ This will fail in production if not fixed.`);
       }
     });
   };
+  const createTodoMessage = (data) => {
+    return request({
+      url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/create`,
+      method: "POST",
+      data
+    });
+  };
+  const deleteTodoMessage = (id) => {
+    return request({
+      url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/delete`,
+      method: "POST",
+      data: { id }
+    });
+  };
   const useListTodoController = () => {
     const todos = vue.ref([]);
     const isLoading = vue.ref(false);
@@ -3077,7 +3091,8 @@ This will fail in production if not fixed.`);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoEditor",
     props: {
-      modelValue: { type: String, required: true }
+      modelValue: { type: String, required: true },
+      placeholder: { type: String, required: false }
     },
     emits: ["update:modelValue"],
     setup(__props, { expose: __expose, emit: __emit }) {
@@ -3241,15 +3256,6 @@ This will fail in production if not fixed.`);
   });
   function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "editor-wrapper" }, [
-      vue.createElementVNode("view", { class: "editor-label-row" }, [
-        vue.createElementVNode("view", { class: "item-left" }, [
-          vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios/50/666666/document--v1.png",
-            class: "item-icon"
-          }),
-          vue.createElementVNode("text", { class: "label-text" }, "Mô tả")
-        ])
-      ]),
       vue.createElementVNode("view", { class: "toolbar" }, [
         vue.createElementVNode("view", { class: "tool-row" }, [
           vue.createElementVNode(
@@ -4098,12 +4104,17 @@ This will fail in production if not fixed.`);
   };
   const useTodoDetailController = () => {
     const authStore = useAuthStore();
+    const currentUserId = authStore.uid;
     const isLoading = vue.ref(false);
     const isLoadingCustomer = vue.ref(false);
     const isLoadingHistory = vue.ref(false);
     const historyList = vue.ref([]);
     const comments = vue.ref([]);
     const isLoadingComments = vue.ref(false);
+    const newCommentText = vue.ref("");
+    const isSubmittingComment = vue.ref(false);
+    const isConfirmDeleteCommentOpen = vue.ref(false);
+    const commentToDeleteId = vue.ref(null);
     const historyFilterIndex = vue.ref(0);
     const historyFilterOptions = [
       "Tất cả",
@@ -4152,6 +4163,64 @@ This will fail in production if not fixed.`);
     const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
     const memberList = vue.ref([]);
     const assigneeOptions = vue.ref([]);
+    const onRequestDeleteComment = (commentId) => {
+      commentToDeleteId.value = commentId;
+      isConfirmDeleteCommentOpen.value = true;
+    };
+    const confirmDeleteComment = async () => {
+      if (!commentToDeleteId.value)
+        return;
+      isConfirmDeleteCommentOpen.value = false;
+      try {
+        await deleteTodoMessage(commentToDeleteId.value);
+        uni.showToast({ title: "Đã xóa", icon: "success" });
+        if (form.value.id) {
+          await fetchComments(form.value.id);
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:105", "Lỗi xóa bình luận:", error);
+        uni.showToast({ title: "Xóa thất bại", icon: "none" });
+      } finally {
+        commentToDeleteId.value = null;
+      }
+    };
+    const cancelDeleteComment = () => {
+      isConfirmDeleteCommentOpen.value = false;
+      commentToDeleteId.value = null;
+    };
+    const submitComment = async () => {
+      if (!newCommentText.value || !newCommentText.value.trim()) {
+        uni.showToast({ title: "Vui lòng nhập nội dung", icon: "none" });
+        return;
+      }
+      isSubmittingComment.value = true;
+      try {
+        const todoId = form.value.id;
+        const senderId = authStore.uid;
+        const payload = {
+          todoId,
+          senderId,
+          message: newCommentText.value,
+          // Nội dung từ editor
+          files: "",
+          // Tạm thời rỗng
+          parentId: -1
+          // Mặc định là comment cha
+        };
+        formatAppLog("log", "at controllers/todo_detail.ts:143", "Đang gửi bình luận:", payload);
+        const res = await createTodoMessage(payload);
+        if (res) {
+          uni.showToast({ title: "Đã gửi bình luận", icon: "success" });
+          newCommentText.value = "";
+          await fetchComments(todoId);
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/todo_detail.ts:161", "Lỗi gửi bình luận:", error);
+        uni.showToast({ title: "Gửi thất bại", icon: "none" });
+      } finally {
+        isSubmittingComment.value = false;
+      }
+    };
     onLoad(async (options) => {
       await fetchMembers();
       if (options && options.id) {
@@ -4164,7 +4233,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:94", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:184", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4187,7 +4256,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:124", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:214", "❌ Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -4212,6 +4281,7 @@ This will fail in production if not fixed.`);
       const reactionList = ((_a = item.reactions) == null ? void 0 : _a.details) || [];
       return {
         id: item.id,
+        senderId: item.senderId,
         senderName,
         senderAvatarChar: avatarChar,
         message: item.message || "",
@@ -4238,7 +4308,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:185", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:276", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -4270,7 +4340,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:234", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:325", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4281,7 +4351,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:246", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:337", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4310,7 +4380,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:289", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:380", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -4338,7 +4408,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:315", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:406", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
@@ -4360,7 +4430,15 @@ This will fail in production if not fixed.`);
       historyFilterIndex,
       onHistoryFilterChange,
       comments,
-      isLoadingComments
+      isLoadingComments,
+      newCommentText,
+      isSubmittingComment,
+      submitComment,
+      isConfirmDeleteCommentOpen,
+      onRequestDeleteComment,
+      confirmDeleteComment,
+      cancelDeleteComment,
+      currentUserId
     };
   };
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
@@ -4385,9 +4463,17 @@ This will fail in production if not fixed.`);
         historyFilterIndex,
         onHistoryFilterChange,
         comments,
-        isLoadingComments
+        isLoadingComments,
+        newCommentText,
+        isSubmittingComment,
+        submitComment,
+        isConfirmDeleteCommentOpen,
+        onRequestDeleteComment,
+        confirmDeleteComment,
+        cancelDeleteComment,
+        currentUserId
       } = useTodoDetailController();
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, TodoEditor, TodoDatePicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, TodoEditor, TodoDatePicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4434,14 +4520,33 @@ This will fail in production if not fixed.`);
         "scroll-y": "true",
         class: "detail-body"
       }, [
+        vue.createElementVNode("view", { class: "section-title" }, "Mô tả"),
         vue.createElementVNode("view", { class: "section-block" }, [
           vue.createVNode($setup["TodoEditor"], {
             modelValue: $setup.form.desc,
-            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event)
+            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event),
+            placeholder: "Nhập mô tả công việc..."
           }, null, 8, ["modelValue"])
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Bình luận và hoạt động"),
         vue.createElementVNode("view", { class: "comments-section" }, [
+          vue.createElementVNode("view", { class: "comment-input-block" }, [
+            vue.createElementVNode("view", { class: "editor-container" }, [
+              vue.createVNode($setup["TodoEditor"], {
+                modelValue: $setup.newCommentText,
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.newCommentText = $event),
+                placeholder: "Viết bình luận"
+              }, null, 8, ["modelValue"])
+            ]),
+            vue.createElementVNode("view", { class: "input-actions" }, [
+              vue.createElementVNode("button", {
+                class: "btn-save-comment",
+                disabled: $setup.isSubmittingComment,
+                onClick: _cache[4] || (_cache[4] = (...args) => $setup.submitComment && $setup.submitComment(...args))
+              }, vue.toDisplayString($setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "divider-line" }),
           $setup.isLoadingComments ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 0,
             class: "loading-row"
@@ -4504,29 +4609,40 @@ This will fail in production if not fixed.`);
                           nodes: item.message
                         }, null, 8, ["nodes"])
                       ]),
-                      item.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-                        key: 0,
-                        class: "reaction-row"
-                      }, [
-                        (vue.openBlock(true), vue.createElementBlock(
-                          vue.Fragment,
-                          null,
-                          vue.renderList(item.reactions, (react, rIdx) => {
-                            return vue.openBlock(), vue.createElementBlock(
-                              "view",
-                              {
-                                key: rIdx,
-                                class: "emoji-tag"
-                              },
-                              vue.toDisplayString(react.codeEmoji),
-                              1
-                              /* TEXT */
-                            );
-                          }),
-                          128
-                          /* KEYED_FRAGMENT */
-                        ))
-                      ])) : vue.createCommentVNode("v-if", true)
+                      vue.createElementVNode("view", { class: "c-footer-actions" }, [
+                        vue.createElementVNode("view", { class: "reaction-row" }, [
+                          item.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+                            (vue.openBlock(true), vue.createElementBlock(
+                              vue.Fragment,
+                              null,
+                              vue.renderList(item.reactions, (react, rIdx) => {
+                                return vue.openBlock(), vue.createElementBlock(
+                                  "view",
+                                  {
+                                    key: rIdx,
+                                    class: "emoji-tag"
+                                  },
+                                  vue.toDisplayString(react.codeEmoji),
+                                  1
+                                  /* TEXT */
+                                );
+                              }),
+                              128
+                              /* KEYED_FRAGMENT */
+                            ))
+                          ])) : vue.createCommentVNode("v-if", true)
+                        ]),
+                        item.id && String(item.senderId) === String($setup.currentUserId) ? (vue.openBlock(), vue.createElementBlock("view", {
+                          key: 0,
+                          class: "btn-delete",
+                          onClick: ($event) => $setup.onRequestDeleteComment(item.id)
+                        }, [
+                          vue.createElementVNode("image", {
+                            src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
+                            class: "icon-trash"
+                          })
+                        ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true)
+                      ])
                     ])
                   ]),
                   item.children.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -4576,29 +4692,40 @@ This will fail in production if not fixed.`);
                                 nodes: child.message
                               }, null, 8, ["nodes"])
                             ]),
-                            child.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-                              key: 0,
-                              class: "reaction-row"
-                            }, [
-                              (vue.openBlock(true), vue.createElementBlock(
-                                vue.Fragment,
-                                null,
-                                vue.renderList(child.reactions, (rChild, rcIdx) => {
-                                  return vue.openBlock(), vue.createElementBlock(
-                                    "view",
-                                    {
-                                      key: rcIdx,
-                                      class: "emoji-tag"
-                                    },
-                                    vue.toDisplayString(rChild.codeEmoji),
-                                    1
-                                    /* TEXT */
-                                  );
-                                }),
-                                128
-                                /* KEYED_FRAGMENT */
-                              ))
-                            ])) : vue.createCommentVNode("v-if", true)
+                            vue.createElementVNode("view", { class: "c-footer-actions" }, [
+                              vue.createElementVNode("view", { class: "reaction-row" }, [
+                                child.reactions.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", { key: 0 }, [
+                                  (vue.openBlock(true), vue.createElementBlock(
+                                    vue.Fragment,
+                                    null,
+                                    vue.renderList(child.reactions, (rChild, rcIdx) => {
+                                      return vue.openBlock(), vue.createElementBlock(
+                                        "view",
+                                        {
+                                          key: rcIdx,
+                                          class: "emoji-tag"
+                                        },
+                                        vue.toDisplayString(rChild.codeEmoji),
+                                        1
+                                        /* TEXT */
+                                      );
+                                    }),
+                                    128
+                                    /* KEYED_FRAGMENT */
+                                  ))
+                                ])) : vue.createCommentVNode("v-if", true)
+                              ]),
+                              child.id && String(child.senderId) === String($setup.currentUserId) ? (vue.openBlock(), vue.createElementBlock("view", {
+                                key: 0,
+                                class: "btn-delete",
+                                onClick: ($event) => $setup.onRequestDeleteComment(child.id)
+                              }, [
+                                vue.createElementVNode("image", {
+                                  src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
+                                  class: "icon-trash"
+                                })
+                              ], 8, ["onClick"])) : vue.createCommentVNode("v-if", true)
+                            ])
                           ])
                         ]);
                       }),
@@ -4627,7 +4754,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.statusOptions,
               value: $setup.form.statusIndex,
-              onChange: _cache[3] || (_cache[3] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
+              onChange: _cache[5] || (_cache[5] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4651,7 +4778,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.sourceOptions,
               value: $setup.form.sourceIndex,
-              onChange: _cache[4] || (_cache[4] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
+              onChange: _cache[6] || (_cache[6] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4675,7 +4802,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.assigneeOptions,
               value: $setup.form.assigneeIndex,
-              onChange: _cache[5] || (_cache[5] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
+              onChange: _cache[7] || (_cache[7] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -4689,11 +4816,11 @@ This will fail in production if not fixed.`);
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[8] || (_cache[8] = ($event) => $setup.form.dueDate = $event),
             notifyDate: $setup.form.notifyDate,
-            "onUpdate:notifyDate": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyDate = $event),
+            "onUpdate:notifyDate": _cache[9] || (_cache[9] = ($event) => $setup.form.notifyDate = $event),
             notifyTime: $setup.form.notifyTime,
-            "onUpdate:notifyTime": _cache[8] || (_cache[8] = ($event) => $setup.form.notifyTime = $event)
+            "onUpdate:notifyTime": _cache[10] || (_cache[10] = ($event) => $setup.form.notifyTime = $event)
           }, null, 8, ["dueDate", "notifyDate", "notifyTime"])
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin khách hàng"),
@@ -4783,7 +4910,7 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onChange: _cache[9] || (_cache[9] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[11] || (_cache[11] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -4855,7 +4982,32 @@ This will fail in production if not fixed.`);
           ]))
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })
-      ])
+      ]),
+      $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "modal-overlay",
+        onClick: _cache[14] || (_cache[14] = vue.withModifiers(() => {
+        }, ["stop"]))
+      }, [
+        vue.createElementVNode("view", { class: "modal-container" }, [
+          vue.createElementVNode("view", { class: "modal-header" }, [
+            vue.createElementVNode("text", { class: "modal-title" }, "Xác nhận xóa")
+          ]),
+          vue.createElementVNode("view", { class: "modal-body" }, [
+            vue.createElementVNode("text", null, "Bạn có chắc muốn xóa bình luận này không?")
+          ]),
+          vue.createElementVNode("view", { class: "modal-footer" }, [
+            vue.createElementVNode("button", {
+              class: "modal-btn cancel",
+              onClick: _cache[12] || (_cache[12] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
+            }, "Hủy"),
+            vue.createElementVNode("button", {
+              class: "modal-btn confirm",
+              onClick: _cache[13] || (_cache[13] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
+            }, "Xác nhận")
+          ])
+        ])
+      ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
   const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot_todo_3/pages/todo/todo_detail.vue"]]);

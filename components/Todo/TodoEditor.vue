@@ -1,12 +1,6 @@
 
 <template>
     <view class="editor-wrapper">
-        <view class="editor-label-row">
-            <view class="item-left">
-                <image src="https://img.icons8.com/ios/50/666666/document--v1.png" class="item-icon"></image>
-                <text class="label-text">Mô tả</text>
-            </view>
-        </view>
 
         <view class="toolbar">
             <view class="tool-row">
@@ -143,7 +137,9 @@ import { ref, computed, nextTick, getCurrentInstance ,watch} from 'vue';
 import { EDITOR_CONFIG } from '@/utils/enums'; // Import Enum đã tạo
 interface EditorProps {
     modelValue: string; // V-model luôn là string
+	placeholder?: string;
 }
+
 const props = defineProps<EditorProps>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -279,8 +275,15 @@ const insertVideo = () => { uni.chooseVideo({ count: 1, success: (r) => editorCt
 
 <style lang="scss" scoped>
     /* Copy CSS liên quan Editor vào đây */
-    .editor-wrapper { background-color: #fff; margin-bottom: 12px; padding: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
-    .editor-label-row { display: flex; align-items: center; margin-bottom: 8px; }
+.editor-wrapper { 
+        background-color: #fff; 
+        margin-bottom: 0; /* Bỏ margin bottom mặc định để parent tự chỉnh */
+        padding: 15px; 
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03); 
+        display: flex; 
+        flex-direction: column;
+        border-radius: 8px; /* Bo tròn đẹp hơn */
+    }    // .editor-label-row { display: flex; align-items: center; margin-bottom: 8px; }
     .item-left { display: flex; align-items: center; margin-right: 15px; }
     .item-icon { width: 22px; height: 22px; opacity: 0.6; }
     .label-text { font-size: 15px; color: #666; }

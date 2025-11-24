@@ -1,4 +1,4 @@
-<template>
+<template> 
     <view class="container">
         <view v-if="isLoading" class="loading-overlay">
             <text>Đang tải...</text>
@@ -16,21 +16,40 @@
 
         <scroll-view scroll-y="true" class="detail-body">
             
+            <!-- MÔ TẢ -->
+            <view class="section-title">Mô tả</view>
             <view class="section-block">
-                <TodoEditor v-model="form.desc" />
+                <TodoEditor v-model="form.desc" placeholder="Nhập mô tả công việc..." />
             </view>
 			
+            <!-- BÌNH LUẬN & HOẠT ĐỘNG -->
 			<view class="section-title">Bình luận và hoạt động</view>
-			            <view class="comments-section">
+			<view class="comments-section">
+			                <view class="comment-input-block">
+			                    <view class="editor-container">
+			                        <TodoEditor v-model="newCommentText" placeholder="Viết bình luận" />
+			                    </view>
+			                    <view class="input-actions">
+			                        <button 
+			                            class="btn-save-comment" 
+			                            :disabled="isSubmittingComment"
+			                            @click="submitComment"
+			                        >
+			                            {{ isSubmittingComment ? 'Đang lưu...' : 'Lưu lại' }}
+			                        </button>
+			                    </view>
+			                </view>
+			                
+			                <view class="divider-line"></view>
 			                
 			                <view v-if="isLoadingComments" class="loading-row">
 			                    <text>Đang tải bình luận...</text>
 			                </view>
-			
+			                
 			                <view v-else-if="comments.length === 0" class="empty-row">
 			                    <text>Chưa có bình luận nào.</text>
 			                </view>
-			
+			                
 			                <view v-else>
 			                    <view v-for="item in comments" :key="item.id" class="comment-thread">
 			                        <view class="comment-row">
@@ -45,14 +64,26 @@
 			                                    <text v-if="item.isEdited" class="c-edited"> • Đã chỉnh sửa</text>
 			                                </view>
 			                                <text class="c-action-row">{{ item.actionText }}</text>
-			
+			                                
 			                                <view class="c-message-box">
 			                                    <rich-text :nodes="item.message"></rich-text>
 			                                </view>
+			                                
+			                                <view class="c-footer-actions">
+			                                    <view class="reaction-row">
+			                                        <view v-if="item.reactions.length > 0">
+			                                            <view v-for="(react, rIdx) in item.reactions" :key="rIdx" class="emoji-tag">
+			                                                {{ react.codeEmoji }}
+			                                            </view>
+			                                        </view>
+			                                    </view>
 			
-			                                <view v-if="item.reactions.length > 0" class="reaction-row">
-			                                    <view v-for="(react, rIdx) in item.reactions" :key="rIdx" class="emoji-tag">
-			                                        {{ react.codeEmoji }}
+			                                    <view 
+			                                        v-if="item.id && String(item.senderId) === String(currentUserId)" 
+			                                        class="btn-delete" 
+			                                        @click="onRequestDeleteComment(item.id)"
+			                                    >
+			                                        <image src="https://img.icons8.com/ios/50/999999/trash--v1.png" class="icon-trash"></image>
 			                                    </view>
 			                                </view>
 			                            </view>
@@ -69,12 +100,26 @@
 			                                        <text class="c-time">{{ child.timeDisplay }}</text>
 			                                        <text v-if="child.isEdited" class="c-edited"> • Đã chỉnh sửa</text>
 			                                    </view>
+			                                    
 			                                    <view class="c-message-box">
 			                                        <rich-text :nodes="child.message"></rich-text>
 			                                    </view>
-			                                    <view v-if="child.reactions.length > 0" class="reaction-row">
-			                                        <view v-for="(rChild, rcIdx) in child.reactions" :key="rcIdx" class="emoji-tag">
-			                                            {{ rChild.codeEmoji }}
+			                                    
+			                                    <view class="c-footer-actions">
+			                                        <view class="reaction-row">
+			                                            <view v-if="child.reactions.length > 0">
+			                                                <view v-for="(rChild, rcIdx) in child.reactions" :key="rcIdx" class="emoji-tag">
+			                                                    {{ rChild.codeEmoji }}
+			                                                </view>
+			                                            </view>
+			                                        </view>
+			
+			                                        <view 
+			                                            v-if="child.id && String(child.senderId) === String(currentUserId)" 
+			                                            class="btn-delete" 
+			                                            @click="onRequestDeleteComment(child.id)"
+			                                        >
+			                                            <image src="https://img.icons8.com/ios/50/999999/trash--v1.png" class="icon-trash"></image>
 			                                        </view>
 			                                    </view>
 			                                </view>
@@ -84,8 +129,11 @@
 			                    </view>
 			                </view>
 			            </view>
+
+            <!-- THÔNG TIN CÔNG VIỆC -->
             <view class="section-title">Thông tin công việc</view>
             <view class="info-group">
+
                 <view class="flat-item">
                     <view class="item-left">
                         <image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon"></image>
@@ -107,26 +155,26 @@
                 </view>
 
                 <view class="flat-item">
-                        <view class="item-left">
-                            <image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
-                            <text class="item-label">Người được giao</text>
-                        </view>
-                        
-                        <picker 
-                            mode="selector" 
-                            :range="assigneeOptions" 
-                            :value="form.assigneeIndex" 
-                            @change="onAssigneeChange" 
-                            class="item-picker-box"
-                        >
-                            <view class="picker-text">
-                                {{ (form.assigneeIndex > -1 && assigneeOptions[form.assigneeIndex]) 
-                                    ? assigneeOptions[form.assigneeIndex] 
-                                    : 'Chọn người giao' 
-                                }} ▾
-                            </view>
-                        </picker>
+                    <view class="item-left">
+                        <image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
+                        <text class="item-label">Người được giao</text>
                     </view>
+                        
+                    <picker 
+                        mode="selector" 
+                        :range="assigneeOptions" 
+                        :value="form.assigneeIndex" 
+                        @change="onAssigneeChange" 
+                        class="item-picker-box"
+                    >
+                        <view class="picker-text">
+                            {{ (form.assigneeIndex > -1 && assigneeOptions[form.assigneeIndex]) 
+                                ? assigneeOptions[form.assigneeIndex] 
+                                : 'Chọn người giao' 
+                            }} ▾
+                        </view>
+                    </picker>
+                </view>
 
                 <TodoDatePicker 
                     v-model:dueDate="form.dueDate"
@@ -135,6 +183,7 @@
                 />
             </view>
 
+            <!-- KHÁCH HÀNG -->
             <view class="section-title">Thông tin khách hàng</view>
             <view class="info-group customer-block">
                 <view v-if="isLoadingCustomer" class="loading-row">
@@ -174,50 +223,69 @@
                 </view>
             </view>
 
+            <!-- LỊCH SỬ -->
             <view class="section-header-row">
-                            <text class="section-title no-margin">Lịch sử tương tác</text>
-                            
-                            <picker 
-                                mode="selector" 
-                                :range="historyFilterOptions" 
-                                :value="historyFilterIndex" 
-                                @change="onHistoryFilterChange"
-                            >
-                                <view class="filter-badge">
-                                    {{ historyFilterOptions[historyFilterIndex] }} ▾
-                                </view>
-                            </picker>
-                        </view>
+                <text class="section-title no-margin">Lịch sử tương tác</text>
+                
+                <picker 
+                    mode="selector" 
+                    :range="historyFilterOptions" 
+                    :value="historyFilterIndex" 
+                    @change="onHistoryFilterChange"
+                >
+                    <view class="filter-badge">
+                        {{ historyFilterOptions[historyFilterIndex] }} ▾
+                    </view>
+                </picker>
+            </view>
                         
-                        <view class="history-container">
-                            <view v-if="isLoadingHistory" class="loading-row">
-                                <text class="loading-text">Đang tải lịch sử...</text>
+            <view class="history-container">
+                <view v-if="isLoadingHistory" class="loading-row">
+                    <text class="loading-text">Đang tải lịch sử...</text>
+                </view>
+
+                <view v-else-if="historyList.length === 0" class="empty-row">
+                    <text>(Không tìm thấy dữ liệu)</text>
+                </view>
+
+                <view v-else class="timeline-list">
+                    <view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
+                        <view class="timeline-line" v-if="index !== historyList.length - 1"></view>
+                        <view class="timeline-dot"></view>
+                        <view class="timeline-content">
+                            <view class="timeline-header">
+                                <text class="t-actor">{{ item.actorName }}</text>
+                                <text class="t-time">{{ item.timeStr }}</text>
                             </view>
-            
-                            <view v-else-if="historyList.length === 0" class="empty-row">
-                                <text>(Không tìm thấy dữ liệu)</text>
-                            </view>
-            
-                            <view v-else class="timeline-list">
-                                <view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
-                                    <view class="timeline-line" v-if="index !== historyList.length - 1"></view>
-                                    <view class="timeline-dot"></view>
-                                    <view class="timeline-content">
-                                        <view class="timeline-header">
-                                            <text class="t-actor">{{ item.actorName }}</text>
-                                            <text class="t-time">{{ item.timeStr }}</text>
-                                        </view>
-                                        <text class="t-action">{{ item.content }}</text>
-                                    </view>
-                                </view>
-                            </view>
+                            <text class="t-action">{{ item.content }}</text>
                         </view>
+                    </view>
+                </view>
+            </view>
 
             <view style="height: 50px;"></view>
 
         </scroll-view> 
+
+        <!-- CONFIRM DELETE MODAL -->
+		<view class="modal-overlay" v-if="isConfirmDeleteCommentOpen" @click.stop>
+		    <view class="modal-container">
+		        <view class="modal-header">
+		            <text class="modal-title">Xác nhận xóa</text>
+		        </view>
+		        <view class="modal-body">
+		            <text>Bạn có chắc muốn xóa bình luận này không?</text>
+		        </view>
+		        <view class="modal-footer">
+		            <button class="modal-btn cancel" @click="cancelDeleteComment">Hủy</button>
+		            <button class="modal-btn confirm" @click="confirmDeleteComment">Xác nhận</button>
+		        </view>
+		    </view>
 		</view>
+
+    </view>
 </template>
+
 
 <script setup lang="ts">
     // Import controller đã chỉnh sửa
@@ -234,6 +302,12 @@
         saveTodo,
 		historyFilterOptions, historyFilterIndex, onHistoryFilterChange,
 		comments, isLoadingComments,
+		newCommentText, isSubmittingComment, submitComment,
+		isConfirmDeleteCommentOpen, 
+		onRequestDeleteComment, 
+		confirmDeleteComment, 
+		cancelDeleteComment,
+		currentUserId,
     } = useTodoDetailController();
 </script>
 
@@ -427,5 +501,94 @@
 				        /* border-left: 2px solid #f0f0f0; */
 				    }
 				    .child-row { margin-bottom: 10px; }
+					
+					.comment-input-block {
+					        margin-bottom: 20px;
+					    }
+					
+					    .editor-container {
+					        /* Tinh chỉnh lại editor cho gọn nếu cần */
+					        margin-bottom: 10px;
+					    }
+					
+					    .input-actions {
+					        display: flex;
+					        justify-content: flex-end; /* Căn nút sang phải */
+					    }
+					
+					    .btn-save-comment {
+					        background-color: #007aff;
+					        color: #fff;
+					        font-size: 14px;
+					        font-weight: bold;
+					        padding: 0 20px;
+					        height: 36px;
+					        line-height: 36px;
+					        border-radius: 18px; /* Bo tròn nút */
+					        border: none;
+					    }
+					    .btn-save-comment[disabled] {
+					        background-color: #a0cfff;
+					    }
+					
+					    .divider-line {
+					        height: 1px;
+					        background-color: #eee;
+					        margin: 15px 0 20px 0;
+					    }
+						
+						.comment-input-block {
+						        margin-bottom: 10px;
+						    }
+						    .editor-container {
+						        margin-bottom: 10px;
+						        border: 1px solid #eee; /* Thêm viền nhẹ cho editor bình luận nếu muốn */
+						        border-radius: 8px;
+						        overflow: hidden;
+						    }
+						    .input-actions {
+						        display: flex; justify-content: flex-end;
+						    }
+						    .btn-save-comment {
+						        background-color: #007aff; color: #fff;
+						        font-size: 13px; font-weight: bold;
+						        padding: 0 20px; height: 32px; line-height: 32px;
+						        border-radius: 16px; border: none;
+						    }
+						    .divider-line {
+						        height: 1px; background-color: #eee; margin: 20px 0;
+						    }
+							
+							.c-footer-actions {
+							        display: flex;
+							        justify-content: space-between;
+							        align-items: center;
+							        margin-top: 4px;
+							        min-height: 20px;
+							    }
+							    
+							    .reaction-row { flex: 1; }
+							
+							    .btn-delete {
+							        padding: 4px 8px;
+							        opacity: 0.6;
+							    }
+							    .btn-delete:active { opacity: 1; }
+							    
+							    .icon-trash {
+							        width: 16px;
+							        height: 16px;
+							    }
+							
+							    /* CSS Modal (Tái sử dụng hoặc copy lại nếu chưa có scope global) */
+							    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+							    .modal-container { width: 80%; background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: popIn 0.2s ease-out; }
+							    .modal-header { padding: 15px; border-bottom: 1px solid #eee; text-align: center; }
+							    .modal-title { font-size: 18px; font-weight: bold; color: #333; }
+							    .modal-body { padding: 20px 15px; text-align: center; font-size: 15px; color: #555; line-height: 1.5; }
+							    .modal-footer { display: flex; border-top: 1px solid #eee; }
+							    .modal-btn { flex: 1; height: 48px; line-height: 48px; font-size: 16px; background-color: #fff; border: none; border-radius: 0; }
+							    .modal-btn.cancel { color: #666; border-right: 1px solid #eee; }
+							    .modal-btn.confirm { color: #ff3b30; font-weight: bold; }
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
 </style>

@@ -26,16 +26,14 @@
 /* Copy CSS liên quan Editor vào đây */
 .editor-wrapper[data-v-7d79903f] {
   background-color: #fff;
-  margin-bottom: 12px;
+  margin-bottom: 0;
+  /* Bỏ margin bottom mặc định để parent tự chỉnh */
   padding: 15px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
-}
-.editor-label-row[data-v-7d79903f] {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  border-radius: 8px;
+  /* Bo tròn đẹp hơn */
 }
 .item-left[data-v-7d79903f] {
   display: flex;
@@ -739,6 +737,149 @@ to {
 }
 .child-row[data-v-9f96c8fe] {
   margin-bottom: 10px;
+}
+.comment-input-block[data-v-9f96c8fe] {
+  margin-bottom: 20px;
+}
+.editor-container[data-v-9f96c8fe] {
+  /* Tinh chỉnh lại editor cho gọn nếu cần */
+  margin-bottom: 10px;
+}
+.input-actions[data-v-9f96c8fe] {
+  display: flex;
+  justify-content: flex-end;
+  /* Căn nút sang phải */
+}
+.btn-save-comment[data-v-9f96c8fe] {
+  background-color: #007aff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0 20px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 18px;
+  /* Bo tròn nút */
+  border: none;
+}
+.btn-save-comment[disabled][data-v-9f96c8fe] {
+  background-color: #a0cfff;
+}
+.divider-line[data-v-9f96c8fe] {
+  height: 1px;
+  background-color: #eee;
+  margin: 15px 0 20px 0;
+}
+.comment-input-block[data-v-9f96c8fe] {
+  margin-bottom: 10px;
+}
+.editor-container[data-v-9f96c8fe] {
+  margin-bottom: 10px;
+  border: 1px solid #eee;
+  /* Thêm viền nhẹ cho editor bình luận nếu muốn */
+  border-radius: 8px;
+  overflow: hidden;
+}
+.input-actions[data-v-9f96c8fe] {
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-save-comment[data-v-9f96c8fe] {
+  background-color: #007aff;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 0 20px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 16px;
+  border: none;
+}
+.divider-line[data-v-9f96c8fe] {
+  height: 1px;
+  background-color: #eee;
+  margin: 20px 0;
+}
+.c-footer-actions[data-v-9f96c8fe] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  min-height: 20px;
+}
+.reaction-row[data-v-9f96c8fe] {
+  flex: 1;
+}
+.btn-delete[data-v-9f96c8fe] {
+  padding: 4px 8px;
+  opacity: 0.6;
+}
+.btn-delete[data-v-9f96c8fe]:active {
+  opacity: 1;
+}
+.icon-trash[data-v-9f96c8fe] {
+  width: 16px;
+  height: 16px;
+}
+
+/* CSS Modal (Tái sử dụng hoặc copy lại nếu chưa có scope global) */
+.modal-overlay[data-v-9f96c8fe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-container[data-v-9f96c8fe] {
+  width: 80%;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: popIn 0.2s ease-out;
+}
+.modal-header[data-v-9f96c8fe] {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+.modal-title[data-v-9f96c8fe] {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+.modal-body[data-v-9f96c8fe] {
+  padding: 20px 15px;
+  text-align: center;
+  font-size: 15px;
+  color: #555;
+  line-height: 1.5;
+}
+.modal-footer[data-v-9f96c8fe] {
+  display: flex;
+  border-top: 1px solid #eee;
+}
+.modal-btn[data-v-9f96c8fe] {
+  flex: 1;
+  height: 48px;
+  line-height: 48px;
+  font-size: 16px;
+  background-color: #fff;
+  border: none;
+  border-radius: 0;
+}
+.modal-btn.cancel[data-v-9f96c8fe] {
+  color: #666;
+  border-right: 1px solid #eee;
+}
+.modal-btn.confirm[data-v-9f96c8fe] {
+  color: #ff3b30;
+  font-weight: bold;
 }
 .loading-overlay[data-v-9f96c8fe] {
   position: fixed;

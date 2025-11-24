@@ -87,3 +87,19 @@ export const getTodoMessages = (todoId: string | number): Promise<any[]> => {
         }
     });
 };
+
+export const createTodoMessage = (data: any): Promise<any> => {
+    return request({
+        url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/create`,
+        method: 'POST',
+        data: data
+    });
+};
+
+export const deleteTodoMessage = (id: number | string): Promise<any> => {
+    return request({
+        url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/delete`,
+        method: 'POST',
+        data: { id: id }
+    });
+};

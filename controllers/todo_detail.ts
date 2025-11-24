@@ -1,7 +1,7 @@
 // src/controllers/todo_detail.ts
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getTodoDetail , getTodoMessages } from '@/api/todo';
+import { getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage} from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import {  getCrmCustomerDetail , getCrmActionTimeline} from '@/api/crm'; // Import API CRM
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
@@ -9,9 +9,9 @@ import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
 import { useAuthStore } from '@/stores/auth';
 import { formatRelativeTime } from '@/utils/dateUtils';
-
 interface CommentItem {
     id: number;
+	senderId: string | number;
     senderName: string;
     senderAvatarChar: string; // Chữ cái đầu
     message: string; // HTML content
@@ -31,6 +31,8 @@ interface HistoryItem {
 }
 export const useTodoDetailController = () => {
 	const authStore = useAuthStore();
+	
+	const currentUserId = authStore.uid;
     const isLoading = ref(false);
     // State loading riêng cho phần khách hàng để UI mượt hơn
     const isLoadingCustomer = ref(false); 
@@ -40,6 +42,12 @@ export const useTodoDetailController = () => {
 	const comments = ref<CommentItem[]>([]);
 	const isLoadingComments = ref(false);
 	
+	const newCommentText = ref(''); 
+	const isSubmittingComment = ref(false);
+	
+	
+	const isConfirmDeleteCommentOpen = ref(false);
+	const commentToDeleteId = ref<number | null>(null);
        const historyFilterIndex = ref(0); // Vị trí đang chọn (0 là Tất cả)
            
            // 1. Danh sách hiển thị (UI)
@@ -74,7 +82,89 @@ export const useTodoDetailController = () => {
     
     const memberList = ref<any[]>([]); 
     const assigneeOptions = ref<string[]>([]);
-
+	
+	const onRequestDeleteComment = (commentId: number) => {
+	        commentToDeleteId.value = commentId;
+	        isConfirmDeleteCommentOpen.value = true;
+	    };
+	const confirmDeleteComment = async () => {
+	        if (!commentToDeleteId.value) return;
+	        
+	        // Đóng modal ngay cho mượt
+	        isConfirmDeleteCommentOpen.value = false;
+	        
+	        try {
+	            await deleteTodoMessage(commentToDeleteId.value);
+	            uni.showToast({ title: 'Đã xóa', icon: 'success' });
+	            
+	            // Reload lại list comment
+	            if (form.value.id) {
+	                await fetchComments(form.value.id);
+	            }
+	        } catch (error) {
+	            console.error("Lỗi xóa bình luận:", error);
+	            uni.showToast({ title: 'Xóa thất bại', icon: 'none' });
+	        } finally {
+	            commentToDeleteId.value = null;
+	        }
+	    };
+	
+	    // [MỚI] Hàm hủy xóa
+	    const cancelDeleteComment = () => {
+	        isConfirmDeleteCommentOpen.value = false;
+	        commentToDeleteId.value = null;
+	    };
+    const submitComment = async () => {
+            // 1. Validate dữ liệu
+            if (!newCommentText.value || !newCommentText.value.trim()) {
+                uni.showToast({ title: 'Vui lòng nhập nội dung', icon: 'none' });
+                return;
+            }
+    
+            // 2. Bật loading
+            isSubmittingComment.value = true;
+    
+            try {
+                // 3. Chuẩn bị dữ liệu gửi đi
+                // Lấy todoId từ form (đã được load từ trước)
+                const todoId = form.value.id; 
+                
+                // Lấy senderId từ Auth Store (UID của user đang đăng nhập)
+                const senderId = authStore.uid;
+    
+                const payload = {
+                    todoId: todoId,
+                    senderId: senderId,
+                    message: newCommentText.value, // Nội dung từ editor
+                    files: "", // Tạm thời rỗng
+                    parentId: -1 // Mặc định là comment cha
+                };
+    
+                console.log("Đang gửi bình luận:", payload);
+    
+                // 4. Gọi API tạo bình luận
+                const res = await createTodoMessage(payload);
+    
+                // 5. Xử lý thành công
+                if (res) {
+                    uni.showToast({ title: 'Đã gửi bình luận', icon: 'success' });
+                    
+                    // Reset ô nhập liệu
+                    newCommentText.value = ''; 
+                    
+                    // [QUAN TRỌNG] Gọi lại API lấy danh sách để cập nhật giao diện
+                    // (Hàm fetchComments đã viết ở bước trước)
+                    await fetchComments(todoId);
+                }
+    
+            } catch (error) {
+                console.error("Lỗi gửi bình luận:", error);
+                uni.showToast({ title: 'Gửi thất bại', icon: 'none' });
+            } finally {
+                // Tắt loading
+                isSubmittingComment.value = false;
+            }
+        };
     onLoad(async (options: any) => {
         // 1. Lấy danh sách thành viên trước (để lát nữa map ID -> Tên quản lý)
         await fetchMembers(); 
@@ -152,6 +242,7 @@ const processCommentData = (item: any): CommentItem => {
 
         return {
             id: item.id,
+			senderId: item.senderId,
             senderName,
             senderAvatarChar: avatarChar,
             message: item.message || '',
@@ -329,5 +420,11 @@ const fetchHistoryLog = async (customerUid: string) => {
 		onHistoryFilterChange,
 		
 		comments, isLoadingComments,
+		newCommentText, isSubmittingComment,submitComment, 
+		isConfirmDeleteCommentOpen,
+		onRequestDeleteComment,
+		confirmDeleteComment,
+		cancelDeleteComment,
+		currentUserId,
     };
 };
