@@ -1766,92 +1766,51 @@ This will fail in production if not fixed.`);
   };
   const getCrmToken = (projectCode, uid) => {
     const authStore = useAuthStore();
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/token`,
-        method: "GET",
-        data: {
-          projectCode,
-          uid,
-          type: "CRM",
-          source: SYSTEM_CONFIG.SOURCE_PARAM
-        },
-        header: {
-          "Authorization": `Bearer ${authStore.rootToken}`
-        },
-        success: (res) => {
-          var _a, _b, _c, _d;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1 && ((_c = (_b = res.data) == null ? void 0 : _b.data) == null ? void 0 : _c.token)) {
-            resolve(res.data.data.token);
-          } else {
-            reject(((_d = res.data) == null ? void 0 : _d.message) || "Lỗi lấy Token CRM");
-          }
-        },
-        fail: (err) => reject(err)
-      });
-    });
+    return request({
+      url: `${CRM_API_URL}/token`,
+      method: "GET",
+      data: {
+        projectCode,
+        uid,
+        type: "CRM",
+        source: SYSTEM_CONFIG.SOURCE_PARAM
+      },
+      // Lưu ý: request wrapper đã tự thêm Authorization từ Store
+      // Nếu API này cần token ROOT đặc biệt thì đè lại header như sau:
+      header: {
+        "Authorization": `Bearer ${authStore.rootToken}`
+      }
+    }).then((data) => data.token);
   };
   const getCrmFieldSearch = (crmToken) => {
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/Customer/getAllFieldSearch`,
-        method: "POST",
-        data: {},
-        header: {
-          "Authorization": `Bearer ${crmToken}`
-        },
-        success: (res) => {
-          var _a, _b;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
-            resolve(res.data.data);
-          } else {
-            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy Field Search");
-          }
-        },
-        fail: (err) => reject(err)
-      });
+    return request({
+      url: `${CRM_API_URL}/Customer/getAllFieldSearch`,
+      method: "POST",
+      data: {},
+      header: { "Authorization": `Bearer ${crmToken}` }
     });
   };
   const getCrmCustomers = (crmToken, body) => {
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/Customer/getAll`,
-        method: "POST",
-        data: body,
-        header: {
-          "Authorization": `Bearer ${crmToken}`
-        },
-        success: (res) => {
-          var _a, _b;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
-            resolve(res.data.data);
-          } else {
-            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy danh sách KH");
-          }
-        },
-        fail: (err) => reject(err)
-      });
+    return request({
+      url: `${CRM_API_URL}/Customer/getAll`,
+      method: "POST",
+      data: body,
+      header: { "Authorization": `Bearer ${crmToken}` }
     });
   };
   const getCrmCustomerDetail = (crmToken, customerUid) => {
     return request({
       url: `${CRM_API_URL}/Customer/getDetail`,
       method: "GET",
-      data: {
-        uid: customerUid
-      },
-      header: {
-        "Authorization": `Bearer ${crmToken}`
-      }
+      data: { uid: customerUid },
+      header: { "Authorization": `Bearer ${crmToken}` }
     });
   };
   const getCrmActionTimeline = (crmToken, customerUid, type = "ALL") => {
     return request({
       url: `${CRM_API_URL}/ActionTimeline/getAll?from=-1&to=-1&customerUid=${customerUid}&type=${type}&page=1&size=10&memberUid=&projectCode=`,
       method: "GET",
-      header: {
-        "Authorization": `Bearer ${crmToken}`
-      }
+      header: { "Authorization": `Bearer ${crmToken}` }
     });
   };
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1e3;
@@ -2000,9 +1959,9 @@ This will fail in production if not fixed.`);
             return;
           }
           if (res.statusCode === 401) {
-            formatAppLog("warn", "at utils/request.ts:42", `⚠️ API 401: Token hết hạn tại ${options.url}`);
+            formatAppLog("warn", "at utils/request.ts:43", `⚠️ API 401: Token hết hạn tại ${options.url}`);
             if (options._isRetry) {
-              formatAppLog("error", "at utils/request.ts:45", "❌ Refresh Token cũng thất bại -> Logout.");
+              formatAppLog("error", "at utils/request.ts:46", "❌ Refresh Token cũng thất bại -> Logout.");
               authStore.logout();
               reject(data);
               return;
@@ -2086,15 +2045,14 @@ This will fail in production if not fixed.`);
       endDate: dateToTimestamp$1(filter.createdTo),
       dueDateFrom: dateToTimestamp$1(filter.dueDateFrom),
       dueDateTo: dateToTimestamp$1(filter.dueDateTo),
+      createdBy: creatorId || "",
+      assigneeId: assigneeId || "",
+      links: sourceValue || "",
+      // Mặc định các trường khác rỗng
       customerCode: "",
       groupId: "",
       transId: "",
-      createdBy: creatorId || "",
-      assigneeId: assigneeId || "",
-      // createdBy: '',
-      // assigneeId: '',
-      pluginType: "",
-      links: sourceValue || ""
+      pluginType: ""
     };
   };
   const mapTodoFromApi = (apiData) => {
@@ -2103,34 +2061,36 @@ This will fail in production if not fixed.`);
     const status = apiData.status || TODO_STATUS.NEW;
     const title = apiData.title || "Không tên";
     return {
-      id: apiData.id,
-      code: apiData.code,
+      ...apiData,
+      // Spread toàn bộ thuộc tính gốc
       title,
+      // Các thuộc tính UI thêm vào (nếu TodoItem cho phép mở rộng hoặc bạn tạo interface UI riêng)
+      // Ở đây mình giả sử TodoItem chứa cả UI fields (statusClass, statusLabel...)
+      // Nếu TodoItem chỉ thuần data API, bạn nên tạo interface TodoItemUI extends TodoItem
       statusClass: STATUS_COLORS[status] || "bg-orange",
       statusLabel: STATUS_LABELS[status] || status,
       avatarText: title.substring(0, 2).toUpperCase(),
-      createdAtFormatted: formatFullDateTime(apiData.createdAt),
-      raw: apiData
+      createdAtFormatted: formatFullDateTime(apiData.createdAt)
     };
   };
   const getTodos = async (params) => {
-    const rawData = await request({
+    const response = await request({
       url: `${TODO_API_URL}/getAll`,
       method: "GET",
       data: {
         projectCode: PROJECT_CODE,
-        pageNo: params.pageNo || 1,
-        pageSize: params.pageSize || 15,
+        pageNo: 1,
+        pageSize: 15,
         ...params
       }
     });
-    if (Array.isArray(rawData)) {
-      return rawData.map((item) => mapTodoFromApi(item));
+    if (Array.isArray(response)) {
+      return response.map((item) => mapTodoFromApi(item));
     }
     return [];
   };
   const getTodoCount = async (params) => {
-    const result = await request({
+    const response = await request({
       url: `${TODO_API_URL}/countAll`,
       method: "GET",
       data: {
@@ -2138,7 +2098,7 @@ This will fail in production if not fixed.`);
         ...params
       }
     });
-    return Number(result) || 0;
+    return Number(response) || 0;
   };
   const createTodo = (data) => {
     return request({
@@ -2162,6 +2122,13 @@ This will fail in production if not fixed.`);
         id,
         projectCode: PROJECT_CODE
       }
+    });
+  };
+  const updateTodo = (data) => {
+    return request({
+      url: `${TODO_API_URL}/update`,
+      method: "POST",
+      data
     });
   };
   const getTodoMessages = (todoId, keySearch = "") => {
@@ -2208,13 +2175,6 @@ This will fail in production if not fixed.`);
   const reactionTodoMessage = (data) => {
     return request({
       url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/reaction`,
-      method: "POST",
-      data
-    });
-  };
-  const updateTodo = (data) => {
-    return request({
-      url: `${TODO_API_URL}/update`,
       method: "POST",
       data
     });
@@ -2296,7 +2256,7 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:72", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:73", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const getTodoList = async () => {
@@ -2331,7 +2291,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         totalItems.value = countData || 0;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:117", error);
+        formatAppLog("error", "at controllers/list_todo.ts:118", error);
         uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -2367,7 +2327,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:152", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:153", "Delete Error:", error);
         uni.showToast({ title: "Xóa thất bại", icon: "none" });
       }
     };
@@ -2956,7 +2916,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot_todo_3/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot_todo_4/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
       return -1;
@@ -3708,7 +3668,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot_todo_3/components/Todo/TodoEditor.vue"]]);
+  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot_todo_4/components/Todo/TodoEditor.vue"]]);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoDatePicker",
     props: {
@@ -3821,7 +3781,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot_todo_3/components/Todo/TodoDatePicker.vue"]]);
+  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot_todo_4/components/Todo/TodoDatePicker.vue"]]);
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -3939,7 +3899,7 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot_todo_3/components/Todo/CustomerModal.vue"]]);
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot_todo_4/components/Todo/CustomerModal.vue"]]);
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
@@ -4093,7 +4053,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot_todo_3/pages/todo/create_todo.vue"]]);
+  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot_todo_4/pages/todo/create_todo.vue"]]);
   const _imports_0 = "/static/logo.png";
   const _sfc_main$2 = {
     data() {
@@ -4122,7 +4082,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "D:/uni_app/vbot_todo_3/pages/index/index.vue"]]);
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "D:/uni_app/vbot_todo_4/pages/index/index.vue"]]);
   const timestampToDateStr = (ts) => {
     if (!ts || ts <= 0)
       return "";
@@ -5845,7 +5805,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot_todo_3/pages/todo/todo_detail.vue"]]);
+  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot_todo_4/pages/todo/todo_detail.vue"]]);
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
   __definePage("pages/todo/create_todo", PagesTodoCreateTodo);
   __definePage("pages/index/index", PagesIndexIndex);
@@ -5878,7 +5838,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot_todo_3/App.vue"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot_todo_4/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());

@@ -1,58 +1,79 @@
-//api/todo.ts 
 import { request } from '@/utils/request';
 import { mapTodoFromApi } from '@/models/todo';
-import type { CreateTodoPayload } from '@/types/todo';
-import { PROJECT_CODE, TODO_API_URL ,SERVER_BASE_URL} from '@/utils/config';
+import { PROJECT_CODE, TODO_API_URL, SERVER_BASE_URL } from '@/utils/config';
 
-export const getTodos = async (params: any): Promise<any[]> => {
-    const rawData = await request({
-       url: `${TODO_API_URL}/getAll`,
-        method: 'GET', 
+// Import Types
+import type { 
+    TodoItem, 
+    GetTodoParams, 
+    CreateTodoPayload, 
+    UpdateTodoPayload 
+} from '@/types/todo';
+import type { 
+    TodoMessageData, 
+    CreateMessagePayload, 
+    UpdateMessagePayload, 
+    ReactionPayload 
+} from '@/types/todo_message';
+
+// 1. Lấy danh sách Todo
+// [SỬA]: request trả về thẳng Array, không qua ApiResponse nữa
+export const getTodos = async (params: Partial<GetTodoParams>): Promise<TodoItem[]> => {
+    const response = await request<TodoItem[]>({
+        url: `${TODO_API_URL}/getAll`,
+        method: 'GET',
         data: {
             projectCode: PROJECT_CODE,
-            pageNo: params.pageNo || 1,
-            pageSize: params.pageSize || 15, 
+            pageNo: 1,
+            pageSize: 15,
             ...params
         }
     });
 
-    if (Array.isArray(rawData)) {
-        return rawData.map((item: any) => mapTodoFromApi(item));
+    // Kiểm tra trực tiếp response có phải là Array không
+    if (Array.isArray(response)) {
+        return response.map((item) => mapTodoFromApi(item));
     }
     return [];
 };
 
-export const getTodoCount = async (params: any): Promise<number> => {
-    const result = await request({
-       url: `${TODO_API_URL}/countAll`,
-        method: 'GET', 
+// 2. Đếm số lượng
+// [SỬA]: request trả về thẳng số (number)
+export const getTodoCount = async (params: Partial<GetTodoParams>): Promise<number> => {
+    const response = await request<number>({
+        url: `${TODO_API_URL}/countAll`,
+        method: 'GET',
         data: {
             projectCode: PROJECT_CODE,
-            ...params 
+            ...params
         }
     });
-    
-    return Number(result) || 0; 
+    return Number(response) || 0;
 };
 
-export const createTodo = (data: CreateTodoPayload): Promise<any> => {
-    return request({
+// 3. Tạo công việc
+// [SỬA]: Server trả về ID (number)
+export const createTodo = (data: CreateTodoPayload): Promise<number> => {
+    return request<number>({
         url: `${TODO_API_URL}/create`,
         method: 'POST',
         data: data
     });
 };
 
-export const deleteTodo = (id: string | number): Promise<any> => {
-    return request({
+// 4. Xóa công việc
+export const deleteTodo = (id: string | number): Promise<boolean> => {
+    return request<boolean>({
         url: `${TODO_API_URL}/delete`,
         method: 'POST',
         data: { id: id }
     });
 };
 
-export const getTodoDetail = (id: string | number): Promise<any> => {
-    return request({
+// 5. Chi tiết công việc
+// [SỬA]: Server trả về Object TodoItem
+export const getTodoDetail = (id: string | number): Promise<TodoItem> => {
+    return request<TodoItem>({
         url: `${TODO_API_URL}/getDetail`,
         method: 'GET',
         data: {
@@ -62,35 +83,50 @@ export const getTodoDetail = (id: string | number): Promise<any> => {
     });
 };
 
-export const getTodoMessages = (todoId: string | number, keySearch: string = ''): Promise<any[]> => {
-    return request({
+// 6. Cập nhật công việc
+export const updateTodo = (data: UpdateTodoPayload): Promise<number> => {
+    return request<number>({
+        url: `${TODO_API_URL}/update`,
+        method: 'POST',
+        data: data
+    });
+};
+
+// --- TODO MESSAGES ---
+
+// 7. Lấy danh sách tin nhắn
+export const getTodoMessages = (todoId: string | number, keySearch: string = ''): Promise<TodoMessageData[]> => {
+    return request<TodoMessageData[]>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getAllNoPageWithReact`,
         method: 'GET',
         data: {
             todoId: todoId,
-            keySearch: keySearch 
+            keySearch: keySearch
         }
     });
 };
 
-export const createTodoMessage = (data: any): Promise<any> => {
-    return request({
+// 8. Tạo tin nhắn
+export const createTodoMessage = (data: CreateMessagePayload): Promise<number> => {
+    return request<number>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/create`,
         method: 'POST',
         data: data
     });
 };
 
-export const deleteTodoMessage = (id: number | string): Promise<any> => {
-    return request({
+// 9. Xóa tin nhắn
+export const deleteTodoMessage = (id: number | string): Promise<boolean> => {
+    return request<boolean>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/delete`,
         method: 'POST',
         data: { id: id }
     });
 };
 
-export const getTodoMessageDetail = (id: number | string, todoId: number | string): Promise<any> => {
-    return request({
+// 10. Chi tiết tin nhắn
+export const getTodoMessageDetail = (id: number | string, todoId: number | string): Promise<TodoMessageData> => {
+    return request<TodoMessageData>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/getDetail`,
         method: 'GET',
         data: {
@@ -100,24 +136,19 @@ export const getTodoMessageDetail = (id: number | string, todoId: number | strin
     });
 };
 
-export const updateTodoMessage = (data: any): Promise<any> => {
-    return request({
+// 11. Cập nhật tin nhắn
+export const updateTodoMessage = (data: UpdateMessagePayload): Promise<TodoMessageData> => {
+    return request<TodoMessageData>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/update`,
         method: 'POST',
         data: data
     });
 };
 
-export const reactionTodoMessage = (data: any): Promise<any> => {
-    return request({
+// 12. Thả tim
+export const reactionTodoMessage = (data: ReactionPayload): Promise<number> => {
+    return request<number>({
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/reaction`,
-        method: 'POST',
-        data: data
-    });
-};
-export const updateTodo = (data: any): Promise<any> => {
-    return request({
-        url: `${TODO_API_URL}/update`,
         method: 'POST',
         data: data
     });

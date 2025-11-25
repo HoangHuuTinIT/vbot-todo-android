@@ -1,7 +1,7 @@
 // models/todo_detail.ts
 import { TODO_STATUS } from '@/utils/constants';
 import { TODO_SOURCE } from '@/utils/enums';
-
+import type { TodoItem } from '@/types/todo';
 // Định nghĩa Interface cho Form Chi tiết để code gợi ý chuẩn hơn
 export interface TodoDetailForm {
     id: string | number;
@@ -11,18 +11,19 @@ export interface TodoDetailForm {
     statusIndex: number;
     sourceIndex: number;
     assigneeIndex: number;
-	assigneeId: string;
-    dueDate: string;     // YYYY-MM-DD
-    notifyDate: string;  // YYYY-MM-DD
-    notifyTime: string;  // HH:mm
-	customerCode: string;       // Lưu lại để gọi API
-	customerName: string;
-	customerNameLabel: string
-	customerPhone: string;
-	customerPhoneLabel: string;
-	customerManagerName: string;
-	customerManagerLabel: string;
-	raw: any;
+    assigneeId: string;
+    dueDate: string;
+    notifyDate: string;
+    notifyTime: string;
+    customerCode: string;
+    customerName: string;
+    customerNameLabel: string;
+    customerPhone: string;
+    customerPhoneLabel: string;
+    customerManagerName: string;
+    customerManagerLabel: string;
+    
+    raw: TodoItem; // <-- KHÔNG DÙNG ANY NỮA
 }
 
 // --- HELPER: Xử lý ngày tháng nội bộ cho file này ---
@@ -50,7 +51,7 @@ const timestampToTimeStr = (ts: number): string => {
 /**
  * Hàm Mapper: Biến dữ liệu API (Raw) -> Dữ liệu Form (UI)
  */
-export const mapTodoDetailToForm = (apiData: any): TodoDetailForm | null => {
+export const mapTodoDetailToForm = (apiData: TodoItem): TodoDetailForm | null => {
     if (!apiData) return null;
 
     // 1. Xử lý Trạng thái (Map String API -> Index Picker)
@@ -87,7 +88,6 @@ export const mapTodoDetailToForm = (apiData: any): TodoDetailForm | null => {
 		customerPhone: '',
 		customerPhoneLabel: 'Số điện thoại',
 		customerManagerName: '',
-		
 		raw: apiData
     };
 };

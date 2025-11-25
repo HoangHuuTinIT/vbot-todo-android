@@ -1,50 +1,90 @@
-// 1. Enum trạng thái (Mapping từ file enums.js)
-export type TodoStatus = 'TO_DO' | 'IN_PROGRESS' | 'DONE';
-
-// 2. Interface cho Form nhập liệu (UI)
-export interface TodoForm {
-    name: string;
-    desc: string;
-    customer: string;
-    assignee: string;
-    dueDate: string;    // YYYY-MM-DD
-    notifyDate: string; // YYYY-MM-DD
-    notifyTime: string; // HH:mm
-}
-
-// 3. Interface cho Payload gửi lên API (Server)
-export interface CreateTodoPayload {
-    title: string;
-    description: string;
-    projectCode: string;
-    createdBy: string;
-    status: TodoStatus;
-    links: string;
-    pluginType: string;
-    customerCode: string;
-    assigneeId: string;
-    groupId: string;
-    transId: string;
-    tagCodes: string;
-    groupMemberUid: string;
-    files: string;
-    phone: string;
-    dueDate: number;             // Timestamp
-    notificationReceivedAt: number; // Timestamp
-}
-
-// 4. Interface Config
+//types/todo.ts  
+// Cấu trúc 1 Todo (Dùng cho cả List và Detail)
+import type { TodoStatusType, TodoLinkType } from './common';
 export interface AppConfig {
     projectCode: string;
     uid: string;
 }
+
+export interface TodoForm {
+    name: string;
+    desc: string;
+    customer: string;
+    customerUid?: string; // Có thể null nếu không chọn KH
+    assignee: string;     // memberUID
+    dueDate: string;      // YYYY-MM-DD
+    notifyDate: string;   // YYYY-MM-DD
+    notifyTime: string;   // HH:mm
+}
 export interface TodoItem {
-    id: string | number;
-    code: string;
+    id: number;
     title: string;
-    statusClass: string;
-    statusLabel: string;
-    avatarText: string;
-    createdAtFormatted: string;
-    raw: any; // Dữ liệu gốc chưa xử lý
+    code: string;
+    customerCode: string;
+    projectCode: string | null;
+    groupId: string;
+    transId: string;
+    description: string; // HTML content
+    status: TodoStatusType;
+    createdBy: string;
+    assigneeId: string;
+    groupMemberUid: string | null;
+    dueDate: number; // Timestamp
+    notificationReceivedAt: number; // Timestamp
+    tags: string[];
+    links: TodoLinkType;
+    pluginType: string;
+    createdAt: number;
+    updatedAt: number;
+    completedAt: number | null;
+    firstActionAt: number | null;
+    reAssignCount: number | null;
+}
+
+// Param trên URL khi Filter/Get All Todo
+export interface GetTodoParams {
+    projectCode: string;
+    keySearch?: string;
+    code?: string;
+    customerCode?: string;
+    groupId?: string;
+    transId?: string;
+    status?: string;
+    createdBy?: string;
+    assigneeId?: string;
+    pluginType?: string;
+    links?: string;
+    startDate?: number;
+    endDate?: number;
+    dueDateFrom?: number;
+    dueDateTo?: number;
+    pageNo?: number;
+    pageSize?: number;
+}
+
+// Payload gửi đi khi TẠO MỚI (Create)
+export interface CreateTodoPayload {
+    title: string;
+    customerCode: string;
+    projectCode: string;
+    description: string;
+    status: TodoStatusType;
+    groupId: string;
+    transId: string;
+    tagCodes: string;
+    links: TodoLinkType;
+    pluginType: string;
+    createdBy: string;
+    assigneeId: string;
+    groupMemberUid: string;
+    files: string;
+    phone: string;
+    dueDate: number; // gửi -1 nếu không có
+    notificationReceivedAt: number; // gửi -1 nếu không có
+}
+
+// Payload gửi đi khi CẬP NHẬT (Update)
+export interface UpdateTodoPayload extends CreateTodoPayload {
+    id: number;
+    preFixCode: string; // VD: "TODO"
 }

@@ -1,3 +1,4 @@
+//controllers/list_todo.ts 
 import { ref, computed } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 // Import từ file .ts (bỏ đuôi .js khi import cũng được)

@@ -1,15 +1,14 @@
-import { useAuthStore } from '@/stores/auth'; // Import Store TS
+import { useAuthStore } from '@/stores/auth'; 
 
-// Định nghĩa kiểu dữ liệu cho options request
 interface RequestOptions extends UniApp.RequestOptions {
-    _isRetry?: boolean; // Cờ custom để xử lý retry
+    _isRetry?: boolean;
     data?: any;
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; // Giới hạn method
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
     header?: any;
 }
 
-// Hàm request chính (Interceptor Logic)
-export const request = async (options: RequestOptions): Promise<any> => {
+// [SỬA Ở ĐÂY]: Thêm <T = any> vào trước dấu ngoặc đơn
+export const request = async <T = any>(options: RequestOptions): Promise<T> => {
     const authStore = useAuthStore();
 
     const token = authStore.todoToken || authStore.rootToken;
@@ -31,10 +30,12 @@ export const request = async (options: RequestOptions): Promise<any> => {
             header: headers,
             
             success: async (res: UniApp.RequestSuccessCallbackResult) => {
-                const data = res.data as any; // Ép kiểu để dễ truy cập
+                const data = res.data as any;
 
+                // Interceptor: Chỉ lấy phần .data bên trong ApiResponse
                 if (res.statusCode === 200) {
-                    resolve(data.data); 
+                    // [QUAN TRỌNG] resolve thẳng data.data với kiểu T
+                    resolve(data.data as T); 
                     return;
                 }
 
@@ -49,12 +50,11 @@ export const request = async (options: RequestOptions): Promise<any> => {
                     }
 
                     try {
-                        // Thử đổi Token mới
                         await authStore.exchangeForTodoToken();
                         console.log('🔄 Đã Refresh Token -> Đang gọi lại API cũ...');
 
-                        // Gọi lại request (đánh dấu là retry)
-                        const retryResult = await request({ 
+                        // Gọi lại request (recursive)
+                        const retryResult = await request<T>({ 
                             ...options, 
                             _isRetry: true 
                         });
