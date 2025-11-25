@@ -17,7 +17,24 @@
             </view>
             <text class="arrow-icon">›</text>
         </view>
-        
+        <view class="flat-item">
+                    <view class="item-left">
+                        <image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
+                    </view>
+                    
+                    <picker 
+                        mode="selector" 
+                        :range="sourceOptions" 
+                        @change="onSourceChange" 
+                        class="full-width-picker"
+                    >
+                        <view class="picker-display" :class="{ 'placeholder-color': sourceIndex === -1 }">
+                            {{ sourceIndex > -1 ? sourceOptions[sourceIndex] : 'Chọn nguồn' }}
+                        </view>
+                    </picker>
+                    
+                    <text class="arrow-icon">›</text>
+                </view>
         <CustomerModal 
             :visible="showCustomerModal"
             :loading="loadingCustomer"
@@ -70,7 +87,10 @@
         memberOptions, onMemberChange, currentAssigneeName,
         // Các biến customer
         showCustomerModal, loadingCustomer, customerList, 
-        openCustomerPopup, onCustomerSelect
+        openCustomerPopup, onCustomerSelect,
+		sourceOptions, 
+		        sourceIndex, 
+		        onSourceChange,
     } = useCreateTodoController();
 </script>
 

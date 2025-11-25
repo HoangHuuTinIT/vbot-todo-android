@@ -7,6 +7,7 @@ import { buildCreateTodoPayload } from '@/models/create_todo';
 import type { TodoForm } from '@/types/todo';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { useAuthStore } from '@/stores/auth';
+import { TODO_SOURCE } from '@/utils/enums';
 export const useCreateTodoController = () => {
     const authStore = useAuthStore();
     // Helpers
@@ -32,7 +33,9 @@ export const useCreateTodoController = () => {
         notifyDate: getTodayISO(),
         notifyTime: getCurrentTime()
     });
-
+	const sourceOptions = ['Cuộc gọi', 'Khách hàng', 'Hội thoại'];
+	const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
+	const sourceIndex = ref(-1);
     // --- MEMBER STATE (Mới) ---
     const memberList = ref<any[]>([]); // Chứa danh sách raw từ API
     const memberOptions = ref<string[]>([]); // Chứa danh sách tên để hiển thị trong Picker
@@ -44,7 +47,9 @@ export const useCreateTodoController = () => {
     const customerList = ref<any[]>([]); // List đã qua xử lý để hiển thị
     const customerToken = ref(''); // Lưu token CRM để dùng lại nếu cần
     // --- LOGIC ACTIONS ---
-    
+    const onSourceChange = (e: any) => {
+            sourceIndex.value = parseInt(e.detail.value);
+        };
     // 1. Hàm gọi API lấy thành viên (Mới)
     const fetchMembers = async () => {
         try {
@@ -162,15 +167,26 @@ export const useCreateTodoController = () => {
             uni.showToast({ title: 'Vui lòng nhập tên công việc', icon: 'none' });
             return;
         }
-        
+        let selectedLink = 'CALL';
+		if (sourceIndex.value >= 0) {
+		            selectedLink = sourceValues[sourceIndex.value];
+		        } else {
+		            // Nếu chưa chọn gì -> Có thể báo lỗi hoặc để mặc định
+		            // Ví dụ báo lỗi:
+		            // uni.showToast({ title: 'Vui lòng chọn nguồn', icon: 'none' });
+		            // return;
+		            
+		            // Hoặc để mặc định là CALL như logic cũ
+		             selectedLink = 'CALL';
+		        }
         loading.value = true;
     
         try {
-            const payload = buildCreateTodoPayload(form.value, {
-                projectCode: PROJECT_CODE,
-                uid: UID
-            });
-    
+                    const payload = buildCreateTodoPayload(form.value, {
+                        projectCode: PROJECT_CODE,
+                        uid: UID,
+                        link: selectedLink // <--- Truyền giá trị động vào đây
+                });
             await createTodo(payload);
     
             uni.showToast({ title: 'Tạo thành công!', icon: 'success' });
@@ -198,6 +214,10 @@ export const useCreateTodoController = () => {
            showCustomerModal, loadingCustomer, customerList, 
            openCustomerPopup, onCustomerSelect,
            // Action
-           goBack, submitForm
+           goBack, submitForm,
+		   
+		   sourceOptions,
+		sourceIndex,
+		    onSourceChange,
        };
 };

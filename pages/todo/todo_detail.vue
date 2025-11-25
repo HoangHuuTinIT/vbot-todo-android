@@ -7,9 +7,9 @@
         <view class="detail-header">
             <view class="header-top">
                 <text class="header-code">#{{ form.code }}</text>
-                <view class="header-actions">
+               <!-- <view class="header-actions">
                     <text class="btn-text" @click="saveTodo">Lưu</text>
-                </view>
+                </view> -->
             </view>
             <input class="header-title-input" v-model="form.title" placeholder="Tên công việc" />
         </view>

@@ -15,6 +15,9 @@ const dateToTimestamp = (dateStr: string): number => {
  * Model: Xây dựng Payload
  * Bây giờ hàm này trả về kiểu CreateTodoPayload -> IDE sẽ biết chính xác kết quả trả về có gì
  */
+export interface CreateTodoConfig extends AppConfig {
+    link?: string; 
+}
 export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): CreateTodoPayload => {
     
     const fullNotifyDateTime = `${form.notifyDate} ${form.notifyTime || '00:00'}`;
@@ -28,7 +31,7 @@ export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): Creat
         createdBy: config.uid,
         
         status: TODO_STATUS.NEW as any, // Ép kiểu nếu constants JS chưa chuẩn
-        links: TODO_SOURCE.CALL,
+		links: config.link || TODO_SOURCE.CALL,
         pluginType: DEFAULT_VALUES.PLUGIN_TYPE, 
         
        customerCode: form.customerUid || DEFAULT_VALUES.CUSTOMER_CODE,

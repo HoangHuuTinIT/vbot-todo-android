@@ -2974,7 +2974,7 @@ This will fail in production if not fixed.`);
       createdBy: config.uid,
       status: TODO_STATUS.NEW,
       // Ép kiểu nếu constants JS chưa chuẩn
-      links: TODO_SOURCE.CALL,
+      links: config.link || TODO_SOURCE.CALL,
       pluginType: DEFAULT_VALUES.PLUGIN_TYPE,
       customerCode: form.customerUid || DEFAULT_VALUES.CUSTOMER_CODE,
       assigneeId: form.assignee || DEFAULT_VALUES.ASSIGNEE_ID,
@@ -3011,6 +3011,9 @@ This will fail in production if not fixed.`);
       notifyDate: getTodayISO(),
       notifyTime: getCurrentTime()
     });
+    const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại"];
+    const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
+    const sourceIndex = vue.ref(-1);
     const memberList = vue.ref([]);
     const memberOptions = vue.ref([]);
     const selectedMemberIndex = vue.ref(-1);
@@ -3018,13 +3021,16 @@ This will fail in production if not fixed.`);
     const loadingCustomer = vue.ref(false);
     const customerList = vue.ref([]);
     const customerToken = vue.ref("");
+    const onSourceChange = (e) => {
+      sourceIndex.value = parseInt(e.detail.value);
+    };
     const fetchMembers = async () => {
       try {
         const data = await getAllMembers();
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:56", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:61", "Lỗi lấy thành viên:", error);
         uni.showToast({ title: "Không thể tải danh sách thành viên", icon: "none" });
       }
     };
@@ -3035,7 +3041,7 @@ This will fail in production if not fixed.`);
       try {
         const token = authStore.crmToken;
         if (!token) {
-          formatAppLog("error", "at controllers/create_todo.ts:70", "Chưa có CRM Token!");
+          formatAppLog("error", "at controllers/create_todo.ts:75", "Chưa có CRM Token!");
           return;
         }
         customerToken.value = token;
@@ -3072,7 +3078,7 @@ This will fail in production if not fixed.`);
           };
         });
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:118", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:123", "Lỗi tải khách hàng:", error);
         uni.showToast({ title: "Lỗi tải dữ liệu CRM", icon: "none" });
       } finally {
         loadingCustomer.value = false;
@@ -3106,11 +3112,19 @@ This will fail in production if not fixed.`);
         uni.showToast({ title: "Vui lòng nhập tên công việc", icon: "none" });
         return;
       }
+      let selectedLink = "CALL";
+      if (sourceIndex.value >= 0) {
+        selectedLink = sourceValues[sourceIndex.value];
+      } else {
+        selectedLink = "CALL";
+      }
       loading.value = true;
       try {
         const payload = buildCreateTodoPayload(form.value, {
           projectCode: PROJECT_CODE,
-          uid: UID
+          uid: UID,
+          link: selectedLink
+          // <--- Truyền giá trị động vào đây
         });
         await createTodo(payload);
         uni.showToast({ title: "Tạo thành công!", icon: "success" });
@@ -3118,7 +3132,7 @@ This will fail in production if not fixed.`);
           uni.navigateBack();
         }, 1500);
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:180", "❌ Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:196", "❌ Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || "Thất bại";
         uni.showToast({ title: "Lỗi: " + errorMsg, icon: "none" });
       } finally {
@@ -3143,7 +3157,10 @@ This will fail in production if not fixed.`);
       onCustomerSelect,
       // Action
       goBack,
-      submitForm
+      submitForm,
+      sourceOptions,
+      sourceIndex,
+      onSourceChange
     };
   };
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
@@ -3940,9 +3957,12 @@ This will fail in production if not fixed.`);
         loadingCustomer,
         customerList,
         openCustomerPopup,
-        onCustomerSelect
+        onCustomerSelect,
+        sourceOptions,
+        sourceIndex,
+        onSourceChange
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, TodoEditor, TodoDatePicker, CustomerModal };
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, TodoEditor, TodoDatePicker, CustomerModal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3996,11 +4016,36 @@ This will fail in production if not fixed.`);
         ),
         vue.createElementVNode("text", { class: "arrow-icon" }, "›")
       ]),
+      vue.createElementVNode("view", { class: "flat-item" }, [
+        vue.createElementVNode("view", { class: "item-left" }, [
+          vue.createElementVNode("image", {
+            src: "https://img.icons8.com/ios/50/666666/internet.png",
+            class: "item-icon"
+          })
+        ]),
+        vue.createElementVNode("picker", {
+          mode: "selector",
+          range: $setup.sourceOptions,
+          onChange: _cache[3] || (_cache[3] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
+          class: "full-width-picker"
+        }, [
+          vue.createElementVNode(
+            "view",
+            {
+              class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
+            },
+            vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : "Chọn nguồn"),
+            3
+            /* TEXT, CLASS */
+          )
+        ], 40, ["range"]),
+        vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+      ]),
       vue.createVNode($setup["CustomerModal"], {
         visible: $setup.showCustomerModal,
         loading: $setup.loadingCustomer,
         customers: $setup.customerList,
-        onClose: _cache[3] || (_cache[3] = ($event) => $setup.showCustomerModal = false),
+        onClose: _cache[4] || (_cache[4] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect
       }, null, 8, ["visible", "loading", "customers", "onSelect"]),
       vue.createElementVNode("view", { class: "flat-item" }, [
@@ -4013,7 +4058,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("picker", {
           mode: "selector",
           range: $setup.memberOptions,
-          onChange: _cache[4] || (_cache[4] = (...args) => $setup.onMemberChange && $setup.onMemberChange(...args)),
+          onChange: _cache[5] || (_cache[5] = (...args) => $setup.onMemberChange && $setup.onMemberChange(...args)),
           class: "full-width-picker"
         }, [
           vue.createElementVNode(
@@ -4029,21 +4074,21 @@ This will fail in production if not fixed.`);
       ]),
       vue.createVNode($setup["TodoDatePicker"], {
         dueDate: $setup.form.dueDate,
-        "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
+        "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
         notifyDate: $setup.form.notifyDate,
-        "onUpdate:notifyDate": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyDate = $event),
+        "onUpdate:notifyDate": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyDate = $event),
         notifyTime: $setup.form.notifyTime,
-        "onUpdate:notifyTime": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyTime = $event)
+        "onUpdate:notifyTime": _cache[8] || (_cache[8] = ($event) => $setup.form.notifyTime = $event)
       }, null, 8, ["dueDate", "notifyDate", "notifyTime"]),
       vue.createElementVNode("view", { class: "footer-action" }, [
         vue.createElementVNode("button", {
           class: "btn btn-cancel",
-          onClick: _cache[8] || (_cache[8] = (...args) => $setup.goBack && $setup.goBack(...args))
+          onClick: _cache[9] || (_cache[9] = (...args) => $setup.goBack && $setup.goBack(...args))
         }, "Hủy bỏ"),
         vue.createElementVNode("button", {
           class: "btn btn-submit",
           disabled: $setup.loading,
-          onClick: _cache[9] || (_cache[9] = (...args) => $setup.submitForm && $setup.submitForm(...args))
+          onClick: _cache[10] || (_cache[10] = (...args) => $setup.submitForm && $setup.submitForm(...args))
         }, vue.toDisplayString($setup.loading ? "Đang lưu..." : "Lưu công việc"), 9, ["disabled"])
       ])
     ]);
@@ -5014,19 +5059,13 @@ This will fail in production if not fixed.`);
             "#" + vue.toDisplayString($setup.form.code),
             1
             /* TEXT */
-          ),
-          vue.createElementVNode("view", { class: "header-actions" }, [
-            vue.createElementVNode("text", {
-              class: "btn-text",
-              onClick: _cache[0] || (_cache[0] = (...args) => $setup.saveTodo && $setup.saveTodo(...args))
-            }, "Lưu")
-          ])
+          )
         ]),
         vue.withDirectives(vue.createElementVNode(
           "input",
           {
             class: "header-title-input",
-            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.title = $event),
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
             placeholder: "Tên công việc"
           },
           null,
@@ -5044,7 +5083,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("view", { class: "section-block" }, [
           vue.createVNode($setup["TodoEditor"], {
             modelValue: $setup.form.desc,
-            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event),
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.desc = $event),
             placeholder: "Nhập mô tả công việc..."
           }, null, 8, ["modelValue"]),
           vue.createElementVNode("view", {
@@ -5054,7 +5093,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("button", {
               class: "btn-save-comment",
               disabled: $setup.isSavingDescription,
-              onClick: _cache[3] || (_cache[3] = (...args) => $setup.onSaveDescription && $setup.onSaveDescription(...args))
+              onClick: _cache[2] || (_cache[2] = (...args) => $setup.onSaveDescription && $setup.onSaveDescription(...args))
             }, vue.toDisplayString($setup.isSavingDescription ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])
           ])
         ]),
@@ -5064,7 +5103,7 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.commentFilterOptions,
             value: $setup.commentFilterIndex,
-            onChange: _cache[4] || (_cache[4] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
+            onChange: _cache[3] || (_cache[3] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -5080,7 +5119,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "editor-container" }, [
               vue.createVNode($setup["TodoEditor"], {
                 modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.newCommentText = $event),
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.newCommentText = $event),
                 placeholder: $setup.isEditingComment ? "Đang chỉnh sửa..." : $setup.isReplying ? "Viết câu trả lời..." : "Viết bình luận"
               }, null, 8, ["modelValue", "placeholder"])
             ]),
@@ -5127,7 +5166,7 @@ This will fail in production if not fixed.`);
                 key: 0,
                 class: "btn-save-comment",
                 disabled: $setup.isSubmittingComment,
-                onClick: _cache[6] || (_cache[6] = (...args) => $setup.submitComment && $setup.submitComment(...args))
+                onClick: _cache[5] || (_cache[5] = (...args) => $setup.submitComment && $setup.submitComment(...args))
               }, vue.toDisplayString($setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 1,
                 class: "edit-actions-row"
@@ -5135,12 +5174,12 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode("button", {
                   class: "btn-cancel-edit",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[7] || (_cache[7] = (...args) => $setup.onCancelEditComment && $setup.onCancelEditComment(...args))
+                  onClick: _cache[6] || (_cache[6] = (...args) => $setup.onCancelEditComment && $setup.onCancelEditComment(...args))
                 }, "Hủy", 8, ["disabled"]),
                 vue.createElementVNode("button", {
                   class: "btn-save-comment",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[8] || (_cache[8] = (...args) => $setup.submitUpdateComment && $setup.submitUpdateComment(...args))
+                  onClick: _cache[7] || (_cache[7] = (...args) => $setup.submitUpdateComment && $setup.submitUpdateComment(...args))
                 }, vue.toDisplayString($setup.isSubmittingComment ? "Đang cập nhật..." : "Cập nhật bình luận"), 9, ["disabled"])
               ])) : $setup.isReplying ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 2,
@@ -5149,12 +5188,12 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode("button", {
                   class: "btn-cancel-edit",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[9] || (_cache[9] = (...args) => $setup.onCancelReply && $setup.onCancelReply(...args))
+                  onClick: _cache[8] || (_cache[8] = (...args) => $setup.onCancelReply && $setup.onCancelReply(...args))
                 }, "Hủy", 8, ["disabled"]),
                 vue.createElementVNode("button", {
                   class: "btn-save-comment",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[10] || (_cache[10] = (...args) => $setup.submitReply && $setup.submitReply(...args))
+                  onClick: _cache[9] || (_cache[9] = (...args) => $setup.submitReply && $setup.submitReply(...args))
                 }, vue.toDisplayString($setup.isSubmittingComment ? "Đang gửi..." : "Trả lời"), 9, ["disabled"])
               ])) : vue.createCommentVNode("v-if", true)
             ])
@@ -5458,7 +5497,7 @@ This will fail in production if not fixed.`);
         $setup.isConfirmCancelEditOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 0,
           class: "modal-overlay",
-          onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
+          onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "modal-container" }, [
@@ -5471,11 +5510,11 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "modal-footer" }, [
               vue.createElementVNode("button", {
                 class: "modal-btn cancel",
-                onClick: _cache[11] || (_cache[11] = (...args) => $setup.continueEditing && $setup.continueEditing(...args))
+                onClick: _cache[10] || (_cache[10] = (...args) => $setup.continueEditing && $setup.continueEditing(...args))
               }, "Tiếp tục chỉnh sửa"),
               vue.createElementVNode("button", {
                 class: "modal-btn confirm",
-                onClick: _cache[12] || (_cache[12] = (...args) => $setup.confirmCancelEdit && $setup.confirmCancelEdit(...args))
+                onClick: _cache[11] || (_cache[11] = (...args) => $setup.confirmCancelEdit && $setup.confirmCancelEdit(...args))
               }, "Có, hủy bỏ")
             ])
           ])
@@ -5483,7 +5522,7 @@ This will fail in production if not fixed.`);
         $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 1,
           class: "modal-overlay",
-          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
+          onClick: _cache[15] || (_cache[15] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "modal-container" }, [
@@ -5496,11 +5535,11 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "modal-footer" }, [
               vue.createElementVNode("button", {
                 class: "modal-btn cancel",
-                onClick: _cache[14] || (_cache[14] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
+                onClick: _cache[13] || (_cache[13] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
               }, "Hủy"),
               vue.createElementVNode("button", {
                 class: "modal-btn confirm",
-                onClick: _cache[15] || (_cache[15] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
+                onClick: _cache[14] || (_cache[14] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
               }, "Xác nhận")
             ])
           ])
@@ -5508,11 +5547,11 @@ This will fail in production if not fixed.`);
         $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 2,
           class: "modal-overlay",
-          onClick: _cache[18] || (_cache[18] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
+          onClick: _cache[17] || (_cache[17] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
         }, [
           vue.createElementVNode("view", {
             class: "emoji-picker-container",
-            onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
+            onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
             }, ["stop"]))
           }, [
             vue.createElementVNode("view", { class: "emoji-grid" }, [
@@ -5547,7 +5586,7 @@ This will fail in production if not fixed.`);
               range: $setup.statusOptions,
               value: $setup.form.statusIndex,
               disabled: $setup.isStatusDisabled,
-              onChange: _cache[19] || (_cache[19] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
+              onChange: _cache[18] || (_cache[18] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -5598,7 +5637,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.assigneeOptions,
               value: $setup.form.assigneeIndex,
-              onChange: _cache[20] || (_cache[20] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
+              onChange: _cache[19] || (_cache[19] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -5612,11 +5651,11 @@ This will fail in production if not fixed.`);
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[21] || (_cache[21] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[20] || (_cache[20] = ($event) => $setup.form.dueDate = $event),
             notifyDate: $setup.form.notifyDate,
-            "onUpdate:notifyDate": _cache[22] || (_cache[22] = ($event) => $setup.form.notifyDate = $event),
+            "onUpdate:notifyDate": _cache[21] || (_cache[21] = ($event) => $setup.form.notifyDate = $event),
             notifyTime: $setup.form.notifyTime,
-            "onUpdate:notifyTime": _cache[23] || (_cache[23] = ($event) => $setup.form.notifyTime = $event),
+            "onUpdate:notifyTime": _cache[22] || (_cache[22] = ($event) => $setup.form.notifyTime = $event),
             onChange: $setup.onDateUpdate
           }, null, 8, ["dueDate", "notifyDate", "notifyTime", "onChange"])
         ]),
@@ -5707,7 +5746,7 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onChange: _cache[24] || (_cache[24] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[23] || (_cache[23] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -5783,7 +5822,7 @@ This will fail in production if not fixed.`);
       $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[27] || (_cache[27] = vue.withModifiers(() => {
+        onClick: _cache[26] || (_cache[26] = vue.withModifiers(() => {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-container" }, [
@@ -5796,11 +5835,11 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "modal-footer" }, [
             vue.createElementVNode("button", {
               class: "modal-btn cancel",
-              onClick: _cache[25] || (_cache[25] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
+              onClick: _cache[24] || (_cache[24] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
             }, "Hủy"),
             vue.createElementVNode("button", {
               class: "modal-btn confirm",
-              onClick: _cache[26] || (_cache[26] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
+              onClick: _cache[25] || (_cache[25] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
             }, "Xác nhận")
           ])
         ])
