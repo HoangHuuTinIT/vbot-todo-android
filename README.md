@@ -2,6 +2,7 @@
 ## Yêu cầu
 HBuilderX version 4.85 
 
+Tải HbuilderX tại : https://www.dcloud.io/hbuilderx.html
 ---
 ## Cài đặt Dependencies
 
@@ -22,11 +23,11 @@ Dự án sử dụng các file .env để quản lý các biến môi trường 
 .env: chứa các biến dùng chung
 .env.example: file biến môi trường mẫu
 
-### Tạo các file cấu hình
+### Tạo file cấu hình
 1. Chuột phải vào tên dự án(thư mục gốc của dự án)
 2. Chọn New > Custom File
 3. Ở hộp thoại hiện lên, đặt tên file là .env
-4. Copy toàn bộ nội dung của .env.example qua file .env bạn vừa tạo
+4. Copy toàn bộ nội dung của .env.example qua file .env vừa tạo
 5. Thay giá trị thực tế cho các biến môi trường (như chú thích trong .env.example)
 ---
 ## Cài đặt các gói cần thiết:
