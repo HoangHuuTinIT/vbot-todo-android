@@ -22,6 +22,7 @@ export interface TodoDetailForm {
 	customerPhoneLabel: string;
 	customerManagerName: string;
 	customerManagerLabel: string;
+	raw: any;
 }
 
 // --- HELPER: Xử lý ngày tháng nội bộ cho file này ---
@@ -82,7 +83,11 @@ export const mapTodoDetailToForm = (apiData: any): TodoDetailForm | null => {
         notifyTime: timestampToTimeStr(notiTimestamp),
 		customerCode: apiData.customerCode || '', 
 		customerName: '', // Sẽ điền sau khi gọi API CRM
+		customerNameLabel: 'Tên khách hàng',
 		customerPhone: '',
-		customerManagerName: ''
+		customerPhoneLabel: 'Số điện thoại',
+		customerManagerName: '',
+		
+		raw: apiData
     };
 };

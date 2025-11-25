@@ -1,7 +1,7 @@
 // src/controllers/todo_detail.ts
 import { ref , nextTick } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage , getTodoMessageDetail, updateTodoMessage,reactionTodoMessage} from '@/api/todo';
+import { updateTodo , getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage , getTodoMessageDetail, updateTodoMessage,reactionTodoMessage} from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import {  getCrmCustomerDetail , getCrmActionTimeline} from '@/api/crm'; // Import API CRM
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
@@ -67,6 +67,50 @@ export const useTodoDetailController = () => {
 	const commentFilterIndex = ref(0);
 	const commentFilterOptions = ['Tất cả hoạt động', 'Bình luận'];
 	const commentFilterValues = ['', 'COMMENT'];	
+	
+	const isSavingDescription = ref(false);
+	
+	const onSaveDescription = async () => {
+	        // 1. Kiểm tra xem có data gốc không
+	        if (!form.value.raw) {
+	            uni.showToast({ title: 'Không tìm thấy dữ liệu gốc', icon: 'none' });
+	            return;
+	        }
+	
+	        isSavingDescription.value = true;
+	
+	        try {
+	            // 2. Chuẩn bị payload
+	            // Lấy toàn bộ data gốc (raw) đè lên bằng các trường thay đổi
+	            const payload = {
+	                ...form.value.raw, // Spread toàn bộ trường cũ (id, title, createdBy, status...)
+	                
+	                // Các trường bắt buộc thay đổi theo yêu cầu:
+	                preFixCode: "TODO", 
+	                description: form.value.desc, // Lấy nội dung từ Editor
+	                files: "",
+	                tagCodes: "",
+	                
+	                // Lưu ý: Nếu form.title bị sửa ở UI, bạn cũng nên update vào đây
+	                title: form.value.title || form.value.raw.title,
+	            };
+	
+	            console.log("Payload Update Todo:", payload);
+	
+	            // 3. Gọi API
+	            const res = await updateTodo(payload);
+	
+	            if (res) {
+	                uni.showToast({ title: 'Đã cập nhật mô tả', icon: 'success' });
+	                // (Tuỳ chọn) Có thể gọi lại fetchDetail(form.value.id) nếu muốn reload mới nhất
+	            }
+	        } catch (error) {
+	            console.error("Lỗi cập nhật công việc:", error);
+	            uni.showToast({ title: 'Cập nhật thất bại', icon: 'none' });
+	        } finally {
+	            isSavingDescription.value = false;
+	        }
+	    };
 	
 	const onRequestReply = async (item: any) => {
 	        // Reset các trạng thái khác nếu đang dở (ví dụ đang sửa)
@@ -239,7 +283,6 @@ export const useTodoDetailController = () => {
             'NOTE'          // Ghi chú
         ];
         const form = ref<TodoDetailForm>({
-            // ... giữ nguyên
             id: '', title: '', code: 'Loading...', desc: '',
             statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
             dueDate: '', notifyDate: '', notifyTime: '',
@@ -775,5 +818,8 @@ const fetchHistoryLog = async (customerUid: string) => {
 		commentFilterIndex,
 		commentFilterOptions,
 		onCommentFilterChange,
+		
+		isSavingDescription,
+		onSaveDescription,
     };
 };

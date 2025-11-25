@@ -129,4 +129,10 @@ export const reactionTodoMessage = (data: any): Promise<any> => {
         data: data
     });
 };
-
+export const updateTodo = (data: any): Promise<any> => {
+    return request({
+        url: `${TODO_API_URL}/update`,
+        method: 'POST',
+        data: data
+    });
+};

@@ -20,6 +20,16 @@
             <view class="section-title">Mô tả</view>
             <view class="section-block">
                 <TodoEditor v-model="form.desc" placeholder="Nhập mô tả công việc..." />
+                
+                <view class="input-actions" style="margin-top: 10px;">
+                    <button 
+                        class="btn-save-comment" 
+                        :disabled="isSavingDescription"
+                        @click="onSaveDescription"
+                    >
+                        {{ isSavingDescription ? 'Đang lưu...' : 'Lưu lại' }}
+                    </button>
+                </view>
             </view>
 <view class="section-header-row">
     <text class="section-title no-margin">Bình luận và hoạt động</text>
@@ -436,8 +446,11 @@
 		        confirmCancelReply,
 				
 				commentFilterIndex,
-				        commentFilterOptions,
-				        onCommentFilterChange,
+				commentFilterOptions,
+				onCommentFilterChange,
+				
+				isSavingDescription,
+				onSaveDescription,
     } = useTodoDetailController();
 </script>
 
