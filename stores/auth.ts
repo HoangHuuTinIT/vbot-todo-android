@@ -1,4 +1,4 @@
-// src/stores/auth.ts
+
 import { defineStore } from 'pinia';
 import { systemLogin, getTodoToken } from '@/api/auth';
 import { getCrmToken } from '@/api/crm';

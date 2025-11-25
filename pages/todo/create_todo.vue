@@ -80,7 +80,7 @@
     import { useCreateTodoController } from '@/controllers/create_todo';
     import TodoEditor from '@/components/Todo/TodoEditor.vue';
     import TodoDatePicker from '@/components/Todo/TodoDatePicker.vue';
-    import CustomerModal from '@/components/Todo/CustomerModal.vue'; // Import Modal
+    import CustomerModal from '@/components/Todo/CustomerModal.vue'; 
 
     const { 
         loading, form, goBack, submitForm,

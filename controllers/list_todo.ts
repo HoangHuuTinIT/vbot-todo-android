@@ -1,16 +1,12 @@
-//controllers/list_todo.ts 
 import { ref, computed } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-// Import từ file .ts (bỏ đuôi .js khi import cũng được)
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo'; 
 import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
-import { buildTodoParams } from '@/models/todo'; // Import từ .ts
+import { buildTodoParams } from '@/models/todo'; 
 import { TODO_SOURCE } from '@/utils/enums';
 import type { TodoItem } from '@/types/todo';
 import { getAllMembers } from '@/api/project';
 export const useListTodoController = () => {
-    // --- STATE CƠ BẢN ---
-    // Định nghĩa rõ mảng chứa các TodoItem
     const todos = ref<TodoItem[]>([]);
     const isLoading = ref<boolean>(false);
     const isFilterOpen = ref<boolean>(false);
@@ -18,21 +14,18 @@ export const useListTodoController = () => {
     const isConfirmDeleteOpen = ref<boolean>(false);
     const itemToDelete = ref<TodoItem | null>(null);
 
-    // --- FILTER CONFIG ---
     const statusOptions = ['Tất cả', STATUS_LABELS[TODO_STATUS.NEW], STATUS_LABELS[TODO_STATUS.IN_PROGRESS], STATUS_LABELS[TODO_STATUS.DONE]];
     const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
     const statusIndex = ref<number>(0);
 
 	const rawMemberList = ref<any[]>([]);
-    // ... (Giữ nguyên creatorOptions, customerOptions...)
-    const creatorOptions = ref(['Tất cả']); // Mặc định có 'Tất cả'
+    const creatorOptions = ref(['Tất cả']); 
     const creatorIndex = ref(0);
     const customerOptions = ['Tất cả', 'KH001', 'KH002', 'VNG'];
     const customerIndex = ref(0);
-    const assigneeOptions = ref(['Tất cả']); // Mặc định có 'Tất cả'
+    const assigneeOptions = ref(['Tất cả']);
     const assigneeIndex = ref(0);
 
-    // Source Enum
     const sourceOptions = ['Tất cả', 'Cuộc gọi (CALL)', 'Khách hàng (CUSTOMER)', 'Hội thoại (CONVERSATION)', 'Tin nhắn (CHAT_MESSAGE)'];
     const sourceValues = ['', TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
     const sourceIndex = ref<number>(0);
@@ -43,7 +36,6 @@ export const useListTodoController = () => {
         dueDateFrom: '', dueDateTo: ''
     });
 
-    // --- STATE PHÂN TRANG ---
     const pageSizeOptions = ['5/trang', '10/trang', '15/trang', '20/trang'];
     const pageSizeValues = [5, 10, 15, 20];
     const pageSizeIndex = ref(2); 
@@ -56,15 +48,11 @@ export const useListTodoController = () => {
         return Math.ceil(totalItems.value / size);
     });
 const fetchFilterMembers = async () => {
-        // Nếu đã có dữ liệu rồi thì thôi, không gọi lại để đỡ lag
         if (rawMemberList.value.length > 0) return;
 
         try {
             const data = await getAllMembers();
             rawMemberList.value = data;
-
-            // Tạo danh sách tên để hiển thị trong Picker
-            // Thêm 'Tất cả' vào đầu
             const names = data.map(m => m.UserName || 'Thành viên ẩn');
             creatorOptions.value = ['Tất cả', ...names];
             assigneeOptions.value = ['Tất cả', ...names];
@@ -73,23 +61,18 @@ const fetchFilterMembers = async () => {
             console.error('Lỗi lấy danh sách thành viên filter:', error);
         }
     };
-    // --- METHODS ---
     const getTodoList = async () => {
             isLoading.value = true;
             try {
-                // [MỚI] Tính toán ID dựa trên Index đang chọn
-                // Index 0 là "Tất cả" -> ID rỗng
-                // Index 1 tương ứng với rawMemberList[0]
+
                 
                 let selectedCreatorId = '';
                 if (creatorIndex.value > 0) {
-                    // Người tạo thường dùng UID
                     selectedCreatorId = rawMemberList.value[creatorIndex.value - 1].UID;
                 }
     
                 let selectedAssigneeId = '';
                 if (assigneeIndex.value > 0) {
-                    // Người được giao thường dùng memberUID
                     selectedAssigneeId = rawMemberList.value[assigneeIndex.value - 1].memberUID;
                 }
     
@@ -97,8 +80,8 @@ const fetchFilterMembers = async () => {
                     filter.value, 
                     statusValues[statusIndex.value],
                     sourceValues[sourceIndex.value],
-                    selectedCreatorId, // Truyền ID người tạo
-                    selectedAssigneeId // Truyền ID người được giao
+                    selectedCreatorId,
+                    selectedAssigneeId 
                 );
                 
                 const currentSize = pageSizeValues[pageSizeIndex.value];
@@ -136,14 +119,12 @@ const fetchFilterMembers = async () => {
         }
     };
 
-    // Logic Xóa
     const onRequestDelete = (item: TodoItem) => { itemToDelete.value = item; isConfirmDeleteOpen.value = true; };
     const cancelDelete = () => { isConfirmDeleteOpen.value = false; itemToDelete.value = null; };
     
     const confirmDelete = async () => {
         if (!itemToDelete.value) return;
         try {
-            // itemToDelete.value.id đã được TS đảm bảo tồn tại
             await deleteTodo(itemToDelete.value.id);
             uni.showToast({ title: 'Đã xóa thành công', icon: 'success' });
             isConfirmDeleteOpen.value = false;
@@ -165,7 +146,6 @@ const fetchFilterMembers = async () => {
         });
     };
 
-    // ... (Các hàm UI Actions giữ nguyên logic, chỉ thêm : any vào event nếu cần)
     const addNewTask = () => { uni.navigateTo({ url: '/pages/todo/create_todo' }); };
    const openFilter = () => { 
            isFilterOpen.value = true; 
@@ -201,7 +181,6 @@ const fetchFilterMembers = async () => {
 
     onShow(() => { getTodoList(); });
 const goToDetail = (item: TodoItem) => {
-    // Truyền ID qua query param
     uni.navigateTo({
         url: `/pages/todo/todo_detail?id=${item.id}`
     });

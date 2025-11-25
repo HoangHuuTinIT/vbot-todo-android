@@ -1,4 +1,3 @@
-// src/controllers/todo_detail.ts
 import { ref , nextTick, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { updateTodo , getTodoDetail , getTodoMessages , createTodoMessage ,deleteTodoMessage , getTodoMessageDetail, updateTodoMessage,reactionTodoMessage} from '@/api/todo';
@@ -14,30 +13,29 @@ interface CommentItem {
     id: number;
 	senderId: string | number;
     senderName: string;
-    senderAvatarChar: string; // Chữ cái đầu
+    senderAvatarChar: string; 
 	senderAvatarColor: string;
-    message: string; // HTML content
+    message: string; 
     timeDisplay: string;
-    actionText: string; // "thêm 1 bình luận"
+    actionText: string; 
     isEdited: boolean;
 	type: string;
-    reactions: any[]; // Mảng emoji
-    children: CommentItem[]; // Bình luận con (Replies)
+    reactions: any[];
+    children: CommentItem[]; 
 }
 
 interface HistoryItem {
     id: number;
-    timeStr: string;      // Giờ hiển thị (VD: 10:30 21/11)
-    content: string;      // Nội dung tương tác (Tiếng Việt)
-    actorName: string;    // Tên người thực hiện
-    originalType: string; // Lưu loại gốc để icon nếu cần
+    timeStr: string;    
+    content: string;     
+    actorName: string;    
+    originalType: string; 
 }
 export const useTodoDetailController = () => {
 	const authStore = useAuthStore();
 	
 	const currentUserId = authStore.uid;
     const isLoading = ref(false);
-    // State loading riêng cho phần khách hàng để UI mượt hơn
     const isLoadingCustomer = ref(false); 
     const isLoadingHistory = ref(false);
 	const historyList = ref<HistoryItem[]>([]);
@@ -52,14 +50,13 @@ export const useTodoDetailController = () => {
 	const isConfirmDeleteCommentOpen = ref(false);
 	const commentToDeleteId = ref<number | null>(null);
 	
-	const isEditingComment = ref(false); // Đang ở chế độ sửa hay không
+	const isEditingComment = ref(false); 
 	const editingMemberName = ref('');
-	const isConfirmCancelEditOpen = ref(false); // Modal xác nhận hủy sửa
-	    // Lưu tạm thông tin bình luận đang sửa để lát gửi lại API update
-	const isReplying = ref(false); // Trạng thái đang trả lời
-	const isConfirmCancelReplyOpen = ref(false); // Modal hủy trả lời
-	const replyingCommentData = ref<any>(null); // Lưu object comment đang được trả lời
-	const replyingMemberName = ref(''); // Tên người được trả lời
+	const isConfirmCancelEditOpen = ref(false);
+	const isReplying = ref(false);
+	const isConfirmCancelReplyOpen = ref(false); 
+	const replyingCommentData = ref<any>(null); 
+	const replyingMemberName = ref(''); 
 	
 	const isEmojiPickerOpen = ref(false);
 	const currentReactingComment = ref<any>(null);
@@ -75,7 +72,6 @@ export const useTodoDetailController = () => {
 	const convertToTimestamp = (dateStr: string, timeStr: string = '00:00'): number => {
 	    if (!dateStr) return 0;
 	    try {
-	        // Ghép chuỗi ngày và giờ
 	        const dateTimeStr = `${dateStr}T${timeStr}:00`; 
 	        return new Date(dateTimeStr).getTime();
 	    } catch {
@@ -84,9 +80,7 @@ export const useTodoDetailController = () => {
 	};
 	
 	const isStatusDisabled = computed(() => {
-	        // Nếu chưa có dữ liệu -> disable
 	        if (!form.value.raw) return true;
-	        // Nếu trạng thái hiện tại là DONE -> disable
 	        return form.value.raw.status === 'DONE';
 	    });
 	const onDateUpdate = async (event: { field: string, value: string }) => {
@@ -95,7 +89,6 @@ export const useTodoDetailController = () => {
 	        uni.showLoading({ title: 'Đang cập nhật...' });
 	
 	        try {
-	            // 1. Chuẩn bị payload cơ sở
 	            const payload = {
 	                ...form.value.raw,
 	                preFixCode: "TODO",
@@ -104,13 +97,10 @@ export const useTodoDetailController = () => {
 	                tagCodes: "",
 	                title: form.value.title || form.value.raw.title
 	            };
-	
-	            // 2. Xử lý logic riêng cho từng loại ngày
 	            if (event.field === 'dueDate') {
-	                payload.dueDate = convertToTimestamp(event.value, '23:59'); // Set cuối ngày cho deadline
+	                payload.dueDate = convertToTimestamp(event.value, '23:59'); 
 	            } 
 	            else if (event.field === 'notifyDate' || event.field === 'notifyTime') {
-	                // Nếu sửa ngày hoặc giờ thông báo -> Phải lấy cả 2 trường ghép lại
 	                const datePart = event.field === 'notifyDate' ? event.value : form.value.notifyDate;
 	                const timePart = event.field === 'notifyTime' ? event.value : form.value.notifyTime;
 	                
@@ -121,20 +111,17 @@ export const useTodoDetailController = () => {
 	
 	            console.log(`Payload Update ${event.field}:`, payload);
 	
-	            // 3. Gọi API
 	            const res = await updateTodo(payload);
 	
 	            if (res) {
 	                uni.showToast({ title: 'Cập nhật thành công', icon: 'success' });
-	                
-	                // [Quan trọng] Cập nhật lại raw data để đồng bộ
+	      
 	                if (event.field === 'dueDate') {
 	                    form.value.raw.dueDate = payload.dueDate;
 	                } else {
 	                    form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
 	                }
 	
-	                // Reload lịch sử
 	                if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
 	                await fetchComments(form.value.id);
 	            }
@@ -147,7 +134,6 @@ export const useTodoDetailController = () => {
 	        }
 	    };
 	const onSaveDescription = async () => {
-	        // 1. Kiểm tra xem có data gốc không
 	        if (!form.value.raw) {
 	            uni.showToast({ title: 'Không tìm thấy dữ liệu gốc', icon: 'none' });
 	            return;
@@ -156,29 +142,24 @@ export const useTodoDetailController = () => {
 	        isSavingDescription.value = true;
 	
 	        try {
-	            // 2. Chuẩn bị payload
-	            // Lấy toàn bộ data gốc (raw) đè lên bằng các trường thay đổi
+
 	            const payload = {
-	                ...form.value.raw, // Spread toàn bộ trường cũ (id, title, createdBy, status...)
-	                
-	                // Các trường bắt buộc thay đổi theo yêu cầu:
+	                ...form.value.raw, 
+	               
 	                preFixCode: "TODO", 
-	                description: form.value.desc, // Lấy nội dung từ Editor
+	                description: form.value.desc, 
 	                files: "",
 	                tagCodes: "",
-	                
-	                // Lưu ý: Nếu form.title bị sửa ở UI, bạn cũng nên update vào đây
+	
 	                title: form.value.title || form.value.raw.title,
 	            };
 	
 	            console.log("Payload Update Todo:", payload);
 	
-	            // 3. Gọi API
 	            const res = await updateTodo(payload);
 	
 	            if (res) {
 	                uni.showToast({ title: 'Đã cập nhật mô tả', icon: 'success' });
-	                // (Tuỳ chọn) Có thể gọi lại fetchDetail(form.value.id) nếu muốn reload mới nhất
 	            }
 	        } catch (error) {
 	            console.error("Lỗi cập nhật công việc:", error);
@@ -189,16 +170,14 @@ export const useTodoDetailController = () => {
 	    };
 	
 	const onRequestReply = async (item: any) => {
-	        // Reset các trạng thái khác nếu đang dở (ví dụ đang sửa)
+	
 	        isEditingComment.value = false; 
 	        editingCommentData.value = null;
-	        newCommentText.value = ''; // Reset text cũ
+	        newCommentText.value = ''; 
 	
-	        // Lưu dữ liệu comment đang được trả lời
 	        replyingCommentData.value = item;
 	        isReplying.value = true;
 	
-	        // Tìm tên người được trả lời (Logic giống phần Edit)
 	        const senderId = item.senderId;
 	        const foundMember = memberList.value.find(m => m.UID === senderId);
 	        if (foundMember) {
@@ -207,14 +186,12 @@ export const useTodoDetailController = () => {
 	            replyingMemberName.value = 'Người dùng ẩn'; 
 	        }
 	
-	        // Focus vào ô nhập liệu (Cần nextTick để UI kịp render)
 	        await nextTick();
-	        // Nếu cần scroll xuống ô input thì xử lý ở đây (tùy chọn)
+	     
 	    };
 	
-	    // 2. Nhấn "Hủy" -> Mở modal xác nhận
 	    const onCancelReply = () => {
-	        // Nếu chưa nhập gì thì hủy luôn cho nhanh
+	     
 	        if (!newCommentText.value.trim()) {
 	            confirmCancelReply();
 	        } else {
@@ -222,18 +199,15 @@ export const useTodoDetailController = () => {
 	        }
 	    };
 	
-	    // 3. Xác nhận hủy trong modal
 	    const confirmCancelReply = () => {
 	        isConfirmCancelReplyOpen.value = false;
 	        resetReplyState();
 	    };
 	
-	    // 4. Tiếp tục trả lời (Đóng modal)
 	    const continueReplying = () => {
 	        isConfirmCancelReplyOpen.value = false;
 	    };
 	
-	    // 5. Gửi trả lời (Gọi API Create)
 	    const submitReply = async () => {
 	        if (!newCommentText.value || !newCommentText.value.trim()) {
 	            uni.showToast({ title: 'Vui lòng nhập nội dung', icon: 'none' });
@@ -246,14 +220,13 @@ export const useTodoDetailController = () => {
 	        try {
 	            const todoId = form.value.id;
 	            const senderId = authStore.uid;
-	            
-	            // Payload trả lời (parentId là ID của comment gốc)
+
 	            const payload = {
 	                todoId: todoId,
 	                senderId: senderId,
 	                message: newCommentText.value,
 	                files: "",
-	                parentId: replyingCommentData.value.id // <--- QUAN TRỌNG: ID của comment cha
+	                parentId: replyingCommentData.value.id
 	            };
 	
 	            console.log(">> Gửi trả lời:", payload);
@@ -272,8 +245,7 @@ export const useTodoDetailController = () => {
 	            isSubmittingComment.value = false;
 	        }
 	    };
-	
-	    // Hàm reset trạng thái reply
+
 	    const resetReplyState = () => {
 	        isReplying.value = false;
 	        replyingCommentData.value = null;
@@ -281,52 +253,41 @@ export const useTodoDetailController = () => {
 	        newCommentText.value = '';
 	    };
 	
-	    // 1. Mở Picker
 	    const onToggleEmojiPicker = (commentItem: any) => {
 	        currentReactingComment.value = commentItem;
 	        isEmojiPickerOpen.value = true;
 	    };
-	
-	    // 2. Đóng Picker
+
 	    const closeEmojiPicker = () => {
 	        isEmojiPickerOpen.value = false;
 	        currentReactingComment.value = null;
 	    };
-	
-	    // 3. Chọn Emoji (Xử lý API sau)
+
 	        const selectEmoji = async (emoji: string) => {
-	            // Kiểm tra xem có đang chọn comment nào không
 	            if (!currentReactingComment.value) return;
 	    
-	            // [QUAN TRỌNG] Lấy ID tin nhắn TRƯỚC KHI đóng modal (vì đóng modal sẽ reset biến này về null)
 	            const messageId = currentReactingComment.value.id; 
 	    
-	            // Đóng modal ngay cho giao diện mượt
 	            closeEmojiPicker();
 	    
-	            // Chuẩn bị dữ liệu
-	            const todoId = form.value.id;          // ID của công việc hiện tại
-	            const senderId = authStore.uid;        // ID của người đang thả tim (chính mình)
-	            
-	            // Payload theo yêu cầu
+	            const todoId = form.value.id;        
+	            const senderId = authStore.uid;        
+	          
 	            const payload = {
-	                todoId: Number(todoId),      // Đảm bảo là số nếu API yêu cầu số
+	                todoId: Number(todoId),    
 	                senderId: senderId,
-	                todoMessageId: Number(messageId), // Dùng biến messageId đã lấy ở trên
+	                todoMessageId: Number(messageId), 
 	                codeEmoji: emoji
 	            };
 	    
 	            console.log(">> Gửi Reaction:", payload);
 	    
 	            try {
-	                // Gọi API
 	                const res = await reactionTodoMessage(payload);
-	                
-	                // Kiểm tra kết quả
+	            
 	                if (res) {
 	                    uni.showToast({ title: 'Đã thả cảm xúc', icon: 'none' });
-	                    
-	                    // Gọi lại API lấy danh sách comment để cập nhật giao diện mới nhất
+	                
 	                    await fetchComments(todoId);
 	                }
 	            } catch (error) {
@@ -339,9 +300,8 @@ export const useTodoDetailController = () => {
 	        todoId: number;
 	        senderId: string;
 	    } | null>(null);
-       const historyFilterIndex = ref(0); // Vị trí đang chọn (0 là Tất cả)
-           
-           // 1. Danh sách hiển thị (UI)
+       const historyFilterIndex = ref(0); 
+          
            const historyFilterOptions = [
                'Tất cả', 
                'Công việc', 
@@ -351,12 +311,12 @@ export const useTodoDetailController = () => {
                'Ghi chú'
            ];
     const historyFilterValues = [
-            'ALL',          // Tất cả
-            'TODO',         // Công việc
-            'TICKET',       // Ticket
-            'HISTORY_CALL', // Lịch sử gọi
-            'CUSTOMER',     // Khách hàng
-            'NOTE'          // Ghi chú
+            'ALL',         
+            'TODO',       
+            'TICKET',      
+            'HISTORY_CALL', 
+            'CUSTOMER',    
+            'NOTE'        
         ];
         const form = ref<TodoDetailForm>({
             id: '', title: '', code: 'Loading...', desc: '',
@@ -373,17 +333,15 @@ export const useTodoDetailController = () => {
     const memberList = ref<any[]>([]); 
     const assigneeOptions = ref<string[]>([]);
 	const dynamicStatusOptions = computed(() => {
-	        // Mặc định đủ 3 trạng thái
 	        const options = [
 	            { label: 'Chưa xử lý', value: 'TO_DO' },
 	            { label: 'Đang xử lý', value: 'IN_PROGRESS' },
 	            { label: 'Hoàn thành', value: 'DONE' }
 	        ];
 	
-	        // Kiểm tra trạng thái hiện tại từ raw data
+	    
 	        if (form.value.raw && form.value.raw.status === 'IN_PROGRESS') {
-	            // Nếu đang là IN_PROGRESS, loại bỏ TO_DO (phần tử đầu tiên)
-	            // Chỉ còn: ['Đang xử lý', 'Hoàn thành']
+	     
 	            return options.filter(opt => opt.value !== 'TO_DO');
 	        }
 	        
@@ -397,15 +355,13 @@ export const useTodoDetailController = () => {
 	        uni.showLoading({ title: 'Đang tải...' });
 	        
 	        try {
-	            // Gọi API lấy chi tiết
+	     
 	            const res = await getTodoMessageDetail(commentId, todoId);
 	            
-	            console.log("API Response Detail:", res); // In ra để kiểm tra cấu trúc thực tế
+	            console.log("API Response Detail:", res); 
 	
 	            if (res) {
-	                // [QUAN TRỌNG] Xử lý lấy dữ liệu đúng cấp độ
-	                // Kiểm tra xem dữ liệu nằm trực tiếp ở res hay nằm trong res.data
-	                // Dựa theo JSON bạn gửi thì dữ liệu nằm trong 'data'
+
 	                const dataDetail = res.data || res; 
 	
 	                editingCommentData.value = {
@@ -416,27 +372,26 @@ export const useTodoDetailController = () => {
 					
 					const senderId = dataDetail.senderId;
 					                
-					                // Tìm trong memberList xem ai có UID trùng với senderId
+					                
 					                const foundMember = memberList.value.find(m => m.UID === senderId);
 					                
 					                if (foundMember) {
 					                    editingMemberName.value = foundMember.UserName;
 					                } else {
-					                    // Fallback nếu không tìm thấy (thường là chính mình)
+					                 
 					                    editingMemberName.value = 'tôi'; 
 					                }
-	                // Lấy message từ dataDetail (chứ không phải từ res cấp ngoài cùng)
+	 
 	                const content = dataDetail.message || '';
 	                
 	                console.log("Nội dung edit:", content);
 	
-	                // 1. Bật chế độ Edit để giao diện đổi sang input
+	               
 	                isEditingComment.value = true;
 	
-	                // 2. Đợi Vue cập nhật DOM xong mới gán giá trị vào Editor
+	          
 	                await nextTick();
-	                
-	                // 3. Gán giá trị
+	        
 	                newCommentText.value = content;
 	            }
 	        } catch (error) {
@@ -457,26 +412,23 @@ export const useTodoDetailController = () => {
 	        isSubmittingComment.value = true;
 	
 	        try {
-	            // Chuẩn bị payload theo yêu cầu
+	       
 	            const payload = {
 	                id: editingCommentData.value.id,
 	                todoId: editingCommentData.value.todoId,
 	                senderId: editingCommentData.value.senderId,
 	                message: newCommentText.value,
-	                files: "" // Tạm để trống
+	                files: "" 
 	            };
 	
 	            console.log("Payload Update:", payload);
 	
-	            // Gọi API Update
 	            await updateTodoMessage(payload);
 	
 	            uni.showToast({ title: 'Đã cập nhật', icon: 'success' });
 	
-	            // Reset trạng thái về ban đầu
 	            resetEditState();
-	            
-	            // Load lại danh sách
+	        
 	            await fetchComments(form.value.id);
 	
 	        } catch (error) {
@@ -487,35 +439,33 @@ export const useTodoDetailController = () => {
 	        }
 	    };
 	
-	    // 3. Nhấn "Hủy" -> Hiện Modal xác nhận
+	   
 	    const onCancelEditComment = () => {
 	        isConfirmCancelEditOpen.value = true;
 	    };
 	
-	    // 4. Trong Modal hủy: Nhấn "Tiếp tục chỉnh sửa"
+	
 	    const continueEditing = () => {
 	        isConfirmCancelEditOpen.value = false;
 	    };
 	
-	    // 5. Trong Modal hủy: Nhấn "Có, hủy bỏ"
+	  
 	    const confirmCancelEdit = async () => {
 	        isConfirmCancelEditOpen.value = false;
 	        
-	        // Reset trạng thái
+	   
 	        resetEditState();
 	
-	        // Gọi lại API list theo yêu cầu
 	        if (form.value.id) {
 	             await fetchComments(form.value.id);
 	        }
 	    };
 	
-	    // Hàm phụ: Reset state edit
 	    const resetEditState = () => {
 	            isEditingComment.value = false;
 	            editingCommentData.value = null;
 	            newCommentText.value = ''; 
-	            editingMemberName.value = ''; // [MỚI] Reset tên
+	            editingMemberName.value = ''; 
 	        };
 	const onRequestDeleteComment = (commentId: number) => {
 	        commentToDeleteId.value = commentId;
@@ -524,14 +474,13 @@ export const useTodoDetailController = () => {
 	const confirmDeleteComment = async () => {
 	        if (!commentToDeleteId.value) return;
 	        
-	        // Đóng modal ngay cho mượt
+	     
 	        isConfirmDeleteCommentOpen.value = false;
 	        
 	        try {
 	            await deleteTodoMessage(commentToDeleteId.value);
 	            uni.showToast({ title: 'Đã xóa', icon: 'success' });
 	            
-	            // Reload lại list comment
 	            if (form.value.id) {
 	                await fetchComments(form.value.id);
 	            }
@@ -543,51 +492,45 @@ export const useTodoDetailController = () => {
 	        }
 	    };
 	
-	    // [MỚI] Hàm hủy xóa
 	    const cancelDeleteComment = () => {
 	        isConfirmDeleteCommentOpen.value = false;
 	        commentToDeleteId.value = null;
 	    };
     const submitComment = async () => {
-            // 1. Validate dữ liệu
+        
             if (!newCommentText.value || !newCommentText.value.trim()) {
                 uni.showToast({ title: 'Vui lòng nhập nội dung', icon: 'none' });
                 return;
             }
     
-            // 2. Bật loading
+            
             isSubmittingComment.value = true;
     
             try {
-                // 3. Chuẩn bị dữ liệu gửi đi
-                // Lấy todoId từ form (đã được load từ trước)
+
                 const todoId = form.value.id; 
-                
-                // Lấy senderId từ Auth Store (UID của user đang đăng nhập)
+              
                 const senderId = authStore.uid;
     
                 const payload = {
                     todoId: todoId,
                     senderId: senderId,
-                    message: newCommentText.value, // Nội dung từ editor
-                    files: "", // Tạm thời rỗng
-                    parentId: -1 // Mặc định là comment cha
+                    message: newCommentText.value, 
+                    files: "", 
+                    parentId: -1 
                 };
     
                 console.log("Đang gửi bình luận:", payload);
     
-                // 4. Gọi API tạo bình luận
+      
                 const res = await createTodoMessage(payload);
     
-                // 5. Xử lý thành công
                 if (res) {
                     uni.showToast({ title: 'Đã gửi bình luận', icon: 'success' });
                     
-                    // Reset ô nhập liệu
+           
                     newCommentText.value = ''; 
-                    
-                    // [QUAN TRỌNG] Gọi lại API lấy danh sách để cập nhật giao diện
-                    // (Hàm fetchComments đã viết ở bước trước)
+               
                     await fetchComments(todoId);
                 }
     
@@ -595,15 +538,14 @@ export const useTodoDetailController = () => {
                 console.error("Lỗi gửi bình luận:", error);
                 uni.showToast({ title: 'Gửi thất bại', icon: 'none' });
             } finally {
-                // Tắt loading
+       
                 isSubmittingComment.value = false;
             }
         };
     onLoad(async (options: any) => {
-        // 1. Lấy danh sách thành viên trước (để lát nữa map ID -> Tên quản lý)
+     
         await fetchMembers(); 
 
-        // 2. Lấy chi tiết Todo
         if (options && options.id) {
             await fetchDetail(options.id);
         }
@@ -637,36 +579,35 @@ export const useTodoDetailController = () => {
 				                form.value.statusIndex = realIndex;
 				            }
 				fetchComments(id);
-                // Map người được giao (Assignee)
+        
                 if (form.value.assigneeId && memberList.value.length > 0) {
                     const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
                     if (index !== -1) form.value.assigneeIndex = index;
                 }
 
-                // [QUAN TRỌNG] Nếu có mã khách hàng -> Gọi tiếp API CRM
                 if (form.value.customerCode) {
                     await fetchCustomerInfo(form.value.customerCode);
 					fetchHistoryLog(form.value.customerCode);
                 }
             }
         } catch (error) {
-            console.error('❌ Lỗi lấy chi tiết:', error);
+            console.error(' Lỗi lấy chi tiết:', error);
             uni.showToast({ title: 'Lỗi kết nối', icon: 'none' });
         } finally {
             isLoading.value = false;
         }
     };
 const processCommentData = (item: any): CommentItem => {
-        // 1. Map Sender Info
+
         let senderName = 'Người dùng ẩn';
         let avatarChar = '?';
         let avatarColor = '#e3f2fd';
         if (item.senderId) {
-                // Tìm trong memberList
+           
                 const member = memberList.value.find(m => m.UID === item.senderId || m.memberUID === item.senderId);
                 if (member) {
                     senderName = member.UserName;
-                    // Lấy màu từ API, nếu không có thì giữ màu mặc định
+               
                     if (member.AvatarColor) {
                         avatarColor = member.AvatarColor;
                     }
@@ -674,13 +615,12 @@ const processCommentData = (item: any): CommentItem => {
             }
         avatarChar = senderName.charAt(0).toUpperCase();
 
-        // 2. Xử lý hành động
+     
         let actionText = '';
         if (item.type === 'COMMENT') actionText = 'đã thêm một bình luận';
         else if (item.type === 'LOG') actionText = 'đã cập nhật hoạt động';
 		else if (item.type==='UPDATE_TODO') actionText = 'cập nhật thông tin công việc';
-        
-        // 3. Xử lý Reactions
+      
         const reactionList = item.reactions?.details || [];
 
         return {
@@ -692,20 +632,20 @@ const processCommentData = (item: any): CommentItem => {
             message: item.message || '',
             timeDisplay: formatRelativeTime(item.createdAt),
             actionText,
-            isEdited: !!item.updatedAt, // Nếu có updatedAt thì là đã sửa
+            isEdited: !!item.updatedAt, 
 			type: item.type,
             reactions: reactionList,
-            children: [] // Sẽ map đệ quy nếu cần
+            children: [] 
         };
     };
 	
 	const fetchComments = async (todoId: string | number) => {
 	        isLoadingComments.value = true;
 	        try {
-	            // Lấy giá trị keySearch dựa trên index đang chọn
+	
 	            const currentKeySearch = commentFilterValues[commentFilterIndex.value];
 	            
-	            // Gọi API với tham số keySearch mới
+	     
 	            const rawData = await getTodoMessages(todoId, currentKeySearch);
 	            
 	            if (Array.isArray(rawData)) {
@@ -717,7 +657,7 @@ const processCommentData = (item: any): CommentItem => {
 	                    return parentComment;
 	                });
 	            } else {
-	                // Nếu API lỗi hoặc rỗng thì reset mảng
+	          
 	                comments.value = [];
 	            }
 	        } catch (error) {
@@ -728,54 +668,50 @@ const processCommentData = (item: any): CommentItem => {
 	    };
 		const onCommentFilterChange = (e: any) => {
 		        const newIndex = e.detail.value;
-		        // Nếu chọn lại cái cũ thì không làm gì
+		    
 		        if (commentFilterIndex.value === newIndex) return;
 		
 		        commentFilterIndex.value = newIndex;
 		        
-		        // Gọi lại API ngay lập tức nếu đã có todoId
+		
 		        if (form.value.id) {
 		            fetchComments(form.value.id);
 		        }
 		    };
-    // [LOGIC MỚI] Hàm xử lý lấy thông tin khách hàng
+
     const fetchCustomerInfo = async (customerUid: string) => {
             isLoadingCustomer.value = true;
             try {
-                // B1. Lấy Token
+             
               const crmToken = authStore.todoToken;
 			  if (!crmToken) return;
-                // B2. Gọi API
+          
                const res = await getCrmCustomerDetail(crmToken, customerUid);
                 
-                // B3. Lấy danh sách fields
+          
                 const fields = res.fields || res.data?.fields || [];
     
-                // Tìm các field tương ứng theo mã code
                 const nameField = fields.find((f: any) => f.code === 'name');
                 const phoneField = fields.find((f: any) => f.code === 'phone');
                 const managerField = fields.find((f: any) => f.code === 'member_no');
     
-                // --- CẬP NHẬT VALUE & LABEL ---
     
-                // 1. Tên khách hàng
                 if (nameField) {
                     form.value.customerName = nameField.value;
-                    form.value.customerNameLabel = nameField.name; // <--- Lấy tiêu đề từ API
+                    form.value.customerNameLabel = nameField.name; 
                 }
     
-                // 2. Số điện thoại
+           
                 if (phoneField) {
                     form.value.customerPhone = phoneField.value;
-                    form.value.customerPhoneLabel = phoneField.name; // <--- Lấy tiêu đề từ API
+                    form.value.customerPhoneLabel = phoneField.name; 
                 }
     
-                // 3. Người quản lý
+            
                 if (managerField) {
-                    // Lấy tiêu đề
-                    form.value.customerManagerLabel = managerField.name; // <--- Lấy tiêu đề từ API
+                
+                    form.value.customerManagerLabel = managerField.name; 
     
-                    // Xử lý Value (Map ID -> Tên Member)
                     const managerUid = managerField.value;
                     const manager = memberList.value.find(m => m.memberUID === managerUid);
                     form.value.customerManagerName = manager ? manager.UserName : '(Chưa xác định)';
@@ -791,39 +727,34 @@ const fetchHistoryLog = async (customerUid: string) => {
         isLoadingHistory.value = true;
         try {
 			const currentType = historyFilterValues[historyFilterIndex.value];
-            // B1. Lấy token
+          
             const crmToken = authStore.todoToken;
             if (!crmToken) {
                             console.error("Chưa có Token CRM/Todo");
                             return;
                         }
-            // B2. Gọi API
+        
          const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
-            
-            // B3. Xử lý dữ liệu (Map)
+        
             if (Array.isArray(rawHistory)) {
                 historyList.value = rawHistory.map((item: any) => {
-                    // 1. Xử lý thời gian (createAt)
+                
                     const date = new Date(item.createAt);
                                         const day = date.getDate().toString().padStart(2, '0');
                                         const month = (date.getMonth() + 1).toString().padStart(2, '0');
                                         const year = date.getFullYear();
                                         
-                                        // Format mới: dd/mm/yyyy (VD: 21/11/2025)
+                            
                                         const timeStr = `${day}/${month}/${year}`;
 
-                    // 2. Xử lý Tên người tương tác (memberUid)
                     let actorName = 'Hệ thống';
                     if (item.memberUid) {
-                        // So sánh memberUid từ API Timeline với memberUID trong danh sách Member
                         const foundMember = memberList.value.find(m => m.memberUID === item.memberUid);
                         if (foundMember) {
                             actorName = foundMember.UserName;
                         }
                     }
 
-                    // 3. Xử lý Nội dung tương tác (typeSub)
-                    // Nếu typeSub có trong map thì lấy tiếng Việt, không thì lấy chính nó
                     const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || 'Tương tác khác';
 
                     return {
@@ -843,69 +774,65 @@ const fetchHistoryLog = async (customerUid: string) => {
         }
     };
 	const onHistoryFilterChange = (e: any) => {
-	        // 1. Cập nhật index mới
+	
 	        historyFilterIndex.value = e.detail.value;
 	        
-	        // 2. Gọi lại API ngay lập tức (nếu đã có mã khách hàng)
+	    
 	        if (form.value.customerCode) {
 	            fetchHistoryLog(form.value.customerCode);
 	        }
 	    };
-    // ... (Giữ nguyên các event handler cũ: onStatusChange, saveTodo...)
+
     const onStatusChange = async (e: any) => {
-            // 1. Lấy index từ UI Picker
+      
             const newIndex = parseInt(e.detail.value);
             const selectedOption = dynamicStatusOptions.value[newIndex];
                     if (!selectedOption) return;
-            // 2. Cập nhật UI ngay lập tức cho người dùng thấy
+       
             form.value.statusIndex = newIndex;
-    
-            // 3. Ánh xạ Index -> API Value
-            // Thứ tự UI: ['Chưa xử lý', 'Đang xử lý', 'Hoàn thành']
+
             const apiStatusValues = ['TO_DO', 'IN_PROGRESS', 'DONE'];
            const newStatus = selectedOption.value;
     
-            // 4. Kiểm tra dữ liệu gốc
+    
            if (!form.value.raw) return;
                    uni.showLoading({ title: 'Đang cập nhật...' });
             
     
             try {
-                // 6. Chuẩn bị payload (Giống hệt logic Save Description)
+    
                 const payload = {
-                    ...form.value.raw, // Lấy toàn bộ dữ liệu cũ
+                    ...form.value.raw, 
                     
-                    status: newStatus, // <-- Ghi đè trạng thái mới
+                    status: newStatus, 
                     
-                    // Các trường bắt buộc theo API update
+            
                     preFixCode: "TODO",
-                    description: form.value.desc, // Lấy mô tả hiện tại (đề phòng người dùng đã sửa mô tả nhưng chưa bấm lưu)
+                    description: form.value.desc, 
                     files: "",
                     tagCodes: "",
-                    
-                    // Cập nhật title nếu có sửa
+               
                     title: form.value.title || form.value.raw.title
                 };
     
                 console.log("Payload Update Status:", payload);
     
-                // 7. Gọi API
+              
                 const res = await updateTodo(payload);
     
                 if (res) {
                     uni.showToast({ title: 'Đã cập nhật trạng thái', icon: 'success' });
-                    
-                    // [QUAN TRỌNG] Cập nhật lại dữ liệu raw local để các lần lưu sau chính xác
+               
                     form.value.raw.status = newStatus;
     const newDisplayIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === newStatus);
                     form.value.statusIndex = newDisplayIndex !== -1 ? newDisplayIndex : 0;
-                    // Tải lại lịch sử để thấy log thay đổi trạng thái (nếu có)
+                 
                    if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
                                    await fetchComments(form.value.id);
                 }
             } catch (error) {
                 console.error("Lỗi cập nhật trạng thái:", error);
-                // Nếu lỗi, có thể rollback lại statusIndex cũ nếu muốn (tùy chọn)
+            
                 uni.showToast({ title: 'Lỗi cập nhật', icon: 'none' });
             } finally {
                 uni.hideLoading();
@@ -913,62 +840,58 @@ const fetchHistoryLog = async (customerUid: string) => {
         };
     const onSourceChange = (e: any) => { form.value.sourceIndex = e.detail.value; };
     const onAssigneeChange = async (e: any) => {
-            // 1. Lấy index từ UI Picker
+      
             const idx = parseInt(e.detail.value);
             
-            // Kiểm tra xem index có hợp lệ trong danh sách member không
+         
             if (!memberList.value[idx]) return;
     
-            // 2. Lấy thông tin member được chọn
+  
             const selectedMember = memberList.value[idx];
             const newAssigneeId = selectedMember.memberUID;
-    
-            // 3. Cập nhật UI ngay lập tức
+
             form.value.assigneeIndex = idx;
             form.value.assigneeId = newAssigneeId;
     
-            // 4. Kiểm tra dữ liệu gốc
             if (!form.value.raw) {
                 uni.showToast({ title: 'Thiếu dữ liệu gốc', icon: 'none' });
                 return;
             }
     
-            // 5. Hiển thị loading
+         
             uni.showLoading({ title: 'Đang cập nhật người giao...' });
     
             try {
-                // 6. Chuẩn bị payload
+           
                 const payload = {
-                    ...form.value.raw, // Lấy toàn bộ dữ liệu cũ
+                    ...form.value.raw, 
                     
-                    assigneeId: newAssigneeId, // <-- Ghi đè người được giao mới
+                    assigneeId: newAssigneeId, 
                     
-                    // Các trường bắt buộc theo API update
                     preFixCode: "TODO",
                     description: form.value.desc, 
                     files: "",
                     tagCodes: "",
                     
-                    // Cập nhật title nếu có sửa
+         
                     title: form.value.title || form.value.raw.title
                 };
     
                 console.log("Payload Update Assignee:", payload);
     
-                // 7. Gọi API
+          
                 const res = await updateTodo(payload);
     
                 if (res) {
                     uni.showToast({ title: 'Đã đổi người thực hiện', icon: 'success' });
                     
-                    // [QUAN TRỌNG] Cập nhật lại dữ liệu raw local
+         
                     form.value.raw.assigneeId = newAssigneeId;
     
-                    // Tải lại lịch sử để thấy log thay đổi người giao (nếu có)
                     if (form.value.customerCode) {
                         await fetchHistoryLog(form.value.customerCode);
                     }
-                    // Tải lại comment
+             
                     await fetchComments(form.value.id);
                 }
             } catch (error) {
@@ -986,7 +909,7 @@ const fetchHistoryLog = async (customerUid: string) => {
 
     return {
         isLoading, isLoadingCustomer,
-		 isLoadingHistory, historyList,// Trả về thêm biến này
+		 isLoadingHistory, historyList,
         form,
         statusOptions: statusLabels, sourceOptions, assigneeOptions,
         onStatusChange, onSourceChange, onAssigneeChange,

@@ -381,7 +381,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 </script>
 
 <style lang="scss" scoped>
-    /* Giữ nguyên CSS cũ */
+
     .container { height: 100vh; display: flex; flex-direction: column; background-color: #f5f5f7; }
     .detail-header { background-color: #fff; padding: 15px 15px 10px 15px; border-bottom: 1px solid #eee; }
     .header-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
@@ -401,10 +401,9 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
     .picker-text { font-size: 15px; color: #007aff; font-weight: 500; }
     .customer-block { min-height: 80px; background: #fff; }
     .item-right-text { font-size: 15px; color: #333; font-weight: 500; text-align: right; flex: 1; }
-        .phone-text { color: #007aff; } /* Màu xanh cho SĐT */
-        .highlight-text { color: #ff9500; font-weight: bold; } /* Màu cam cho quản lý */
+        .phone-text { color: #007aff; } 
+        .highlight-text { color: #ff9500; font-weight: bold; } 
 		.loading-row, .empty-row { padding: 20px; text-align: center; color: #999; font-size: 14px; font-style: italic;}
-    /* Thêm CSS cho Loading */
 	
 	.history-container {
 	        background-color: #fff;
@@ -421,7 +420,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 	    .timeline-item {
 	        display: flex;
 	        position: relative;
-	        padding-bottom: 25px; /* Khoảng cách giữa các item */
+	        padding-bottom: 25px; 
 	    }
 	    .timeline-item:last-child {
 	        padding-bottom: 0;
@@ -430,7 +429,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 	    .timeline-dot {
 	        width: 10px;
 	        height: 10px;
-	        background-color: #007aff; /* Màu xanh chủ đạo */
+	        background-color: #007aff; 
 	        border-radius: 50%;
 	        margin-top: 5px;
 	        z-index: 2;
@@ -439,8 +438,8 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 	
 	    .timeline-line {
 	        position: absolute;
-	        left: 4px; /* Canh giữa dot (10px/2 - 1px) */
-	        top: 15px; /* Bắt đầu từ dưới dot */
+	        left: 4px; 
+	        top: 15px; 
 	        bottom: 0;
 	        width: 2px;
 	        background-color: #e5e5ea;
@@ -480,14 +479,14 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 		        align-items: center;
 		        margin-bottom: 10px;
 		        margin-left: 5px;
-		        margin-right: 5px; /* Căn lề phải cho đẹp */
+		        margin-right: 5px; 
 		    }
 			.section-title.no-margin {
-			        margin-bottom: 0; /* Bỏ margin bottom cũ của title để căn giữa với picker */
+			        margin-bottom: 0;
 			    }
 			
 			    .filter-badge {
-			        background-color: #e3f2fd; /* Màu nền xanh nhạt */
+			        background-color: #e3f2fd; 
 			        color: #007aff;
 			        font-size: 13px;
 			        font-weight: 600;
@@ -520,28 +519,15 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 				        align-items: flex-start;
 				    }
 				
-				    /* Avatar Styles */
-				
-				        /* Sửa màu chữ mặc định hoặc dùng class riêng */
-				       
-				    
-				     
-				    
-				    /* Small Avatar for Replies */
-				
+			
 				    .avatar-char.small-char { font-size: 14px; }
 				
-				   
-				
-				    /* Header Info */
+				 
 				
 				    .c-action { font-size: 13px; color: #666; }
 				    .c-edited { font-size: 11px; color: #aaa; font-style: italic; margin-left: 5px; }
 				    .c-action-row { display: block; font-size: 12px; color: #888; margin-bottom: 4px; }
 				
-				    /* Message Content */
-				    
-				    /* Reactions */
 				    .reaction-row { display: flex; gap: 5px; margin-top: 5px; }
 				    .emoji-tag {
 				        background-color: #fff; border: 1px solid #eee;
@@ -549,11 +535,11 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 				        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 				    }
 				
-				    /* Nested Replies */
+				 
 				    .replies-wrapper {
 				        margin-top: 12px;
-				        padding-left: 50px; /* Thụt đầu dòng */
-				        /* border-left: 2px solid #f0f0f0; */
+				        padding-left: 50px; 
+				   
 				    }
 				    .child-row { margin-bottom: 10px; }
 					
@@ -562,13 +548,13 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 					    }
 					
 					    .editor-container {
-					        /* Tinh chỉnh lại editor cho gọn nếu cần */
+			
 					        margin-bottom: 10px;
 					    }
 					
 					    .input-actions {
 					        display: flex;
-					        justify-content: flex-end; /* Căn nút sang phải */
+					        justify-content: flex-end; 
 					    }
 					
 					    .btn-save-comment {
@@ -579,7 +565,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 					        padding: 0 20px;
 					        height: 36px;
 					        line-height: 36px;
-					        border-radius: 18px; /* Bo tròn nút */
+					        border-radius: 18px; 
 					        border: none;
 					    }
 					    .btn-save-comment[disabled] {
@@ -597,7 +583,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 						    }
 						    .editor-container {
 						        margin-bottom: 10px;
-						        border: 1px solid #eee; /* Thêm viền nhẹ cho editor bình luận nếu muốn */
+						        border: 1px solid #eee; 
 						        border-radius: 8px;
 						        overflow: hidden;
 						    }
@@ -628,7 +614,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 							        height: 16px;
 							    }
 							
-							    /* CSS Modal (Tái sử dụng hoặc copy lại nếu chưa có scope global) */
+							
 							    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
 							    .modal-container { width: 80%; background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: popIn 0.2s ease-out; }
 							    .modal-header { padding: 15px; border-bottom: 1px solid #eee; text-align: center; }
@@ -673,27 +659,27 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 	    .btn-icon-action:active { opacity: 1; }
 	
 	    .icon-action {
-	        width: 18px; /* Kích thước icon */
+	        width: 18px; 
 	        height: 18px;
 	    }
 		.editing-alert {
 		    margin-bottom: 10px;
 		    padding: 8px 12px;
-		    background-color: #fff7e6; /* Màu nền vàng nhạt cảnh báo nhẹ */
+		    background-color: #fff7e6; 
 		    border-radius: 6px;
 		    border: 1px solid #ffd591;
 		}
 		
 		.editing-text {
 		    font-size: 13px;
-		    color: #d48806; /* Màu chữ cam đậm */
+		    color: #d48806; 
 		}
 		.emoji-picker-container {
 		    background-color: #fff;
 		    border-radius: 12px;
 		    padding: 15px;
 		    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-		    /* Căn giữa hoặc hiển thị gần chỗ bấm tùy chỉnh sau */
+	
 		    width: 80%; 
 		    max-width: 300px;
 		    animation: popIn 0.2s ease-out;
@@ -717,18 +703,18 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 		    transform: scale(1.2);
 		}
 		
-		/* Cập nhật lại action container để chứa nút emoji */
+	
 		.action-buttons-container {
 		    display: flex;
 		    gap: 15px;
 		    align-items: center;
-		    /* Đẩy sang phải */
+		  
 		    margin-left: auto; 
 		}
 		.reply-alert {
 		        margin-bottom: 10px;
 		        padding: 10px 12px;
-		        background-color: #e6f7ff; /* Màu xanh nhạt đặc trưng cho reply */
+		        background-color: #e6f7ff; 
 		        border-radius: 8px;
 		        border-left: 4px solid #1890ff;
 		    }
@@ -755,7 +741,7 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 		        padding: 4px 8px;
 		        border-radius: 4px;
 		        display: -webkit-box;
-		        -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+		        -webkit-line-clamp: 2; 
 		        -webkit-box-orient: vertical;
 		        overflow: hidden;
 		    }
@@ -766,7 +752,6 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 		        font-weight: bold;
 		    }
 		
-		    /* Giới hạn nội dung trong quote để không bị vỡ layout */
 		    .quote-content {
 		        display: inline;
 		    }
@@ -776,16 +761,16 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 			        font-weight: 500; 
 			    }
 			
-			    /* [MỚI] Style cho text bị vô hiệu hóa */
+			 
 			    .disabled-text {
-			        color: #999 !important; /* Màu xám */
-			        pointer-events: none;   /* Chặn click chuột (cho chắc chắn) */
+			        color: #999 !important;
+			        pointer-events: none;   
 			    }
 				
 				.toggle-header {
 				        display: flex;
 				        align-items: center;
-				        /* Tăng vùng bấm cho dễ thao tác */
+				
 				        padding: 5px 0; 
 				    }
 				
@@ -794,12 +779,12 @@ import CommentItem from '@/components/Todo/CommentItem.vue';
 				        height: 16px;
 				        margin-left: 8px;
 				        opacity: 0.6;
-				        transition: transform 0.3s ease; /* Hiệu ứng xoay mượt mà */
-				        transform: rotate(-90deg); /* Mặc định xoay ngang (đóng) */
+				        transition: transform 0.3s ease; 
+				        transform: rotate(-90deg);
 				    }
 				
 				    .toggle-icon.open {
-				        transform: rotate(0deg); /* Khi mở thì xoay xuống */
+				        transform: rotate(0deg); 
 				        opacity: 1;
 				    }
     .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 100; display: flex; justify-content: center; align-items: center; color: #007aff; font-weight: bold; }
