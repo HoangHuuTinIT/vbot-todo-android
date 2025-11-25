@@ -1,6 +1,7 @@
 // src/stores/auth.ts
 import { defineStore } from 'pinia';
 import { systemLogin, getTodoToken } from '@/api/auth';
+import { getCrmToken } from '@/api/crm';
 import { PROJECT_CODE, UID } from '@/utils/config';
 
 // Hằng số: 7 ngày tính bằng mili giây
@@ -14,14 +15,14 @@ export const useAuthStore = defineStore('auth', {
         rootLoginTime: uni.getStorageSync('vbot_root_login_time') || 0, 
         
         todoToken: uni.getStorageSync('todo_access_token') || '',
-        
+        crmToken: uni.getStorageSync('crm_access_token') || '',
         uid: uni.getStorageSync('vbot_uid') || '',
         projectCode: uni.getStorageSync('vbot_project_code') || '',
     }),
 
     // 2. GETTERS
     getters: {
-        isLoggedIn: (state) => !!state.todoToken,
+        isLoggedIn: (state) => !!state.todoToken && !!state.crmToken,
         
         // [MỚI] Kiểm tra Root Token còn hạn 7 ngày không
         isRootTokenValid: (state) => {
@@ -60,30 +61,42 @@ export const useAuthStore = defineStore('auth', {
                 uni.setStorageSync('todo_access_token', data.todoToken);
                 // Không cần set expiry cho todoToken nữa vì nó "bất tử"
             }
+			if (data.crmToken) {
+			                this.crmToken = data.crmToken;
+			                uni.setStorageSync('crm_access_token', data.crmToken);
+			            }
         },
 
         // Đổi Root Token lấy Todo Token
-        async exchangeForTodoToken() {
-            try {
-                // Kiểm tra lại Root Token trước khi đổi
-                if (!this.isRootTokenValid) {
-                    console.log('⚠️ Root Token hết hạn 7 ngày, cần đăng nhập lại.');
-                    await this.loginDevMode(); // Gọi đăng nhập lại để lấy Root mới
-                    return;
-                }
-
-                console.log('🔄 Store: Đang dùng Root Token đổi Todo Token...');
-                const todoToken = await getTodoToken(this.rootToken, this.projectCode, this.uid);
-                this.setAuthData({ todoToken });
-                console.log('✅ Store: Đã lấy được Todo Token mới.');
-            } catch (error) {
-                console.error('❌ Store: Lỗi đổi token:', error);
-                // Nếu đổi lỗi (VD: root token bị thu hồi), logout luôn cho an toàn
-                this.logout();
-                throw error;
-            }
-        },
-
+        async fetchModuleTokens() {
+                    try {
+                        if (!this.isRootTokenValid) {
+                            console.log('⚠️ Root Token hết hạn, login lại...');
+                            await this.loginDevMode();
+                            return;
+                        }
+        
+                        console.log('🔄 Store: Đang lấy Token cho Todo và CRM...');
+                        
+                        // Gọi song song 2 API để tiết kiệm thời gian
+                        const [newTodoToken, newCrmToken] = await Promise.all([
+                            getTodoToken(this.rootToken, this.projectCode, this.uid),
+                            getCrmToken(this.projectCode, this.uid)
+                        ]);
+        
+                        // Lưu cả 2 vào store
+                        this.setAuthData({ 
+                            todoToken: newTodoToken,
+                            crmToken: newCrmToken
+                        });
+                        
+                        console.log('✅ Store: Đã lấy đủ Token (Todo & CRM).');
+                    } catch (error) {
+                        console.error('❌ Store: Lỗi lấy module tokens:', error);
+                        this.logout();
+                        throw error;
+                    }
+                },
         // Đăng nhập hệ thống (Lấy Root Token)
         async loginDevMode() {
             const devUser = import.meta.env.VITE_TEST_USERNAME;
@@ -108,7 +121,7 @@ export const useAuthStore = defineStore('auth', {
                 });
 
                 // Sau khi có Root mới -> Lấy Todo Token
-                await this.exchangeForTodoToken();
+                await this.fetchModuleTokens();
             } catch (error) {
                 console.error('❌ Store: Đăng nhập Dev thất bại', error);
             }
@@ -116,33 +129,36 @@ export const useAuthStore = defineStore('auth', {
 
         // --- HÀM CHÍNH: Logic thông minh ---
         async initialize(options: any) {
-            console.log('🚀 Store: Khởi tạo Auth...');
-
-            // CASE 1: Ưu tiên dùng Token Module có sẵn (Nhanh nhất)
-            if (this.todoToken) {
-                console.log('>> ✅ Đã có Token Module cũ. Dùng luôn, không cần gọi API.');
-                return; 
-            }
-
-            // CASE 2: Không có Token Module, kiểm tra Root Token
-            // Nếu Root Token còn hạn (< 7 ngày) -> Dùng nó đổi Token Module
-            if (this.isRootTokenValid) {
-                console.log('>> ⚠️ Mất Token Module, nhưng Root Token còn hạn. Đang lấy lại...');
-                await this.exchangeForTodoToken();
-                return;
-            }
-
-            // CASE 3: Không có gì hoặc Root Token hết hạn -> Đăng nhập lại từ đầu
-            console.log('>> ❌ Root Token hết hạn hoặc chưa đăng nhập. Login lại...');
-            await this.loginDevMode();
+                    console.log('🚀 Store: Khởi tạo Auth...');
+        
+                    // CASE 1: Đã có đủ cả 2 token -> Dùng luôn
+                    if (this.todoToken && this.crmToken) {
+                        console.log('>> ✅ Đã có đủ Token cũ. Ready!');
+                        return; 
+                    }
+        
+                    // CASE 2: Thiếu token nào đó nhưng Root còn hạn -> Lấy lại cả 2
+                    if (this.isRootTokenValid) {
+                        console.log('>> ⚠️ Thiếu token module, đang lấy lại...');
+                        await this.fetchModuleTokens();
+                        return;
+                    }
+        
+                    // CASE 3: Login lại từ đầu
+                    console.log('>> ❌ Root Token hết hạn. Login lại...');
+                    await this.loginDevMode();
+                },
+async exchangeForTodoToken() {
+            // Thực chất là gọi lại hàm lấy cả 2 token
+            await this.fetchModuleTokens();
         },
-
         logout() {
             console.log('👋 Store: Đăng xuất...');
             this.rootToken = '';
             this.rootLoginTime = 0;
             this.todoToken = '';
-            
+            this.crmToken = '';
+                        uni.removeStorageSync('crm_access_token');
             uni.removeStorageSync('todo_access_token');
             uni.removeStorageSync('vbot_root_token');
             uni.removeStorageSync('vbot_root_login_time');

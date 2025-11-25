@@ -5,9 +5,10 @@ import { getAllMembers } from '@/api/project';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { buildCreateTodoPayload } from '@/models/create_todo';
 import type { TodoForm } from '@/types/todo';
-import { getCrmToken, getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
+import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
+import { useAuthStore } from '@/stores/auth';
 export const useCreateTodoController = () => {
-    
+    const authStore = useAuthStore();
     // Helpers
     const pad = (n: number) => n.toString().padStart(2, '0');
     const getTodayISO = () => {
@@ -64,7 +65,12 @@ export const useCreateTodoController = () => {
 	        loadingCustomer.value = true;
 	        try {
 	            // B1: Lấy Token CRM
-	            const token = await getCrmToken(PROJECT_CODE, UID);
+	            const token = authStore.crmToken;
+				if (!token) {
+				                console.error("Chưa có CRM Token!");
+				                // Có thể gọi lại authStore.fetchModuleTokens() nếu muốn chắc chắn
+				                return;
+				            }
 	            customerToken.value = token;
 	
 	            // B2: Lấy cấu hình Field Search để tìm ID của name, phone

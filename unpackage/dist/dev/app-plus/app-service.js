@@ -1764,6 +1764,96 @@ This will fail in production if not fixed.`);
       });
     });
   };
+  const getCrmToken = (projectCode, uid) => {
+    const authStore = useAuthStore();
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: `${CRM_API_URL}/token`,
+        method: "GET",
+        data: {
+          projectCode,
+          uid,
+          type: "CRM",
+          source: SYSTEM_CONFIG.SOURCE_PARAM
+        },
+        header: {
+          "Authorization": `Bearer ${authStore.rootToken}`
+        },
+        success: (res) => {
+          var _a, _b, _c, _d;
+          if (((_a = res.data) == null ? void 0 : _a.status) === 1 && ((_c = (_b = res.data) == null ? void 0 : _b.data) == null ? void 0 : _c.token)) {
+            resolve(res.data.data.token);
+          } else {
+            reject(((_d = res.data) == null ? void 0 : _d.message) || "Lỗi lấy Token CRM");
+          }
+        },
+        fail: (err) => reject(err)
+      });
+    });
+  };
+  const getCrmFieldSearch = (crmToken) => {
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: `${CRM_API_URL}/Customer/getAllFieldSearch`,
+        method: "POST",
+        data: {},
+        header: {
+          "Authorization": `Bearer ${crmToken}`
+        },
+        success: (res) => {
+          var _a, _b;
+          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
+            resolve(res.data.data);
+          } else {
+            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy Field Search");
+          }
+        },
+        fail: (err) => reject(err)
+      });
+    });
+  };
+  const getCrmCustomers = (crmToken, body) => {
+    return new Promise((resolve, reject) => {
+      uni.request({
+        url: `${CRM_API_URL}/Customer/getAll`,
+        method: "POST",
+        data: body,
+        header: {
+          "Authorization": `Bearer ${crmToken}`
+        },
+        success: (res) => {
+          var _a, _b;
+          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
+            resolve(res.data.data);
+          } else {
+            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy danh sách KH");
+          }
+        },
+        fail: (err) => reject(err)
+      });
+    });
+  };
+  const getCrmCustomerDetail = (crmToken, customerUid) => {
+    return request({
+      url: `${CRM_API_URL}/Customer/getDetail`,
+      method: "GET",
+      data: {
+        uid: customerUid
+      },
+      header: {
+        "Authorization": `Bearer ${crmToken}`
+      }
+    });
+  };
+  const getCrmActionTimeline = (crmToken, customerUid, type = "ALL") => {
+    return request({
+      url: `${CRM_API_URL}/ActionTimeline/getAll?from=-1&to=-1&customerUid=${customerUid}&type=${type}&page=1&size=10&memberUid=&projectCode=`,
+      method: "GET",
+      header: {
+        "Authorization": `Bearer ${crmToken}`
+      }
+    });
+  };
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1e3;
   const useAuthStore = defineStore("auth", {
     // 1. STATE
@@ -1772,12 +1862,13 @@ This will fail in production if not fixed.`);
       // [MỚI] Lưu thời điểm lấy Root Token để tính hạn 7 ngày
       rootLoginTime: uni.getStorageSync("vbot_root_login_time") || 0,
       todoToken: uni.getStorageSync("todo_access_token") || "",
+      crmToken: uni.getStorageSync("crm_access_token") || "",
       uid: uni.getStorageSync("vbot_uid") || "",
       projectCode: uni.getStorageSync("vbot_project_code") || ""
     }),
     // 2. GETTERS
     getters: {
-      isLoggedIn: (state) => !!state.todoToken,
+      isLoggedIn: (state) => !!state.todoToken && !!state.crmToken,
       // [MỚI] Kiểm tra Root Token còn hạn 7 ngày không
       isRootTokenValid: (state) => {
         if (!state.rootToken || !state.rootLoginTime)
@@ -1807,21 +1898,31 @@ This will fail in production if not fixed.`);
           this.todoToken = data.todoToken;
           uni.setStorageSync("todo_access_token", data.todoToken);
         }
+        if (data.crmToken) {
+          this.crmToken = data.crmToken;
+          uni.setStorageSync("crm_access_token", data.crmToken);
+        }
       },
       // Đổi Root Token lấy Todo Token
-      async exchangeForTodoToken() {
+      async fetchModuleTokens() {
         try {
           if (!this.isRootTokenValid) {
-            formatAppLog("log", "at stores/auth.ts:70", "⚠️ Root Token hết hạn 7 ngày, cần đăng nhập lại.");
+            formatAppLog("log", "at stores/auth.ts:74", "⚠️ Root Token hết hạn, login lại...");
             await this.loginDevMode();
             return;
           }
-          formatAppLog("log", "at stores/auth.ts:75", "🔄 Store: Đang dùng Root Token đổi Todo Token...");
-          const todoToken = await getTodoToken(this.rootToken, this.projectCode, this.uid);
-          this.setAuthData({ todoToken });
-          formatAppLog("log", "at stores/auth.ts:78", "✅ Store: Đã lấy được Todo Token mới.");
+          formatAppLog("log", "at stores/auth.ts:79", "🔄 Store: Đang lấy Token cho Todo và CRM...");
+          const [newTodoToken, newCrmToken] = await Promise.all([
+            getTodoToken(this.rootToken, this.projectCode, this.uid),
+            getCrmToken(this.projectCode, this.uid)
+          ]);
+          this.setAuthData({
+            todoToken: newTodoToken,
+            crmToken: newCrmToken
+          });
+          formatAppLog("log", "at stores/auth.ts:93", "✅ Store: Đã lấy đủ Token (Todo & CRM).");
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:80", "❌ Store: Lỗi đổi token:", error);
+          formatAppLog("error", "at stores/auth.ts:95", "❌ Store: Lỗi lấy module tokens:", error);
           this.logout();
           throw error;
         }
@@ -1833,38 +1934,43 @@ This will fail in production if not fixed.`);
         const devUid = "87d90802634146e29721476337bce64b";
         const devProject = "PR202511211001129372";
         try {
-          formatAppLog("log", "at stores/auth.ts:100", "🛠 Store: Đang gọi API đăng nhập hệ thống...");
+          formatAppLog("log", "at stores/auth.ts:113", "🛠 Store: Đang gọi API đăng nhập hệ thống...");
           const loginData = await systemLogin(devUser, devPass);
           this.setAuthData({
             rootToken: loginData.access_token,
             uid: devUid,
             projectCode: devProject
           });
-          await this.exchangeForTodoToken();
+          await this.fetchModuleTokens();
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:113", "❌ Store: Đăng nhập Dev thất bại", error);
+          formatAppLog("error", "at stores/auth.ts:126", "❌ Store: Đăng nhập Dev thất bại", error);
         }
       },
       // --- HÀM CHÍNH: Logic thông minh ---
       async initialize(options) {
-        formatAppLog("log", "at stores/auth.ts:119", "🚀 Store: Khởi tạo Auth...");
-        if (this.todoToken) {
-          formatAppLog("log", "at stores/auth.ts:123", ">> ✅ Đã có Token Module cũ. Dùng luôn, không cần gọi API.");
+        formatAppLog("log", "at stores/auth.ts:132", "🚀 Store: Khởi tạo Auth...");
+        if (this.todoToken && this.crmToken) {
+          formatAppLog("log", "at stores/auth.ts:136", ">> ✅ Đã có đủ Token cũ. Ready!");
           return;
         }
         if (this.isRootTokenValid) {
-          formatAppLog("log", "at stores/auth.ts:130", ">> ⚠️ Mất Token Module, nhưng Root Token còn hạn. Đang lấy lại...");
-          await this.exchangeForTodoToken();
+          formatAppLog("log", "at stores/auth.ts:142", ">> ⚠️ Thiếu token module, đang lấy lại...");
+          await this.fetchModuleTokens();
           return;
         }
-        formatAppLog("log", "at stores/auth.ts:136", ">> ❌ Root Token hết hạn hoặc chưa đăng nhập. Login lại...");
+        formatAppLog("log", "at stores/auth.ts:148", ">> ❌ Root Token hết hạn. Login lại...");
         await this.loginDevMode();
       },
+      async exchangeForTodoToken() {
+        await this.fetchModuleTokens();
+      },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:141", "👋 Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:156", "👋 Store: Đăng xuất...");
         this.rootToken = "";
         this.rootLoginTime = 0;
         this.todoToken = "";
+        this.crmToken = "";
+        uni.removeStorageSync("crm_access_token");
         uni.removeStorageSync("todo_access_token");
         uni.removeStorageSync("vbot_root_token");
         uni.removeStorageSync("vbot_root_login_time");
@@ -2882,97 +2988,8 @@ This will fail in production if not fixed.`);
       notificationReceivedAt: dateToTimestamp(fullNotifyDateTime)
     };
   };
-  const getCrmToken = (projectCode, uid) => {
-    const authStore = useAuthStore();
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/token`,
-        method: "GET",
-        data: {
-          projectCode,
-          uid,
-          type: "CRM",
-          source: SYSTEM_CONFIG.SOURCE_PARAM
-        },
-        header: {
-          "Authorization": `Bearer ${authStore.rootToken}`
-        },
-        success: (res) => {
-          var _a, _b, _c, _d;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1 && ((_c = (_b = res.data) == null ? void 0 : _b.data) == null ? void 0 : _c.token)) {
-            resolve(res.data.data.token);
-          } else {
-            reject(((_d = res.data) == null ? void 0 : _d.message) || "Lỗi lấy Token CRM");
-          }
-        },
-        fail: (err) => reject(err)
-      });
-    });
-  };
-  const getCrmFieldSearch = (crmToken) => {
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/Customer/getAllFieldSearch`,
-        method: "POST",
-        data: {},
-        header: {
-          "Authorization": `Bearer ${crmToken}`
-        },
-        success: (res) => {
-          var _a, _b;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
-            resolve(res.data.data);
-          } else {
-            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy Field Search");
-          }
-        },
-        fail: (err) => reject(err)
-      });
-    });
-  };
-  const getCrmCustomers = (crmToken, body) => {
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${CRM_API_URL}/Customer/getAll`,
-        method: "POST",
-        data: body,
-        header: {
-          "Authorization": `Bearer ${crmToken}`
-        },
-        success: (res) => {
-          var _a, _b;
-          if (((_a = res.data) == null ? void 0 : _a.status) === 1) {
-            resolve(res.data.data);
-          } else {
-            reject(((_b = res.data) == null ? void 0 : _b.message) || "Lỗi lấy danh sách KH");
-          }
-        },
-        fail: (err) => reject(err)
-      });
-    });
-  };
-  const getCrmCustomerDetail = (crmToken, customerUid) => {
-    return request({
-      url: `${CRM_API_URL}/Customer/getDetail`,
-      method: "GET",
-      data: {
-        uid: customerUid
-      },
-      header: {
-        "Authorization": `Bearer ${crmToken}`
-      }
-    });
-  };
-  const getCrmActionTimeline = (crmToken, customerUid, type = "ALL") => {
-    return request({
-      url: `${CRM_API_URL}/ActionTimeline/getAll?from=-1&to=-1&customerUid=${customerUid}&type=${type}&page=1&size=10&memberUid=&projectCode=`,
-      method: "GET",
-      header: {
-        "Authorization": `Bearer ${crmToken}`
-      }
-    });
-  };
   const useCreateTodoController = () => {
+    const authStore = useAuthStore();
     const pad = (n) => n.toString().padStart(2, "0");
     const getTodayISO = () => {
       const d = /* @__PURE__ */ new Date();
@@ -3007,7 +3024,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:55", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:56", "Lỗi lấy thành viên:", error);
         uni.showToast({ title: "Không thể tải danh sách thành viên", icon: "none" });
       }
     };
@@ -3016,7 +3033,11 @@ This will fail in production if not fixed.`);
         return;
       loadingCustomer.value = true;
       try {
-        const token = await getCrmToken(PROJECT_CODE, UID);
+        const token = authStore.crmToken;
+        if (!token) {
+          formatAppLog("error", "at controllers/create_todo.ts:70", "Chưa có CRM Token!");
+          return;
+        }
         customerToken.value = token;
         const fields = await getCrmFieldSearch(token);
         const nameField = fields.find((f) => f.code === "name");
@@ -3051,7 +3072,7 @@ This will fail in production if not fixed.`);
           };
         });
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:112", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:118", "Lỗi tải khách hàng:", error);
         uni.showToast({ title: "Lỗi tải dữ liệu CRM", icon: "none" });
       } finally {
         loadingCustomer.value = false;
@@ -3097,7 +3118,7 @@ This will fail in production if not fixed.`);
           uni.navigateBack();
         }, 1500);
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:174", "❌ Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:180", "❌ Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || "Thất bại";
         uni.showToast({ title: "Lỗi: " + errorMsg, icon: "none" });
       } finally {
