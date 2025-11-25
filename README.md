@@ -21,6 +21,7 @@ Dự án sử dụng các file .env để quản lý các biến môi trường 
 
 ### Các file cấu hình
 .env: chứa các biến dùng chung
+
 .env.example: file biến môi trường mẫu
 
 ### Tạo file cấu hình
