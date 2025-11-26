@@ -23,10 +23,8 @@
 </template>
 
 <script setup lang="ts">
-// Import hàm tiện ích
 import { formatDateDisplay } from '@/utils/dateUtils';
 
-// Các phần còn lại giữ nguyên
 const props = defineProps<{
   title?: string;
   startDate: string;
@@ -45,7 +43,6 @@ const onEndChange = (e: any) => {
 </script>
 
 <style lang="scss" scoped>
-/* Giữ nguyên style cũ */
 .f-section-title {
   margin-top: 20px;
   margin-bottom: 10px;

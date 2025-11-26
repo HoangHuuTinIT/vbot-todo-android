@@ -29,7 +29,6 @@ export const formatRelativeTime = (timestamp: number | null): string => {
 export const formatDateDisplay = (dateStr: string): string => {
     if (!dateStr) return '';
     try {
-        // Nếu chuỗi có dạng YYYY-MM-DD thì cắt chuỗi và đảo ngược lại
         if (dateStr.includes('-')) {
             const parts = dateStr.split('-');
             if (parts.length === 3) {
@@ -37,7 +36,7 @@ export const formatDateDisplay = (dateStr: string): string => {
                 return `${day}/${month}/${year}`;
             }
         }
-        return dateStr; // Trả về nguyên gốc nếu không đúng định dạng
+        return dateStr; 
     } catch (e) {
         return dateStr;
     }

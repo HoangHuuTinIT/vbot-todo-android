@@ -3944,6 +3944,28 @@ This will fail in production if not fixed.`);
       __expose();
       const props = __props;
       const emit = __emit;
+      const filter = vue.reactive({
+        name: "",
+        phone: "",
+        managerIndex: 0,
+        startDate: "",
+        endDate: ""
+      });
+      const managerOptions = vue.ref(["Thành viên quản lý", "Nguyễn Văn A", "Trần Thị B"]);
+      const onManagerChange = (e) => {
+        filter.managerIndex = e.detail.value;
+      };
+      const resetFilter = () => {
+        filter.name = "";
+        filter.phone = "";
+        filter.managerIndex = 0;
+        filter.startDate = "";
+        filter.endDate = "";
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:128", "Đã đặt lại bộ lọc");
+      };
+      const applyFilter = () => {
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:132", "Thực hiện lọc với:", filter);
+      };
       const close = () => {
         emit("close");
       };
@@ -3957,7 +3979,7 @@ This will fail in production if not fixed.`);
         const date = new Date(timestamp);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       };
-      const __returned__ = { props, emit, close, selectCustomer, formatDate, UserAvatar };
+      const __returned__ = { props, emit, filter, managerOptions, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3970,7 +3992,7 @@ This will fail in production if not fixed.`);
     }, [
       vue.createElementVNode("view", {
         class: "modal-content",
-        onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+        onClick: _cache[4] || (_cache[4] = vue.withModifiers(() => {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-header" }, [
@@ -3979,6 +4001,80 @@ This will fail in production if not fixed.`);
             class: "close-btn",
             onClick: $setup.close
           }, "✕")
+        ]),
+        vue.createElementVNode("view", { class: "filter-section" }, [
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.withDirectives(vue.createElementVNode(
+              "input",
+              {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.name = $event),
+                placeholder: "Nhập tên khách hàng",
+                "placeholder-class": "ph-style"
+              },
+              null,
+              512
+              /* NEED_PATCH */
+            ), [
+              [vue.vModelText, $setup.filter.name]
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.withDirectives(vue.createElementVNode(
+              "input",
+              {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.phone = $event),
+                type: "number",
+                placeholder: "Nhập số điện thoại",
+                "placeholder-class": "ph-style"
+              },
+              null,
+              512
+              /* NEED_PATCH */
+            ), [
+              [vue.vModelText, $setup.filter.phone]
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.createElementVNode("picker", {
+              mode: "selector",
+              range: $setup.managerOptions,
+              value: $setup.filter.managerIndex,
+              onChange: $setup.onManagerChange
+            }, [
+              vue.createElementVNode("view", { class: "f-picker-box" }, [
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: vue.normalizeClass($setup.filter.managerIndex === 0 ? "text-ph" : "text-val")
+                  },
+                  vue.toDisplayString($setup.managerOptions[$setup.filter.managerIndex]),
+                  3
+                  /* TEXT, CLASS */
+                ),
+                vue.createElementVNode("text", { class: "arrow" }, "▼")
+              ])
+            ], 40, ["range", "value"])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.createVNode($setup["DateRangeFilter"], {
+              startDate: $setup.filter.startDate,
+              endDate: $setup.filter.endDate,
+              "onUpdate:startDate": _cache[2] || (_cache[2] = (val) => $setup.filter.startDate = val),
+              "onUpdate:endDate": _cache[3] || (_cache[3] = (val) => $setup.filter.endDate = val)
+            }, null, 8, ["startDate", "endDate"])
+          ]),
+          vue.createElementVNode("view", { class: "f-actions" }, [
+            vue.createElementVNode("button", {
+              class: "btn-reset",
+              onClick: $setup.resetFilter
+            }, "Đặt lại"),
+            vue.createElementVNode("button", {
+              class: "btn-submit",
+              onClick: $setup.applyFilter
+            }, "Lọc")
+          ])
         ]),
         $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 0,
