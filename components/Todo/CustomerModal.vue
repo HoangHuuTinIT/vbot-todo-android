@@ -1,3 +1,4 @@
+//components/Todo/CustomerModal.vue
 <template>
     <view class="modal-overlay" v-if="visible" @click.stop="close">
         <view class="modal-content" @click.stop>

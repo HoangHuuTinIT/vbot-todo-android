@@ -1,3 +1,4 @@
+//components/StatusBadge.vue
 <template>
   <view 
     class="px-2 py-1 rounded-full text-xs font-bold inline-block text-center min-w-[80px]"

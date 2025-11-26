@@ -2238,7 +2238,7 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:73", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:61", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const getTodoList = async () => {
@@ -2257,9 +2257,7 @@ This will fail in production if not fixed.`);
           statusValues[statusIndex.value],
           sourceValues[sourceIndex.value],
           selectedCreatorId,
-          // Truyền ID người tạo
           selectedAssigneeId
-          // Truyền ID người được giao
         );
         const currentSize = pageSizeValues[pageSizeIndex.value];
         const [listData, countData] = await Promise.all([
@@ -2273,7 +2271,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         totalItems.value = countData || 0;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:118", error);
+        formatAppLog("error", "at controllers/list_todo.ts:101", error);
         uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -2309,7 +2307,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:153", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:134", "Delete Error:", error);
         uni.showToast({ title: "Xóa thất bại", icon: "none" });
       }
     };
@@ -2417,7 +2415,7 @@ This will fail in production if not fixed.`);
       confirmDelete
     };
   };
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -2464,7 +2462,7 @@ This will fail in production if not fixed.`);
     }
     return target;
   };
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2476,7 +2474,122 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const formatRelativeTime = (timestamp) => {
+    if (!timestamp)
+      return "";
+    const now2 = Date.now();
+    const diff = now2 - timestamp;
+    if (diff < 6e4)
+      return "Vừa xong";
+    if (diff < 36e5) {
+      const minutes = Math.floor(diff / 6e4);
+      return `${minutes} phút trước`;
+    }
+    if (diff < 864e5) {
+      const hours = Math.floor(diff / 36e5);
+      return `${hours} giờ trước`;
+    }
+    const date = new Date(timestamp);
+    const d = date.getDate().toString().padStart(2, "0");
+    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const y = date.getFullYear();
+    const h = date.getHours().toString().padStart(2, "0");
+    const min = date.getMinutes().toString().padStart(2, "0");
+    return `${d}/${m}/${y} ${h}:${min}`;
+  };
+  const formatDateDisplay = (dateStr) => {
+    if (!dateStr)
+      return "";
+    try {
+      if (dateStr.includes("-")) {
+        const parts = dateStr.split("-");
+        if (parts.length === 3) {
+          const [year, month, day] = parts;
+          return `${day}/${month}/${year}`;
+        }
+      }
+      return dateStr;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    __name: "DateRangeFilter",
+    props: {
+      title: { type: String, required: false },
+      startDate: { type: String, required: true },
+      endDate: { type: String, required: true }
+    },
+    emits: ["update:startDate", "update:endDate"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const onStartChange = (e) => {
+        emit("update:startDate", e.detail.value);
+      };
+      const onEndChange = (e) => {
+        emit("update:endDate", e.detail.value);
+      };
+      const __returned__ = { props, emit, onStartChange, onEndChange, get formatDateDisplay() {
+        return formatDateDisplay;
+      } };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
+      $props.title ? (vue.openBlock(), vue.createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "f-section-title"
+        },
+        vue.toDisplayString($props.title),
+        1
+        /* TEXT */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode("view", { class: "f-row" }, [
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          vue.createElementVNode("picker", {
+            mode: "date",
+            value: $props.startDate,
+            onChange: $setup.onStartChange
+          }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
+              },
+              vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : "Từ ngày"),
+              3
+              /* TEXT, CLASS */
+            )
+          ], 40, ["value"])
+        ]),
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          vue.createElementVNode("picker", {
+            mode: "date",
+            value: $props.endDate,
+            onChange: $setup.onEndChange
+          }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
+              },
+              vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : "Đến ngày"),
+              3
+              /* TEXT, CLASS */
+            )
+          ], 40, ["value"])
+        ])
+      ])
+    ]);
+  }
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -2519,7 +2632,7 @@ This will fail in production if not fixed.`);
         confirmDelete,
         goToDetail
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -2829,72 +2942,20 @@ This will fail in production if not fixed.`);
                 ])
               ], 40, ["range", "value"])
             ]),
-            vue.createElementVNode("view", { class: "f-section-title" }, "Thời gian tạo"),
-            vue.createElementVNode("view", { class: "f-row" }, [
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.createdFrom,
-                  onChange: _cache[13] || (_cache[13] = (e) => $setup.filter.createdFrom = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.createdFrom || "Từ ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ]),
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.createdTo,
-                  onChange: _cache[14] || (_cache[14] = (e) => $setup.filter.createdTo = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.createdTo || "Đến ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ])
-            ]),
-            vue.createElementVNode("view", { class: "f-section-title" }, "Thời gian hết hạn"),
-            vue.createElementVNode("view", { class: "f-row" }, [
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.dueDateFrom,
-                  onChange: _cache[15] || (_cache[15] = (e) => $setup.filter.dueDateFrom = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.dueDateFrom || "Từ ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ]),
-              vue.createElementVNode("view", { class: "f-group half" }, [
-                vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $setup.filter.dueDateTo,
-                  onChange: _cache[16] || (_cache[16] = (e) => $setup.filter.dueDateTo = e.detail.value)
-                }, [
-                  vue.createElementVNode(
-                    "view",
-                    { class: "f-picker date" },
-                    vue.toDisplayString($setup.filter.dueDateTo || "Đến ngày"),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["value"])
-              ])
-            ]),
+            vue.createVNode($setup["DateRangeFilter"], {
+              title: "Thời gian tạo",
+              startDate: $setup.filter.createdFrom,
+              "onUpdate:startDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.createdFrom = $event),
+              endDate: $setup.filter.createdTo,
+              "onUpdate:endDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.createdTo = $event)
+            }, null, 8, ["startDate", "endDate"]),
+            vue.createVNode($setup["DateRangeFilter"], {
+              title: "Thời gian hết hạn",
+              startDate: $setup.filter.dueDateFrom,
+              "onUpdate:startDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.dueDateFrom = $event),
+              endDate: $setup.filter.dueDateTo,
+              "onUpdate:endDate": _cache[16] || (_cache[16] = ($event) => $setup.filter.dueDateTo = $event)
+            }, null, 8, ["startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
           vue.createElementVNode("view", { class: "filter-footer" }, [
@@ -2991,7 +3052,6 @@ This will fail in production if not fixed.`);
       customer: "",
       customerUid: "",
       assignee: "",
-      // Trường này sẽ chứa memberUID
       dueDate: getTodayISO(),
       notifyDate: getTodayISO(),
       notifyTime: getCurrentTime()
@@ -3015,7 +3075,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:61", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:55", "Lỗi lấy thành viên:", error);
         uni.showToast({ title: "Không thể tải danh sách thành viên", icon: "none" });
       }
     };
@@ -3026,7 +3086,7 @@ This will fail in production if not fixed.`);
       try {
         const token = authStore.crmToken;
         if (!token) {
-          formatAppLog("error", "at controllers/create_todo.ts:75", "Chưa có CRM Token!");
+          formatAppLog("error", "at controllers/create_todo.ts:67", "Chưa có CRM Token!");
           return;
         }
         customerToken.value = token;
@@ -3040,10 +3100,8 @@ This will fail in production if not fixed.`);
         const requestBody = {
           page: 1,
           size: 20,
-          // Lấy 20 khách hàng demo
           fieldSearch: [
             { id: -1, value: "", type: "", isSearch: false },
-            // create_at
             { id: nameId, value: "", type: "", isSearch: false },
             { id: phoneId, value: "", type: "", isSearch: false },
             { id: memberNoId, value: "", type: "", isSearch: false }
@@ -3056,14 +3114,13 @@ This will fail in production if not fixed.`);
           return {
             id: item.id,
             uid: item.uid,
-            // [QUAN TRỌNG] Lấy trường uid từ API trả về
             createAt: item.createAt,
             name: nameObj ? nameObj.value : "(Không tên)",
             phone: phoneObj ? phoneObj.value : ""
           };
         });
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:123", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:108", "Lỗi tải khách hàng:", error);
         uni.showToast({ title: "Lỗi tải dữ liệu CRM", icon: "none" });
       } finally {
         loadingCustomer.value = false;
@@ -3109,7 +3166,6 @@ This will fail in production if not fixed.`);
           projectCode: PROJECT_CODE,
           uid: UID,
           link: selectedLink
-          // <--- Truyền giá trị động vào đây
         });
         await createTodo(payload);
         uni.showToast({ title: "Tạo thành công!", icon: "success" });
@@ -3117,7 +3173,7 @@ This will fail in production if not fixed.`);
           uni.navigateBack();
         }, 1500);
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:196", "❌ Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:169", " Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || "Thất bại";
         uni.showToast({ title: "Lỗi: " + errorMsg, icon: "none" });
       } finally {
@@ -3130,17 +3186,14 @@ This will fail in production if not fixed.`);
     return {
       loading,
       form,
-      // Member
       memberOptions,
       onMemberChange,
       currentAssigneeName,
-      // Customer (Return biến mới)
       showCustomerModal,
       loadingCustomer,
       customerList,
       openCustomerPopup,
       onCustomerSelect,
-      // Action
       goBack,
       submitForm,
       sourceOptions,
@@ -3712,7 +3765,7 @@ This will fail in production if not fixed.`);
           emit("change", { field, value: e.detail.value });
         }, 50);
       };
-      const formatDateDisplay = (isoStr) => {
+      const formatDateDisplay2 = (isoStr) => {
         if (!isoStr)
           return "";
         try {
@@ -3725,7 +3778,7 @@ This will fail in production if not fixed.`);
           return isoStr;
         }
       };
-      const __returned__ = { props, emit, onDateChange, formatDateDisplay };
+      const __returned__ = { props, emit, onDateChange, formatDateDisplay: formatDateDisplay2 };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4183,47 +4236,21 @@ This will fail in production if not fixed.`);
       title: apiData.title || "",
       code: apiData.code || "",
       desc: apiData.description || "",
-      // HTML từ API
       statusIndex: sIndex,
       sourceIndex: srcIndex,
       assigneeIndex: 0,
-      // Tạm fix cứng vì chưa có API User
       assigneeId: apiData.assigneeId || "",
       dueDate: timestampToDateStr(apiData.dueDate),
       notifyDate: timestampToDateStr(notiTimestamp),
       notifyTime: timestampToTimeStr(notiTimestamp),
       customerCode: apiData.customerCode || "",
       customerName: "",
-      // Sẽ điền sau khi gọi API CRM
       customerNameLabel: "Tên khách hàng",
       customerPhone: "",
       customerPhoneLabel: "Số điện thoại",
       customerManagerName: "",
       raw: apiData
     };
-  };
-  const formatRelativeTime = (timestamp) => {
-    if (!timestamp)
-      return "";
-    const now2 = Date.now();
-    const diff = now2 - timestamp;
-    if (diff < 6e4)
-      return "Vừa xong";
-    if (diff < 36e5) {
-      const minutes = Math.floor(diff / 6e4);
-      return `${minutes} phút trước`;
-    }
-    if (diff < 864e5) {
-      const hours = Math.floor(diff / 36e5);
-      return `${hours} giờ trước`;
-    }
-    const date = new Date(timestamp);
-    const d = date.getDate().toString().padStart(2, "0");
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
-    const y = date.getFullYear();
-    const h = date.getHours().toString().padStart(2, "0");
-    const min = date.getMinutes().toString().padStart(2, "0");
-    return `${d}/${m}/${y} ${h}:${min}`;
   };
   const useTodoDetailController = () => {
     const authStore = useAuthStore();
@@ -4289,7 +4316,7 @@ This will fail in production if not fixed.`);
             payload.notificationReceivedAt = convertToTimestamp(datePart, timePart);
           }
         }
-        formatAppLog("log", "at controllers/todo_detail.ts:122", `Payload Update ${event.field}:`, payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:112", `Payload Update ${event.field}:`, payload);
         const res = await updateTodo(payload);
         if (res) {
           uni.showToast({ title: "Cập nhật thành công", icon: "success" });
@@ -4303,7 +4330,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:143", "Lỗi cập nhật ngày:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:130", "Lỗi cập nhật ngày:", error);
         uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
       } finally {
         uni.hideLoading();
@@ -4318,23 +4345,19 @@ This will fail in production if not fixed.`);
       try {
         const payload = {
           ...form.value.raw,
-          // Spread toàn bộ trường cũ (id, title, createdBy, status...)
-          // Các trường bắt buộc thay đổi theo yêu cầu:
           preFixCode: "TODO",
           description: form.value.desc,
-          // Lấy nội dung từ Editor
           files: "",
           tagCodes: "",
-          // Lưu ý: Nếu form.title bị sửa ở UI, bạn cũng nên update vào đây
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:174", "Payload Update Todo:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:157", "Payload Update Todo:", payload);
         const res = await updateTodo(payload);
         if (res) {
           uni.showToast({ title: "Đã cập nhật mô tả", icon: "success" });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:184", "Lỗi cập nhật công việc:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:165", "Lỗi cập nhật công việc:", error);
         uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
       } finally {
         isSavingDescription.value = false;
@@ -4386,9 +4409,8 @@ This will fail in production if not fixed.`);
           message: newCommentText.value,
           files: "",
           parentId: replyingCommentData.value.id
-          // <--- QUAN TRỌNG: ID của comment cha
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:259", ">> Gửi trả lời:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:232", ">> Gửi trả lời:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
           uni.showToast({ title: "Đã trả lời", icon: "success" });
@@ -4396,7 +4418,7 @@ This will fail in production if not fixed.`);
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:269", "Lỗi gửi trả lời:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:242", "Lỗi gửi trả lời:", error);
         uni.showToast({ title: "Gửi thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4425,13 +4447,11 @@ This will fail in production if not fixed.`);
       const senderId = authStore.uid;
       const payload = {
         todoId: Number(todoId),
-        // Đảm bảo là số nếu API yêu cầu số
         senderId,
         todoMessageId: Number(messageId),
-        // Dùng biến messageId đã lấy ở trên
         codeEmoji: emoji
       };
-      formatAppLog("log", "at controllers/todo_detail.ts:319", ">> Gửi Reaction:", payload);
+      formatAppLog("log", "at controllers/todo_detail.ts:283", ">> Gửi Reaction:", payload);
       try {
         const res = await reactionTodoMessage(payload);
         if (res) {
@@ -4439,7 +4459,7 @@ This will fail in production if not fixed.`);
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:333", "Lỗi thả cảm xúc:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:294", "Lỗi thả cảm xúc:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       }
     };
@@ -4455,17 +4475,11 @@ This will fail in production if not fixed.`);
     ];
     const historyFilterValues = [
       "ALL",
-      // Tất cả
       "TODO",
-      // Công việc
       "TICKET",
-      // Ticket
       "HISTORY_CALL",
-      // Lịch sử gọi
       "CUSTOMER",
-      // Khách hàng
       "NOTE"
-      // Ghi chú
     ];
     const form = vue.ref({
       id: "",
@@ -4509,7 +4523,7 @@ This will fail in production if not fixed.`);
       uni.showLoading({ title: "Đang tải..." });
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:403", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:361", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -4525,13 +4539,13 @@ This will fail in production if not fixed.`);
             editingMemberName.value = "tôi";
           }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:431", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:387", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:443", "Lỗi lấy chi tiết bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:398", "Lỗi lấy chi tiết bình luận:", error);
         uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
       } finally {
         uni.hideLoading();
@@ -4552,15 +4566,14 @@ This will fail in production if not fixed.`);
           senderId: editingCommentData.value.senderId,
           message: newCommentText.value,
           files: ""
-          // Tạm để trống
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:469", "Payload Update:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:424", "Payload Update:", payload);
         await updateTodoMessage(payload);
         uni.showToast({ title: "Đã cập nhật", icon: "success" });
         resetEditState();
         await fetchComments(form.value.id);
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:483", "Lỗi cập nhật:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:435", "Lỗi cập nhật:", error);
         uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4600,7 +4613,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:539", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:488", "Lỗi xóa bình luận:", error);
         uni.showToast({ title: "Xóa thất bại", icon: "none" });
       } finally {
         commentToDeleteId.value = null;
@@ -4623,13 +4636,10 @@ This will fail in production if not fixed.`);
           todoId,
           senderId,
           message: newCommentText.value,
-          // Nội dung từ editor
           files: "",
-          // Tạm thời rỗng
           parentId: -1
-          // Mặc định là comment cha
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:577", "Đang gửi bình luận:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:523", "Đang gửi bình luận:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
           uni.showToast({ title: "Đã gửi bình luận", icon: "success" });
@@ -4637,7 +4647,7 @@ This will fail in production if not fixed.`);
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:595", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:538", "Lỗi gửi bình luận:", error);
         uni.showToast({ title: "Gửi thất bại", icon: "none" });
       } finally {
         isSubmittingComment.value = false;
@@ -4655,7 +4665,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:618", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:560", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4683,7 +4693,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:653", "❌ Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:594", " Lỗi lấy chi tiết:", error);
         uni.showToast({ title: "Lỗi kết nối", icon: "none" });
       } finally {
         isLoading.value = false;
@@ -4722,11 +4732,9 @@ This will fail in production if not fixed.`);
         timeDisplay: formatRelativeTime(item.createdAt),
         actionText,
         isEdited: !!item.updatedAt,
-        // Nếu có updatedAt thì là đã sửa
         type: item.type,
         reactions: reactionList,
         children: []
-        // Sẽ map đệ quy nếu cần
       };
     };
     const fetchComments = async (todoId) => {
@@ -4746,7 +4754,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:724", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:664", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -4787,7 +4795,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:785", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:721", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4798,7 +4806,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:797", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:733", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4827,7 +4835,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:840", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:771", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -4851,19 +4859,14 @@ This will fail in production if not fixed.`);
       try {
         const payload = {
           ...form.value.raw,
-          // Lấy toàn bộ dữ liệu cũ
           status: newStatus,
-          // <-- Ghi đè trạng thái mới
-          // Các trường bắt buộc theo API update
           preFixCode: "TODO",
           description: form.value.desc,
-          // Lấy mô tả hiện tại (đề phòng người dùng đã sửa mô tả nhưng chưa bấm lưu)
           files: "",
           tagCodes: "",
-          // Cập nhật title nếu có sửa
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:890", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:818", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           uni.showToast({ title: "Đã cập nhật trạng thái", icon: "success" });
@@ -4875,7 +4878,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:907", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:834", "Lỗi cập nhật trạng thái:", error);
         uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
       } finally {
         uni.hideLoading();
@@ -4900,18 +4903,14 @@ This will fail in production if not fixed.`);
       try {
         const payload = {
           ...form.value.raw,
-          // Lấy toàn bộ dữ liệu cũ
           assigneeId: newAssigneeId,
-          // <-- Ghi đè người được giao mới
-          // Các trường bắt buộc theo API update
           preFixCode: "TODO",
           description: form.value.desc,
           files: "",
           tagCodes: "",
-          // Cập nhật title nếu có sửa
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:956", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:880", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           uni.showToast({ title: "Đã đổi người thực hiện", icon: "success" });
@@ -4922,7 +4921,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:975", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:898", "Lỗi cập nhật người giao:", error);
         uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
       } finally {
         uni.hideLoading();
@@ -4932,7 +4931,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:983", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:906", "Lưu:", form.value);
       uni.showToast({ title: "Đã lưu", icon: "success" });
     };
     return {
@@ -4940,7 +4939,6 @@ This will fail in production if not fixed.`);
       isLoadingCustomer,
       isLoadingHistory,
       historyList,
-      // Trả về thêm biến này
       form,
       statusOptions: statusLabels,
       sourceOptions,

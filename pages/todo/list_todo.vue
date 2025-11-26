@@ -116,33 +116,17 @@
 						</picker>
 					</view>
 
-					<view class="f-section-title">Thời gian tạo</view>
-					<view class="f-row">
-						<view class="f-group half">
-							<picker mode="date" :value="filter.createdFrom" @change="(e) => filter.createdFrom = e.detail.value">
-								<view class="f-picker date">{{ filter.createdFrom || 'Từ ngày' }}</view>
-							</picker>
-						</view>
-						<view class="f-group half">
-							<picker mode="date" :value="filter.createdTo" @change="(e) => filter.createdTo = e.detail.value">
-								<view class="f-picker date">{{ filter.createdTo || 'Đến ngày' }}</view>
-							</picker>
-						</view>
-					</view>
-
-					<view class="f-section-title">Thời gian hết hạn</view>
-					<view class="f-row">
-						<view class="f-group half">
-							<picker mode="date" :value="filter.dueDateFrom" @change="(e) => filter.dueDateFrom = e.detail.value">
-								<view class="f-picker date">{{ filter.dueDateFrom || 'Từ ngày' }}</view>
-							</picker>
-						</view>
-						<view class="f-group half">
-							<picker mode="date" :value="filter.dueDateTo" @change="(e) => filter.dueDateTo = e.detail.value">
-								<view class="f-picker date">{{ filter.dueDateTo || 'Đến ngày' }}</view>
-							</picker>
-						</view>
-					</view>
+					<DateRangeFilter 
+					          title="Thời gian tạo"
+					          v-model:startDate="filter.createdFrom"
+					          v-model:endDate="filter.createdTo"
+					        />
+					
+					        <DateRangeFilter 
+					          title="Thời gian hết hạn"
+					          v-model:startDate="filter.dueDateFrom"
+					          v-model:endDate="filter.dueDateTo"
+					        />
 					
 					<view style="height: 20px;"></view>
 				</scroll-view>
@@ -175,6 +159,7 @@
 <script setup lang="ts">
 	import { useListTodoController } from '@/controllers/list_todo';
 	import StatusBadge from '@/components/StatusBadge.vue';
+	import DateRangeFilter from '@/components/DateRangeFilter.vue';
 	const { 
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,

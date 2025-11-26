@@ -1,3 +1,4 @@
+//components/Todo/CommentItem.vue 
 <template>
   <view class="comment-thread">
     <view class="flex gap-3 mb-4 items-start">

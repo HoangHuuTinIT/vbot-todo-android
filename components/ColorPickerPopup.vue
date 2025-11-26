@@ -1,3 +1,4 @@
+//components/ColorPickerPopup.vue
 <template>
     <view class="color-popup-overlay" v-if="visible" @click="close">
         <view class="color-popup" @click.stop>

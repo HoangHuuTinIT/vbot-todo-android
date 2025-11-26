@@ -1,3 +1,4 @@
+//components/UserAvatar.vue
 <template>
   <view 
     class="rounded-full flex items-center justify-center overflow-hidden shrink-0"

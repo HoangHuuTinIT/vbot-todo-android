@@ -515,7 +515,6 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-/* Giữ nguyên CSS cũ */
 .container[data-v-9f96c8fe] {
   height: 100vh;
   display: flex;
@@ -624,14 +623,10 @@ to {
 .phone-text[data-v-9f96c8fe] {
   color: #007aff;
 }
-
-/* Màu xanh cho SĐT */
 .highlight-text[data-v-9f96c8fe] {
   color: #ff9500;
   font-weight: bold;
 }
-
-/* Màu cam cho quản lý */
 .loading-row[data-v-9f96c8fe], .empty-row[data-v-9f96c8fe] {
   padding: 20px;
   text-align: center;
@@ -639,8 +634,6 @@ to {
   font-size: 14px;
   font-style: italic;
 }
-
-/* Thêm CSS cho Loading */
 .history-container[data-v-9f96c8fe] {
   background-color: #fff;
   border-radius: 8px;
@@ -655,7 +648,6 @@ to {
   display: flex;
   position: relative;
   padding-bottom: 25px;
-  /* Khoảng cách giữa các item */
 }
 .timeline-item[data-v-9f96c8fe]:last-child {
   padding-bottom: 0;
@@ -664,7 +656,6 @@ to {
   width: 10px;
   height: 10px;
   background-color: #007aff;
-  /* Màu xanh chủ đạo */
   border-radius: 50%;
   margin-top: 5px;
   z-index: 2;
@@ -673,9 +664,7 @@ to {
 .timeline-line[data-v-9f96c8fe] {
   position: absolute;
   left: 4px;
-  /* Canh giữa dot (10px/2 - 1px) */
   top: 15px;
-  /* Bắt đầu từ dưới dot */
   bottom: 0;
   width: 2px;
   background-color: #e5e5ea;
@@ -711,15 +700,12 @@ to {
   margin-bottom: 10px;
   margin-left: 5px;
   margin-right: 5px;
-  /* Căn lề phải cho đẹp */
 }
 .section-title.no-margin[data-v-9f96c8fe] {
   margin-bottom: 0;
-  /* Bỏ margin bottom cũ của title để căn giữa với picker */
 }
 .filter-badge[data-v-9f96c8fe] {
   background-color: #e3f2fd;
-  /* Màu nền xanh nhạt */
   color: #007aff;
   font-size: 13px;
   font-weight: 600;
@@ -748,15 +734,9 @@ to {
   display: flex;
   align-items: flex-start;
 }
-
-/* Avatar Styles */
-/* Sửa màu chữ mặc định hoặc dùng class riêng */
-/* Small Avatar for Replies */
 .avatar-char.small-char[data-v-9f96c8fe] {
   font-size: 14px;
 }
-
-/* Header Info */
 .c-action[data-v-9f96c8fe] {
   font-size: 13px;
   color: #666;
@@ -773,9 +753,6 @@ to {
   color: #888;
   margin-bottom: 4px;
 }
-
-/* Message Content */
-/* Reactions */
 .reaction-row[data-v-9f96c8fe] {
   display: flex;
   gap: 5px;
@@ -789,13 +766,9 @@ to {
   font-size: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-
-/* Nested Replies */
 .replies-wrapper[data-v-9f96c8fe] {
   margin-top: 12px;
   padding-left: 50px;
-  /* Thụt đầu dòng */
-  /* border-left: 2px solid #f0f0f0; */
 }
 .child-row[data-v-9f96c8fe] {
   margin-bottom: 10px;
@@ -804,13 +777,11 @@ to {
   margin-bottom: 20px;
 }
 .editor-container[data-v-9f96c8fe] {
-  /* Tinh chỉnh lại editor cho gọn nếu cần */
   margin-bottom: 10px;
 }
 .input-actions[data-v-9f96c8fe] {
   display: flex;
   justify-content: flex-end;
-  /* Căn nút sang phải */
 }
 .btn-save-comment[data-v-9f96c8fe] {
   background-color: #007aff;
@@ -821,7 +792,6 @@ to {
   height: 36px;
   line-height: 36px;
   border-radius: 18px;
-  /* Bo tròn nút */
   border: none;
 }
 .btn-save-comment[disabled][data-v-9f96c8fe] {
@@ -838,7 +808,6 @@ to {
 .editor-container[data-v-9f96c8fe] {
   margin-bottom: 10px;
   border: 1px solid #eee;
-  /* Thêm viền nhẹ cho editor bình luận nếu muốn */
   border-radius: 8px;
   overflow: hidden;
 }
@@ -876,8 +845,6 @@ to {
   width: 16px;
   height: 16px;
 }
-
-/* CSS Modal (Tái sử dụng hoặc copy lại nếu chưa có scope global) */
 .modal-overlay[data-v-9f96c8fe] {
   position: fixed;
   top: 0;
@@ -970,28 +937,24 @@ to {
 }
 .icon-action[data-v-9f96c8fe] {
   width: 18px;
-  /* Kích thước icon */
   height: 18px;
 }
 .editing-alert[data-v-9f96c8fe] {
   margin-bottom: 10px;
   padding: 8px 12px;
   background-color: #fff7e6;
-  /* Màu nền vàng nhạt cảnh báo nhẹ */
   border-radius: 6px;
   border: 1px solid #ffd591;
 }
 .editing-text[data-v-9f96c8fe] {
   font-size: 13px;
   color: #d48806;
-  /* Màu chữ cam đậm */
 }
 .emoji-picker-container[data-v-9f96c8fe] {
   background-color: #fff;
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  /* Căn giữa hoặc hiển thị gần chỗ bấm tùy chỉnh sau */
   width: 80%;
   max-width: 300px;
   animation: popIn 0.2s ease-out;
@@ -1011,20 +974,16 @@ to {
 .emoji-item[data-v-9f96c8fe]:active {
   transform: scale(1.2);
 }
-
-/* Cập nhật lại action container để chứa nút emoji */
 .action-buttons-container[data-v-9f96c8fe] {
   display: flex;
   gap: 15px;
   align-items: center;
-  /* Đẩy sang phải */
   margin-left: auto;
 }
 .reply-alert[data-v-9f96c8fe] {
   margin-bottom: 10px;
   padding: 10px 12px;
   background-color: #e6f7ff;
-  /* Màu xanh nhạt đặc trưng cho reply */
   border-radius: 8px;
   border-left: 4px solid #1890ff;
 }
@@ -1048,7 +1007,6 @@ to {
   border-radius: 4px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* Giới hạn 2 dòng */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1057,8 +1015,6 @@ to {
   color: #999;
   font-weight: bold;
 }
-
-/* Giới hạn nội dung trong quote để không bị vỡ layout */
 .quote-content[data-v-9f96c8fe] {
   display: inline;
 }
@@ -1067,18 +1023,13 @@ to {
   color: #007aff;
   font-weight: 500;
 }
-
-/* [MỚI] Style cho text bị vô hiệu hóa */
 .disabled-text[data-v-9f96c8fe] {
   color: #999 !important;
-  /* Màu xám */
   pointer-events: none;
-  /* Chặn click chuột (cho chắc chắn) */
 }
 .toggle-header[data-v-9f96c8fe] {
   display: flex;
   align-items: center;
-  /* Tăng vùng bấm cho dễ thao tác */
   padding: 5px 0;
 }
 .toggle-icon[data-v-9f96c8fe] {
@@ -1087,13 +1038,10 @@ to {
   margin-left: 8px;
   opacity: 0.6;
   transition: transform 0.3s ease;
-  /* Hiệu ứng xoay mượt mà */
   transform: rotate(-90deg);
-  /* Mặc định xoay ngang (đóng) */
 }
 .toggle-icon.open[data-v-9f96c8fe] {
   transform: rotate(0deg);
-  /* Khi mở thì xoay xuống */
   opacity: 1;
 }
 .loading-overlay[data-v-9f96c8fe] {
