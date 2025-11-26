@@ -1,3 +1,4 @@
+//pages/todo/create_todo.vue
 <template>
 	<view class="container">
 		<view class="flat-item">
@@ -54,7 +55,7 @@
 			<AppButton type="primary" :label="loading ? 'Đang lưu...' : 'Lưu công việc'" :loading="loading"
 				class="btn-submit" @click="submitForm" />
 		</view>
-
+<GlobalMessage />
 	</view>
 </template>
 <script setup lang="ts">
@@ -63,6 +64,7 @@
 	import TodoDatePicker from '@/components/Todo/TodoDatePicker.vue';
 	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import AppButton from '@/components/AppButton.vue';
+	import GlobalMessage from '@/components/GlobalMessage.vue';
 	const {
 		loading, form, goBack, submitForm,
 		memberOptions, onMemberChange, currentAssigneeName,

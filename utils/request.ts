@@ -1,3 +1,4 @@
+//utils/request.ts
 import { useAuthStore } from '@/stores/auth'; 
 
 interface RequestOptions extends UniApp.RequestOptions {

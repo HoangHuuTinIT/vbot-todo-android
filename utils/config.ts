@@ -1,3 +1,4 @@
+//utils/config.ts 
 import { SYSTEM_CONFIG } from '@/utils/enums';
 
 export const SERVER_BASE_URL: string = import.meta.env.VITE_SERVER_BASE_URL as string;

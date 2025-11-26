@@ -1946,16 +1946,16 @@ This will fail in production if not fixed.`);
             return;
           }
           if (res.statusCode === 401) {
-            formatAppLog("warn", "at utils/request.ts:39", `API 401: Token hết hạn tại ${options.url}`);
+            formatAppLog("warn", "at utils/request.ts:40", `API 401: Token hết hạn tại ${options.url}`);
             if (options._isRetry) {
-              formatAppLog("error", "at utils/request.ts:42", " Refresh Token cũng thất bại -> Logout.");
+              formatAppLog("error", "at utils/request.ts:43", " Refresh Token cũng thất bại -> Logout.");
               authStore.logout();
               reject(data);
               return;
             }
             try {
               await authStore.exchangeForTodoToken();
-              formatAppLog("log", "at utils/request.ts:50", " Đã Refresh Token -> Đang gọi lại API cũ...");
+              formatAppLog("log", "at utils/request.ts:51", " Đã Refresh Token -> Đang gọi lại API cũ...");
               const retryResult = await request({
                 ...options,
                 _isRetry: true
@@ -1967,11 +1967,11 @@ This will fail in production if not fixed.`);
             }
             return;
           }
-          formatAppLog("error", "at utils/request.ts:65", `[API Error ${res.statusCode}]`, data);
+          formatAppLog("error", "at utils/request.ts:66", `[API Error ${res.statusCode}]`, data);
           reject(data);
         },
         fail: (err) => {
-          formatAppLog("error", "at utils/request.ts:70", "[Network Error]", err);
+          formatAppLog("error", "at utils/request.ts:71", "[Network Error]", err);
           reject(err);
         }
       });
@@ -2190,6 +2190,14 @@ This will fail in production if not fixed.`);
       });
     });
   };
+  const showMessage = (message, type = "success") => {
+    uni.$emit("app-toast-show", { message, type });
+  };
+  const showSuccess = (msg) => showMessage(msg, "success");
+  const showError = (msg) => showMessage(msg, "error");
+  const showInfo = (msg) => showMessage(msg, "info");
+  const showLoading = (title = "Đang xử lý...") => uni.showLoading({ title, mask: true });
+  const hideLoading = () => uni.hideLoading();
   const useListTodoController = () => {
     const todos = vue.ref([]);
     const isLoading = vue.ref(false);
@@ -2238,7 +2246,7 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:61", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:63", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const getTodoList = async () => {
@@ -2271,8 +2279,8 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         totalItems.value = countData || 0;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:101", error);
-        uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
+        formatAppLog("error", "at controllers/list_todo.ts:103", error);
+        showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
       }
@@ -2302,13 +2310,13 @@ This will fail in production if not fixed.`);
         return;
       try {
         await deleteTodo(itemToDelete.value.id);
-        uni.showToast({ title: "Đã xóa thành công", icon: "success" });
+        showSuccess("Đã xóa thành công");
         isConfirmDeleteOpen.value = false;
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:134", "Delete Error:", error);
-        uni.showToast({ title: "Xóa thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/list_todo.ts:136", "Delete Error:", error);
+        showError("Xóa thất bại");
       }
     };
     const showActionMenu = (item) => {
@@ -2415,7 +2423,7 @@ This will fail in production if not fixed.`);
       confirmDelete
     };
   };
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -2462,7 +2470,7 @@ This will fail in production if not fixed.`);
     }
     return target;
   };
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2474,7 +2482,7 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -2514,7 +2522,7 @@ This will fail in production if not fixed.`);
       return dateStr;
     }
   };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -2539,7 +2547,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
         "view",
@@ -2589,8 +2597,8 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
       label: { type: String, required: false, default: "" },
@@ -2614,7 +2622,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass(["app-btn", [
         `btn-${$props.type}`,
@@ -2640,7 +2648,92 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    __name: "GlobalMessage",
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const isVisible = vue.ref(false);
+      const msgContent = vue.ref("");
+      const msgType = vue.ref("success");
+      const safeAreaTop = vue.ref(0);
+      let timer = null;
+      const icons = {
+        success: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23047857%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z%22%2F%3E%3C%2Fsvg%3E",
+        error: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23b91c1c%22%3E%3Cpath%20d%3D%22M12%202C6.47%202%202%206.47%202%2012s4.47%2010%2010%2010%2010-4.47%2010-10S17.53%202%2012%202zm5%2013.59L15.59%2017%2012%2013.41%208.41%2017%207%2015.59%2010.59%2012%207%208.41%208.41%207%2012%2010.59%2015.59%207%2017%208.41%2013.41%2012%2017%2015.59z%22%2F%3E%3C%2Fsvg%3E",
+        info: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%231d4ed8%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm1%2015h-2v-6h2v6zm0-8h-2V7h2v2z%22%2F%3E%3C%2Fsvg%3E",
+        warning: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23b45309%22%3E%3Cpath%20d%3D%22M1%2021h22L12%202%201%2021zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z%22%2F%3E%3C%2Fsvg%3E"
+      };
+      const iconPath = vue.computed(() => {
+        return icons[msgType.value] || icons["info"];
+      });
+      const handleShowToast = (data) => {
+        if (timer) {
+          clearTimeout(timer);
+          isVisible.value = false;
+        }
+        msgContent.value = data.message;
+        msgType.value = data.type || "success";
+        setTimeout(() => {
+          isVisible.value = true;
+        }, 50);
+        timer = setTimeout(() => {
+          isVisible.value = false;
+        }, 2500);
+      };
+      vue.onMounted(() => {
+        const sysInfo = uni.getSystemInfoSync();
+        safeAreaTop.value = sysInfo.statusBarHeight || 0;
+        uni.$on("app-toast-show", handleShowToast);
+      });
+      vue.onUnmounted(() => {
+        uni.$off("app-toast-show", handleShowToast);
+      });
+      const __returned__ = { isVisible, msgContent, msgType, safeAreaTop, get timer() {
+        return timer;
+      }, set timer(v) {
+        timer = v;
+      }, icons, iconPath, handleShowToast };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: vue.normalizeClass(["global-message-container", { "show": $setup.isVisible }]),
+        style: vue.normalizeStyle({ paddingTop: $setup.safeAreaTop + 10 + "px" })
+      },
+      [
+        vue.createElementVNode(
+          "view",
+          {
+            class: vue.normalizeClass(["message-content", $setup.msgType])
+          },
+          [
+            vue.createElementVNode("image", {
+              src: $setup.iconPath,
+              class: "msg-icon",
+              mode: "aspectFit"
+            }, null, 8, ["src"]),
+            vue.createElementVNode(
+              "text",
+              { class: "msg-text" },
+              vue.toDisplayString($setup.msgContent),
+              1
+              /* TEXT */
+            )
+          ],
+          2
+          /* CLASS */
+        )
+      ],
+      6
+      /* CLASS, STYLE */
+    );
+  }
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -2683,7 +2776,7 @@ This will fail in production if not fixed.`);
         confirmDelete,
         goToDetail
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton, GlobalMessage };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3059,7 +3152,8 @@ This will fail in production if not fixed.`);
             }, null, 8, ["onClick"])
           ])
         ])
-      ])) : vue.createCommentVNode("v-if", true)
+      ])) : vue.createCommentVNode("v-if", true),
+      vue.createVNode($setup["GlobalMessage"])
     ]);
   }
   const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/list_todo.vue"]]);
@@ -3134,8 +3228,8 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:55", "Lỗi lấy thành viên:", error);
-        uni.showToast({ title: "Không thể tải danh sách thành viên", icon: "none" });
+        formatAppLog("error", "at controllers/create_todo.ts:57", "Lỗi lấy thành viên:", error);
+        showError("Không thể tải danh sách thành viên");
       }
     };
     const fetchCustomers = async () => {
@@ -3145,7 +3239,7 @@ This will fail in production if not fixed.`);
       try {
         const token = authStore.crmToken;
         if (!token) {
-          formatAppLog("error", "at controllers/create_todo.ts:67", "Chưa có CRM Token!");
+          formatAppLog("error", "at controllers/create_todo.ts:69", "Chưa có CRM Token!");
           return;
         }
         customerToken.value = token;
@@ -3179,8 +3273,8 @@ This will fail in production if not fixed.`);
           };
         });
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:108", "Lỗi tải khách hàng:", error);
-        uni.showToast({ title: "Lỗi tải dữ liệu CRM", icon: "none" });
+        formatAppLog("error", "at controllers/create_todo.ts:109", "Lỗi tải khách hàng:", error);
+        showError("Lỗi tải dữ liệu CRM");
       } finally {
         loadingCustomer.value = false;
       }
@@ -3210,7 +3304,7 @@ This will fail in production if not fixed.`);
     const goBack = () => uni.navigateBack();
     const submitForm = async () => {
       if (!form.value.name || !form.value.name.trim()) {
-        uni.showToast({ title: "Vui lòng nhập tên công việc", icon: "none" });
+        showInfo("Vui lòng nhập tên công việc");
         return;
       }
       let selectedLink = "CALL";
@@ -3227,14 +3321,14 @@ This will fail in production if not fixed.`);
           link: selectedLink
         });
         await createTodo(payload);
-        uni.showToast({ title: "Tạo thành công!", icon: "success" });
+        showSuccess("Tạo thành công!");
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:169", " Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:170", " Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || "Thất bại";
-        uni.showToast({ title: "Lỗi: " + errorMsg, icon: "none" });
+        showError("Lỗi: " + errorMsg);
       } finally {
         loading.value = false;
       }
@@ -4217,7 +4311,7 @@ This will fail in production if not fixed.`);
         sourceIndex,
         onSourceChange
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, TodoEditor, TodoDatePicker, CustomerModal, AppButton };
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4349,7 +4443,8 @@ This will fail in production if not fixed.`);
           class: "btn-submit",
           onClick: $setup.submitForm
         }, null, 8, ["label", "loading", "onClick"])
-      ])
+      ]),
+      vue.createVNode($setup["GlobalMessage"])
     ]);
   }
   const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/create_todo.vue"]]);
@@ -4456,7 +4551,7 @@ This will fail in production if not fixed.`);
     const onDateUpdate = async (event) => {
       if (!form.value.raw)
         return;
-      uni.showLoading({ title: "Đang cập nhật..." });
+      showLoading("Đang cập nhật...");
       try {
         const payload = {
           ...form.value.raw,
@@ -4475,10 +4570,10 @@ This will fail in production if not fixed.`);
             payload.notificationReceivedAt = convertToTimestamp(datePart, timePart);
           }
         }
-        formatAppLog("log", "at controllers/todo_detail.ts:112", `Payload Update ${event.field}:`, payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:114", `Payload Update ${event.field}:`, payload);
         const res = await updateTodo(payload);
         if (res) {
-          uni.showToast({ title: "Cập nhật thành công", icon: "success" });
+          showSuccess("Cập nhật thành công");
           if (event.field === "dueDate") {
             form.value.raw.dueDate = payload.dueDate;
           } else {
@@ -4489,15 +4584,15 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:130", "Lỗi cập nhật ngày:", error);
-        uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:132", "Lỗi cập nhật ngày:", error);
+        showError("Lỗi cập nhật");
       } finally {
-        uni.hideLoading();
+        hideLoading();
       }
     };
     const onSaveDescription = async () => {
       if (!form.value.raw) {
-        uni.showToast({ title: "Không tìm thấy dữ liệu gốc", icon: "none" });
+        showError("Không tìm thấy dữ liệu gốc");
         return;
       }
       isSavingDescription.value = true;
@@ -4510,14 +4605,14 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:157", "Payload Update Todo:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:159", "Payload Update Todo:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          uni.showToast({ title: "Đã cập nhật mô tả", icon: "success" });
+          showSuccess("Đã cập nhật mô tả");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:165", "Lỗi cập nhật công việc:", error);
-        uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:167", "Lỗi cập nhật công việc:", error);
+        showError("Cập nhật thất bại");
       } finally {
         isSavingDescription.value = false;
       }
@@ -4553,7 +4648,7 @@ This will fail in production if not fixed.`);
     };
     const submitReply = async () => {
       if (!newCommentText.value || !newCommentText.value.trim()) {
-        uni.showToast({ title: "Vui lòng nhập nội dung", icon: "none" });
+        showInfo("Vui lòng nhập nội dung");
         return;
       }
       if (!replyingCommentData.value)
@@ -4569,16 +4664,16 @@ This will fail in production if not fixed.`);
           files: "",
           parentId: replyingCommentData.value.id
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:232", ">> Gửi trả lời:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:234", ">> Gửi trả lời:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
-          uni.showToast({ title: "Đã trả lời", icon: "success" });
+          showSuccess("Đã trả lời");
           resetReplyState();
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:242", "Lỗi gửi trả lời:", error);
-        uni.showToast({ title: "Gửi thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:244", "Lỗi gửi trả lời:", error);
+        showError("Gửi thất bại");
       } finally {
         isSubmittingComment.value = false;
       }
@@ -4610,16 +4705,16 @@ This will fail in production if not fixed.`);
         todoMessageId: Number(messageId),
         codeEmoji: emoji
       };
-      formatAppLog("log", "at controllers/todo_detail.ts:283", ">> Gửi Reaction:", payload);
+      formatAppLog("log", "at controllers/todo_detail.ts:285", ">> Gửi Reaction:", payload);
       try {
         const res = await reactionTodoMessage(payload);
         if (res) {
-          uni.showToast({ title: "Đã thả cảm xúc", icon: "none" });
+          showSuccess("Đã thả cảm xúc");
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:294", "Lỗi thả cảm xúc:", error);
-        uni.showToast({ title: "Lỗi kết nối", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:296", "Lỗi thả cảm xúc:", error);
+        showError("Lỗi kết nối");
       }
     };
     const editingCommentData = vue.ref(null);
@@ -4679,10 +4774,10 @@ This will fail in production if not fixed.`);
       const todoId = form.value.id;
       if (!todoId)
         return;
-      uni.showLoading({ title: "Đang tải..." });
+      showLoading("Đang tải...");
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:361", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:363", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -4698,14 +4793,14 @@ This will fail in production if not fixed.`);
             editingMemberName.value = "tôi";
           }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:387", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:389", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:398", "Lỗi lấy chi tiết bình luận:", error);
-        uni.showToast({ title: "Lỗi tải dữ liệu", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:400", "Lỗi lấy chi tiết bình luận:", error);
+        showError("Lỗi tải dữ liệu");
       } finally {
         uni.hideLoading();
       }
@@ -4714,7 +4809,7 @@ This will fail in production if not fixed.`);
       if (!editingCommentData.value)
         return;
       if (!newCommentText.value || !newCommentText.value.trim()) {
-        uni.showToast({ title: "Nội dung không được để trống", icon: "none" });
+        showInfo("Nội dung không được để trống");
         return;
       }
       isSubmittingComment.value = true;
@@ -4726,14 +4821,14 @@ This will fail in production if not fixed.`);
           message: newCommentText.value,
           files: ""
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:424", "Payload Update:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:426", "Payload Update:", payload);
         await updateTodoMessage(payload);
-        uni.showToast({ title: "Đã cập nhật", icon: "success" });
+        showSuccess("Đã cập nhật");
         resetEditState();
         await fetchComments(form.value.id);
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:435", "Lỗi cập nhật:", error);
-        uni.showToast({ title: "Cập nhật thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:437", "Lỗi cập nhật:", error);
+        showError("Cập nhật thất bại");
       } finally {
         isSubmittingComment.value = false;
       }
@@ -4767,13 +4862,13 @@ This will fail in production if not fixed.`);
       isConfirmDeleteCommentOpen.value = false;
       try {
         await deleteTodoMessage(commentToDeleteId.value);
-        uni.showToast({ title: "Đã xóa", icon: "success" });
+        showSuccess("Đã xóa");
         if (form.value.id) {
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:488", "Lỗi xóa bình luận:", error);
-        uni.showToast({ title: "Xóa thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:490", "Lỗi xóa bình luận:", error);
+        showError("Xóa thất bại");
       } finally {
         commentToDeleteId.value = null;
       }
@@ -4784,7 +4879,7 @@ This will fail in production if not fixed.`);
     };
     const submitComment = async () => {
       if (!newCommentText.value || !newCommentText.value.trim()) {
-        uni.showToast({ title: "Vui lòng nhập nội dung", icon: "none" });
+        showInfo("Vui lòng nhập nội dung");
         return;
       }
       isSubmittingComment.value = true;
@@ -4798,16 +4893,16 @@ This will fail in production if not fixed.`);
           files: "",
           parentId: -1
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:523", "Đang gửi bình luận:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:525", "Đang gửi bình luận:", payload);
         const res = await createTodoMessage(payload);
         if (res) {
-          uni.showToast({ title: "Đã gửi bình luận", icon: "success" });
+          showSuccess("Đã gửi bình luận");
           newCommentText.value = "";
           await fetchComments(todoId);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:538", "Lỗi gửi bình luận:", error);
-        uni.showToast({ title: "Gửi thất bại", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:540", "Lỗi gửi bình luận:", error);
+        showError("Gửi thất bại");
       } finally {
         isSubmittingComment.value = false;
       }
@@ -4824,7 +4919,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:560", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:562", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
@@ -4852,8 +4947,8 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:594", " Lỗi lấy chi tiết:", error);
-        uni.showToast({ title: "Lỗi kết nối", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:596", " Lỗi lấy chi tiết:", error);
+        showError("Lỗi kết nối");
       } finally {
         isLoading.value = false;
       }
@@ -4913,7 +5008,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:664", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:666", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -4954,7 +5049,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:721", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:723", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -4965,7 +5060,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:733", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:735", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -4994,7 +5089,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:771", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:773", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -5014,7 +5109,7 @@ This will fail in production if not fixed.`);
       const newStatus = selectedOption.value;
       if (!form.value.raw)
         return;
-      uni.showLoading({ title: "Đang cập nhật..." });
+      showLoading("Đang cập nhật...");
       try {
         const payload = {
           ...form.value.raw,
@@ -5025,10 +5120,10 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:818", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:820", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          uni.showToast({ title: "Đã cập nhật trạng thái", icon: "success" });
+          showSuccess("Đã cập nhật trạng thái");
           form.value.raw.status = newStatus;
           const newDisplayIndex = dynamicStatusOptions.value.findIndex((opt) => opt.value === newStatus);
           form.value.statusIndex = newDisplayIndex !== -1 ? newDisplayIndex : 0;
@@ -5037,8 +5132,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:834", "Lỗi cập nhật trạng thái:", error);
-        uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:836", "Lỗi cập nhật trạng thái:", error);
+        showError("Lỗi cập nhật");
       } finally {
         uni.hideLoading();
       }
@@ -5055,10 +5150,10 @@ This will fail in production if not fixed.`);
       form.value.assigneeIndex = idx;
       form.value.assigneeId = newAssigneeId;
       if (!form.value.raw) {
-        uni.showToast({ title: "Thiếu dữ liệu gốc", icon: "none" });
+        showError("Thiếu dữ liệu gốc");
         return;
       }
-      uni.showLoading({ title: "Đang cập nhật người giao..." });
+      showLoading("Đang cập nhật người giao...");
       try {
         const payload = {
           ...form.value.raw,
@@ -5069,10 +5164,10 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:880", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:879", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          uni.showToast({ title: "Đã đổi người thực hiện", icon: "success" });
+          showSuccess("Đã đổi người thực hiện");
           form.value.raw.assigneeId = newAssigneeId;
           if (form.value.customerCode) {
             await fetchHistoryLog(form.value.customerCode);
@@ -5080,18 +5175,18 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:898", "Lỗi cập nhật người giao:", error);
-        uni.showToast({ title: "Lỗi cập nhật", icon: "none" });
+        formatAppLog("error", "at controllers/todo_detail.ts:897", "Lỗi cập nhật người giao:", error);
+        showError("Lỗi cập nhật");
       } finally {
-        uni.hideLoading();
+        hideLoading();
       }
     };
     const goBack = () => {
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:906", "Lưu:", form.value);
-      uni.showToast({ title: "Đã lưu", icon: "success" });
+      formatAppLog("log", "at controllers/todo_detail.ts:905", "Lưu:", form.value);
+      showSuccess("Đã lưu");
     };
     return {
       isLoading,
@@ -5377,7 +5472,7 @@ This will fail in production if not fixed.`);
       const toggleComments = () => {
         isCommentsOpen.value = !isCommentsOpen.value;
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem, AppButton };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -5931,7 +6026,8 @@ This will fail in production if not fixed.`);
             ))
           ])
         ])
-      ])) : vue.createCommentVNode("v-if", true)
+      ])) : vue.createCommentVNode("v-if", true),
+      vue.createVNode($setup["GlobalMessage"])
     ]);
   }
   const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/todo_detail.vue"]]);

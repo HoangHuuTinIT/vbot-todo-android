@@ -1,3 +1,4 @@
+//pages/todo/todo_detail.vue
 <template>
 	<view class="container">
 		<view v-if="isLoading" class="loading-overlay">
@@ -271,7 +272,7 @@
 				</view>
 			</view>
 		</view>
-
+<GlobalMessage />
 	</view>
 </template>
 
@@ -284,6 +285,7 @@
 	import UserAvatar from '@/components/UserAvatar.vue';
 	import CommentItem from '@/components/Todo/CommentItem.vue';
 	import AppButton from '@/components/AppButton.vue';
+	import GlobalMessage from '@/components/GlobalMessage.vue';
 	const {
 		isLoading, isLoadingCustomer, 
 		isLoadingHistory, historyList,

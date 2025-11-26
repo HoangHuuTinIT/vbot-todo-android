@@ -154,7 +154,7 @@
 				</view>
 			</view>
 		</view>
-
+<GlobalMessage />
 	</view>
 </template>
 
@@ -163,6 +163,7 @@
 	import StatusBadge from '@/components/StatusBadge.vue';
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
 	import AppButton from '@/components/AppButton.vue';
+	import GlobalMessage from '@/components/GlobalMessage.vue';
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
