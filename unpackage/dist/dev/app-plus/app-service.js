@@ -2415,7 +2415,7 @@ This will fail in production if not fixed.`);
       confirmDelete
     };
   };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -2462,7 +2462,7 @@ This will fail in production if not fixed.`);
     }
     return target;
   };
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2474,7 +2474,7 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -2514,7 +2514,7 @@ This will fail in production if not fixed.`);
       return dateStr;
     }
   };
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -2539,7 +2539,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
         "view",
@@ -2589,7 +2589,58 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    __name: "AppButton",
+    props: {
+      label: { type: String, required: false, default: "" },
+      type: { type: String, required: false, default: "primary" },
+      size: { type: String, required: false, default: "normal" },
+      disabled: { type: Boolean, required: false, default: false },
+      loading: { type: Boolean, required: false, default: false }
+    },
+    emits: ["click"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const handleClick = (event) => {
+        if (!props.disabled && !props.loading) {
+          emit("click", event);
+        }
+      };
+      const __returned__ = { props, emit, handleClick };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("button", {
+      class: vue.normalizeClass(["app-btn", [
+        `btn-${$props.type}`,
+        $props.size === "small" ? "btn-sm" : "",
+        { "is-disabled": $props.disabled || $props.loading }
+      ]]),
+      disabled: $props.disabled || $props.loading,
+      onClick: $setup.handleClick,
+      "hover-class": "btn-hover"
+    }, [
+      $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "loading-spinner"
+      })) : vue.createCommentVNode("v-if", true),
+      vue.renderSlot(_ctx.$slots, "default", {}, () => [
+        vue.createElementVNode(
+          "text",
+          { class: "btn-text" },
+          vue.toDisplayString($props.label),
+          1
+          /* TEXT */
+        )
+      ], true)
+    ], 10, ["disabled"]);
+  }
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -2632,7 +2683,7 @@ This will fail in production if not fixed.`);
         confirmDelete,
         goToDetail
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -2785,7 +2836,7 @@ This will fail in production if not fixed.`);
                 class: vue.normalizeClass(["page-arrow", { "disabled": $setup.currentPage >= $setup.totalPages }]),
                 onClick: _cache[3] || (_cache[3] = ($event) => $setup.changePage(1))
               },
-              "›",
+              "› ",
               2
               /* CLASS */
             )
@@ -2802,11 +2853,11 @@ This will fail in production if not fixed.`);
       $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "filter-overlay",
-        onClick: _cache[20] || (_cache[20] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
+        onClick: _cache[18] || (_cache[18] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel",
-          onClick: _cache[19] || (_cache[19] = vue.withModifiers(() => {
+          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
@@ -2959,21 +3010,25 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
           vue.createElementVNode("view", { class: "filter-footer" }, [
-            vue.createElementVNode("button", {
-              class: "btn-reset",
-              onClick: _cache[17] || (_cache[17] = (...args) => $setup.resetFilter && $setup.resetFilter(...args))
-            }, "Đặt lại"),
-            vue.createElementVNode("button", {
-              class: "btn-apply",
-              onClick: _cache[18] || (_cache[18] = (...args) => $setup.applyFilter && $setup.applyFilter(...args))
-            }, "Áp dụng")
+            vue.createVNode($setup["AppButton"], {
+              type: "secondary",
+              label: "Đặt lại",
+              class: "btn-filter-reset",
+              onClick: $setup.resetFilter
+            }, null, 8, ["onClick"]),
+            vue.createVNode($setup["AppButton"], {
+              type: "primary",
+              label: "Áp dụng",
+              class: "btn-filter-apply",
+              onClick: $setup.applyFilter
+            }, null, 8, ["onClick"])
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
       $setup.isConfirmDeleteOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[23] || (_cache[23] = vue.withModifiers(() => {
+        onClick: _cache[19] || (_cache[19] = vue.withModifiers(() => {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-container" }, [
@@ -2990,14 +3045,18 @@ This will fail in production if not fixed.`);
             )
           ]),
           vue.createElementVNode("view", { class: "modal-footer" }, [
-            vue.createElementVNode("button", {
-              class: "modal-btn cancel",
-              onClick: _cache[21] || (_cache[21] = (...args) => $setup.cancelDelete && $setup.cancelDelete(...args))
-            }, "Hủy"),
-            vue.createElementVNode("button", {
-              class: "modal-btn confirm",
-              onClick: _cache[22] || (_cache[22] = (...args) => $setup.confirmDelete && $setup.confirmDelete(...args))
-            }, "Xác nhận")
+            vue.createVNode($setup["AppButton"], {
+              type: "secondary",
+              label: "Hủy",
+              class: "btn-modal",
+              onClick: $setup.cancelDelete
+            }, null, 8, ["onClick"]),
+            vue.createVNode($setup["AppButton"], {
+              type: "danger",
+              label: "Xác nhận",
+              class: "btn-modal",
+              onClick: $setup.confirmDelete
+            }, null, 8, ["onClick"])
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true)
@@ -4158,7 +4217,7 @@ This will fail in production if not fixed.`);
         sourceIndex,
         onSourceChange
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, TodoEditor, TodoDatePicker, CustomerModal };
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, TodoEditor, TodoDatePicker, CustomerModal, AppButton };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4277,15 +4336,19 @@ This will fail in production if not fixed.`);
         "onUpdate:notifyTime": _cache[8] || (_cache[8] = ($event) => $setup.form.notifyTime = $event)
       }, null, 8, ["dueDate", "notifyDate", "notifyTime"]),
       vue.createElementVNode("view", { class: "footer-action" }, [
-        vue.createElementVNode("button", {
-          class: "btn btn-cancel",
-          onClick: _cache[9] || (_cache[9] = (...args) => $setup.goBack && $setup.goBack(...args))
-        }, "Hủy bỏ"),
-        vue.createElementVNode("button", {
-          class: "btn btn-submit",
-          disabled: $setup.loading,
-          onClick: _cache[10] || (_cache[10] = (...args) => $setup.submitForm && $setup.submitForm(...args))
-        }, vue.toDisplayString($setup.loading ? "Đang lưu..." : "Lưu công việc"), 9, ["disabled"])
+        vue.createVNode($setup["AppButton"], {
+          type: "secondary",
+          label: "Hủy bỏ",
+          class: "btn-cancel",
+          onClick: $setup.goBack
+        }, null, 8, ["onClick"]),
+        vue.createVNode($setup["AppButton"], {
+          type: "primary",
+          label: $setup.loading ? "Đang lưu..." : "Lưu công việc",
+          loading: $setup.loading,
+          class: "btn-submit",
+          onClick: $setup.submitForm
+        }, null, 8, ["label", "loading", "onClick"])
       ])
     ]);
   }
@@ -5257,7 +5320,6 @@ This will fail in production if not fixed.`);
       const {
         isLoading,
         isLoadingCustomer,
-        // Lấy thêm isLoading
         isLoadingHistory,
         historyList,
         form,
@@ -5315,7 +5377,7 @@ This will fail in production if not fixed.`);
       const toggleComments = () => {
         isCommentsOpen.value = !isCommentsOpen.value;
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem, AppButton };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -5367,11 +5429,13 @@ This will fail in production if not fixed.`);
             class: "input-actions",
             style: { "margin-top": "10px" }
           }, [
-            vue.createElementVNode("button", {
-              class: "btn-save-comment",
-              disabled: $setup.isSavingDescription,
-              onClick: _cache[2] || (_cache[2] = (...args) => $setup.onSaveDescription && $setup.onSaveDescription(...args))
-            }, vue.toDisplayString($setup.isSavingDescription ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])
+            vue.createVNode($setup["AppButton"], {
+              type: "primary",
+              size: "small",
+              loading: $setup.isSavingDescription,
+              label: $setup.isSavingDescription ? "Đang lưu..." : "Lưu lại",
+              onClick: $setup.onSaveDescription
+            }, null, 8, ["loading", "label", "onClick"])
           ])
         ]),
         vue.createElementVNode("view", { class: "section-title" }, "Thông tin công việc"),
@@ -5389,7 +5453,7 @@ This will fail in production if not fixed.`);
               range: $setup.statusOptions,
               value: $setup.form.statusIndex,
               disabled: $setup.isStatusDisabled,
-              onChange: _cache[3] || (_cache[3] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
+              onChange: _cache[2] || (_cache[2] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -5440,7 +5504,7 @@ This will fail in production if not fixed.`);
               mode: "selector",
               range: $setup.assigneeOptions,
               value: $setup.form.assigneeIndex,
-              onChange: _cache[4] || (_cache[4] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
+              onChange: _cache[3] || (_cache[3] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
               class: "item-picker-box"
             }, [
               vue.createElementVNode(
@@ -5454,11 +5518,11 @@ This will fail in production if not fixed.`);
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[4] || (_cache[4] = ($event) => $setup.form.dueDate = $event),
             notifyDate: $setup.form.notifyDate,
-            "onUpdate:notifyDate": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyDate = $event),
+            "onUpdate:notifyDate": _cache[5] || (_cache[5] = ($event) => $setup.form.notifyDate = $event),
             notifyTime: $setup.form.notifyTime,
-            "onUpdate:notifyTime": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyTime = $event),
+            "onUpdate:notifyTime": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyTime = $event),
             onChange: $setup.onDateUpdate
           }, null, 8, ["dueDate", "notifyDate", "notifyTime", "onChange"])
         ]),
@@ -5564,9 +5628,9 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.commentFilterOptions,
             value: $setup.commentFilterIndex,
-            onClick: _cache[8] || (_cache[8] = vue.withModifiers(() => {
+            onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
             }, ["stop"])),
-            onChange: _cache[9] || (_cache[9] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
+            onChange: _cache[8] || (_cache[8] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -5585,7 +5649,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "editor-container" }, [
               vue.createVNode($setup["TodoEditor"], {
                 modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.newCommentText = $event),
+                "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => $setup.newCommentText = $event),
                 placeholder: $setup.isEditingComment ? "Đang chỉnh sửa..." : $setup.isReplying ? "Viết câu trả lời..." : "Viết bình luận"
               }, null, 8, ["modelValue", "placeholder"])
             ]),
@@ -5628,39 +5692,49 @@ This will fail in production if not fixed.`);
               ])
             ])) : vue.createCommentVNode("v-if", true),
             vue.createElementVNode("view", { class: "input-actions" }, [
-              !$setup.isEditingComment && !$setup.isReplying ? (vue.openBlock(), vue.createElementBlock("button", {
+              !$setup.isEditingComment && !$setup.isReplying ? (vue.openBlock(), vue.createBlock($setup["AppButton"], {
                 key: 0,
-                class: "btn-save-comment",
-                disabled: $setup.isSubmittingComment,
-                onClick: _cache[11] || (_cache[11] = (...args) => $setup.submitComment && $setup.submitComment(...args))
-              }, vue.toDisplayString($setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại"), 9, ["disabled"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
+                type: "primary",
+                size: "small",
+                loading: $setup.isSubmittingComment,
+                label: $setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại",
+                onClick: $setup.submitComment
+              }, null, 8, ["loading", "label", "onClick"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 1,
                 class: "edit-actions-row"
               }, [
-                vue.createElementVNode("button", {
-                  class: "btn-cancel-edit",
+                vue.createVNode($setup["AppButton"], {
+                  type: "secondary",
+                  size: "small",
+                  label: "Hủy",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[12] || (_cache[12] = (...args) => $setup.onCancelEditComment && $setup.onCancelEditComment(...args))
-                }, "Hủy", 8, ["disabled"]),
-                vue.createElementVNode("button", {
-                  class: "btn-save-comment",
-                  disabled: $setup.isSubmittingComment,
-                  onClick: _cache[13] || (_cache[13] = (...args) => $setup.submitUpdateComment && $setup.submitUpdateComment(...args))
-                }, vue.toDisplayString($setup.isSubmittingComment ? "Đang cập nhật..." : "Cập nhật bình luận"), 9, ["disabled"])
+                  onClick: $setup.onCancelEditComment
+                }, null, 8, ["disabled", "onClick"]),
+                vue.createVNode($setup["AppButton"], {
+                  type: "primary",
+                  size: "small",
+                  loading: $setup.isSubmittingComment,
+                  label: $setup.isSubmittingComment ? "Đang cập nhật..." : "Cập nhật",
+                  onClick: $setup.submitUpdateComment
+                }, null, 8, ["loading", "label", "onClick"])
               ])) : $setup.isReplying ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 2,
                 class: "edit-actions-row"
               }, [
-                vue.createElementVNode("button", {
-                  class: "btn-cancel-edit",
+                vue.createVNode($setup["AppButton"], {
+                  type: "secondary",
+                  size: "small",
+                  label: "Hủy",
                   disabled: $setup.isSubmittingComment,
-                  onClick: _cache[14] || (_cache[14] = (...args) => $setup.onCancelReply && $setup.onCancelReply(...args))
-                }, "Hủy", 8, ["disabled"]),
-                vue.createElementVNode("button", {
-                  class: "btn-save-comment",
-                  disabled: $setup.isSubmittingComment,
-                  onClick: _cache[15] || (_cache[15] = (...args) => $setup.submitReply && $setup.submitReply(...args))
-                }, vue.toDisplayString($setup.isSubmittingComment ? "Đang gửi..." : "Trả lời"), 9, ["disabled"])
+                  onClick: $setup.onCancelReply
+                }, null, 8, ["disabled", "onClick"]),
+                vue.createVNode($setup["AppButton"], {
+                  type: "primary",
+                  size: "small",
+                  loading: $setup.isSubmittingComment,
+                  label: $setup.isSubmittingComment ? "Đang gửi..." : "Trả lời",
+                  onClick: $setup.submitReply
+                }, null, 8, ["loading", "label", "onClick"])
               ])) : vue.createCommentVNode("v-if", true)
             ])
           ]),
@@ -5685,8 +5759,8 @@ This will fail in production if not fixed.`);
                   data: item,
                   onReact: $setup.onToggleEmojiPicker,
                   onReply: $setup.onRequestReply,
-                  onEdit: _cache[16] || (_cache[16] = (data) => $setup.onRequestEditComment(data.id)),
-                  onDelete: _cache[17] || (_cache[17] = (id) => $setup.onRequestDeleteComment(id))
+                  onEdit: _cache[10] || (_cache[10] = (data) => $setup.onRequestEditComment(data.id)),
+                  onDelete: _cache[11] || (_cache[11] = (id) => $setup.onRequestDeleteComment(id))
                 }, null, 8, ["data", "onReact", "onReply"]);
               }),
               128
@@ -5697,7 +5771,7 @@ This will fail in production if not fixed.`);
         $setup.isConfirmCancelEditOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 1,
           class: "modal-overlay",
-          onClick: _cache[20] || (_cache[20] = vue.withModifiers(() => {
+          onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "modal-container" }, [
@@ -5708,14 +5782,18 @@ This will fail in production if not fixed.`);
               vue.createElementVNode("text", null, "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.")
             ]),
             vue.createElementVNode("view", { class: "modal-footer" }, [
-              vue.createElementVNode("button", {
-                class: "modal-btn cancel",
-                onClick: _cache[18] || (_cache[18] = (...args) => $setup.continueEditing && $setup.continueEditing(...args))
-              }, "Tiếp tục chỉnh sửa"),
-              vue.createElementVNode("button", {
-                class: "modal-btn confirm",
-                onClick: _cache[19] || (_cache[19] = (...args) => $setup.confirmCancelEdit && $setup.confirmCancelEdit(...args))
-              }, "Có, hủy bỏ")
+              vue.createVNode($setup["AppButton"], {
+                type: "secondary",
+                label: "Tiếp tục sửa",
+                class: "flex-1",
+                onClick: $setup.continueEditing
+              }, null, 8, ["onClick"]),
+              vue.createVNode($setup["AppButton"], {
+                type: "danger",
+                label: "Hủy bỏ",
+                class: "flex-1",
+                onClick: $setup.confirmCancelEdit
+              }, null, 8, ["onClick"])
             ])
           ])
         ])) : vue.createCommentVNode("v-if", true),
@@ -5725,7 +5803,7 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onChange: _cache[21] || (_cache[21] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[13] || (_cache[13] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -5801,7 +5879,7 @@ This will fail in production if not fixed.`);
       $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[24] || (_cache[24] = vue.withModifiers(() => {
+        onClick: _cache[14] || (_cache[14] = vue.withModifiers(() => {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-container" }, [
@@ -5812,25 +5890,29 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("text", null, "Bạn có chắc muốn xóa bình luận này không?")
           ]),
           vue.createElementVNode("view", { class: "modal-footer" }, [
-            vue.createElementVNode("button", {
-              class: "modal-btn cancel",
-              onClick: _cache[22] || (_cache[22] = (...args) => $setup.cancelDeleteComment && $setup.cancelDeleteComment(...args))
-            }, "Hủy"),
-            vue.createElementVNode("button", {
-              class: "modal-btn confirm",
-              onClick: _cache[23] || (_cache[23] = (...args) => $setup.confirmDeleteComment && $setup.confirmDeleteComment(...args))
-            }, "Xác nhận")
+            vue.createVNode($setup["AppButton"], {
+              type: "secondary",
+              label: "Hủy",
+              class: "flex-1",
+              onClick: $setup.cancelDeleteComment
+            }, null, 8, ["onClick"]),
+            vue.createVNode($setup["AppButton"], {
+              type: "danger",
+              label: "Xác nhận",
+              class: "flex-1",
+              onClick: $setup.confirmDeleteComment
+            }, null, 8, ["onClick"])
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 2,
         class: "modal-overlay",
-        onClick: _cache[26] || (_cache[26] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
+        onClick: _cache[16] || (_cache[16] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
       }, [
         vue.createElementVNode("view", {
           class: "emoji-picker-container",
-          onClick: _cache[25] || (_cache[25] = vue.withModifiers(() => {
+          onClick: _cache[15] || (_cache[15] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "emoji-grid" }, [

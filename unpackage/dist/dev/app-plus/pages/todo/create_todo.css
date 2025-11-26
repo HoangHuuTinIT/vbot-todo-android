@@ -641,6 +641,98 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.app-btn[data-v-2f131dae] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 20px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.btn-hover[data-v-2f131dae] {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+.btn-primary[data-v-2f131dae] {
+  background-color: #009688;
+  color: #ffffff;
+  border-color: #009688;
+}
+.btn-secondary[data-v-2f131dae] {
+  background-color: #f5f5f5;
+  color: #666666;
+  border-color: #f5f5f5;
+}
+.btn-danger[data-v-2f131dae] {
+  background-color: #ff3b30;
+  color: #ffffff;
+  border-color: #ff3b30;
+}
+.btn-outline[data-v-2f131dae] {
+  background-color: #ffffff;
+  color: #009688;
+  border-color: #009688;
+}
+.btn-sm[data-v-2f131dae] {
+  height: 32px;
+  line-height: 30px;
+  font-size: 12px;
+  padding: 0 12px;
+}
+.is-disabled[data-v-2f131dae] {
+  opacity: 0.6;
+  background-color: #e0e0e0 !important;
+  color: #999 !important;
+  border-color: #e0e0e0 !important;
+  pointer-events: none;
+}
+.loading-spinner[data-v-2f131dae] {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  margin-right: 8px;
+  animation: spin-2f131dae 0.8s linear infinite;
+}
+@keyframes spin-2f131dae {
+to {
+    transform: rotate(360deg);
+}
+}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
 .container {
   min-height: 100vh;
   background-color: #f5f5f7;
@@ -686,6 +778,7 @@ to {
   margin-top: 30px;
   display: flex;
   justify-content: space-between;
+  gap: 15px;
 }
 .btn {
   border-radius: 0;
@@ -697,13 +790,9 @@ to {
 }
 .btn-cancel {
   width: 35%;
-  background-color: #e5e5ea;
-  color: #333;
 }
 .btn-submit {
   width: 60%;
-  background-color: #007aff;
-  color: #fff;
 }
 .btn-submit[disabled] {
   background-color: #8dc2ff;
