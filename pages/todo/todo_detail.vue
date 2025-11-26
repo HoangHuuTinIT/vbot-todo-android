@@ -193,20 +193,16 @@
 				</view>
 			</view>
 
-			<view class="modal-overlay" v-if="isConfirmCancelEditOpen" @click.stop>
-				<view class="modal-container">
-					<view class="modal-header">
-						<text class="modal-title">Xác nhận hủy</text>
-					</view>
-					<view class="modal-body">
-						<text>Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.</text>
-					</view>
-					<view class="modal-footer">
-						<AppButton type="secondary" label="Tiếp tục sửa" class="flex-1" @click="continueEditing" />
-						<AppButton type="danger" label="Hủy bỏ" class="flex-1" @click="confirmCancelEdit" />
-					</view>
-				</view>
-			</view>
+			<ConfirmModal 
+			    v-model:visible="isConfirmCancelEditOpen"
+			    title="Xác nhận hủy"
+			    message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu."
+			    cancel-label="Tiếp tục sửa"
+			    confirm-label="Hủy bỏ"
+			    confirm-type="danger"
+			    @cancel="continueEditing"
+			    @confirm="confirmCancelEdit"
+			/>
 
 			<view class="section-header-row">
 				<text class="section-title no-margin">Lịch sử tương tác</text>
@@ -247,20 +243,14 @@
 
 		</scroll-view>
 
-		<view class="modal-overlay" v-if="isConfirmDeleteCommentOpen" @click.stop>
-			<view class="modal-container">
-				<view class="modal-header">
-					<text class="modal-title">Xác nhận xóa</text>
-				</view>
-				<view class="modal-body">
-					<text>Bạn có chắc muốn xóa bình luận này không?</text>
-				</view>
-				<view class="modal-footer">
-					<AppButton type="secondary" label="Hủy" class="flex-1" @click="cancelDeleteComment" />
-					<AppButton type="danger" label="Xác nhận" class="flex-1" @click="confirmDeleteComment" />
-				</view>
-			</view>
-		</view>
+		<ConfirmModal 
+		    v-model:visible="isConfirmDeleteCommentOpen"
+		    title="Xác nhận xóa"
+		    message="Bạn có chắc muốn xóa bình luận này không?"
+		    confirm-type="danger"
+		    @confirm="confirmDeleteComment"
+		    @cancel="cancelDeleteComment"
+		/>
 
 		<view class="modal-overlay" v-if="isEmojiPickerOpen" @click="closeEmojiPicker">
 			<view class="emoji-picker-container" @click.stop>
@@ -286,6 +276,7 @@
 	import CommentItem from '@/components/Todo/CommentItem.vue';
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
+	import ConfirmModal from '@/components/ConfirmModal.vue';
 	const {
 		isLoading, isLoadingCustomer, 
 		isLoadingHistory, historyList,
@@ -725,70 +716,9 @@
 		height: 16px;
 	}
 
-
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 1000;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.modal-container {
-		width: 80%;
-		background-color: #fff;
-		border-radius: 12px;
-		overflow: hidden;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		animation: popIn 0.2s ease-out;
-	}
-
-	.modal-header {
-		padding: 15px;
-		border-bottom: 1px solid #eee;
-		text-align: center;
-	}
-
-	.modal-title {
-		font-size: 18px;
-		font-weight: bold;
-		color: #333;
-	}
-
-	.modal-body {
-		padding: 20px 15px;
-		text-align: center;
-		font-size: 15px;
-		color: #555;
-		line-height: 1.5;
-	}
-
-	.modal-footer {
-		display: flex;
-		border-top: 1px solid #eee;
-		padding: 15px;
-		gap: 10px;
-	}
-
 	.flex-1 {
 		flex: 1;
 	}
-
-	.modal-btn {
-		flex: 1;
-		height: 48px;
-		line-height: 48px;
-		font-size: 16px;
-		background-color: #fff;
-		border: none;
-		border-radius: 0;
-	}
-
 	.modal-btn.cancel {
 		color: #666;
 		border-right: 1px solid #eee;

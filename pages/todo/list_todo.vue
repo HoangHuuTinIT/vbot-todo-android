@@ -140,20 +140,14 @@
 			</view>
 		</view>
 
-		<view class="modal-overlay" v-if="isConfirmDeleteOpen" @click.stop>
-			<view class="modal-container">
-				<view class="modal-header">
-					<text class="modal-title">Thông báo</text>
-				</view>
-				<view class="modal-body">
-					<text>Bạn có chắc muốn xóa công việc "{{ itemToDelete?.title }}"?</text>
-				</view>
-				<view class="modal-footer">
-					<AppButton type="secondary" label="Hủy" class="btn-modal" @click="cancelDelete" />
-					<AppButton type="danger" label="Xác nhận" class="btn-modal" @click="confirmDelete" />
-				</view>
-			</view>
-		</view>
+		<ConfirmModal 
+		    v-model:visible="isConfirmDeleteOpen"
+		    title="Thông báo"
+		    :message="`Bạn có chắc muốn xóa công việc &quot;${itemToDelete?.title}&quot;?`"
+		    confirm-type="danger"
+		    @confirm="confirmDelete"
+		    @cancel="cancelDelete"
+		/>
 <GlobalMessage />
 	</view>
 </template>
@@ -164,6 +158,7 @@
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
+	import ConfirmModal from '@/components/ConfirmModal.vue';
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
@@ -569,27 +564,6 @@
 		width: 60%;
 	}
 
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 1000;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.modal-container {
-		width: 80%;
-		background-color: #fff;
-		border-radius: 12px;
-		overflow: hidden;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		animation: popIn 0.2s ease-out;
-	}
 
 	@keyframes popIn {
 		from {
@@ -601,47 +575,6 @@
 			transform: scale(1);
 			opacity: 1;
 		}
-	}
-
-	.modal-header {
-		padding: 15px;
-		border-bottom: 1px solid #eee;
-		text-align: center;
-	}
-
-	.modal-title {
-		font-size: 18px;
-		font-weight: bold;
-		color: #333;
-	}
-
-	.modal-body {
-		padding: 20px 15px;
-		text-align: center;
-		font-size: 15px;
-		color: #555;
-		line-height: 1.5;
-	}
-
-	.modal-footer {
-		display: flex;
-		border-top: 1px solid #eee;
-		padding: 15px;
-		gap: 10px;
-	}
-
-	.btn-modal {
-		flex: 1;
-	}
-
-	.modal-btn {
-		flex: 1;
-		height: 48px;
-		line-height: 48px;
-		font-size: 16px;
-		background-color: #fff;
-		border: none;
-		border-radius: 0;
 	}
 
 	.modal-btn::after {

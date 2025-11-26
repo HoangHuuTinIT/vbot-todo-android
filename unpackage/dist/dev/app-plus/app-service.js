@@ -2423,7 +2423,7 @@ This will fail in production if not fixed.`);
       confirmDelete
     };
   };
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -2470,7 +2470,7 @@ This will fail in production if not fixed.`);
     }
     return target;
   };
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2482,7 +2482,7 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -2522,7 +2522,7 @@ This will fail in production if not fixed.`);
       return dateStr;
     }
   };
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -2547,7 +2547,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
         "view",
@@ -2597,8 +2597,8 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
       label: { type: String, required: false, default: "" },
@@ -2622,7 +2622,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass(["app-btn", [
         `btn-${$props.type}`,
@@ -2648,8 +2648,8 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -2698,7 +2698,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2733,7 +2733,83 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    __name: "ConfirmModal",
+    props: {
+      visible: { type: Boolean, required: true },
+      title: { type: String, required: false, default: "Thông báo" },
+      message: { type: String, required: false, default: "" },
+      cancelLabel: { type: String, required: false, default: "Hủy" },
+      confirmLabel: { type: String, required: false, default: "Xác nhận" },
+      confirmType: { type: String, required: false, default: "primary" }
+    },
+    emits: ["update:visible", "confirm", "cancel"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const onCancel = () => {
+        emit("update:visible", false);
+        emit("cancel");
+      };
+      const onConfirm = () => {
+        emit("confirm");
+      };
+      const __returned__ = { props, emit, onCancel, onConfirm, AppButton };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
+      key: 0,
+      class: "modal-overlay",
+      onClick: $setup.onCancel
+    }, [
+      vue.createElementVNode("view", {
+        class: "modal-container",
+        onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+        }, ["stop"]))
+      }, [
+        vue.createElementVNode("view", { class: "modal-header" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "modal-title" },
+            vue.toDisplayString($props.title),
+            1
+            /* TEXT */
+          )
+        ]),
+        vue.createElementVNode("view", { class: "modal-body" }, [
+          vue.renderSlot(_ctx.$slots, "default", {}, () => [
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString($props.message),
+              1
+              /* TEXT */
+            )
+          ], true)
+        ]),
+        vue.createElementVNode("view", { class: "modal-footer" }, [
+          vue.createVNode($setup["AppButton"], {
+            type: "secondary",
+            label: $props.cancelLabel,
+            class: "flex-1",
+            onClick: $setup.onCancel
+          }, null, 8, ["label"]),
+          vue.createVNode($setup["AppButton"], {
+            type: $props.confirmType,
+            label: $props.confirmLabel,
+            class: "flex-1",
+            onClick: $setup.onConfirm
+          }, null, 8, ["type", "label"])
+        ])
+      ])
+    ])) : vue.createCommentVNode("v-if", true);
+  }
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -2776,7 +2852,7 @@ This will fail in production if not fixed.`);
         confirmDelete,
         goToDetail
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton, GlobalMessage };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3118,41 +3194,15 @@ This will fail in production if not fixed.`);
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
-      $setup.isConfirmDeleteOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "modal-overlay",
-        onClick: _cache[19] || (_cache[19] = vue.withModifiers(() => {
-        }, ["stop"]))
-      }, [
-        vue.createElementVNode("view", { class: "modal-container" }, [
-          vue.createElementVNode("view", { class: "modal-header" }, [
-            vue.createElementVNode("text", { class: "modal-title" }, "Thông báo")
-          ]),
-          vue.createElementVNode("view", { class: "modal-body" }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              'Bạn có chắc muốn xóa công việc "' + vue.toDisplayString((_a = $setup.itemToDelete) == null ? void 0 : _a.title) + '"?',
-              1
-              /* TEXT */
-            )
-          ]),
-          vue.createElementVNode("view", { class: "modal-footer" }, [
-            vue.createVNode($setup["AppButton"], {
-              type: "secondary",
-              label: "Hủy",
-              class: "btn-modal",
-              onClick: $setup.cancelDelete
-            }, null, 8, ["onClick"]),
-            vue.createVNode($setup["AppButton"], {
-              type: "danger",
-              label: "Xác nhận",
-              class: "btn-modal",
-              onClick: $setup.confirmDelete
-            }, null, 8, ["onClick"])
-          ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
+      vue.createVNode($setup["ConfirmModal"], {
+        visible: $setup.isConfirmDeleteOpen,
+        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
+        title: "Thông báo",
+        message: `Bạn có chắc muốn xóa công việc "${(_a = $setup.itemToDelete) == null ? void 0 : _a.title}"?`,
+        "confirm-type": "danger",
+        onConfirm: $setup.confirmDelete,
+        onCancel: $setup.cancelDelete
+      }, null, 8, ["visible", "message", "onConfirm", "onCancel"]),
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
@@ -5472,7 +5522,7 @@ This will fail in production if not fixed.`);
       const toggleComments = () => {
         isCommentsOpen.value = !isCommentsOpen.value;
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, isCommentsOpen, toggleComments, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -5863,35 +5913,17 @@ This will fail in production if not fixed.`);
             ))
           ]))
         ])) : vue.createCommentVNode("v-if", true),
-        $setup.isConfirmCancelEditOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 1,
-          class: "modal-overlay",
-          onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }, [
-          vue.createElementVNode("view", { class: "modal-container" }, [
-            vue.createElementVNode("view", { class: "modal-header" }, [
-              vue.createElementVNode("text", { class: "modal-title" }, "Xác nhận hủy")
-            ]),
-            vue.createElementVNode("view", { class: "modal-body" }, [
-              vue.createElementVNode("text", null, "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.")
-            ]),
-            vue.createElementVNode("view", { class: "modal-footer" }, [
-              vue.createVNode($setup["AppButton"], {
-                type: "secondary",
-                label: "Tiếp tục sửa",
-                class: "flex-1",
-                onClick: $setup.continueEditing
-              }, null, 8, ["onClick"]),
-              vue.createVNode($setup["AppButton"], {
-                type: "danger",
-                label: "Hủy bỏ",
-                class: "flex-1",
-                onClick: $setup.confirmCancelEdit
-              }, null, 8, ["onClick"])
-            ])
-          ])
-        ])) : vue.createCommentVNode("v-if", true),
+        vue.createVNode($setup["ConfirmModal"], {
+          visible: $setup.isConfirmCancelEditOpen,
+          "onUpdate:visible": _cache[12] || (_cache[12] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+          title: "Xác nhận hủy",
+          message: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
+          "cancel-label": "Tiếp tục sửa",
+          "confirm-label": "Hủy bỏ",
+          "confirm-type": "danger",
+          onCancel: $setup.continueEditing,
+          onConfirm: $setup.confirmCancelEdit
+        }, null, 8, ["visible", "onCancel", "onConfirm"]),
         vue.createElementVNode("view", { class: "section-header-row" }, [
           vue.createElementVNode("text", { class: "section-title no-margin" }, "Lịch sử tương tác"),
           vue.createElementVNode("picker", {
@@ -5971,37 +6003,17 @@ This will fail in production if not fixed.`);
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })
       ]),
-      $setup.isConfirmDeleteCommentOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "modal-overlay",
-        onClick: _cache[14] || (_cache[14] = vue.withModifiers(() => {
-        }, ["stop"]))
-      }, [
-        vue.createElementVNode("view", { class: "modal-container" }, [
-          vue.createElementVNode("view", { class: "modal-header" }, [
-            vue.createElementVNode("text", { class: "modal-title" }, "Xác nhận xóa")
-          ]),
-          vue.createElementVNode("view", { class: "modal-body" }, [
-            vue.createElementVNode("text", null, "Bạn có chắc muốn xóa bình luận này không?")
-          ]),
-          vue.createElementVNode("view", { class: "modal-footer" }, [
-            vue.createVNode($setup["AppButton"], {
-              type: "secondary",
-              label: "Hủy",
-              class: "flex-1",
-              onClick: $setup.cancelDeleteComment
-            }, null, 8, ["onClick"]),
-            vue.createVNode($setup["AppButton"], {
-              type: "danger",
-              label: "Xác nhận",
-              class: "flex-1",
-              onClick: $setup.confirmDeleteComment
-            }, null, 8, ["onClick"])
-          ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
+      vue.createVNode($setup["ConfirmModal"], {
+        visible: $setup.isConfirmDeleteCommentOpen,
+        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
+        title: "Xác nhận xóa",
+        message: "Bạn có chắc muốn xóa bình luận này không?",
+        "confirm-type": "danger",
+        onConfirm: $setup.confirmDeleteComment,
+        onCancel: $setup.cancelDeleteComment
+      }, null, 8, ["visible", "onConfirm", "onCancel"]),
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 2,
+        key: 1,
         class: "modal-overlay",
         onClick: _cache[16] || (_cache[16] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
       }, [
