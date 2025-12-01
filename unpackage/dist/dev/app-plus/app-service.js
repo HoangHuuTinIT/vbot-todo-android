@@ -2097,11 +2097,6 @@ This will fail in production if not fixed.`);
     CUSTOMER_CODE: "",
     PHONE_PLACEHOLDER: "072836272322"
   };
-  const EDITOR_CONFIG = {
-    DEFAULT_COLOR: "#000000",
-    TRANSPARENT: "transparent",
-    HEADER_NORMAL: "Normal"
-  };
   const SERVER_BASE_URL = "https://api-sandbox-h01.vbot.vn/v1.0";
   const AUTH_API_URL = SERVER_BASE_URL;
   const CRM_API_URL = `${SERVER_BASE_URL}/api/module-crm`;
@@ -3793,238 +3788,226 @@ This will fail in production if not fixed.`);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoEditor",
     props: {
-      modelValue: { type: String, required: true },
-      placeholder: { type: String, required: false }
+      modelValue: String,
+      placeholder: { type: String, default: "Nhập nội dung..." }
     },
     emits: ["update:modelValue"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
       const props = __props;
       const emit = __emit;
-      const editorId = vue.ref(`editor-${Math.random().toString(36).substring(2, 9)}`);
+      const tools = [
+        { name: "header", iconText: "H", style: "font-weight:bold", action: "header-menu" },
+        { name: "fontSize", iconText: "A", style: "font-weight:bold; font-size:18px", action: "fontsize-menu" },
+        { name: "bold", iconText: "B", style: "font-weight:900" },
+        { name: "italic", iconText: "I", style: "font-style:italic" },
+        { name: "underline", iconText: "U", style: "text-decoration:underline" },
+        { name: "strike", iconText: "S", style: "text-decoration:line-through" },
+        { name: "align", value: "left", iconImg: "https://img.icons8.com/ios/50/666666/align-left.png" },
+        { name: "align", value: "center", iconImg: "https://img.icons8.com/ios/50/666666/align-center.png" },
+        { name: "align", value: "right", iconImg: "https://img.icons8.com/ios/50/666666/align-right.png" },
+        { name: "align", value: "justify", iconImg: "https://img.icons8.com/ios/50/666666/align-justify.png" },
+        { name: "list", value: "ordered", iconImg: "https://img.icons8.com/ios/50/666666/numbered-list.png" },
+        { name: "list", value: "bullet", iconImg: "https://img.icons8.com/ios/50/666666/list.png" }
+      ];
+      const editorId = vue.ref(`editor-${Math.random().toString(36).substr(2, 5)}`);
       const editorCtx = vue.ref(null);
       const formats = vue.ref({});
       const instance = vue.getCurrentInstance();
-      const isTyping = vue.ref(false);
-      const showLinkPopup = vue.ref(false);
-      const linkUrl = vue.ref("");
-      const linkText = vue.ref("");
-      const canInsertLink = vue.ref(false);
       const isLinkSelected = vue.ref(false);
-      const focusLinkInput = vue.ref(false);
-      const showColorPopup = vue.ref(false);
-      const colorType = vue.ref("color");
-      const currentColor = vue.ref(EDITOR_CONFIG.DEFAULT_COLOR);
-      const currentBgColor = vue.ref(EDITOR_CONFIG.TRANSPARENT);
-      const currentHeader = vue.ref(EDITOR_CONFIG.HEADER_NORMAL);
-      const colorList = ["#000000", "#424242", "#666666", "#999999", "#B7B7B7", "#CCCCCC", "#D9D9D9", "#EFEFEF", "#F3F3F3", "#FFFFFF", "#980000", "#FF0000", "#FF9900", "#FFFF00", "#00FF00", "#00FFFF", "#4A86E8", "#0000FF", "#9900FF", "#FF00FF", "#CC4125", "#E06666", "#F6B26B", "#FFD966", "#93C47D", "#76A5AF", "#6D9EEB", "#6FA8DC", "#8E7CC3", "#C27BA0", "#A61C00", "#CC0000", "#E69138", "#F1C232", "#6AA84F", "#45818E", "#3C78D8", "#3D85C6", "#674EA7", "#A64D79"];
-      const headerOptions = [{ label: "Normal", value: null }, { label: "H1", value: 1 }, { label: "H2", value: 2 }, { label: "H3", value: 3 }];
-      const alignIcon = vue.computed(() => formats.value.align === "center" ? "https://img.icons8.com/ios/50/666666/align-center.png" : formats.value.align === "right" ? "https://img.icons8.com/ios/50/666666/align-right.png" : "https://img.icons8.com/ios/50/666666/align-left.png");
-      const showAlignPopup = vue.ref(false);
-      const isPopupOpen = vue.computed(() => showLinkPopup.value || showColorPopup.value || showAlignPopup.value);
-      const selectAlign = (alignType) => {
-        format("align", alignType);
-        showAlignPopup.value = false;
+      const showLinkModal = vue.ref(false);
+      const linkUrl = vue.ref("");
+      const handleToolClick = (item) => {
+        if (item.action === "header-menu") {
+          handleHeaderSetting();
+          return;
+        }
+        if (item.action === "fontsize-menu") {
+          handleFontSizeSetting();
+          return;
+        }
+        format(item.name, item.value);
+      };
+      const handleFontSizeSetting = () => {
+        const options = [
+          "Nhỏ",
+          "Bình thường",
+          "Lớn",
+          "Rất lớn"
+        ];
+        uni.showActionSheet({
+          itemList: options,
+          success: (res) => {
+            const index = res.tapIndex;
+            if (index === 0)
+              format("fontSize", "small");
+            if (index === 1)
+              format("fontSize", null);
+            if (index === 2)
+              format("fontSize", "large");
+            if (index === 3)
+              format("fontSize", "huge");
+          }
+        });
+      };
+      const handleHeaderSetting = () => {
+        const options = ["Tiêu đề 1 (H1)", "Tiêu đề 2 (H2)", "Tiêu đề 3 (H3)", "Tiêu đề 4 (H4)", "Tiêu đề 5 (H5)", "Tiêu đề 6 (H6)", "Văn bản thường"];
+        uni.showActionSheet({
+          itemList: options,
+          success: (res) => {
+            if (res.tapIndex < 6) {
+              format("header", res.tapIndex + 1);
+            } else {
+              format("header", null);
+            }
+          }
+        });
+      };
+      const isActive = (item) => {
+        const currentFormat = formats.value[item.name];
+        if (item.action === "header-menu")
+          return !!currentFormat;
+        if (item.action === "fontsize-menu")
+          return !!currentFormat;
+        if (item.value)
+          return currentFormat === item.value;
+        return !!currentFormat;
       };
       const onEditorReady = () => {
-        const queryId = `#${editorId.value}`;
-        uni.createSelectorQuery().in(instance.proxy).select(queryId).context((res) => {
+        uni.createSelectorQuery().in(instance).select(`#${editorId.value}`).context((res) => {
           if (res && res.context) {
             editorCtx.value = res.context;
-            if (props.modelValue) {
+            if (props.modelValue)
               editorCtx.value.setContents({ html: props.modelValue });
-            }
-          } else {
-            formatAppLog("error", "at components/Todo/TodoEditor.vue:186", `Không tìm thấy Editor Context cho ID: ${queryId}`);
           }
         }).exec();
       };
-      const lastEmittedValue = vue.ref("");
-      vue.watch(() => props.modelValue, (newVal) => {
-        if (newVal === lastEmittedValue.value)
-          return;
-        if (editorCtx.value && newVal) {
-          editorCtx.value.setContents({ html: newVal });
-        }
-      });
-      const onEditorInput = (e) => {
-        const val = e.detail.html;
-        lastEmittedValue.value = val;
-        emit("update:modelValue", val);
-      };
+      const onInput = (e) => emit("update:modelValue", e.detail.html);
       const onStatusChange = (e) => {
         formats.value = e.detail;
-        if (e.detail.color)
-          currentColor.value = e.detail.color;
-        if (e.detail.backgroundColor)
-          currentBgColor.value = e.detail.backgroundColor;
-        if (e.detail.hasOwnProperty("link")) {
-          isLinkSelected.value = true;
-          linkUrl.value = e.detail.link || "";
-        } else {
-          isLinkSelected.value = false;
-          linkUrl.value = "";
-        }
-        if (editorCtx.value) {
-          editorCtx.value.getSelectionText({
-            success: (res) => {
-              if (res.text && res.text.length > 0) {
-                canInsertLink.value = true;
-                if (!isLinkSelected.value)
-                  linkText.value = res.text;
-              } else {
-                canInsertLink.value = false;
-                if (!isLinkSelected.value)
-                  linkText.value = "";
-              }
-            },
-            fail: () => {
-              canInsertLink.value = false;
-            }
-          });
-        }
+        isLinkSelected.value = !!e.detail.link;
       };
-      const format = (name, value) => {
-        if (editorCtx.value)
-          editorCtx.value.format(name, value);
-      };
-      const handleLinkBtn = () => {
-        if (isLinkSelected.value || canInsertLink.value) {
-          if (canInsertLink.value && !isLinkSelected.value)
-            linkUrl.value = "";
-          showLinkPopup.value = true;
-          vue.nextTick(() => {
-            focusLinkInput.value = true;
-          });
-        } else {
-          uni.showToast({ title: "Bôi đen chữ để chèn Link", icon: "none" });
-        }
-      };
-      const closeLinkPopup = () => {
-        showLinkPopup.value = false;
-        focusLinkInput.value = false;
-      };
-      const confirmLink = () => {
-        const url = linkUrl.value;
-        const text = linkText.value;
-        closeLinkPopup();
-        setTimeout(() => {
-          if (url && text) {
-            editorCtx.value.insertText({ text });
-            editorCtx.value.format("link", url);
-          }
-        }, 300);
-      };
-      const removeLink = () => {
-        closeLinkPopup();
-        setTimeout(() => {
-          editorCtx.value.format("link", null);
-        }, 300);
-      };
-      const onHeaderChange = (e) => {
-        const sel = headerOptions[e.detail.value];
-        currentHeader.value = sel.label;
-        format("header", sel.value);
-      };
-      const toggleAlign = () => {
-        let a = "center";
-        if (formats.value.align === "center")
-          a = "right";
-        else if (formats.value.align === "right")
-          a = "left";
-        format("align", a);
-      };
-      const openColorPicker = (type) => {
-        colorType.value = type;
-        showColorPopup.value = true;
-      };
-      const closeColorPopup = () => {
-        showColorPopup.value = false;
-      };
-      const selectColor = (color) => {
-        if (colorType.value === "color") {
-          currentColor.value = color || EDITOR_CONFIG.DEFAULT_COLOR;
-          format("color", color);
-        } else {
-          currentBgColor.value = color || EDITOR_CONFIG.TRANSPARENT;
-          format("backgroundColor", color);
-        }
-        closeColorPopup();
+      const format = (name, value = null) => {
+        if (!editorCtx.value)
+          return;
+        editorCtx.value.format(name, value);
       };
       const insertImage = () => {
-        uni.chooseImage({ count: 1, success: (r) => editorCtx.value.insertImage({ src: r.tempFilePaths[0], width: "80%" }) });
+        uni.showActionSheet({
+          itemList: ["Chụp ảnh mới", "Chọn từ thư viện"],
+          success: (res) => {
+            const index = res.tapIndex;
+            let source = "album";
+            if (index === 0)
+              source = "camera";
+            if (index === 1)
+              source = "album";
+            uni.chooseImage({
+              count: 1,
+              sourceType: [source],
+              success: (imageRes) => {
+                if (editorCtx.value) {
+                  editorCtx.value.insertImage({
+                    src: imageRes.tempFilePaths[0],
+                    width: "80%",
+                    alt: "image"
+                  });
+                }
+              }
+            });
+          }
+        });
       };
-      const insertVideo = () => {
-        uni.chooseVideo({ count: 1, success: (r) => editorCtx.value.insertVideo({ src: r.tempFilePath, width: "80%" }) });
+      const handleLink = () => {
+        if (isLinkSelected.value) {
+          editorCtx.value.format("link", null);
+        } else {
+          linkUrl.value = "";
+          showLinkModal.value = true;
+        }
       };
-      const __returned__ = { props, emit, editorId, editorCtx, formats, instance, isTyping, showLinkPopup, linkUrl, linkText, canInsertLink, isLinkSelected, focusLinkInput, showColorPopup, colorType, currentColor, currentBgColor, currentHeader, colorList, headerOptions, alignIcon, showAlignPopup, isPopupOpen, selectAlign, onEditorReady, lastEmittedValue, onEditorInput, onStatusChange, format, handleLinkBtn, closeLinkPopup, confirmLink, removeLink, onHeaderChange, toggleAlign, openColorPicker, closeColorPopup, selectColor, insertImage, insertVideo };
+      const confirmLink = () => {
+        if (linkUrl.value) {
+          editorCtx.value.format("link", linkUrl.value);
+        }
+        showLinkModal.value = false;
+      };
+      const clearFormat = () => {
+        editorCtx.value.removeFormat();
+      };
+      const lastVal = vue.ref("");
+      vue.watch(() => props.modelValue, (val) => {
+        if (val !== lastVal.value && editorCtx.value) {
+          if (!val) {
+            editorCtx.value.clear();
+          } else {
+            editorCtx.value.setContents({
+              html: val
+            });
+          }
+        }
+        lastVal.value = val || "";
+      });
+      const __returned__ = { props, emit, tools, editorId, editorCtx, formats, instance, isLinkSelected, showLinkModal, linkUrl, handleToolClick, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat, lastVal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "editor-wrapper" }, [
+    return vue.openBlock(), vue.createElementBlock("view", { class: "editor-container" }, [
+      vue.createElementVNode("editor", {
+        id: $setup.editorId,
+        class: "ql-container",
+        placeholder: $props.placeholder,
+        "show-img-size": "",
+        "show-img-toolbar": "",
+        "show-img-resize": "",
+        onReady: $setup.onEditorReady,
+        onInput: $setup.onInput,
+        onStatuschange: $setup.onStatusChange
+      }, null, 40, ["id", "placeholder"]),
       vue.createElementVNode("view", { class: "toolbar" }, [
-        vue.createElementVNode("view", { class: "tool-row" }, [
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["tool-item", { "active": $setup.formats.bold }]),
-              onTouchend: _cache[0] || (_cache[0] = vue.withModifiers(($event) => $setup.format("bold"), ["prevent"]))
-            },
-            [
-              vue.createElementVNode("text", { class: "txt-icon bold" }, "B")
-            ],
-            34
-            /* CLASS, NEED_HYDRATION */
-          ),
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["tool-item", { "active": $setup.formats.italic }]),
-              onTouchend: _cache[1] || (_cache[1] = vue.withModifiers(($event) => $setup.format("italic"), ["prevent"]))
-            },
-            [
-              vue.createElementVNode("text", { class: "txt-icon italic" }, "I")
-            ],
-            34
-            /* CLASS, NEED_HYDRATION */
-          ),
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["tool-item", { "active": $setup.formats.underline }]),
-              onTouchend: _cache[2] || (_cache[2] = vue.withModifiers(($event) => $setup.format("underline"), ["prevent"]))
-            },
-            [
-              vue.createElementVNode("text", { class: "txt-icon underline" }, "U")
-            ],
-            34
-            /* CLASS, NEED_HYDRATION */
-          ),
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["tool-item", { "active": $setup.formats.strike }]),
-              onTouchend: _cache[3] || (_cache[3] = vue.withModifiers(($event) => $setup.format("strike"), ["prevent"]))
-            },
-            [
-              vue.createElementVNode("text", { class: "txt-icon strike" }, "S")
-            ],
-            34
-            /* CLASS, NEED_HYDRATION */
-          ),
+        vue.createElementVNode("view", { class: "tool-list" }, [
+          (vue.openBlock(), vue.createElementBlock(
+            vue.Fragment,
+            null,
+            vue.renderList($setup.tools, (item, index) => {
+              return vue.createElementVNode("view", {
+                key: index,
+                class: vue.normalizeClass(["tool-item", { "active": $setup.isActive(item) }]),
+                onTouchend: vue.withModifiers(($event) => $setup.handleToolClick(item), ["prevent"])
+              }, [
+                item.iconText ? (vue.openBlock(), vue.createElementBlock(
+                  "text",
+                  {
+                    key: 0,
+                    style: vue.normalizeStyle(item.style),
+                    class: "txt-icon"
+                  },
+                  vue.toDisplayString(item.iconText),
+                  5
+                  /* TEXT, STYLE */
+                )) : (vue.openBlock(), vue.createElementBlock("image", {
+                  key: 1,
+                  src: item.iconImg,
+                  class: "img-icon"
+                }, null, 8, ["src"]))
+              ], 42, ["onTouchend"]);
+            }),
+            64
+            /* STABLE_FRAGMENT */
+          )),
           vue.createElementVNode("view", { class: "tool-divider" }),
           vue.createElementVNode(
             "view",
             {
               class: "tool-item",
-              onTouchend: _cache[4] || (_cache[4] = vue.withModifiers(($event) => $setup.format("list", "ordered"), ["prevent"]))
+              onTouchend: vue.withModifiers($setup.insertImage, ["prevent"])
             },
             [
               vue.createElementVNode("image", {
-                src: "https://img.icons8.com/ios/50/666666/numbered-list.png",
-                class: "img-tool"
+                src: "https://img.icons8.com/ios/50/666666/image.png",
+                class: "img-icon"
               })
             ],
             32
@@ -4033,303 +4016,63 @@ This will fail in production if not fixed.`);
           vue.createElementVNode(
             "view",
             {
-              class: "tool-item",
-              onTouchend: _cache[5] || (_cache[5] = vue.withModifiers(($event) => $setup.format("list", "bullet"), ["prevent"]))
+              class: vue.normalizeClass(["tool-item", { "active": $setup.isLinkSelected }]),
+              onTouchend: vue.withModifiers($setup.handleLink, ["prevent"])
             },
             [
               vue.createElementVNode("image", {
-                src: "https://img.icons8.com/ios/50/666666/list.png",
-                class: "img-tool"
+                src: "https://img.icons8.com/ios/50/666666/link--v1.png",
+                class: "img-icon"
               })
             ],
-            32
-            /* NEED_HYDRATION */
+            34
+            /* CLASS, NEED_HYDRATION */
           ),
           vue.createElementVNode(
-            "picker",
+            "view",
             {
-              range: $setup.headerOptions,
-              "range-key": "label",
-              onChange: $setup.onHeaderChange,
-              class: "tool-picker"
+              class: "tool-item",
+              onTouchend: vue.withModifiers($setup.clearFormat, ["prevent"])
             },
             [
-              vue.createElementVNode(
-                "view",
-                { class: "picker-label" },
-                vue.toDisplayString($setup.currentHeader) + " ▾",
-                1
-                /* TEXT */
-              )
+              vue.createElementVNode("text", {
+                class: "txt-icon",
+                style: { "font-size": "12px" }
+              }, "Clear")
             ],
             32
             /* NEED_HYDRATION */
           )
-        ]),
-        vue.createElementVNode("view", { class: "tool-row" }, [
-          vue.createElementVNode("view", {
-            class: "tool-item",
-            onClick: _cache[6] || (_cache[6] = ($event) => $setup.openColorPicker("color"))
-          }, [
-            vue.createElementVNode(
-              "text",
-              {
-                class: "txt-icon color-text",
-                style: vue.normalizeStyle({ color: $setup.currentColor })
-              },
-              "A",
-              4
-              /* STYLE */
-            ),
-            vue.createElementVNode(
-              "view",
-              {
-                class: "color-bar",
-                style: vue.normalizeStyle({ backgroundColor: $setup.currentColor })
-              },
-              null,
-              4
-              /* STYLE */
-            )
-          ]),
-          vue.createElementVNode("view", {
-            class: "tool-item",
-            onClick: _cache[7] || (_cache[7] = ($event) => $setup.openColorPicker("backgroundColor"))
-          }, [
-            vue.createElementVNode(
-              "text",
-              {
-                class: "txt-icon bg-text",
-                style: vue.normalizeStyle({ backgroundColor: $setup.currentBgColor })
-              },
-              "A",
-              4
-              /* STYLE */
-            )
-          ]),
-          vue.createElementVNode("view", { class: "tool-divider" }),
-          vue.createElementVNode("view", {
-            class: "tool-item",
-            onClick: _cache[8] || (_cache[8] = ($event) => $setup.showAlignPopup = true)
-          }, [
-            vue.createElementVNode("image", {
-              src: $setup.alignIcon,
-              class: "img-tool"
-            }, null, 8, ["src"])
-          ]),
-          vue.createElementVNode("view", { class: "tool-divider" }),
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["tool-item", { "active": $setup.isLinkSelected, "disabled": !$setup.canInsertLink && !$setup.isLinkSelected }]),
-              onClick: $setup.handleLinkBtn
-            },
-            [
-              vue.createElementVNode(
-                "image",
-                {
-                  src: "https://img.icons8.com/ios/50/666666/link--v1.png",
-                  class: "img-tool",
-                  style: vue.normalizeStyle({ opacity: $setup.canInsertLink || $setup.isLinkSelected ? 1 : 0.3 })
-                },
-                null,
-                4
-                /* STYLE */
-              )
-            ],
-            2
-            /* CLASS */
-          ),
-          vue.createElementVNode("view", {
-            class: "tool-item",
-            onClick: $setup.insertImage
-          }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/image.png",
-              class: "img-tool"
-            })
-          ]),
-          vue.createElementVNode("view", {
-            class: "tool-item",
-            onClick: $setup.insertVideo
-          }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/video-call.png",
-              class: "img-tool"
-            })
-          ])
         ])
       ]),
-      $setup.isPopupOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+      $setup.showLinkModal ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
-        class: "ql-container static-view"
-      }, [
-        vue.createElementVNode("rich-text", {
-          nodes: $props.modelValue || "<p style='color:#999'>Nhập mô tả...</p>"
-        }, null, 8, ["nodes"])
-      ])) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode("editor", {
-        id: $setup.editorId,
-        class: "ql-container",
-        placeholder: $props.placeholder || "Nhập nội dung...",
-        "show-img-size": true,
-        "show-img-toolbar": true,
-        "show-img-resize": true,
-        onReady: $setup.onEditorReady,
-        onInput: $setup.onEditorInput,
-        onStatuschange: $setup.onStatusChange
-      }, null, 40, ["id", "placeholder"]),
-      $setup.showColorPopup ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "color-popup-overlay",
-        onClick: $setup.closeColorPopup
+        class: "link-modal",
+        onClick: _cache[3] || (_cache[3] = ($event) => $setup.showLinkModal = false)
       }, [
         vue.createElementVNode("view", {
-          class: "color-popup",
-          onClick: _cache[10] || (_cache[10] = vue.withModifiers(() => {
+          class: "modal-box",
+          onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
-          vue.createElementVNode("text", { class: "popup-title" }, "Chọn màu"),
-          vue.createElementVNode("view", { class: "color-grid" }, [
-            (vue.openBlock(), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.colorList, (c) => {
-                return vue.createElementVNode("view", {
-                  key: c,
-                  class: "color-cell",
-                  style: vue.normalizeStyle({ backgroundColor: c }),
-                  onClick: ($event) => $setup.selectColor(c)
-                }, null, 12, ["onClick"]);
-              }),
-              64
-              /* STABLE_FRAGMENT */
-            )),
-            vue.createElementVNode("view", {
-              class: "color-cell remove-color",
-              onClick: _cache[9] || (_cache[9] = ($event) => $setup.selectColor(null))
-            }, "✕")
-          ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.showColorPopup ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 2,
-        class: "color-popup-overlay",
-        onClick: $setup.closeColorPopup
-      }, [
-        vue.createElementVNode("view", {
-          class: "color-popup",
-          onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }, [
-          vue.createElementVNode("text", { class: "popup-title" }, "Chọn màu"),
-          vue.createElementVNode("view", { class: "color-grid" }, [
-            (vue.openBlock(), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.colorList, (c) => {
-                return vue.createElementVNode("view", {
-                  key: c,
-                  class: "color-cell",
-                  style: vue.normalizeStyle({ backgroundColor: c }),
-                  onClick: ($event) => $setup.selectColor(c)
-                }, null, 12, ["onClick"]);
-              }),
-              64
-              /* STABLE_FRAGMENT */
-            )),
-            vue.createElementVNode("view", {
-              class: "color-cell remove-color",
-              onClick: _cache[11] || (_cache[11] = ($event) => $setup.selectColor(null))
-            }, "✕")
-          ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.showLinkPopup ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 3,
-        class: "link-popup-overlay",
-        onClick: $setup.closeLinkPopup
-      }, [
-        vue.createElementVNode("view", {
-          class: "link-popup",
-          onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }, [
-          vue.createElementVNode("text", { class: "popup-title" }, "Chèn liên kết")
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      $setup.showAlignPopup ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 4,
-        class: "color-popup-overlay",
-        onClick: _cache[19] || (_cache[19] = ($event) => $setup.showAlignPopup = false)
-      }, [
-        vue.createElementVNode("view", {
-          class: "link-popup",
-          onClick: _cache[18] || (_cache[18] = vue.withModifiers(() => {
-          }, ["stop"]))
-        }, [
-          vue.createElementVNode("text", { class: "popup-title" }, "Căn chỉnh"),
-          vue.createElementVNode("view", { class: "align-grid" }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["tool-item align-item", { active: $setup.formats.align === "left" }]),
-                onClick: _cache[14] || (_cache[14] = ($event) => $setup.selectAlign("left"))
-              },
-              [
-                vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/666666/align-left.png",
-                  class: "img-tool"
-                })
-              ],
-              2
-              /* CLASS */
-            ),
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["tool-item align-item", { active: $setup.formats.align === "center" }]),
-                onClick: _cache[15] || (_cache[15] = ($event) => $setup.selectAlign("center"))
-              },
-              [
-                vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/666666/align-center.png",
-                  class: "img-tool"
-                })
-              ],
-              2
-              /* CLASS */
-            ),
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["tool-item align-item", { active: $setup.formats.align === "right" }]),
-                onClick: _cache[16] || (_cache[16] = ($event) => $setup.selectAlign("right"))
-              },
-              [
-                vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/666666/align-right.png",
-                  class: "img-tool"
-                })
-              ],
-              2
-              /* CLASS */
-            ),
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["tool-item align-item", { active: $setup.formats.align === "justify" }]),
-                onClick: _cache[17] || (_cache[17] = ($event) => $setup.selectAlign("justify"))
-              },
-              [
-                vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/666666/align-justify.png",
-                  class: "img-tool"
-                })
-              ],
-              2
-              /* CLASS */
-            )
+          vue.createElementVNode("text", { class: "modal-title" }, "Chèn liên kết"),
+          vue.withDirectives(vue.createElementVNode("input", {
+            class: "modal-input",
+            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.linkUrl = $event),
+            placeholder: "https://example.com",
+            focus: $setup.showLinkModal
+          }, null, 8, ["focus"]), [
+            [vue.vModelText, $setup.linkUrl]
+          ]),
+          vue.createElementVNode("view", { class: "modal-actions" }, [
+            vue.createElementVNode("button", {
+              class: "btn-cancel",
+              onClick: _cache[1] || (_cache[1] = ($event) => $setup.showLinkModal = false)
+            }, "Hủy"),
+            vue.createElementVNode("button", {
+              class: "btn-confirm",
+              onClick: $setup.confirmLink
+            }, "Xác nhận")
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true)
