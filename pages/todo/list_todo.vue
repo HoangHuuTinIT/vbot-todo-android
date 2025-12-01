@@ -100,13 +100,14 @@
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Mã khách hàng</text>
-						<picker mode="selector" :range="customerOptions" :value="customerIndex"
-							@change="onCustomerChange">
-							<view class="f-picker">{{ customerOptions[customerIndex] }}<text class="arrow">▼</text>
-							</view>
-						</picker>
-					</view>
+					                        <text class="f-label">Khách hàng</text>
+					                        <view class="f-input" @click="openCustomerPopup" style="justify-content: space-between;">
+					                            <text :style="{ color: selectedCustomerName ? '#333' : '#999' }">
+					                                {{ selectedCustomerName || 'Chọn khách hàng' }}
+					                            </text>
+					                            <text class="arrow">›</text>
+					                        </view>
+					                    </view>
 
 					<view class="f-group">
 						<text class="f-label">Người được giao</text>
@@ -129,7 +130,11 @@
 
 					<DateRangeFilter title="Thời gian hết hạn" v-model:startDate="filter.dueDateFrom"
 						v-model:endDate="filter.dueDateTo" />
-
+					<DateRangeFilter 
+					    title="Thời gian thông báo" 
+					    v-model:startDate="filter.notifyFrom"
+					    v-model:endDate="filter.notifyTo" 
+					/>
 					<view style="height: 20px;"></view>
 				</scroll-view>
 
@@ -139,7 +144,14 @@
 				</view>
 			</view>
 		</view>
-
+<CustomerModal 
+            :visible="showCustomerModal" 
+            :loading="loadingCustomer" 
+            :customers="customerList"
+            @close="showCustomerModal = false" 
+            @select="onCustomerSelect"
+            @filter="onFilterCustomerInModal" 
+        />
 		<ConfirmModal 
 		    v-model:visible="isConfirmDeleteOpen"
 		    title="Thông báo"
@@ -153,6 +165,7 @@
 </template>
 
 <script setup lang="ts">
+	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import { useListTodoController } from '@/controllers/list_todo';
 	import StatusBadge from '@/components/StatusBadge.vue';
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
@@ -169,7 +182,9 @@
 		assigneeOptions, assigneeIndex, onAssigneeChange,
 		sourceOptions, sourceIndex, onSourceChange,
 		addNewTask, openFilter, closeFilter, resetFilter, applyFilter,
-		showActionMenu, cancelDelete, confirmDelete, goToDetail
+		showActionMenu, cancelDelete, confirmDelete, goToDetail,
+		showCustomerModal, loadingCustomer, customerList, selectedCustomerName,
+		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal
 	} = useListTodoController();
 </script>
 

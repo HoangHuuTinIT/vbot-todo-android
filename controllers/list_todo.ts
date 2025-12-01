@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
+import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
+import { useAuthStore } from '@/stores/auth';
 import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
 import { buildTodoParams } from '@/models/todo';
 import { TODO_SOURCE } from '@/utils/enums';
@@ -12,7 +14,12 @@ export const useListTodoController = () => {
 	const todos = ref<TodoItem[]>([]);
 	const isLoading = ref<boolean>(false);
 	const isFilterOpen = ref<boolean>(false);
-
+	const authStore = useAuthStore();
+	
+	const showCustomerModal = ref(false);
+	const loadingCustomer = ref(false);
+	const customerList = ref<any[]>([]);
+	const selectedCustomerName = ref('');
 	const isConfirmDeleteOpen = ref<boolean>(false);
 	const itemToDelete = ref<TodoItem | null>(null);
 
@@ -28,16 +35,17 @@ export const useListTodoController = () => {
 	const assigneeOptions = ref(['Tất cả']);
 	const assigneeIndex = ref(0);
 
-	const sourceOptions = ['Tất cả', 'Cuộc gọi (CALL)', 'Khách hàng (CUSTOMER)', 'Hội thoại (CONVERSATION)', 'Tin nhắn (CHAT_MESSAGE)'];
+	const sourceOptions = ['Tất cả', 'Cuộc gọi', 'Khách hàng', 'Hội thoại', 'Tin nhắn'];
 	const sourceValues = ['', TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
 	const sourceIndex = ref<number>(0);
 
 	const filter = ref({
 		title: '', jobCode: '',
 		createdFrom: '', createdTo: '',
-		dueDateFrom: '', dueDateTo: ''
+		dueDateFrom: '', dueDateTo: '',
+		customerCode: '',
+		notifyFrom: '', notifyTo: '',
 	});
-
 	const pageSizeOptions = ['5/trang', '10/trang', '15/trang', '20/trang'];
 	const pageSizeValues = [5, 10, 15, 20];
 	const pageSizeIndex = ref(2);
@@ -64,49 +72,114 @@ export const useListTodoController = () => {
 		}
 	};
 	const getTodoList = async () => {
-		isLoading.value = true;
-		try {
+	        isLoading.value = true;
+	        try {
+	            let selectedCreatorId = '';
+	            if (creatorIndex.value > 0) {
+	                const member = rawMemberList.value[creatorIndex.value - 1];
+	                selectedCreatorId = member.UID || ''; 
+	            }
 
+	            let selectedAssigneeId = '';
+	            if (assigneeIndex.value > 0) {
+	                const member = rawMemberList.value[assigneeIndex.value - 1];
+	                selectedAssigneeId = member.UID || ''; 
+	            }
+	
+	            const filterParams = buildTodoParams(
+	                filter.value,
+	                statusValues[statusIndex.value],
+	                sourceValues[sourceIndex.value],
+	                selectedCreatorId,
+	                selectedAssigneeId
+	            );
+	
+	            const currentSize = pageSizeValues[pageSizeIndex.value];
+	
+	            const [listData, countData] = await Promise.all([
+	                getTodos({
+	                    ...filterParams,
+	                    pageNo: currentPage.value,
+	                    pageSize: currentSize
+	                }),
+	                getTodoCount(filterParams)
+	            ]);
+	
+	            todos.value = listData || [];
+	            totalItems.value = countData || 0;
+	        } catch (error) {
+	            console.error(error);
+	            showError('Lỗi tải dữ liệu');
+	        } finally {
+	            isLoading.value = false;
+	        }
+	    };
+const fetchCustomers = async (searchFilter: any = null) => {
+        loadingCustomer.value = true;
+        try {
+            const token = authStore.crmToken;
+            if (!token) {
+                console.error("Chưa có CRM Token!");
+                return;
+            }
 
-			let selectedCreatorId = '';
-			if (creatorIndex.value > 0) {
-				selectedCreatorId = rawMemberList.value[creatorIndex.value - 1].UID;
-			}
+            const fields = await getCrmFieldSearch(token);
+            const nameField = fields.find((f: any) => f.code === 'name');
+            const phoneField = fields.find((f: any) => f.code === 'phone');
+            const memberNoField = fields.find((f: any) => f.code === 'member_no');
 
-			let selectedAssigneeId = '';
-			if (assigneeIndex.value > 0) {
-				selectedAssigneeId = rawMemberList.value[assigneeIndex.value - 1].memberUID;
-			}
+            const nameId = nameField ? nameField.id : 134;
+            const phoneId = phoneField ? phoneField.id : 135;
+            const memberNoId = memberNoField ? memberNoField.id : 136;
 
-			const filterParams = buildTodoParams(
-				filter.value,
-				statusValues[statusIndex.value],
-				sourceValues[sourceIndex.value],
-				selectedCreatorId,
-				selectedAssigneeId
-			);
+            const requestBody = {
+                page: 1,
+                size: 20,
+                fieldSearch: [
+                    { id: -1, value: "", type: "", isSearch: false },
+                    { id: nameId, value: searchFilter?.name || "", type: "", isSearch: !!searchFilter?.name },
+                    { id: phoneId, value: searchFilter?.phone || "", type: "", isSearch: !!searchFilter?.phone },
+                    { id: memberNoId, value: "", type: "", isSearch: false }
+                ]
+            };
 
-			const currentSize = pageSizeValues[pageSizeIndex.value];
+            const rawData = await getCrmCustomers(token, requestBody);
+            
+            customerList.value = rawData.map((item: any) => {
+                const nameObj = item.customerFieldItems.find((f: any) => f.code === 'name');
+                const phoneObj = item.customerFieldItems.find((f: any) => f.code === 'phone');
+                return {
+                    id: item.id,
+                    uid: item.uid, 
+                    createAt: item.createAt,
+                    name: nameObj ? nameObj.value : '(Không tên)',
+                    phone: phoneObj ? phoneObj.value : '',
+                    code: item.code || ''
+                };
+            });
 
-			const [listData, countData] = await Promise.all([
-				getTodos({
-					...filterParams,
-					pageNo: currentPage.value,
-					pageSize: currentSize
-				}),
-				getTodoCount(filterParams)
-			]);
-
-			todos.value = listData || [];
-			totalItems.value = countData || 0;
-		} catch (error) {
-			console.error(error);
-			showError('Lỗi tải dữ liệu');
-		} finally {
-			isLoading.value = false;
-		}
-	};
-
+        } catch (error) {
+            console.error('Lỗi tải khách hàng:', error);
+            showError('Lỗi tải dữ liệu CRM');
+        } finally {
+            loadingCustomer.value = false;
+        }
+    };
+	const openCustomerPopup = () => {
+	        showCustomerModal.value = true;
+	        if (customerList.value.length === 0) {
+	            fetchCustomers();
+	        }
+	    };
+		const onCustomerSelect = (customer: any) => {
+		        filter.value.customerCode = customer.uid; 
+		        
+		        selectedCustomerName.value = customer.name;
+		        showCustomerModal.value = false; 
+		    };
+		const onFilterCustomerInModal = (filterParams: any) => {
+		        fetchCustomers(filterParams);
+		    };
 	const onPageSizeChange = (e : any) => {
 		pageSizeIndex.value = e.detail.value;
 		currentPage.value = 1;
@@ -157,7 +230,6 @@ export const useListTodoController = () => {
 
 	const onStatusChange = (e : any) => { statusIndex.value = e.detail.value; };
 	const onCreatorChange = (e : any) => { creatorIndex.value = e.detail.value; };
-	const onCustomerChange = (e : any) => { customerIndex.value = e.detail.value; };
 	const onAssigneeChange = (e : any) => { assigneeIndex.value = e.detail.value; };
 	const onSourceChange = (e : any) => { sourceIndex.value = e.detail.value; };
 
@@ -165,7 +237,9 @@ export const useListTodoController = () => {
 		filter.value = {
 			title: '', jobCode: '',
 			createdFrom: '', createdTo: '',
-			dueDateFrom: '', dueDateTo: ''
+			dueDateFrom: '', dueDateTo: '',
+			customerCode: '',
+			notifyFrom: '', notifyTo: ''
 		};
 		statusIndex.value = 0;
 		creatorIndex.value = 0;
@@ -173,6 +247,8 @@ export const useListTodoController = () => {
 		assigneeIndex.value = 0;
 		sourceIndex.value = 0;
 		currentPage.value = 1;
+		selectedCustomerName.value = '';
+		
 	};
 
 	const applyFilter = () => {
@@ -194,9 +270,11 @@ export const useListTodoController = () => {
 		statusOptions, statusIndex, onStatusChange,
 		creatorOptions, creatorIndex, onCreatorChange,
 		assigneeOptions, assigneeIndex, onAssigneeChange,
-		customerOptions, customerIndex, onCustomerChange,
 		sourceOptions, sourceIndex, onSourceChange,
 		addNewTask, openFilter, closeFilter, resetFilter, applyFilter,
-		showActionMenu, cancelDelete, confirmDelete
+		showActionMenu, cancelDelete, confirmDelete,
+		showCustomerModal, loadingCustomer, customerList, selectedCustomerName,
+		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, 
+	
 	};
 };

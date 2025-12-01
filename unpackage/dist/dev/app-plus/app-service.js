@@ -65,6 +65,405 @@ if (uni.restoreGlobal) {
     2
     /* HookFlags.PAGE */
   );
+  const _export_sfc = (sfc, props) => {
+    const target = sfc.__vccOpts || sfc;
+    for (const [key, val] of props) {
+      target[key] = val;
+    }
+    return target;
+  };
+  const _sfc_main$d = {
+    __name: "UserAvatar",
+    props: {
+      name: {
+        type: String,
+        default: ""
+      },
+      avatarUrl: {
+        type: String,
+        default: ""
+      },
+      avatarColor: {
+        type: String,
+        default: "#3b82f6"
+      },
+      size: {
+        type: Number,
+        default: 40
+      }
+    },
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const props = __props;
+      const initialChar = vue.computed(() => {
+        if (!props.name)
+          return "?";
+        return props.name.trim().charAt(0).toUpperCase();
+      });
+      const __returned__ = { props, initialChar, computed: vue.computed };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  };
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: "rounded-full flex items-center justify-center overflow-hidden shrink-0",
+        style: vue.normalizeStyle({
+          width: $props.size + "px",
+          height: $props.size + "px",
+          backgroundColor: $props.avatarColor || "#e0e0e0",
+          borderRadius: "50%"
+        })
+      },
+      [
+        $props.avatarUrl ? (vue.openBlock(), vue.createElementBlock("image", {
+          key: 0,
+          src: $props.avatarUrl,
+          class: "w-full h-full",
+          mode: "aspectFill"
+        }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock(
+          "text",
+          {
+            key: 1,
+            class: "text-white font-bold flex items-center justify-center",
+            style: vue.normalizeStyle({
+              fontSize: $props.size * 0.45 + "px",
+              lineHeight: "1",
+              display: "flex"
+            })
+          },
+          vue.toDisplayString($setup.initialChar),
+          5
+          /* TEXT, STYLE */
+        ))
+      ],
+      4
+      /* STYLE */
+    );
+  }
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android/components/UserAvatar.vue"]]);
+  const formatRelativeTime = (timestamp) => {
+    if (!timestamp)
+      return "";
+    const now2 = Date.now();
+    const diff = now2 - timestamp;
+    if (diff < 6e4)
+      return "Vừa xong";
+    if (diff < 36e5) {
+      const minutes = Math.floor(diff / 6e4);
+      return `${minutes} phút trước`;
+    }
+    if (diff < 864e5) {
+      const hours = Math.floor(diff / 36e5);
+      return `${hours} giờ trước`;
+    }
+    const date = new Date(timestamp);
+    const d = date.getDate().toString().padStart(2, "0");
+    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const y = date.getFullYear();
+    const h = date.getHours().toString().padStart(2, "0");
+    const min = date.getMinutes().toString().padStart(2, "0");
+    return `${d}/${m}/${y} ${h}:${min}`;
+  };
+  const formatDateDisplay = (dateStr) => {
+    if (!dateStr)
+      return "";
+    try {
+      if (dateStr.includes("-")) {
+        const parts = dateStr.split("-");
+        if (parts.length === 3) {
+          const [year, month, day] = parts;
+          return `${day}/${month}/${year}`;
+        }
+      }
+      return dateStr;
+    } catch (e) {
+      return dateStr;
+    }
+  };
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+    __name: "DateRangeFilter",
+    props: {
+      title: { type: String, required: false },
+      startDate: { type: String, required: true },
+      endDate: { type: String, required: true }
+    },
+    emits: ["update:startDate", "update:endDate"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const onStartChange = (e) => {
+        emit("update:startDate", e.detail.value);
+      };
+      const onEndChange = (e) => {
+        emit("update:endDate", e.detail.value);
+      };
+      const __returned__ = { props, emit, onStartChange, onEndChange, get formatDateDisplay() {
+        return formatDateDisplay;
+      } };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
+      $props.title ? (vue.openBlock(), vue.createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "f-section-title"
+        },
+        vue.toDisplayString($props.title),
+        1
+        /* TEXT */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode("view", { class: "f-row" }, [
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          vue.createElementVNode("picker", {
+            mode: "date",
+            value: $props.startDate,
+            onChange: $setup.onStartChange
+          }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
+              },
+              vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : "Từ ngày"),
+              3
+              /* TEXT, CLASS */
+            )
+          ], 40, ["value"])
+        ]),
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          vue.createElementVNode("picker", {
+            mode: "date",
+            value: $props.endDate,
+            onChange: $setup.onEndChange
+          }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
+              },
+              vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : "Đến ngày"),
+              3
+              /* TEXT, CLASS */
+            )
+          ], 40, ["value"])
+        ])
+      ])
+    ]);
+  }
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+    __name: "CustomerModal",
+    props: {
+      visible: { type: Boolean, required: true },
+      customers: { type: Array, required: true },
+      loading: { type: Boolean, required: true }
+    },
+    emits: ["close", "select"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const filter = vue.reactive({
+        name: "",
+        phone: "",
+        managerIndex: 0,
+        startDate: "",
+        endDate: ""
+      });
+      const managerOptions = vue.ref(["Thành viên quản lý", "Nguyễn Văn A", "Trần Thị B"]);
+      const onManagerChange = (e) => {
+        filter.managerIndex = e.detail.value;
+      };
+      const resetFilter = () => {
+        filter.name = "";
+        filter.phone = "";
+        filter.managerIndex = 0;
+        filter.startDate = "";
+        filter.endDate = "";
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:128", "Đã đặt lại bộ lọc");
+      };
+      const applyFilter = () => {
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:132", "Thực hiện lọc với:", filter);
+      };
+      const close = () => {
+        emit("close");
+      };
+      const selectCustomer = (item) => {
+        emit("select", item);
+        close();
+      };
+      const formatDate = (timestamp) => {
+        if (!timestamp)
+          return "";
+        const date = new Date(timestamp);
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      };
+      const __returned__ = { props, emit, filter, managerOptions, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+    return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
+      key: 0,
+      class: "modal-overlay",
+      onClick: vue.withModifiers($setup.close, ["stop"])
+    }, [
+      vue.createElementVNode("view", {
+        class: "modal-content",
+        onClick: _cache[4] || (_cache[4] = vue.withModifiers(() => {
+        }, ["stop"]))
+      }, [
+        vue.createElementVNode("view", { class: "modal-header" }, [
+          vue.createElementVNode("text", { class: "modal-title" }, "Chọn khách hàng"),
+          vue.createElementVNode("text", {
+            class: "close-btn",
+            onClick: $setup.close
+          }, "✕")
+        ]),
+        vue.createElementVNode("view", { class: "filter-section" }, [
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.withDirectives(vue.createElementVNode(
+              "input",
+              {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.name = $event),
+                placeholder: "Nhập tên khách hàng",
+                "placeholder-class": "ph-style"
+              },
+              null,
+              512
+              /* NEED_PATCH */
+            ), [
+              [vue.vModelText, $setup.filter.name]
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.withDirectives(vue.createElementVNode(
+              "input",
+              {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.phone = $event),
+                type: "number",
+                placeholder: "Nhập số điện thoại",
+                "placeholder-class": "ph-style"
+              },
+              null,
+              512
+              /* NEED_PATCH */
+            ), [
+              [vue.vModelText, $setup.filter.phone]
+            ])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.createElementVNode("picker", {
+              mode: "selector",
+              range: $setup.managerOptions,
+              value: $setup.filter.managerIndex,
+              onChange: $setup.onManagerChange
+            }, [
+              vue.createElementVNode("view", { class: "f-picker-box" }, [
+                vue.createElementVNode(
+                  "text",
+                  {
+                    class: vue.normalizeClass($setup.filter.managerIndex === 0 ? "text-ph" : "text-val")
+                  },
+                  vue.toDisplayString($setup.managerOptions[$setup.filter.managerIndex]),
+                  3
+                  /* TEXT, CLASS */
+                ),
+                vue.createElementVNode("text", { class: "arrow" }, "▼")
+              ])
+            ], 40, ["range", "value"])
+          ]),
+          vue.createElementVNode("view", { class: "f-item" }, [
+            vue.createVNode($setup["DateRangeFilter"], {
+              startDate: $setup.filter.startDate,
+              endDate: $setup.filter.endDate,
+              "onUpdate:startDate": _cache[2] || (_cache[2] = (val) => $setup.filter.startDate = val),
+              "onUpdate:endDate": _cache[3] || (_cache[3] = (val) => $setup.filter.endDate = val)
+            }, null, 8, ["startDate", "endDate"])
+          ]),
+          vue.createElementVNode("view", { class: "f-actions" }, [
+            vue.createElementVNode("button", {
+              class: "btn-reset",
+              onClick: $setup.resetFilter
+            }, "Đặt lại"),
+            vue.createElementVNode("button", {
+              class: "btn-submit",
+              onClick: $setup.applyFilter
+            }, "Lọc")
+          ])
+        ]),
+        $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 0,
+          class: "loading-state"
+        }, "Đang tải dữ liệu...")) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
+          key: 1,
+          "scroll-y": "",
+          class: "customer-list"
+        }, [
+          (vue.openBlock(true), vue.createElementBlock(
+            vue.Fragment,
+            null,
+            vue.renderList($props.customers, (item, index) => {
+              return vue.openBlock(), vue.createElementBlock("view", {
+                key: item.id,
+                class: "customer-item",
+                onClick: ($event) => $setup.selectCustomer(item)
+              }, [
+                vue.createVNode($setup["UserAvatar"], {
+                  name: item.name,
+                  size: 40,
+                  class: "mr-3"
+                }, null, 8, ["name"]),
+                vue.createElementVNode("view", { class: "info-column" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "name-text" },
+                    vue.toDisplayString(item.name || "(Không tên)"),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "phone-text" },
+                    vue.toDisplayString(item.phone || "Không có SĐT"),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode("view", { class: "date-column" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "date-text" },
+                    vue.toDisplayString($setup.formatDate(item.createAt)),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ], 8, ["onClick"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          )),
+          $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "empty-state"
+          }, "Không có dữ liệu")) : vue.createCommentVNode("v-if", true)
+        ]))
+      ])
+    ])) : vue.createCommentVNode("v-if", true);
+  }
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CustomerModal.vue"]]);
   var isVue2 = false;
   function set(target, key, val) {
     if (Array.isArray(target)) {
@@ -2022,20 +2421,33 @@ This will fail in production if not fixed.`);
     const s = date.getSeconds().toString().padStart(2, "0");
     return `${d}/${m}/${y} ${h}:${min}:${s}`;
   };
-  const dateToTimestamp$1 = (dateStr) => !dateStr ? -1 : new Date(dateStr).getTime();
+  const getStartOfDay = (dateStr) => {
+    if (!dateStr)
+      return -1;
+    const safeDate = dateStr.replace(/-/g, "/");
+    return (/* @__PURE__ */ new Date(`${safeDate} 00:00:00`)).getTime();
+  };
+  const getEndOfDay = (dateStr) => {
+    if (!dateStr)
+      return -1;
+    const safeDate = dateStr.replace(/-/g, "/");
+    return (/* @__PURE__ */ new Date(`${safeDate} 00:00:00`)).getTime();
+  };
   const buildTodoParams = (filter, statusValue, sourceValue, creatorId, assigneeId) => {
     return {
       keySearch: filter.title || "",
       code: filter.jobCode || "",
       status: statusValue || "",
-      startDate: dateToTimestamp$1(filter.createdFrom),
-      endDate: dateToTimestamp$1(filter.createdTo),
-      dueDateFrom: dateToTimestamp$1(filter.dueDateFrom),
-      dueDateTo: dateToTimestamp$1(filter.dueDateTo),
+      startDate: getStartOfDay(filter.createdFrom),
+      endDate: getEndOfDay(filter.createdTo),
+      dueDateFrom: getStartOfDay(filter.dueDateFrom),
+      dueDateTo: getEndOfDay(filter.dueDateTo),
+      notificationReceivedAtFrom: getStartOfDay(filter.notifyFrom),
+      notificationReceivedAtTo: getEndOfDay(filter.notifyTo),
       createdBy: creatorId || "",
       assigneeId: assigneeId || "",
+      customerCode: filter.customerCode || "",
       links: sourceValue || "",
-      customerCode: "",
       groupId: "",
       transId: "",
       pluginType: ""
@@ -2202,6 +2614,11 @@ This will fail in production if not fixed.`);
     const todos = vue.ref([]);
     const isLoading = vue.ref(false);
     const isFilterOpen = vue.ref(false);
+    const authStore = useAuthStore();
+    const showCustomerModal = vue.ref(false);
+    const loadingCustomer = vue.ref(false);
+    const customerList = vue.ref([]);
+    const selectedCustomerName = vue.ref("");
     const isConfirmDeleteOpen = vue.ref(false);
     const itemToDelete = vue.ref(null);
     const statusOptions = ["Tất cả", STATUS_LABELS[TODO_STATUS.NEW], STATUS_LABELS[TODO_STATUS.IN_PROGRESS], STATUS_LABELS[TODO_STATUS.DONE]];
@@ -2210,11 +2627,10 @@ This will fail in production if not fixed.`);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.ref(["Tất cả"]);
     const creatorIndex = vue.ref(0);
-    const customerOptions = ["Tất cả", "KH001", "KH002", "VNG"];
     const customerIndex = vue.ref(0);
     const assigneeOptions = vue.ref(["Tất cả"]);
     const assigneeIndex = vue.ref(0);
-    const sourceOptions = ["Tất cả", "Cuộc gọi (CALL)", "Khách hàng (CUSTOMER)", "Hội thoại (CONVERSATION)", "Tin nhắn (CHAT_MESSAGE)"];
+    const sourceOptions = ["Tất cả", "Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
     const sourceValues = ["", TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
     const sourceIndex = vue.ref(0);
     const filter = vue.ref({
@@ -2223,7 +2639,10 @@ This will fail in production if not fixed.`);
       createdFrom: "",
       createdTo: "",
       dueDateFrom: "",
-      dueDateTo: ""
+      dueDateTo: "",
+      customerCode: "",
+      notifyFrom: "",
+      notifyTo: ""
     });
     const pageSizeOptions = ["5/trang", "10/trang", "15/trang", "20/trang"];
     const pageSizeValues = [5, 10, 15, 20];
@@ -2246,7 +2665,7 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:63", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:71", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const getTodoList = async () => {
@@ -2254,11 +2673,13 @@ This will fail in production if not fixed.`);
       try {
         let selectedCreatorId = "";
         if (creatorIndex.value > 0) {
-          selectedCreatorId = rawMemberList.value[creatorIndex.value - 1].UID;
+          const member = rawMemberList.value[creatorIndex.value - 1];
+          selectedCreatorId = member.UID || "";
         }
         let selectedAssigneeId = "";
         if (assigneeIndex.value > 0) {
-          selectedAssigneeId = rawMemberList.value[assigneeIndex.value - 1].memberUID;
+          const member = rawMemberList.value[assigneeIndex.value - 1];
+          selectedAssigneeId = member.UID || "";
         }
         const filterParams = buildTodoParams(
           filter.value,
@@ -2279,11 +2700,70 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         totalItems.value = countData || 0;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:103", error);
+        formatAppLog("error", "at controllers/list_todo.ts:111", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
       }
+    };
+    const fetchCustomers = async (searchFilter = null) => {
+      loadingCustomer.value = true;
+      try {
+        const token = authStore.crmToken;
+        if (!token) {
+          formatAppLog("error", "at controllers/list_todo.ts:122", "Chưa có CRM Token!");
+          return;
+        }
+        const fields = await getCrmFieldSearch(token);
+        const nameField = fields.find((f) => f.code === "name");
+        const phoneField = fields.find((f) => f.code === "phone");
+        const memberNoField = fields.find((f) => f.code === "member_no");
+        const nameId = nameField ? nameField.id : 134;
+        const phoneId = phoneField ? phoneField.id : 135;
+        const memberNoId = memberNoField ? memberNoField.id : 136;
+        const requestBody = {
+          page: 1,
+          size: 20,
+          fieldSearch: [
+            { id: -1, value: "", type: "", isSearch: false },
+            { id: nameId, value: (searchFilter == null ? void 0 : searchFilter.name) || "", type: "", isSearch: !!(searchFilter == null ? void 0 : searchFilter.name) },
+            { id: phoneId, value: (searchFilter == null ? void 0 : searchFilter.phone) || "", type: "", isSearch: !!(searchFilter == null ? void 0 : searchFilter.phone) },
+            { id: memberNoId, value: "", type: "", isSearch: false }
+          ]
+        };
+        const rawData = await getCrmCustomers(token, requestBody);
+        customerList.value = rawData.map((item) => {
+          const nameObj = item.customerFieldItems.find((f) => f.code === "name");
+          const phoneObj = item.customerFieldItems.find((f) => f.code === "phone");
+          return {
+            id: item.id,
+            uid: item.uid,
+            createAt: item.createAt,
+            name: nameObj ? nameObj.value : "(Không tên)",
+            phone: phoneObj ? phoneObj.value : "",
+            code: item.code || ""
+          };
+        });
+      } catch (error) {
+        formatAppLog("error", "at controllers/list_todo.ts:162", "Lỗi tải khách hàng:", error);
+        showError("Lỗi tải dữ liệu CRM");
+      } finally {
+        loadingCustomer.value = false;
+      }
+    };
+    const openCustomerPopup = () => {
+      showCustomerModal.value = true;
+      if (customerList.value.length === 0) {
+        fetchCustomers();
+      }
+    };
+    const onCustomerSelect = (customer) => {
+      filter.value.customerCode = customer.uid;
+      selectedCustomerName.value = customer.name;
+      showCustomerModal.value = false;
+    };
+    const onFilterCustomerInModal = (filterParams) => {
+      fetchCustomers(filterParams);
     };
     const onPageSizeChange = (e) => {
       pageSizeIndex.value = e.detail.value;
@@ -2315,7 +2795,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:136", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:209", "Delete Error:", error);
         showError("Xóa thất bại");
       }
     };
@@ -2345,9 +2825,6 @@ This will fail in production if not fixed.`);
     const onCreatorChange = (e) => {
       creatorIndex.value = e.detail.value;
     };
-    const onCustomerChange = (e) => {
-      customerIndex.value = e.detail.value;
-    };
     const onAssigneeChange = (e) => {
       assigneeIndex.value = e.detail.value;
     };
@@ -2361,7 +2838,10 @@ This will fail in production if not fixed.`);
         createdFrom: "",
         createdTo: "",
         dueDateFrom: "",
-        dueDateTo: ""
+        dueDateTo: "",
+        customerCode: "",
+        notifyFrom: "",
+        notifyTo: ""
       };
       statusIndex.value = 0;
       creatorIndex.value = 0;
@@ -2369,6 +2849,7 @@ This will fail in production if not fixed.`);
       assigneeIndex.value = 0;
       sourceIndex.value = 0;
       currentPage.value = 1;
+      selectedCustomerName.value = "";
     };
     const applyFilter = () => {
       currentPage.value = 1;
@@ -2407,9 +2888,6 @@ This will fail in production if not fixed.`);
       assigneeOptions,
       assigneeIndex,
       onAssigneeChange,
-      customerOptions,
-      customerIndex,
-      onCustomerChange,
       sourceOptions,
       sourceIndex,
       onSourceChange,
@@ -2420,10 +2898,17 @@ This will fail in production if not fixed.`);
       applyFilter,
       showActionMenu,
       cancelDelete,
-      confirmDelete
+      confirmDelete,
+      showCustomerModal,
+      loadingCustomer,
+      customerList,
+      selectedCustomerName,
+      openCustomerPopup,
+      onCustomerSelect,
+      onFilterCustomerInModal
     };
   };
-  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -2463,14 +2948,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _export_sfc = (sfc, props) => {
-    const target = sfc.__vccOpts || sfc;
-    for (const [key, val] of props) {
-      target[key] = val;
-    }
-    return target;
-  };
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2482,123 +2960,8 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
-  const formatRelativeTime = (timestamp) => {
-    if (!timestamp)
-      return "";
-    const now2 = Date.now();
-    const diff = now2 - timestamp;
-    if (diff < 6e4)
-      return "Vừa xong";
-    if (diff < 36e5) {
-      const minutes = Math.floor(diff / 6e4);
-      return `${minutes} phút trước`;
-    }
-    if (diff < 864e5) {
-      const hours = Math.floor(diff / 36e5);
-      return `${hours} giờ trước`;
-    }
-    const date = new Date(timestamp);
-    const d = date.getDate().toString().padStart(2, "0");
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
-    const y = date.getFullYear();
-    const h = date.getHours().toString().padStart(2, "0");
-    const min = date.getMinutes().toString().padStart(2, "0");
-    return `${d}/${m}/${y} ${h}:${min}`;
-  };
-  const formatDateDisplay = (dateStr) => {
-    if (!dateStr)
-      return "";
-    try {
-      if (dateStr.includes("-")) {
-        const parts = dateStr.split("-");
-        if (parts.length === 3) {
-          const [year, month, day] = parts;
-          return `${day}/${month}/${year}`;
-        }
-      }
-      return dateStr;
-    } catch (e) {
-      return dateStr;
-    }
-  };
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
-    __name: "DateRangeFilter",
-    props: {
-      title: { type: String, required: false },
-      startDate: { type: String, required: true },
-      endDate: { type: String, required: true }
-    },
-    emits: ["update:startDate", "update:endDate"],
-    setup(__props, { expose: __expose, emit: __emit }) {
-      __expose();
-      const props = __props;
-      const emit = __emit;
-      const onStartChange = (e) => {
-        emit("update:startDate", e.detail.value);
-      };
-      const onEndChange = (e) => {
-        emit("update:endDate", e.detail.value);
-      };
-      const __returned__ = { props, emit, onStartChange, onEndChange, get formatDateDisplay() {
-        return formatDateDisplay;
-      } };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
-      $props.title ? (vue.openBlock(), vue.createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: "f-section-title"
-        },
-        vue.toDisplayString($props.title),
-        1
-        /* TEXT */
-      )) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode("view", { class: "f-row" }, [
-        vue.createElementVNode("view", { class: "f-group half" }, [
-          vue.createElementVNode("picker", {
-            mode: "date",
-            value: $props.startDate,
-            onChange: $setup.onStartChange
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
-              },
-              vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : "Từ ngày"),
-              3
-              /* TEXT, CLASS */
-            )
-          ], 40, ["value"])
-        ]),
-        vue.createElementVNode("view", { class: "f-group half" }, [
-          vue.createElementVNode("picker", {
-            mode: "date",
-            value: $props.endDate,
-            onChange: $setup.onEndChange
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
-              },
-              vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : "Đến ngày"),
-              3
-              /* TEXT, CLASS */
-            )
-          ], 40, ["value"])
-        ])
-      ])
-    ]);
-  }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
       label: { type: String, required: false, default: "" },
@@ -2622,7 +2985,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass(["app-btn", [
         `btn-${$props.type}`,
@@ -2648,8 +3011,8 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -2698,7 +3061,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -2733,8 +3096,8 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
+  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "ConfirmModal",
     props: {
       visible: { type: Boolean, required: true },
@@ -2761,7 +3124,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "modal-overlay",
@@ -2809,8 +3172,8 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
+  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -2850,14 +3213,21 @@ This will fail in production if not fixed.`);
         showActionMenu,
         cancelDelete,
         confirmDelete,
-        goToDetail
+        goToDetail,
+        showCustomerModal,
+        loadingCustomer,
+        customerList,
+        selectedCustomerName,
+        openCustomerPopup,
+        onCustomerSelect,
+        onFilterCustomerInModal
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     var _a;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "header" }, [
@@ -3022,11 +3392,11 @@ This will fail in production if not fixed.`);
       $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "filter-overlay",
-        onClick: _cache[18] || (_cache[18] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
+        onClick: _cache[20] || (_cache[20] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel",
-          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
+          onClick: _cache[19] || (_cache[19] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
@@ -3109,22 +3479,23 @@ This will fail in production if not fixed.`);
               ], 40, ["range", "value"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Mã khách hàng"),
-              vue.createElementVNode("picker", {
-                mode: "selector",
-                range: $setup.customerOptions,
-                value: $setup.customerIndex,
-                onChange: _cache[10] || (_cache[10] = (...args) => $setup.onCustomerChange && $setup.onCustomerChange(...args))
+              vue.createElementVNode("text", { class: "f-label" }, "Khách hàng"),
+              vue.createElementVNode("view", {
+                class: "f-input",
+                onClick: _cache[10] || (_cache[10] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
+                style: { "justify-content": "space-between" }
               }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.customerOptions[$setup.customerIndex]),
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["range", "value"])
+                vue.createElementVNode(
+                  "text",
+                  {
+                    style: vue.normalizeStyle({ color: $setup.selectedCustomerName ? "#333" : "#999" })
+                  },
+                  vue.toDisplayString($setup.selectedCustomerName || "Chọn khách hàng"),
+                  5
+                  /* TEXT, STYLE */
+                ),
+                vue.createElementVNode("text", { class: "arrow" }, "›")
+              ])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
               vue.createElementVNode("text", { class: "f-label" }, "Người được giao"),
@@ -3176,6 +3547,13 @@ This will fail in production if not fixed.`);
               endDate: $setup.filter.dueDateTo,
               "onUpdate:endDate": _cache[16] || (_cache[16] = ($event) => $setup.filter.dueDateTo = $event)
             }, null, 8, ["startDate", "endDate"]),
+            vue.createVNode($setup["DateRangeFilter"], {
+              title: "Thời gian thông báo",
+              startDate: $setup.filter.notifyFrom,
+              "onUpdate:startDate": _cache[17] || (_cache[17] = ($event) => $setup.filter.notifyFrom = $event),
+              endDate: $setup.filter.notifyTo,
+              "onUpdate:endDate": _cache[18] || (_cache[18] = ($event) => $setup.filter.notifyTo = $event)
+            }, null, 8, ["startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
           vue.createElementVNode("view", { class: "filter-footer" }, [
@@ -3194,9 +3572,17 @@ This will fail in production if not fixed.`);
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
+      vue.createVNode($setup["CustomerModal"], {
+        visible: $setup.showCustomerModal,
+        loading: $setup.loadingCustomer,
+        customers: $setup.customerList,
+        onClose: _cache[21] || (_cache[21] = ($event) => $setup.showCustomerModal = false),
+        onSelect: $setup.onCustomerSelect,
+        onFilter: $setup.onFilterCustomerInModal
+      }, null, 8, ["visible", "loading", "customers", "onSelect", "onFilter"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
-        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
+        "onUpdate:visible": _cache[22] || (_cache[22] = ($event) => $setup.isConfirmDeleteOpen = $event),
         title: "Thông báo",
         message: `Bạn có chắc muốn xóa công việc "${(_a = $setup.itemToDelete) == null ? void 0 : _a.title}"?`,
         "confirm-type": "danger",
@@ -3206,7 +3592,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
       return -1;
@@ -3404,7 +3790,7 @@ This will fail in production if not fixed.`);
       onSourceChange
     };
   };
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoEditor",
     props: {
       modelValue: { type: String, required: true },
@@ -3576,7 +3962,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "editor-wrapper" }, [
       vue.createElementVNode("view", { class: "toolbar" }, [
         vue.createElementVNode("view", { class: "tool-row" }, [
@@ -3949,8 +4335,8 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoEditor.vue"]]);
-  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
+  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoEditor.vue"]]);
+  const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoDatePicker",
     props: {
       dueDate: { type: String, required: true },
@@ -3986,7 +4372,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flat-item date-compound-block" }, [
       vue.createElementVNode("view", { class: "right-column" }, [
         vue.createElementVNode("view", { class: "date-row" }, [
@@ -4062,284 +4448,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoDatePicker.vue"]]);
-  const _sfc_main$5 = {
-    __name: "UserAvatar",
-    props: {
-      name: {
-        type: String,
-        default: ""
-      },
-      avatarUrl: {
-        type: String,
-        default: ""
-      },
-      avatarColor: {
-        type: String,
-        default: "#3b82f6"
-      },
-      size: {
-        type: Number,
-        default: 40
-      }
-    },
-    setup(__props, { expose: __expose }) {
-      __expose();
-      const props = __props;
-      const initialChar = vue.computed(() => {
-        if (!props.name)
-          return "?";
-        return props.name.trim().charAt(0).toUpperCase();
-      });
-      const __returned__ = { props, initialChar, computed: vue.computed };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  };
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock(
-      "view",
-      {
-        class: "rounded-full flex items-center justify-center overflow-hidden shrink-0",
-        style: vue.normalizeStyle({
-          width: $props.size + "px",
-          height: $props.size + "px",
-          backgroundColor: $props.avatarColor || "#e0e0e0",
-          borderRadius: "50%"
-        })
-      },
-      [
-        $props.avatarUrl ? (vue.openBlock(), vue.createElementBlock("image", {
-          key: 0,
-          src: $props.avatarUrl,
-          class: "w-full h-full",
-          mode: "aspectFill"
-        }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock(
-          "text",
-          {
-            key: 1,
-            class: "text-white font-bold flex items-center justify-center",
-            style: vue.normalizeStyle({
-              fontSize: $props.size * 0.45 + "px",
-              lineHeight: "1",
-              display: "flex"
-            })
-          },
-          vue.toDisplayString($setup.initialChar),
-          5
-          /* TEXT, STYLE */
-        ))
-      ],
-      4
-      /* STYLE */
-    );
-  }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android/components/UserAvatar.vue"]]);
-  const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
-    __name: "CustomerModal",
-    props: {
-      visible: { type: Boolean, required: true },
-      customers: { type: Array, required: true },
-      loading: { type: Boolean, required: true }
-    },
-    emits: ["close", "select"],
-    setup(__props, { expose: __expose, emit: __emit }) {
-      __expose();
-      const props = __props;
-      const emit = __emit;
-      const filter = vue.reactive({
-        name: "",
-        phone: "",
-        managerIndex: 0,
-        startDate: "",
-        endDate: ""
-      });
-      const managerOptions = vue.ref(["Thành viên quản lý", "Nguyễn Văn A", "Trần Thị B"]);
-      const onManagerChange = (e) => {
-        filter.managerIndex = e.detail.value;
-      };
-      const resetFilter = () => {
-        filter.name = "";
-        filter.phone = "";
-        filter.managerIndex = 0;
-        filter.startDate = "";
-        filter.endDate = "";
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:128", "Đã đặt lại bộ lọc");
-      };
-      const applyFilter = () => {
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:132", "Thực hiện lọc với:", filter);
-      };
-      const close = () => {
-        emit("close");
-      };
-      const selectCustomer = (item) => {
-        emit("select", item);
-        close();
-      };
-      const formatDate = (timestamp) => {
-        if (!timestamp)
-          return "";
-        const date = new Date(timestamp);
-        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-      };
-      const __returned__ = { props, emit, filter, managerOptions, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
-    return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
-      key: 0,
-      class: "modal-overlay",
-      onClick: vue.withModifiers($setup.close, ["stop"])
-    }, [
-      vue.createElementVNode("view", {
-        class: "modal-content",
-        onClick: _cache[4] || (_cache[4] = vue.withModifiers(() => {
-        }, ["stop"]))
-      }, [
-        vue.createElementVNode("view", { class: "modal-header" }, [
-          vue.createElementVNode("text", { class: "modal-title" }, "Chọn khách hàng"),
-          vue.createElementVNode("text", {
-            class: "close-btn",
-            onClick: $setup.close
-          }, "✕")
-        ]),
-        vue.createElementVNode("view", { class: "filter-section" }, [
-          vue.createElementVNode("view", { class: "f-item" }, [
-            vue.withDirectives(vue.createElementVNode(
-              "input",
-              {
-                class: "f-input",
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.name = $event),
-                placeholder: "Nhập tên khách hàng",
-                "placeholder-class": "ph-style"
-              },
-              null,
-              512
-              /* NEED_PATCH */
-            ), [
-              [vue.vModelText, $setup.filter.name]
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "f-item" }, [
-            vue.withDirectives(vue.createElementVNode(
-              "input",
-              {
-                class: "f-input",
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.phone = $event),
-                type: "number",
-                placeholder: "Nhập số điện thoại",
-                "placeholder-class": "ph-style"
-              },
-              null,
-              512
-              /* NEED_PATCH */
-            ), [
-              [vue.vModelText, $setup.filter.phone]
-            ])
-          ]),
-          vue.createElementVNode("view", { class: "f-item" }, [
-            vue.createElementVNode("picker", {
-              mode: "selector",
-              range: $setup.managerOptions,
-              value: $setup.filter.managerIndex,
-              onChange: $setup.onManagerChange
-            }, [
-              vue.createElementVNode("view", { class: "f-picker-box" }, [
-                vue.createElementVNode(
-                  "text",
-                  {
-                    class: vue.normalizeClass($setup.filter.managerIndex === 0 ? "text-ph" : "text-val")
-                  },
-                  vue.toDisplayString($setup.managerOptions[$setup.filter.managerIndex]),
-                  3
-                  /* TEXT, CLASS */
-                ),
-                vue.createElementVNode("text", { class: "arrow" }, "▼")
-              ])
-            ], 40, ["range", "value"])
-          ]),
-          vue.createElementVNode("view", { class: "f-item" }, [
-            vue.createVNode($setup["DateRangeFilter"], {
-              startDate: $setup.filter.startDate,
-              endDate: $setup.filter.endDate,
-              "onUpdate:startDate": _cache[2] || (_cache[2] = (val) => $setup.filter.startDate = val),
-              "onUpdate:endDate": _cache[3] || (_cache[3] = (val) => $setup.filter.endDate = val)
-            }, null, 8, ["startDate", "endDate"])
-          ]),
-          vue.createElementVNode("view", { class: "f-actions" }, [
-            vue.createElementVNode("button", {
-              class: "btn-reset",
-              onClick: $setup.resetFilter
-            }, "Đặt lại"),
-            vue.createElementVNode("button", {
-              class: "btn-submit",
-              onClick: $setup.applyFilter
-            }, "Lọc")
-          ])
-        ]),
-        $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "loading-state"
-        }, "Đang tải dữ liệu...")) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
-          key: 1,
-          "scroll-y": "",
-          class: "customer-list"
-        }, [
-          (vue.openBlock(true), vue.createElementBlock(
-            vue.Fragment,
-            null,
-            vue.renderList($props.customers, (item, index) => {
-              return vue.openBlock(), vue.createElementBlock("view", {
-                key: item.id,
-                class: "customer-item",
-                onClick: ($event) => $setup.selectCustomer(item)
-              }, [
-                vue.createVNode($setup["UserAvatar"], {
-                  name: item.name,
-                  size: 40,
-                  class: "mr-3"
-                }, null, 8, ["name"]),
-                vue.createElementVNode("view", { class: "info-column" }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "name-text" },
-                    vue.toDisplayString(item.name || "(Không tên)"),
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode(
-                    "text",
-                    { class: "phone-text" },
-                    vue.toDisplayString(item.phone || "Không có SĐT"),
-                    1
-                    /* TEXT */
-                  )
-                ]),
-                vue.createElementVNode("view", { class: "date-column" }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "date-text" },
-                    vue.toDisplayString($setup.formatDate(item.createAt)),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ], 8, ["onClick"]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          )),
-          $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "empty-state"
-          }, "Không có dữ liệu")) : vue.createCommentVNode("v-if", true)
-        ]))
-      ])
-    ])) : vue.createCommentVNode("v-if", true);
-  }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CustomerModal.vue"]]);
+  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoDatePicker.vue"]]);
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
