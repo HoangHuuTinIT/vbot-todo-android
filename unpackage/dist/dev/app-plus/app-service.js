@@ -3860,17 +3860,34 @@ This will fail in production if not fixed.`);
       const emit = __emit;
       const tools = [
         { name: "header", iconText: "H", style: "font-weight:bold", action: "header-menu" },
-        { name: "fontSize", iconText: "A", style: "font-weight:bold; font-size:18px", action: "fontsize-menu" },
+        { name: "fontSize", iconText: "A", style: "font-weight:bold; font-size:16px", action: "fontsize-menu" },
         { name: "bold", iconText: "B", style: "font-weight:900" },
         { name: "italic", iconText: "I", style: "font-style:italic" },
         { name: "underline", iconText: "U", style: "text-decoration:underline" },
+        { name: "color", iconImg: "https://img.icons8.com/ios-filled/50/000000/text-color.png", action: "color-picker" },
+        { name: "backgroundColor", iconImg: "https://img.icons8.com/ios-filled/50/000000/marker-pen.png", action: "bgcolor-picker" },
         { name: "strike", iconText: "S", style: "text-decoration:line-through" },
-        { name: "align", value: "left", iconImg: "https://img.icons8.com/ios/50/666666/align-left.png" },
-        { name: "align", value: "center", iconImg: "https://img.icons8.com/ios/50/666666/align-center.png" },
-        { name: "align", value: "right", iconImg: "https://img.icons8.com/ios/50/666666/align-right.png" },
-        { name: "align", value: "justify", iconImg: "https://img.icons8.com/ios/50/666666/align-justify.png" },
+        { name: "align", iconImg: "https://img.icons8.com/ios/50/666666/align-left.png", action: "align-menu" },
         { name: "list", value: "ordered", iconImg: "https://img.icons8.com/ios/50/666666/numbered-list.png" },
         { name: "list", value: "bullet", iconImg: "https://img.icons8.com/ios/50/666666/list.png" }
+      ];
+      const colorList = [
+        "#000000",
+        "#333333",
+        "#888888",
+        "#aaaaaa",
+        "#e60000",
+        "#ff9900",
+        "#ffff00",
+        "#008a00",
+        "#0066cc",
+        "#880088",
+        "#ffffff",
+        "#facccc",
+        "#ffebcc",
+        "#ffffcc",
+        "#cce8cc",
+        "#cce0f5"
       ];
       const editorId = vue.ref(`editor-${Math.random().toString(36).substr(2, 5)}`);
       const editorCtx = vue.ref(null);
@@ -3879,24 +3896,91 @@ This will fail in production if not fixed.`);
       const isLinkSelected = vue.ref(false);
       const showLinkModal = vue.ref(false);
       const linkUrl = vue.ref("");
+      const showColorModal = vue.ref(false);
+      const colorTab = vue.ref("color");
+      const getDisplayText = (item) => {
+        const formatVal = formats.value[item.name];
+        if (item.action === "header-menu")
+          return formatVal ? `H${formatVal}` : "H";
+        if (item.action === "fontsize-menu") {
+          if (formatVal === "small")
+            return "Sm";
+          if (formatVal === "large")
+            return "Lg";
+          if (formatVal === "huge")
+            return "Hg";
+          return "A";
+        }
+        return item.iconText;
+      };
+      const getDisplayImage = (item) => {
+        if (item.action === "align-menu") {
+          const alignVal = formats.value.align || "left";
+          switch (alignVal) {
+            case "center":
+              return "https://img.icons8.com/ios/50/666666/align-center.png";
+            case "right":
+              return "https://img.icons8.com/ios/50/666666/align-right.png";
+            case "justify":
+              return "https://img.icons8.com/ios/50/666666/align-justify.png";
+            default:
+              return "https://img.icons8.com/ios/50/666666/align-left.png";
+          }
+        }
+        return item.iconImg;
+      };
       const handleToolClick = (item) => {
-        if (item.action === "header-menu") {
-          handleHeaderSetting();
+        if (item.action === "header-menu")
+          return handleHeaderSetting();
+        if (item.action === "fontsize-menu")
+          return handleFontSizeSetting();
+        if (item.action === "align-menu")
+          return handleAlignSetting();
+        if (item.action === "color-picker") {
+          colorTab.value = "color";
+          showColorModal.value = true;
           return;
         }
-        if (item.action === "fontsize-menu") {
-          handleFontSizeSetting();
+        if (item.action === "bgcolor-picker") {
+          colorTab.value = "backgroundColor";
+          showColorModal.value = true;
           return;
         }
         format(item.name, item.value);
       };
+      const applyColor = (color) => {
+        if (color) {
+          format(colorTab.value, color);
+        } else {
+          format(colorTab.value, null);
+        }
+        showColorModal.value = false;
+      };
+      const closeColorModal = () => {
+        showColorModal.value = false;
+      };
+      const isColorSelected = (color) => {
+        return formats.value[colorTab.value] === color;
+      };
+      const handleAlignSetting = () => {
+        const options = ["Căn trái", "Căn giữa", "Căn phải", "Căn đều"];
+        uni.showActionSheet({
+          itemList: options,
+          success: (res) => {
+            const index = res.tapIndex;
+            if (index === 0)
+              format("align", "left");
+            if (index === 1)
+              format("align", "center");
+            if (index === 2)
+              format("align", "right");
+            if (index === 3)
+              format("align", "justify");
+          }
+        });
+      };
       const handleFontSizeSetting = () => {
-        const options = [
-          "Nhỏ",
-          "Bình thường",
-          "Lớn",
-          "Rất lớn"
-        ];
+        const options = ["Nhỏ", "Bình thường", "Lớn", "Rất lớn"];
         uni.showActionSheet({
           itemList: options,
           success: (res) => {
@@ -3931,6 +4015,12 @@ This will fail in production if not fixed.`);
           return !!currentFormat;
         if (item.action === "fontsize-menu")
           return !!currentFormat;
+        if (item.action === "align-menu")
+          return !!currentFormat && currentFormat !== "left";
+        if (item.name === "color")
+          return !!formats.value.color;
+        if (item.name === "backgroundColor")
+          return !!formats.value.backgroundColor;
         if (item.value)
           return currentFormat === item.value;
         return !!currentFormat;
@@ -3944,7 +4034,11 @@ This will fail in production if not fixed.`);
           }
         }).exec();
       };
-      const onInput = (e) => emit("update:modelValue", e.detail.html);
+      const onInput = (e) => {
+        const val = e.detail.html;
+        lastVal.value = val;
+        emit("update:modelValue", val);
+      };
       const onStatusChange = (e) => {
         formats.value = e.detail;
         isLinkSelected.value = !!e.detail.link;
@@ -4007,10 +4101,10 @@ This will fail in production if not fixed.`);
               html: val
             });
           }
+          lastVal.value = val || "";
         }
-        lastVal.value = val || "";
       });
-      const __returned__ = { props, emit, tools, editorId, editorCtx, formats, instance, isLinkSelected, showLinkModal, linkUrl, handleToolClick, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat, lastVal };
+      const __returned__ = { props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, showLinkModal, linkUrl, showColorModal, colorTab, getDisplayText, getDisplayImage, handleToolClick, applyColor, closeColorModal, isColorSelected, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat, lastVal };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4044,14 +4138,14 @@ This will fail in production if not fixed.`);
                   {
                     key: 0,
                     style: vue.normalizeStyle(item.style),
-                    class: "txt-icon"
+                    class: vue.normalizeClass(["txt-icon", { "txt-dynamic": item.action }])
                   },
-                  vue.toDisplayString(item.iconText),
-                  5
-                  /* TEXT, STYLE */
+                  vue.toDisplayString($setup.getDisplayText(item)),
+                  7
+                  /* TEXT, CLASS, STYLE */
                 )) : (vue.openBlock(), vue.createElementBlock("image", {
                   key: 1,
-                  src: item.iconImg,
+                  src: $setup.getDisplayImage(item),
                   class: "img-icon"
                 }, null, 8, ["src"]))
               ], 42, ["onTouchend"]);
@@ -4109,7 +4203,7 @@ This will fail in production if not fixed.`);
       ]),
       $setup.showLinkModal ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
-        class: "link-modal",
+        class: "modal-overlay",
         onClick: _cache[3] || (_cache[3] = ($event) => $setup.showLinkModal = false)
       }, [
         vue.createElementVNode("view", {
@@ -4135,6 +4229,62 @@ This will fail in production if not fixed.`);
               class: "btn-confirm",
               onClick: $setup.confirmLink
             }, "Xác nhận")
+          ])
+        ])
+      ])) : vue.createCommentVNode("v-if", true),
+      $setup.showColorModal ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "modal-overlay",
+        onClick: $setup.closeColorModal
+      }, [
+        vue.createElementVNode("view", {
+          class: "modal-box color-box",
+          onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("view", { class: "color-tabs" }, [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "color" }]),
+                onClick: _cache[4] || (_cache[4] = ($event) => $setup.colorTab = "color")
+              },
+              " Màu chữ ",
+              2
+              /* CLASS */
+            ),
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "backgroundColor" }]),
+                onClick: _cache[5] || (_cache[5] = ($event) => $setup.colorTab = "backgroundColor")
+              },
+              " Màu nền ",
+              2
+              /* CLASS */
+            )
+          ]),
+          vue.createElementVNode("view", { class: "color-grid" }, [
+            vue.createElementVNode("view", {
+              class: "color-circle no-color",
+              onClick: _cache[6] || (_cache[6] = ($event) => $setup.applyColor(""))
+            }, [
+              vue.createElementVNode("text", { class: "x-mark" }, "✕")
+            ]),
+            (vue.openBlock(), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($setup.colorList, (c, idx) => {
+                return vue.createElementVNode("view", {
+                  key: idx,
+                  class: vue.normalizeClass(["color-circle", { selected: $setup.isColorSelected(c) }]),
+                  style: vue.normalizeStyle({ backgroundColor: c }),
+                  onClick: ($event) => $setup.applyColor(c)
+                }, null, 14, ["onClick"]);
+              }),
+              64
+              /* STABLE_FRAGMENT */
+            ))
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true)
