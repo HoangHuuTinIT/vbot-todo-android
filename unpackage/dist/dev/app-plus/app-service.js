@@ -2568,6 +2568,34 @@ This will fail in production if not fixed.`);
       data
     });
   };
+  const uploadTodoFile = (filePath) => {
+    const authStore = useAuthStore();
+    return new Promise((resolve, reject) => {
+      uni.uploadFile({
+        url: `${SERVER_BASE_URL}/api/module-todo/file/upload`,
+        filePath,
+        name: "file",
+        header: {
+          "Authorization": `Bearer ${authStore.todoToken}`
+        },
+        success: (uploadFileRes) => {
+          try {
+            const res = JSON.parse(uploadFileRes.data);
+            if (res.status === 200 && res.data) {
+              resolve(res.data);
+            } else {
+              reject(res.message || "Upload thất bại");
+            }
+          } catch (e) {
+            reject("Lỗi phân tích phản hồi từ server");
+          }
+        },
+        fail: (err) => {
+          reject(err);
+        }
+      });
+    });
+  };
   const getAllMembers = () => {
     const authStore = useAuthStore();
     const { rootToken, projectCode } = authStore;
@@ -3612,7 +3640,7 @@ This will fail in production if not fixed.`);
       transId: DEFAULT_VALUES.TRANS_ID,
       tagCodes: "test1",
       groupMemberUid: "test1",
-      files: DEFAULT_VALUES.STRING,
+      files: config.uploadedFiles || DEFAULT_VALUES.STRING,
       phone: DEFAULT_VALUES.PHONE_PLACEHOLDER,
       dueDate: dateToTimestamp(fullDueDate),
       notificationReceivedAt: dateToTimestamp(fullNotifyDateTime)
@@ -3733,6 +3761,35 @@ This will fail in production if not fixed.`);
       return "";
     });
     const goBack = () => uni.navigateBack();
+    const processDescriptionImages = async (htmlContent) => {
+      if (!htmlContent)
+        return { newContent: "", fileUrls: [] };
+      const imgRegex = /<img[^>]+src="([^">]+)"/g;
+      let match;
+      const promises = [];
+      const replacements = [];
+      const uploadedUrls = [];
+      while ((match = imgRegex.exec(htmlContent)) !== null) {
+        const src = match[1];
+        if (!src.startsWith("http") || src.startsWith("file://") || src.startsWith("blob:")) {
+          const uploadPromise = uploadTodoFile(src).then((serverUrl) => {
+            replacements.push({ oldSrc: src, newSrc: serverUrl });
+            uploadedUrls.push(serverUrl);
+          }).catch((err) => {
+            formatAppLog("error", "at controllers/create_todo.ts:161", `Upload ảnh ${src} lỗi:`, err);
+          });
+          promises.push(uploadPromise);
+        }
+      }
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
+      let newHtml = htmlContent;
+      replacements.forEach((rep) => {
+        newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+      });
+      return { newContent: newHtml, fileUrls: uploadedUrls };
+    };
     const submitForm = async () => {
       if (!form.value.name || !form.value.name.trim()) {
         showInfo("Vui lòng nhập tên công việc");
@@ -3741,24 +3798,29 @@ This will fail in production if not fixed.`);
       let selectedLink = "CALL";
       if (sourceIndex.value >= 0) {
         selectedLink = sourceValues[sourceIndex.value];
-      } else {
-        selectedLink = "CALL";
       }
       loading.value = true;
+      showLoading("Đang xử lý dữ liệu...");
       try {
+        const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+        form.value.desc = newContent;
         const payload = buildCreateTodoPayload(form.value, {
           projectCode: PROJECT_CODE,
           uid: UID,
-          link: selectedLink
+          link: selectedLink,
+          uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
+        formatAppLog("log", "at controllers/create_todo.ts:204", "Payload Submit:", payload);
         await createTodo(payload);
+        hideLoading();
         showSuccess("Tạo thành công!");
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:170", " Create Error:", error);
-        const errorMsg = (error == null ? void 0 : error.message) || "Thất bại";
+        hideLoading();
+        formatAppLog("error", "at controllers/create_todo.ts:214", "Create Error:", error);
+        const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError("Lỗi: " + errorMsg);
       } finally {
         loading.value = false;

@@ -1,6 +1,6 @@
 //controllers/create_todo.ts
 import { ref, onMounted, computed } from 'vue';
-import { createTodo } from '@/api/todo';
+import { createTodo, uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { buildCreateTodoPayload } from '@/models/create_todo';
@@ -8,7 +8,7 @@ import type { TodoForm } from '@/types/todo';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_SOURCE } from '@/utils/enums';
-import { showSuccess, showError, showInfo } from '@/utils/toast';
+import { showSuccess, showError, showInfo,showLoading, hideLoading } from '@/utils/toast';
 export const useCreateTodoController = () => {
 	const authStore = useAuthStore();
 	const pad = (n : number) => n.toString().padStart(2, '0');
@@ -141,39 +141,83 @@ export const useCreateTodoController = () => {
 	});
 
 	const goBack = () => uni.navigateBack();
+const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
+        if (!htmlContent) return { newContent: '', fileUrls: [] };
+        const imgRegex = /<img[^>]+src="([^">]+)"/g;
+        let match;
+        const promises: Promise<any>[] = [];
+        const replacements: { oldSrc: string, newSrc: string }[] = [];
+        const uploadedUrls: string[] = [];
 
+        while ((match = imgRegex.exec(htmlContent)) !== null) {
+            const src = match[1];
+            if (!src.startsWith('http') || src.startsWith('file://') || src.startsWith('blob:')) {
+                 const uploadPromise = uploadTodoFile(src)
+                    .then(serverUrl => {
+                        replacements.push({ oldSrc: src, newSrc: serverUrl });
+                        uploadedUrls.push(serverUrl);
+                    })
+                    .catch(err => {
+                        console.error(`Upload ảnh ${src} lỗi:`, err);
+                    });
+                promises.push(uploadPromise);
+            }
+        }
+
+        if (promises.length > 0) {
+            await Promise.all(promises);
+        }
+
+        let newHtml = htmlContent;
+        replacements.forEach(rep => {
+            newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+        });
+
+        return { newContent: newHtml, fileUrls: uploadedUrls };
+    };
 	const submitForm = async () => {
-		if (!form.value.name || !form.value.name.trim()) {
-			showInfo('Vui lòng nhập tên công việc');
-			return;
-		}
-		let selectedLink = 'CALL';
-		if (sourceIndex.value >= 0) {
-			selectedLink = sourceValues[sourceIndex.value];
-		} else {
-			selectedLink = 'CALL';
-		}
-		loading.value = true;
-
-		try {
-			const payload = buildCreateTodoPayload(form.value, {
-				projectCode: PROJECT_CODE,
-				uid: UID,
-				link: selectedLink
-			});
-			await createTodo(payload);
-
-			showSuccess('Tạo thành công!');
-			setTimeout(() => { uni.navigateBack(); }, 1500);
-
-		} catch (error : any) {
-			console.error(" Create Error:", error);
-			const errorMsg = error?.message || 'Thất bại';
-			showError('Lỗi: ' + errorMsg);
-		} finally {
-			loading.value = false;
-		}
-	};
+	        if (!form.value.name || !form.value.name.trim()) {
+	            showInfo('Vui lòng nhập tên công việc');
+	            return;
+	        }
+	
+	        let selectedLink = 'CALL';
+	        if (sourceIndex.value >= 0) {
+	            selectedLink = sourceValues[sourceIndex.value];
+	        }
+	
+	        loading.value = true;
+	        showLoading('Đang xử lý dữ liệu...'); 
+	
+	        try {
+	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+	            
+	            form.value.desc = newContent; 
+	
+	            const payload = buildCreateTodoPayload(form.value, {
+	                projectCode: PROJECT_CODE,
+	                uid: UID,
+	                link: selectedLink,
+	                uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : '' 
+	            });
+	
+	            console.log("Payload Submit:", payload);
+	
+	            await createTodo(payload);
+	
+	            hideLoading();
+	            showSuccess('Tạo thành công!');
+	            setTimeout(() => { uni.navigateBack(); }, 1500);
+	
+	        } catch (error : any) {
+	            hideLoading();
+	            console.error("Create Error:", error);
+	            const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
+	            showError('Lỗi: ' + errorMsg);
+	        } finally {
+	            loading.value = false;
+	        }
+	    };
 
 	onMounted(() => {
 		fetchMembers();

@@ -1,7 +1,7 @@
 import { request } from '@/utils/request';
 import { mapTodoFromApi } from '@/models/todo';
 import { PROJECT_CODE, TODO_API_URL, SERVER_BASE_URL } from '@/utils/config';
-
+import { useAuthStore } from '@/stores/auth';
 import type { 
     TodoItem, 
     GetTodoParams, 
@@ -133,5 +133,35 @@ export const reactionTodoMessage = (data: ReactionPayload): Promise<number> => {
         url: `${SERVER_BASE_URL}/api/module-todo/todoMessages/reaction`,
         method: 'POST',
         data: data
+    });
+};
+
+export const uploadTodoFile = (filePath: string): Promise<string> => {
+    const authStore = useAuthStore();
+    
+    return new Promise((resolve, reject) => {
+        uni.uploadFile({
+            url: `${SERVER_BASE_URL}/api/module-todo/file/upload`,
+            filePath: filePath,
+            name: 'file',
+            header: {
+                'Authorization': `Bearer ${authStore.todoToken}`, 
+            },
+            success: (uploadFileRes) => {
+                try {
+                    const res = JSON.parse(uploadFileRes.data);
+                    if (res.status === 200 && res.data) {
+                        resolve(res.data);
+                    } else {
+                        reject(res.message || 'Upload thất bại');
+                    }
+                } catch (e) {
+                    reject('Lỗi phân tích phản hồi từ server');
+                }
+            },
+            fail: (err) => {
+                reject(err);
+            }
+        });
     });
 };

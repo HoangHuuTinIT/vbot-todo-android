@@ -10,6 +10,7 @@ const dateToTimestamp = (dateStr: string): number => {
 
 export interface CreateTodoConfig extends AppConfig {
     link?: string; 
+	uploadedFiles?: string;
 }
 export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): CreateTodoPayload => {
     
@@ -18,7 +19,7 @@ export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): Creat
 
     return {
         title: form.name,
-        description: form.desc || DEFAULT_VALUES.STRING, 
+        description: form.desc || DEFAULT_VALUES.STRING,
         
         projectCode: config.projectCode,
         createdBy: config.uid,
@@ -35,7 +36,7 @@ export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): Creat
         
         tagCodes: "test1", 
         groupMemberUid: "test1",
-        files: DEFAULT_VALUES.STRING,
+        files: config.uploadedFiles || DEFAULT_VALUES.STRING,
         phone: DEFAULT_VALUES.PHONE_PLACEHOLDER,
         
         dueDate: dateToTimestamp(fullDueDate),
