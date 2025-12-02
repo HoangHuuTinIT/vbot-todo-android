@@ -61,11 +61,13 @@ export const useListTodoController = () => {
 			console.error('Lỗi lấy danh sách thành viên filter:', error);
 		}
 	};
-	const { 
-	        customerList, 
-	        loadingCustomer, 
-	        fetchCustomers 
-	    } = useCustomerFilter();
+	const {
+		customerList,
+		loadingCustomer,
+		loadingMore,
+		fetchCustomers,
+		loadMoreCustomers
+	} = useCustomerFilter();
 	const fetchData = async () => {
 		isLoading.value = true;
 		try {
@@ -125,22 +127,22 @@ export const useListTodoController = () => {
 		getTodoList();
 	};
 	const openCustomerPopup = () => {
-	        showCustomerModal.value = true;
-	        fetchFilterMembers(); 
-	        
-	        if (customerList.value.length === 0) {
-	             fetchCustomers({}); 
-	        }
-	    };
+		showCustomerModal.value = true;
+		fetchFilterMembers();
+
+		if (customerList.value.length === 0) {
+			fetchCustomers({});
+		}
+	};
 	const onCustomerSelect = (customer : any) => {
 		filter.value.customerCode = customer.uid;
 
 		selectedCustomerName.value = customer.name;
 		showCustomerModal.value = false;
 	};
-	const onFilterCustomerInModal = (filterParams: any) => {
-	        fetchCustomers(filterParams);
-	    };
+	const onFilterCustomerInModal = (filterParams : any) => {
+		fetchCustomers(filterParams);
+	};
 
 
 
@@ -272,7 +274,8 @@ export const useListTodoController = () => {
 
 		pageNo, pageSize, totalCount,
 		onChangePage, onUpdatePageSize,
-		
-		rawMemberList,fetchCustomers,
+
+		rawMemberList, fetchCustomers,
+		loadingMore, loadMoreCustomers,
 	};
 };

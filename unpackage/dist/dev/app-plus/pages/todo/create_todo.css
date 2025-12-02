@@ -501,7 +501,8 @@ to {
 .f-item[data-v-0c007ba7] {
   margin-bottom: 10px;
 }
-.f-input[data-v-0c007ba7], .f-picker-box[data-v-0c007ba7] {
+.f-input[data-v-0c007ba7],
+.f-picker-box[data-v-0c007ba7] {
   background-color: #f8f9fa;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -531,7 +532,8 @@ to {
   gap: 10px;
   margin-top: 5px;
 }
-.btn-reset[data-v-0c007ba7], .btn-submit[data-v-0c007ba7] {
+.btn-reset[data-v-0c007ba7],
+.btn-submit[data-v-0c007ba7] {
   flex: 1;
   height: 38px;
   line-height: 38px;
@@ -551,7 +553,8 @@ to {
   flex: 1;
   height: 1px;
 }
-.loading-state[data-v-0c007ba7], .empty-state[data-v-0c007ba7] {
+.loading-state[data-v-0c007ba7],
+.empty-state[data-v-0c007ba7] {
   text-align: center;
   padding: 30px;
   color: #888;
@@ -595,6 +598,16 @@ to {
   flex-shrink: 0;
 }
 .date-text[data-v-0c007ba7] {
+  font-size: 12px;
+  color: #999;
+}
+.loading-more-container[data-v-0c007ba7] {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loading-more-text[data-v-0c007ba7] {
   font-size: 12px;
   color: #999;
 }

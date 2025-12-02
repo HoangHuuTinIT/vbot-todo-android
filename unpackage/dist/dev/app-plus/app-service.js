@@ -265,9 +265,10 @@ if (uni.restoreGlobal) {
       visible: { type: Boolean, required: true },
       customers: { type: Array, required: true },
       loading: { type: Boolean, required: true },
-      managers: { type: Array, required: true }
+      managers: { type: Array, required: true },
+      loadingMore: { type: Boolean, required: false }
     },
-    emits: ["close", "select", "filter"],
+    emits: ["close", "select", "filter", "loadMore"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
       const props = __props;
@@ -281,6 +282,10 @@ if (uni.restoreGlobal) {
         startDate: "",
         endDate: ""
       });
+      const onScrollToLower = () => {
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:109", "Cuộn xuống đáy -> Load more");
+        emit("loadMore");
+      };
       const managerDisplayOptions = vue.computed(() => {
         const defaultOption = "Thành viên quản lý";
         const list = props.managers || [];
@@ -310,7 +315,7 @@ if (uni.restoreGlobal) {
         filter.startDate = "";
         filter.endDate = "";
         applyFilter();
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:139", "Đã đặt lại bộ lọc");
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:146", "Đã đặt lại bộ lọc");
       };
       const applyFilter = () => {
         emit("filter", {
@@ -335,7 +340,7 @@ if (uni.restoreGlobal) {
         const date = new Date(timestamp);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       };
-      const __returned__ = { props, emit, isFilterExpanded, filter, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
+      const __returned__ = { props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -455,60 +460,74 @@ if (uni.restoreGlobal) {
         $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 1,
           class: "loading-state"
-        }, "Đang tải dữ liệu...")) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
-          key: 2,
-          "scroll-y": "",
-          class: "customer-list"
-        }, [
-          (vue.openBlock(true), vue.createElementBlock(
-            vue.Fragment,
-            null,
-            vue.renderList($props.customers, (item, index) => {
-              return vue.openBlock(), vue.createElementBlock("view", {
-                key: item.id,
-                class: "customer-item",
-                onClick: ($event) => $setup.selectCustomer(item)
-              }, [
-                vue.createVNode($setup["UserAvatar"], {
-                  name: item.name,
-                  size: 40,
-                  class: "mr-3"
-                }, null, 8, ["name"]),
-                vue.createElementVNode("view", { class: "info-column" }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "name-text" },
-                    vue.toDisplayString(item.name || "(Không tên)"),
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode(
-                    "text",
-                    { class: "phone-text" },
-                    vue.toDisplayString(item.phone || "Không có SĐT"),
-                    1
-                    /* TEXT */
-                  )
-                ]),
-                vue.createElementVNode("view", { class: "date-column" }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "date-text" },
-                    vue.toDisplayString($setup.formatDate(item.createAt)),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ], 8, ["onClick"]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          )),
-          $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "empty-state"
-          }, "Không có dữ liệu")) : vue.createCommentVNode("v-if", true)
-        ]))
+        }, "Đang tải dữ liệu...")) : (vue.openBlock(), vue.createElementBlock(
+          "scroll-view",
+          {
+            key: 2,
+            "scroll-y": "",
+            class: "customer-list",
+            onScrolltolower: $setup.onScrollToLower,
+            "lower-threshold": "50"
+          },
+          [
+            (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              null,
+              vue.renderList($props.customers, (item, index) => {
+                return vue.openBlock(), vue.createElementBlock("view", {
+                  key: item.id,
+                  class: "customer-item",
+                  onClick: ($event) => $setup.selectCustomer(item)
+                }, [
+                  vue.createVNode($setup["UserAvatar"], {
+                    name: item.name,
+                    size: 40,
+                    class: "mr-3"
+                  }, null, 8, ["name"]),
+                  vue.createElementVNode("view", { class: "info-column" }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "name-text" },
+                      vue.toDisplayString(item.name || "(Không tên)"),
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode(
+                      "text",
+                      { class: "phone-text" },
+                      vue.toDisplayString(item.phone || "Không có SĐT"),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  vue.createElementVNode("view", { class: "date-column" }, [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "date-text" },
+                      vue.toDisplayString($setup.formatDate(item.createAt)),
+                      1
+                      /* TEXT */
+                    )
+                  ])
+                ], 8, ["onClick"]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            )),
+            $props.loadingMore ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "loading-more-container"
+            }, [
+              vue.createElementVNode("text", { class: "loading-more-text" }, "Đang tải thêm...")
+            ])) : vue.createCommentVNode("v-if", true),
+            $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "empty-state"
+            }, "Không có dữ liệu")) : vue.createCommentVNode("v-if", true)
+          ],
+          32
+          /* NEED_HYDRATION */
+        ))
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
@@ -2745,14 +2764,28 @@ This will fail in production if not fixed.`);
     const authStore = useAuthStore();
     const customerList = vue.ref([]);
     const loadingCustomer = vue.ref(false);
-    const fetchCustomers = async (searchFilter = {}) => {
-      loadingCustomer.value = true;
+    const loadingMore = vue.ref(false);
+    const currentPage = vue.ref(1);
+    const savedFilter = vue.ref({});
+    const isFinished = vue.ref(false);
+    const PAGE_SIZE = 15;
+    const fetchCustomers = async (searchFilter = {}, isLoadMore = false) => {
+      if (isLoadMore) {
+        if (isFinished.value || loadingMore.value)
+          return;
+        loadingMore.value = true;
+        currentPage.value += 1;
+      } else {
+        loadingCustomer.value = true;
+        currentPage.value = 1;
+        customerList.value = [];
+        isFinished.value = false;
+        savedFilter.value = searchFilter;
+      }
       try {
         const token = authStore.crmToken;
-        if (!token) {
-          formatAppLog("error", "at composables/useCustomerFilter.ts:36", "Chưa có CRM Token!");
+        if (!token)
           return;
-        }
         const fields = await getCrmFieldSearch(token);
         const findFieldId = (code, defaultId) => {
           const f = fields.find((item) => item.code === code);
@@ -2762,43 +2795,23 @@ This will fail in production if not fixed.`);
         const nameId = findFieldId("name", 154);
         const phoneId = findFieldId("phone", 155);
         const memberNoId = findFieldId("member_no", 156);
-        const filterName = (searchFilter == null ? void 0 : searchFilter.name) || "";
-        const filterPhone = (searchFilter == null ? void 0 : searchFilter.phone) || "";
-        const filterMemberUID = (searchFilter == null ? void 0 : searchFilter.managerUID) || "";
-        const dateValue = convertDateRangeToValue(searchFilter == null ? void 0 : searchFilter.startDate, searchFilter == null ? void 0 : searchFilter.endDate);
+        const activeFilter = isLoadMore ? savedFilter.value : searchFilter;
+        const filterName = (activeFilter == null ? void 0 : activeFilter.name) || "";
+        const filterPhone = (activeFilter == null ? void 0 : activeFilter.phone) || "";
+        const filterMemberUID = (activeFilter == null ? void 0 : activeFilter.managerUID) || "";
+        const dateValue = convertDateRangeToValue(activeFilter == null ? void 0 : activeFilter.startDate, activeFilter == null ? void 0 : activeFilter.endDate);
         const requestBody = {
-          page: 1,
-          // Mặc định page 1 (có thể mở rộng thêm tham số page nếu cần)
-          size: 20,
+          page: currentPage.value,
+          size: PAGE_SIZE,
           fieldSearch: [
-            {
-              id: createAtId,
-              value: dateValue,
-              type: "RANGER",
-              isSearch: !!dateValue
-            },
-            {
-              id: nameId,
-              value: filterName,
-              type: "CONTAIN",
-              isSearch: !!filterName
-            },
-            {
-              id: phoneId,
-              value: filterPhone,
-              type: "CONTAIN",
-              isSearch: !!filterPhone
-            },
-            {
-              id: memberNoId,
-              value: filterMemberUID,
-              type: "EQUAL",
-              isSearch: !!filterMemberUID
-            }
+            { id: createAtId, value: dateValue, type: "RANGER", isSearch: !!dateValue },
+            { id: nameId, value: filterName, type: "CONTAIN", isSearch: !!filterName },
+            { id: phoneId, value: filterPhone, type: "CONTAIN", isSearch: !!filterPhone },
+            { id: memberNoId, value: filterMemberUID, type: "EQUAL", isSearch: !!filterMemberUID }
           ]
         };
         const rawData = await getCrmCustomers(token, requestBody);
-        customerList.value = rawData.map((item) => {
+        const mappedData = rawData.map((item) => {
           const nameObj = item.customerFieldItems.find((f) => f.code === "name");
           const phoneObj = item.customerFieldItems.find((f) => f.code === "phone");
           return {
@@ -2810,17 +2823,31 @@ This will fail in production if not fixed.`);
             code: item.code || ""
           };
         });
+        if (isLoadMore) {
+          customerList.value = [...customerList.value, ...mappedData];
+        } else {
+          customerList.value = mappedData;
+        }
+        if (mappedData.length < PAGE_SIZE) {
+          isFinished.value = true;
+        }
       } catch (error) {
-        formatAppLog("error", "at composables/useCustomerFilter.ts:111", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at composables/useCustomerFilter.ts:108", "Lỗi tải khách hàng:", error);
         showError("Lỗi tải dữ liệu CRM");
       } finally {
         loadingCustomer.value = false;
+        loadingMore.value = false;
       }
+    };
+    const loadMoreCustomers = () => {
+      fetchCustomers(null, true);
     };
     return {
       customerList,
       loadingCustomer,
-      fetchCustomers
+      loadingMore,
+      fetchCustomers,
+      loadMoreCustomers
     };
   };
   const useListTodoController = () => {
@@ -2880,7 +2907,9 @@ This will fail in production if not fixed.`);
     const {
       customerList,
       loadingCustomer,
-      fetchCustomers
+      loadingMore,
+      fetchCustomers,
+      loadMoreCustomers
     } = useCustomerFilter();
     const fetchData = async () => {
       isLoading.value = true;
@@ -2918,7 +2947,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:111", error);
+        formatAppLog("error", "at controllers/list_todo.ts:113", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -2988,7 +3017,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:185", error);
+        formatAppLog("error", "at controllers/list_todo.ts:187", error);
         showError("Lỗi tải dữ liệu");
         todos.value = [];
       } finally {
@@ -3005,7 +3034,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:201", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:203", "Delete Error:", error);
         showError("Xóa thất bại");
       }
     };
@@ -3117,7 +3146,9 @@ This will fail in production if not fixed.`);
       onChangePage,
       onUpdatePageSize,
       rawMemberList,
-      fetchCustomers
+      fetchCustomers,
+      loadingMore,
+      loadMoreCustomers
     };
   };
   const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
@@ -3552,9 +3583,11 @@ This will fail in production if not fixed.`);
         totalCount,
         onChangePage,
         onUpdatePageSize,
-        rawMemberList
+        rawMemberList,
+        loadingMore,
+        loadMoreCustomers
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3872,12 +3905,14 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["CustomerModal"], {
         visible: $setup.showCustomerModal,
         loading: $setup.loadingCustomer,
+        loadingMore: $setup.loadingMore,
         customers: $setup.customerList,
         managers: $setup.rawMemberList,
         onClose: _cache[18] || (_cache[18] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect,
-        onFilter: $setup.onFilterCustomerInModal
-      }, null, 8, ["visible", "loading", "customers", "managers", "onSelect", "onFilter"]),
+        onFilter: $setup.onFilterCustomerInModal,
+        onLoadMore: $setup.loadMoreCustomers
+      }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
         "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
@@ -3935,7 +3970,9 @@ This will fail in production if not fixed.`);
     const {
       customerList,
       loadingCustomer,
-      fetchCustomers
+      loadingMore,
+      fetchCustomers,
+      loadMoreCustomers
     } = useCustomerFilter();
     const loading = vue.ref(false);
     const form = vue.ref({
@@ -3965,7 +4002,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:61", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:63", "Lỗi lấy thành viên:", error);
         showError("Không thể tải danh sách thành viên");
       }
     };
@@ -4011,7 +4048,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:111", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:113", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -4045,7 +4082,7 @@ This will fail in production if not fixed.`);
           link: selectedLink,
           uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
-        formatAppLog("log", "at controllers/create_todo.ts:154", "Payload Submit:", payload);
+        formatAppLog("log", "at controllers/create_todo.ts:156", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
         showSuccess("Tạo thành công!");
@@ -4054,7 +4091,7 @@ This will fail in production if not fixed.`);
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:164", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:166", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError("Lỗi: " + errorMsg);
       } finally {
@@ -4081,7 +4118,9 @@ This will fail in production if not fixed.`);
       sourceIndex,
       onSourceChange,
       memberList,
-      onCustomerFilter
+      onCustomerFilter,
+      loadingMore,
+      loadMoreCustomers
     };
   };
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
@@ -4662,9 +4701,11 @@ This will fail in production if not fixed.`);
         sourceIndex,
         onSourceChange,
         memberList,
-        onCustomerFilter
+        onCustomerFilter,
+        loadingMore,
+        loadMoreCustomers
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage };
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4721,12 +4762,14 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["CustomerModal"], {
         visible: $setup.showCustomerModal,
         loading: $setup.loadingCustomer,
+        loadingMore: $setup.loadingMore,
         customers: $setup.customerList,
         managers: $setup.memberList,
         onClose: _cache[3] || (_cache[3] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect,
-        onFilter: $setup.onCustomerFilter
-      }, null, 8, ["visible", "loading", "customers", "managers", "onSelect", "onFilter"]),
+        onFilter: $setup.onCustomerFilter,
+        onLoadMore: $setup.loadMoreCustomers
+      }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
       vue.createElementVNode("view", { class: "flat-item" }, [
         vue.createElementVNode("view", { class: "item-left" }, [
           vue.createElementVNode("image", {

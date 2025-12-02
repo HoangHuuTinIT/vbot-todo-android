@@ -7,7 +7,7 @@ import { buildCreateTodoPayload } from '@/models/create_todo';
 import type { TodoForm } from '@/types/todo';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_SOURCE } from '@/utils/enums';
-import { showSuccess, showError, showInfo,showLoading, hideLoading } from '@/utils/toast';
+import { showSuccess, showError, showInfo, showLoading, hideLoading } from '@/utils/toast';
 import { useCustomerFilter } from '@/composables/useCustomerFilter';
 
 
@@ -22,11 +22,13 @@ export const useCreateTodoController = () => {
 		const d = new Date();
 		return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 	};
-const { 
-        customerList, 
-        loadingCustomer, 
-        fetchCustomers 
-    } = useCustomerFilter();
+	const {
+		customerList,
+		loadingCustomer,
+		loadingMore,
+		fetchCustomers,
+		loadMoreCustomers
+	} = useCustomerFilter();
 	const loading = ref<boolean>(false);
 
 	const form = ref<TodoForm>({
@@ -63,17 +65,17 @@ const {
 		}
 	};
 	const openCustomerPopup = () => {
-	        showCustomerModal.value = true;
-	        fetchCustomers({}); 
-	    };
-const onCustomerFilter = (filterParams: any) => {
-        fetchCustomers(filterParams); 
-    };
-	const onCustomerSelect = (customer: any) => {
-	        form.value.customer = `${customer.name} - ${customer.phone}`;
-	        form.value.customerUid = customer.uid;
-	        showCustomerModal.value = false; 
-	    };
+		showCustomerModal.value = true;
+		fetchCustomers({});
+	};
+	const onCustomerFilter = (filterParams : any) => {
+		fetchCustomers(filterParams);
+	};
+	const onCustomerSelect = (customer : any) => {
+		form.value.customer = `${customer.name} - ${customer.phone}`;
+		form.value.customerUid = customer.uid;
+		showCustomerModal.value = false;
+	};
 	const onMemberChange = (e : any) => {
 		const index = e.detail.value;
 		selectedMemberIndex.value = index;
@@ -91,83 +93,83 @@ const onCustomerFilter = (filterParams: any) => {
 	});
 
 	const goBack = () => uni.navigateBack();
-const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
-        if (!htmlContent) return { newContent: '', fileUrls: [] };
-        const imgRegex = /<img[^>]+src="([^">]+)"/g;
-        let match;
-        const promises: Promise<any>[] = [];
-        const replacements: { oldSrc: string, newSrc: string }[] = [];
-        const uploadedUrls: string[] = [];
+	const processDescriptionImages = async (htmlContent : string) : Promise<{ newContent : string, fileUrls : string[] }> => {
+		if (!htmlContent) return { newContent: '', fileUrls: [] };
+		const imgRegex = /<img[^>]+src="([^">]+)"/g;
+		let match;
+		const promises : Promise<any>[] = [];
+		const replacements : { oldSrc : string, newSrc : string }[] = [];
+		const uploadedUrls : string[] = [];
 
-        while ((match = imgRegex.exec(htmlContent)) !== null) {
-            const src = match[1];
-            if (!src.startsWith('http') || src.startsWith('file://') || src.startsWith('blob:')) {
-                 const uploadPromise = uploadTodoFile(src)
-                    .then(serverUrl => {
-                        replacements.push({ oldSrc: src, newSrc: serverUrl });
-                        uploadedUrls.push(serverUrl);
-                    })
-                    .catch(err => {
-                        console.error(`Upload ảnh ${src} lỗi:`, err);
-                    });
-                promises.push(uploadPromise);
-            }
-        }
+		while ((match = imgRegex.exec(htmlContent)) !== null) {
+			const src = match[1];
+			if (!src.startsWith('http') || src.startsWith('file://') || src.startsWith('blob:')) {
+				const uploadPromise = uploadTodoFile(src)
+					.then(serverUrl => {
+						replacements.push({ oldSrc: src, newSrc: serverUrl });
+						uploadedUrls.push(serverUrl);
+					})
+					.catch(err => {
+						console.error(`Upload ảnh ${src} lỗi:`, err);
+					});
+				promises.push(uploadPromise);
+			}
+		}
 
-        if (promises.length > 0) {
-            await Promise.all(promises);
-        }
+		if (promises.length > 0) {
+			await Promise.all(promises);
+		}
 
-        let newHtml = htmlContent;
-        replacements.forEach(rep => {
-            newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
-        });
+		let newHtml = htmlContent;
+		replacements.forEach(rep => {
+			newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+		});
 
-        return { newContent: newHtml, fileUrls: uploadedUrls };
-    };
+		return { newContent: newHtml, fileUrls: uploadedUrls };
+	};
 	const submitForm = async () => {
-	        if (!form.value.name || !form.value.name.trim()) {
-	            showInfo('Vui lòng nhập tên công việc');
-	            return;
-	        }
-	
-	        let selectedLink = 'CALL';
-	        if (sourceIndex.value >= 0) {
-	            selectedLink = sourceValues[sourceIndex.value];
-	        }
-	
-	        loading.value = true;
-	        showLoading('Đang xử lý dữ liệu...'); 
-	
-	        try {
-	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
-	            
-	            form.value.desc = newContent; 
-	
-	            const payload = buildCreateTodoPayload(form.value, {
-	                projectCode: PROJECT_CODE,
-	                uid: UID,
-	                link: selectedLink,
-	                uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : '' 
-	            });
-	
-	            console.log("Payload Submit:", payload);
-	
-	            await createTodo(payload);
-	
-	            hideLoading();
-	            showSuccess('Tạo thành công!');
-	            setTimeout(() => { uni.navigateBack(); }, 1500);
-	
-	        } catch (error : any) {
-	            hideLoading();
-	            console.error("Create Error:", error);
-	            const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
-	            showError('Lỗi: ' + errorMsg);
-	        } finally {
-	            loading.value = false;
-	        }
-	    };
+		if (!form.value.name || !form.value.name.trim()) {
+			showInfo('Vui lòng nhập tên công việc');
+			return;
+		}
+
+		let selectedLink = 'CALL';
+		if (sourceIndex.value >= 0) {
+			selectedLink = sourceValues[sourceIndex.value];
+		}
+
+		loading.value = true;
+		showLoading('Đang xử lý dữ liệu...');
+
+		try {
+			const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+
+			form.value.desc = newContent;
+
+			const payload = buildCreateTodoPayload(form.value, {
+				projectCode: PROJECT_CODE,
+				uid: UID,
+				link: selectedLink,
+				uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ''
+			});
+
+			console.log("Payload Submit:", payload);
+
+			await createTodo(payload);
+
+			hideLoading();
+			showSuccess('Tạo thành công!');
+			setTimeout(() => { uni.navigateBack(); }, 1500);
+
+		} catch (error : any) {
+			hideLoading();
+			console.error("Create Error:", error);
+			const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
+			showError('Lỗi: ' + errorMsg);
+		} finally {
+			loading.value = false;
+		}
+	};
 
 	onMounted(() => {
 		fetchMembers();
@@ -184,5 +186,7 @@ const processDescriptionImages = async (htmlContent: string): Promise<{ newConte
 		onSourceChange,
 		memberList,
 		onCustomerFilter,
+		loadingMore,
+		loadMoreCustomers,
 	};
 };

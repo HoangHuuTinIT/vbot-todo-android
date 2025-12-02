@@ -3,121 +3,125 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { showError } from '@/utils/toast';
-const convertDateRangeToValue = (startDate: string, endDate: string): string => {
-    if (!startDate && !endDate) return "";
-    let startTs = "";
-    let endTs = "";
-    if (startDate) {
-        const d = new Date(startDate);
-        d.setHours(0, 0, 0, 0);
-        startTs = d.getTime().toString();
-    }
-    if (endDate) {
-        const d = new Date(endDate);
-        d.setHours(0, 0, 0, 0);
-        endTs = d.getTime().toString();
-    }
-    if (!startTs && !endTs) return "";
-    return `${startTs}|${endTs}`;
+
+const convertDateRangeToValue = (startDate : string, endDate : string) : string => {
+	if (!startDate && !endDate) return "";
+	let startTs = "";
+	let endTs = "";
+	if (startDate) {
+		const d = new Date(startDate);
+		d.setHours(0, 0, 0, 0);
+		startTs = d.getTime().toString();
+	}
+	if (endDate) {
+		const d = new Date(endDate);
+		d.setHours(0, 0, 0, 0);
+		endTs = d.getTime().toString();
+	}
+	if (!startTs && !endTs) return "";
+	return `${startTs}|${endTs}`;
 };
 
 export const useCustomerFilter = () => {
-    const authStore = useAuthStore();
-    const customerList = ref<any[]>([]);
-    const loadingCustomer = ref(false);
+	const authStore = useAuthStore();
+	const customerList = ref<any[]>([]);
+	const loadingCustomer = ref(false);
+	const loadingMore = ref(false);
 
-    const fetchCustomers = async (searchFilter: any = {}) => {
-        // searchFilter: { name, phone, managerUID, startDate, endDate }
-        loadingCustomer.value = true;
-        
-        try {
-            const token = authStore.crmToken;
-            if (!token) {
-                console.error("Chưa có CRM Token!");
-                return;
-            }
+	const currentPage = ref(1);
+	const savedFilter = ref<any>({});
+	const isFinished = ref(false);
 
-            // 1. Lấy danh sách Field ID
-            const fields = await getCrmFieldSearch(token);
-            
-            // Helper tìm field
-            const findFieldId = (code: string, defaultId: number) => {
-                const f = fields.find((item: any) => item.code === code);
-                return f ? f.id : defaultId;
-            };
+	const PAGE_SIZE = 15;
 
-            const createAtId = findFieldId('create_at', -1);
-            const nameId = findFieldId('name', 154);
-            const phoneId = findFieldId('phone', 155);
-            const memberNoId = findFieldId('member_no', 156);
+	const fetchCustomers = async (searchFilter : any = {}, isLoadMore = false) => {
+		if (isLoadMore) {
+			if (isFinished.value || loadingMore.value) return;
+			loadingMore.value = true;
+			currentPage.value += 1;
+		} else {
+			loadingCustomer.value = true;
+			currentPage.value = 1;
+			customerList.value = [];
+			isFinished.value = false;
+			savedFilter.value = searchFilter;
+		}
 
-            // 2. Chuẩn bị giá trị lọc
-            const filterName = searchFilter?.name || "";
-            const filterPhone = searchFilter?.phone || "";
-            const filterMemberUID = searchFilter?.managerUID || "";
-            const dateValue = convertDateRangeToValue(searchFilter?.startDate, searchFilter?.endDate);
+		try {
+			const token = authStore.crmToken;
+			if (!token) return;
 
-            // 3. Build Request Body
-            const requestBody = {
-                page: 1, // Mặc định page 1 (có thể mở rộng thêm tham số page nếu cần)
-                size: 20,
-                fieldSearch: [
-                    { 
-                        id: createAtId, 
-                        value: dateValue, 
-                        type: "RANGER", 
-                        isSearch: !!dateValue 
-                    },
-                    { 
-                        id: nameId, 
-                        value: filterName, 
-                        type: "CONTAIN", 
-                        isSearch: !!filterName 
-                    },
-                    { 
-                        id: phoneId, 
-                        value: filterPhone, 
-                        type: "CONTAIN", 
-                        isSearch: !!filterPhone 
-                    },
-                    { 
-                        id: memberNoId, 
-                        value: filterMemberUID, 
-                        type: "EQUAL", 
-                        isSearch: !!filterMemberUID 
-                    }
-                ]
-            };
+			const fields = await getCrmFieldSearch(token);
+			const findFieldId = (code : string, defaultId : number) => {
+				const f = fields.find((item : any) => item.code === code);
+				return f ? f.id : defaultId;
+			};
+			const createAtId = findFieldId('create_at', -1);
+			const nameId = findFieldId('name', 154);
+			const phoneId = findFieldId('phone', 155);
+			const memberNoId = findFieldId('member_no', 156);
 
-            // 4. Gọi API
-            const rawData = await getCrmCustomers(token, requestBody);
+			const activeFilter = isLoadMore ? savedFilter.value : searchFilter;
 
-            // 5. Map dữ liệu trả về
-            customerList.value = rawData.map((item: any) => {
-                const nameObj = item.customerFieldItems.find((f: any) => f.code === 'name');
-                const phoneObj = item.customerFieldItems.find((f: any) => f.code === 'phone');
+			const filterName = activeFilter?.name || "";
+			const filterPhone = activeFilter?.phone || "";
+			const filterMemberUID = activeFilter?.managerUID || "";
+			const dateValue = convertDateRangeToValue(activeFilter?.startDate, activeFilter?.endDate);
 
-                return {
-                    id: item.id,
-                    uid: item.uid,
-                    createAt: item.createAt,
-                    name: nameObj ? nameObj.value : '(Không tên)',
-                    phone: phoneObj ? phoneObj.value : '',
-                    code: item.code || ''
-                };
-            });
+			const requestBody = {
+				page: currentPage.value,
+				size: PAGE_SIZE,
+				fieldSearch: [
+					{ id: createAtId, value: dateValue, type: "RANGER", isSearch: !!dateValue },
+					{ id: nameId, value: filterName, type: "CONTAIN", isSearch: !!filterName },
+					{ id: phoneId, value: filterPhone, type: "CONTAIN", isSearch: !!filterPhone },
+					{ id: memberNoId, value: filterMemberUID, type: "EQUAL", isSearch: !!filterMemberUID }
+				]
+			};
 
-        } catch (error) {
-            console.error('Lỗi tải khách hàng:', error);
-            showError('Lỗi tải dữ liệu CRM');
-        } finally {
-            loadingCustomer.value = false;
-        }
-    };
+			const rawData = await getCrmCustomers(token, requestBody);
 
-    return {
-        customerList,
-        loadingCustomer,
-        fetchCustomers
-    };
+			const mappedData = rawData.map((item : any) => {
+				const nameObj = item.customerFieldItems.find((f : any) => f.code === 'name');
+				const phoneObj = item.customerFieldItems.find((f : any) => f.code === 'phone');
+				return {
+					id: item.id,
+					uid: item.uid,
+					createAt: item.createAt,
+					name: nameObj ? nameObj.value : '(Không tên)',
+					phone: phoneObj ? phoneObj.value : '',
+					code: item.code || ''
+				};
+			});
+
+			if (isLoadMore) {
+				customerList.value = [...customerList.value, ...mappedData];
+			} else {
+				customerList.value = mappedData;
+			}
+
+			if (mappedData.length < PAGE_SIZE) {
+				isFinished.value = true;
+			}
+
+		} catch (error) {
+			console.error('Lỗi tải khách hàng:', error);
+			showError('Lỗi tải dữ liệu CRM');
+		} finally {
+			loadingCustomer.value = false;
+			loadingMore.value = false;
+		}
+	};
+
+	const loadMoreCustomers = () => {
+		fetchCustomers(null, true);
+	};
+
+	return {
+		customerList,
+		loadingCustomer,
+		loadingMore,
+		fetchCustomers,
+		loadMoreCustomers
+	};
 };
