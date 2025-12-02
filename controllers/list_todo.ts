@@ -1,5 +1,5 @@
 //controllers/list_todo.ts
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
@@ -10,16 +10,22 @@ import { TODO_SOURCE } from '@/utils/enums';
 import type { TodoItem } from '@/types/todo';
 import { getAllMembers } from '@/api/project';
 import { showSuccess, showError } from '@/utils/toast';
+import { usePagination } from '@/composables/usePagination';
 export const useListTodoController = () => {
 	const todos = ref<TodoItem[]>([]);
+	const {
+		pageNo, pageSize, totalCount, pageSizeOptions,
+		resetPage, setTotal, changePage, changePageSize
+	} = usePagination(15);
 	const isLoading = ref<boolean>(false);
 	const isFilterOpen = ref<boolean>(false);
 	const authStore = useAuthStore();
-	
+
 	const showCustomerModal = ref(false);
 	const loadingCustomer = ref(false);
 	const customerList = ref<any[]>([]);
 	const selectedCustomerName = ref('');
+
 	const isConfirmDeleteOpen = ref<boolean>(false);
 	const itemToDelete = ref<TodoItem | null>(null);
 
@@ -46,157 +52,186 @@ export const useListTodoController = () => {
 		customerCode: '',
 		notifyFrom: '', notifyTo: '',
 	});
-	const pageSizeOptions = ['5/trang', '10/trang', '15/trang', '20/trang'];
-	const pageSizeValues = [5, 10, 15, 20];
-	const pageSizeIndex = ref(2);
-	const currentPage = ref(1);
-	const totalItems = ref(0);
-
-	const totalPages = computed(() => {
-		if (totalItems.value === 0) return 1;
-		const size = pageSizeValues[pageSizeIndex.value];
-		return Math.ceil(totalItems.value / size);
-	});
 	const fetchFilterMembers = async () => {
 		if (rawMemberList.value.length > 0) return;
-
 		try {
 			const data = await getAllMembers();
 			rawMemberList.value = data;
 			const names = data.map(m => m.UserName || 'Thành viên ẩn');
 			creatorOptions.value = ['Tất cả', ...names];
 			assigneeOptions.value = ['Tất cả', ...names];
-
 		} catch (error) {
 			console.error('Lỗi lấy danh sách thành viên filter:', error);
 		}
 	};
-	const getTodoList = async () => {
-	        isLoading.value = true;
-	        try {
-	            let selectedCreatorId = '';
-	            if (creatorIndex.value > 0) {
-	                const member = rawMemberList.value[creatorIndex.value - 1];
-	                selectedCreatorId = member.UID || ''; 
-	            }
+	const fetchData = async () => {
+		isLoading.value = true;
+		try {
+			const params = {
+				...filter.value,
+				pageNo: pageNo.value,
+				pageSize: pageSize.value
+			};
 
-	            let selectedAssigneeId = '';
-	            if (assigneeIndex.value > 0) {
-	                const member = rawMemberList.value[assigneeIndex.value - 1];
-	                selectedAssigneeId = member.UID || ''; 
-	            }
-	
-	            const filterParams = buildTodoParams(
-	                filter.value,
-	                statusValues[statusIndex.value],
-	                sourceValues[sourceIndex.value],
-	                selectedCreatorId,
-	                selectedAssigneeId
-	            );
-	
-	            const currentSize = pageSizeValues[pageSizeIndex.value];
-	
-	            const [listData, countData] = await Promise.all([
-	                getTodos({
-	                    ...filterParams,
-	                    pageNo: currentPage.value,
-	                    pageSize: currentSize
-	                }),
-	                getTodoCount(filterParams)
-	            ]);
-	
-	            todos.value = listData || [];
-	            totalItems.value = countData || 0;
-	        } catch (error) {
-	            console.error(error);
-	            showError('Lỗi tải dữ liệu');
-	        } finally {
-	            isLoading.value = false;
-	        }
-	    };
-const fetchCustomers = async (searchFilter: any = null) => {
-        loadingCustomer.value = true;
-        try {
-            const token = authStore.crmToken;
-            if (!token) {
-                console.error("Chưa có CRM Token!");
-                return;
-            }
+			let selectedCreatorId = '';
+			if (creatorIndex.value > 0) {
+				const member = rawMemberList.value[creatorIndex.value - 1];
+				selectedCreatorId = member.UID || '';
+			}
 
-            const fields = await getCrmFieldSearch(token);
-            const nameField = fields.find((f: any) => f.code === 'name');
-            const phoneField = fields.find((f: any) => f.code === 'phone');
-            const memberNoField = fields.find((f: any) => f.code === 'member_no');
+			let selectedAssigneeId = '';
+			if (assigneeIndex.value > 0) {
+				const member = rawMemberList.value[assigneeIndex.value - 1];
+				selectedAssigneeId = member.UID || '';
+			}
 
-            const nameId = nameField ? nameField.id : 134;
-            const phoneId = phoneField ? phoneField.id : 135;
-            const memberNoId = memberNoField ? memberNoField.id : 136;
+			const filterParams = buildTodoParams(
+				filter.value,
+				statusValues[statusIndex.value],
+				sourceValues[sourceIndex.value],
+				selectedCreatorId,
+				selectedAssigneeId
+			);
 
-            const requestBody = {
-                page: 1,
-                size: 20,
-                fieldSearch: [
-                    { id: -1, value: "", type: "", isSearch: false },
-                    { id: nameId, value: searchFilter?.name || "", type: "", isSearch: !!searchFilter?.name },
-                    { id: phoneId, value: searchFilter?.phone || "", type: "", isSearch: !!searchFilter?.phone },
-                    { id: memberNoId, value: "", type: "", isSearch: false }
-                ]
-            };
+			const [listData, countData] = await Promise.all([
+				getTodos({
+					...filterParams,
+					pageNo: pageNo.value,
+					pageSize: pageSize.value
+				}),
+				getTodoCount(filterParams)
+			]);
 
-            const rawData = await getCrmCustomers(token, requestBody);
-            
-            customerList.value = rawData.map((item: any) => {
-                const nameObj = item.customerFieldItems.find((f: any) => f.code === 'name');
-                const phoneObj = item.customerFieldItems.find((f: any) => f.code === 'phone');
-                return {
-                    id: item.id,
-                    uid: item.uid, 
-                    createAt: item.createAt,
-                    name: nameObj ? nameObj.value : '(Không tên)',
-                    phone: phoneObj ? phoneObj.value : '',
-                    code: item.code || ''
-                };
-            });
+			todos.value = listData || [];
+			setTotal(countData || 0);
 
-        } catch (error) {
-            console.error('Lỗi tải khách hàng:', error);
-            showError('Lỗi tải dữ liệu CRM');
-        } finally {
-            loadingCustomer.value = false;
-        }
-    };
-	const openCustomerPopup = () => {
-	        showCustomerModal.value = true;
-	        if (customerList.value.length === 0) {
-	            fetchCustomers();
-	        }
-	    };
-		const onCustomerSelect = (customer: any) => {
-		        filter.value.customerCode = customer.uid; 
-		        
-		        selectedCustomerName.value = customer.name;
-		        showCustomerModal.value = false; 
-		    };
-		const onFilterCustomerInModal = (filterParams: any) => {
-		        fetchCustomers(filterParams);
-		    };
-	const onPageSizeChange = (e : any) => {
-		pageSizeIndex.value = e.detail.value;
-		currentPage.value = 1;
-		getTodoList();
+		} catch (error) {
+			console.error(error);
+			showError('Lỗi tải dữ liệu');
+		} finally {
+			isLoading.value = false;
+		}
 	};
-
-	const changePage = (direction : number) => {
-		const newPage = currentPage.value + direction;
-		if (newPage >= 1 && newPage <= totalPages.value) {
-			currentPage.value = newPage;
+	const onChangePage = (step : number) => {
+		const changed = changePage(step);
+		if (changed) {
 			getTodoList();
 		}
 	};
+	const onUpdatePageSize = (newSize : number) => {
+		changePageSize(newSize);
+		getTodoList();
+	};
+	const fetchCustomers = async (searchFilter : any = null) => {
+		loadingCustomer.value = true;
+		try {
+			const token = authStore.crmToken;
+			if (!token) return;
+
+			const fields = await getCrmFieldSearch(token);
+			const nameField = fields.find((f : any) => f.code === 'name');
+			const phoneField = fields.find((f : any) => f.code === 'phone');
+			const memberNoField = fields.find((f : any) => f.code === 'member_no');
+
+			const nameId = nameField ? nameField.id : 134;
+			const phoneId = phoneField ? phoneField.id : 135;
+			const memberNoId = memberNoField ? memberNoField.id : 136;
+
+			const requestBody = {
+				page: 1,
+				size: 20,
+				fieldSearch: [
+					{ id: -1, value: "", type: "", isSearch: false },
+					{ id: nameId, value: searchFilter?.name || "", type: "", isSearch: !!searchFilter?.name },
+					{ id: phoneId, value: searchFilter?.phone || "", type: "", isSearch: !!searchFilter?.phone },
+					{ id: memberNoId, value: "", type: "", isSearch: false }
+				]
+			};
+
+			const rawData = await getCrmCustomers(token, requestBody);
+
+			customerList.value = rawData.map((item : any) => {
+				const nameObj = item.customerFieldItems.find((f : any) => f.code === 'name');
+				const phoneObj = item.customerFieldItems.find((f : any) => f.code === 'phone');
+				return {
+					id: item.id,
+					uid: item.uid,
+					createAt: item.createAt,
+					name: nameObj ? nameObj.value : '(Không tên)',
+					phone: phoneObj ? phoneObj.value : '',
+					code: item.code || ''
+				};
+			});
+
+		} catch (error) {
+			console.error('Lỗi tải khách hàng:', error);
+		} finally {
+			loadingCustomer.value = false;
+		}
+	};
+	const openCustomerPopup = () => {
+		showCustomerModal.value = true;
+		if (customerList.value.length === 0) {
+			fetchCustomers();
+		}
+	};
+	const onCustomerSelect = (customer : any) => {
+		filter.value.customerCode = customer.uid;
+
+		selectedCustomerName.value = customer.name;
+		showCustomerModal.value = false;
+	};
+	const onFilterCustomerInModal = (filterParams : any) => {
+		fetchCustomers(filterParams);
+	};
+
+
 
 	const onRequestDelete = (item : TodoItem) => { itemToDelete.value = item; isConfirmDeleteOpen.value = true; };
 	const cancelDelete = () => { isConfirmDeleteOpen.value = false; itemToDelete.value = null; };
+	const getTodoList = async () => {
+		isLoading.value = true;
+		try {
+			let selectedCreatorId = '';
+			if (creatorIndex.value > 0) {
+				const member = rawMemberList.value[creatorIndex.value - 1];
+				selectedCreatorId = member.UID || '';
+			}
 
+			let selectedAssigneeId = '';
+			if (assigneeIndex.value > 0) {
+				const member = rawMemberList.value[assigneeIndex.value - 1];
+				selectedAssigneeId = member.UID || '';
+			}
+
+			const filterParams = buildTodoParams(
+				filter.value,
+				statusValues[statusIndex.value],
+				sourceValues[sourceIndex.value],
+				selectedCreatorId,
+				selectedAssigneeId
+			);
+
+			const [listData, countData] = await Promise.all([
+				getTodos({
+					...filterParams,
+					pageNo: pageNo.value,
+					pageSize: pageSize.value
+				}),
+				getTodoCount(filterParams)
+			]);
+
+			todos.value = listData || [];
+			setTotal(countData || 0);
+
+		} catch (error) {
+			console.error(error);
+			showError('Lỗi tải dữ liệu');
+			todos.value = [];
+		} finally {
+			isLoading.value = false;
+		}
+	};
 	const confirmDelete = async () => {
 		if (!itemToDelete.value) return;
 		try {
@@ -243,21 +278,23 @@ const fetchCustomers = async (searchFilter: any = null) => {
 		};
 		statusIndex.value = 0;
 		creatorIndex.value = 0;
-		customerIndex.value = 0;
 		assigneeIndex.value = 0;
 		sourceIndex.value = 0;
-		currentPage.value = 1;
 		selectedCustomerName.value = '';
-		
+		resetPage();
 	};
 
 	const applyFilter = () => {
-		currentPage.value = 1;
+		resetPage();
+		fetchData();
 		closeFilter();
-		getTodoList();
 	};
+	onMounted(() => {
+		getTodoList();
+	});
+	onShow(() => {
 
-	onShow(() => { getTodoList(); });
+	});
 	const goToDetail = (item : TodoItem) => {
 		uni.navigateTo({
 			url: `/pages/todo/todo_detail?id=${item.id}`
@@ -266,7 +303,7 @@ const fetchCustomers = async (searchFilter: any = null) => {
 	return {
 		todos, isLoading, isFilterOpen, filter, goToDetail,
 		isConfirmDeleteOpen, itemToDelete,
-		pageSizeOptions, pageSizeIndex, currentPage, totalPages, totalItems, onPageSizeChange, changePage,
+		pageSizeOptions,
 		statusOptions, statusIndex, onStatusChange,
 		creatorOptions, creatorIndex, onCreatorChange,
 		assigneeOptions, assigneeIndex, onAssigneeChange,
@@ -274,7 +311,9 @@ const fetchCustomers = async (searchFilter: any = null) => {
 		addNewTask, openFilter, closeFilter, resetFilter, applyFilter,
 		showActionMenu, cancelDelete, confirmDelete,
 		showCustomerModal, loadingCustomer, customerList, selectedCustomerName,
-		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, 
-	
+		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal,
+
+		pageNo, pageSize, totalCount,
+		onChangePage, onUpdatePageSize,
 	};
 };

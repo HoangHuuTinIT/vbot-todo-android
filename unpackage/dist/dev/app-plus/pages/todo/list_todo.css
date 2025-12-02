@@ -589,6 +589,98 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.pagination-footer[data-v-813f2b74] {
+  flex-shrink: 0;
+  background-color: #fff;
+  padding: 10px 15px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #eee;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.page-size-selector[data-v-813f2b74] {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: #f9f9f9;
+}
+.size-text[data-v-813f2b74] {
+  font-size: 12px;
+  color: #333;
+  margin-right: 4px;
+}
+.dropdown-arrow[data-v-813f2b74] {
+  font-size: 10px;
+  color: #666;
+}
+.total-text[data-v-813f2b74] {
+  font-size: 12px;
+  color: #999;
+  margin: 0 5px;
+}
+.pagination-controls[data-v-813f2b74] {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.page-arrow[data-v-813f2b74] {
+  font-size: 18px;
+  color: #666;
+  padding: 0 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.page-arrow.disabled[data-v-813f2b74] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+.page-box[data-v-813f2b74] {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #333;
+}
+.page-box.active[data-v-813f2b74] {
+  background-color: #2dce89;
+  color: #fff;
+  border-color: #2dce89;
+  font-weight: bold;
+}
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
 .container[data-v-1b4e60ea] {
   display: flex;
   flex-direction: column;
@@ -947,4 +1039,11 @@ to {
 }
 .modal-btn[data-v-1b4e60ea]:active {
   background-color: #f9f9f9;
+}
+.add-task-simple[data-v-1b4e60ea] {
+  display: flex;
+  align-items: center;
+  color: #007aff;
+  padding: 5px 0;
+  margin-left: 10px;
 }

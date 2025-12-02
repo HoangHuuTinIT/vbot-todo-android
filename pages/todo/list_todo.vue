@@ -46,26 +46,15 @@
 				</scroll-view>
 			</view>
 
-			<view class="fixed-footer">
-				<picker mode="selector" :range="pageSizeOptions" :value="pageSizeIndex" @change="onPageSizeChange">
-					<view class="page-size-selector">
-						<text class="size-text">{{ pageSizeOptions[pageSizeIndex] }}</text>
-						<text class="dropdown-arrow">▼</text>
+			<Pagination :pageNo="pageNo" :pageSize="pageSize" :total="totalCount" :pageSizeOptions="pageSizeOptions"
+				@changePage="onChangePage" @update:pageSize="onUpdatePageSize">
+				<template #action>
+					<view class="add-task-simple" @click="addNewTask">
+						<text class="plus-icon">+</text>
+						<text class="add-text">Thêm công việc</text>
 					</view>
-				</picker>
-
-				<view class="pagination-controls">
-					<view class="page-arrow" :class="{ 'disabled': currentPage <= 1 }" @click="changePage(-1)">‹</view>
-					<view class="page-box active">{{ currentPage }}</view>
-					<view class="page-arrow" :class="{ 'disabled': currentPage >= totalPages }" @click="changePage(1)">›
-					</view>
-				</view>
-
-				<view class="add-task-simple" @click="addNewTask">
-					<text class="plus-icon">+</text>
-					<text class="add-text">Thêm công việc</text>
-				</view>
-			</view>
+				</template>
+			</Pagination>
 		</view>
 
 		<view class="filter-overlay" v-if="isFilterOpen" @click.stop="closeFilter">
@@ -100,14 +89,14 @@
 					</view>
 
 					<view class="f-group">
-					                        <text class="f-label">Khách hàng</text>
-					                        <view class="f-input" @click="openCustomerPopup" style="justify-content: space-between;">
-					                            <text :style="{ color: selectedCustomerName ? '#333' : '#999' }">
-					                                {{ selectedCustomerName || 'Chọn khách hàng' }}
-					                            </text>
-					                            <text class="arrow">›</text>
-					                        </view>
-					                    </view>
+						<text class="f-label">Khách hàng</text>
+						<view class="f-input" @click="openCustomerPopup" style="justify-content: space-between;">
+							<text :style="{ color: selectedCustomerName ? '#333' : '#999' }">
+								{{ selectedCustomerName || 'Chọn khách hàng' }}
+							</text>
+							<text class="arrow">›</text>
+						</view>
+					</view>
 
 					<view class="f-group">
 						<text class="f-label">Người được giao</text>
@@ -130,11 +119,8 @@
 
 					<DateRangeFilter title="Thời gian hết hạn" v-model:startDate="filter.dueDateFrom"
 						v-model:endDate="filter.dueDateTo" />
-					<DateRangeFilter 
-					    title="Thời gian thông báo" 
-					    v-model:startDate="filter.notifyFrom"
-					    v-model:endDate="filter.notifyTo" 
-					/>
+					<DateRangeFilter title="Thời gian thông báo" v-model:startDate="filter.notifyFrom"
+						v-model:endDate="filter.notifyTo" />
 					<view style="height: 20px;"></view>
 				</scroll-view>
 
@@ -144,23 +130,12 @@
 				</view>
 			</view>
 		</view>
-<CustomerModal 
-    :visible="showCustomerModal" 
-    :loading="loadingCustomer" 
-    :customers="customerList"
-    :managers="[]"  @close="showCustomerModal = false" 
-    @select="onCustomerSelect"
-    @filter="onFilterCustomerInModal" 
-/>
-		<ConfirmModal 
-		    v-model:visible="isConfirmDeleteOpen"
-		    title="Thông báo"
-		    :message="`Bạn có chắc muốn xóa công việc &quot;${itemToDelete?.title}&quot;?`"
-		    confirm-type="danger"
-		    @confirm="confirmDelete"
-		    @cancel="cancelDelete"
-		/>
-<GlobalMessage />
+		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :customers="customerList" :managers="[]"
+			@close="showCustomerModal = false" @select="onCustomerSelect" @filter="onFilterCustomerInModal" />
+		<ConfirmModal v-model:visible="isConfirmDeleteOpen" title="Thông báo"
+			:message="`Bạn có chắc muốn xóa công việc &quot;${itemToDelete?.title}&quot;?`" confirm-type="danger"
+			@confirm="confirmDelete" @cancel="cancelDelete" />
+		<GlobalMessage />
 	</view>
 </template>
 
@@ -172,6 +147,7 @@
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import ConfirmModal from '@/components/ConfirmModal.vue';
+	import Pagination from '@/components/Pagination.vue';
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
@@ -184,7 +160,11 @@
 		addNewTask, openFilter, closeFilter, resetFilter, applyFilter,
 		showActionMenu, cancelDelete, confirmDelete, goToDetail,
 		showCustomerModal, loadingCustomer, customerList, selectedCustomerName,
-		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal
+		openCustomerPopup, onCustomerSelect, onFilterCustomerInModal,
+		pageNo, pageSize,
+		totalCount,
+		onChangePage,
+		onUpdatePageSize,
 	} = useListTodoController();
 </script>
 
@@ -608,5 +588,13 @@
 
 	.modal-btn:active {
 		background-color: #f9f9f9;
+	}
+
+	.add-task-simple {
+		display: flex;
+		align-items: center;
+		color: #007aff;
+		padding: 5px 0;
+		margin-left: 10px;
 	}
 </style>

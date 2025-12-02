@@ -72,7 +72,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$d = {
+  const _sfc_main$e = {
     __name: "UserAvatar",
     props: {
       name: {
@@ -105,7 +105,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   };
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -143,7 +143,7 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android/components/UserAvatar.vue"]]);
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android/components/UserAvatar.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -183,7 +183,7 @@ if (uni.restoreGlobal) {
       return dateStr;
     }
   };
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -208,7 +208,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
         "view",
@@ -258,8 +258,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
       visible: { type: Boolean, required: true },
@@ -340,7 +340,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   });
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "modal-overlay",
@@ -512,7 +512,7 @@ if (uni.restoreGlobal) {
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CustomerModal.vue"]]);
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CustomerModal.vue"]]);
   var isVue2 = false;
   function set(target, key, val) {
     if (Array.isArray(target)) {
@@ -2682,8 +2682,58 @@ This will fail in production if not fixed.`);
   const showInfo = (msg) => showMessage(msg, "info");
   const showLoading = (title = "Đang xử lý...") => uni.showLoading({ title, mask: true });
   const hideLoading = () => uni.hideLoading();
+  const usePagination = (defaultPageSize = 15) => {
+    const pageNo = vue.ref(1);
+    const pageSize = vue.ref(defaultPageSize);
+    const totalCount = vue.ref(0);
+    const pageSizeOptions = [5, 10, 15, 20];
+    const totalPages = vue.computed(() => {
+      if (totalCount.value === 0)
+        return 1;
+      return Math.ceil(totalCount.value / pageSize.value);
+    });
+    const resetPage = () => {
+      pageNo.value = 1;
+    };
+    const setTotal = (count) => {
+      totalCount.value = count;
+    };
+    const changePage = (step) => {
+      const newPage = pageNo.value + step;
+      if (newPage >= 1 && newPage <= totalPages.value) {
+        pageNo.value = newPage;
+        return true;
+      }
+      return false;
+    };
+    const changePageSize = (newSize) => {
+      pageSize.value = newSize;
+      pageNo.value = 1;
+    };
+    return {
+      pageNo,
+      pageSize,
+      totalCount,
+      pageSizeOptions,
+      totalPages,
+      resetPage,
+      setTotal,
+      changePage,
+      changePageSize
+    };
+  };
   const useListTodoController = () => {
     const todos = vue.ref([]);
+    const {
+      pageNo,
+      pageSize,
+      totalCount,
+      pageSizeOptions,
+      resetPage,
+      setTotal,
+      changePage,
+      changePageSize
+    } = usePagination(15);
     const isLoading = vue.ref(false);
     const isFilterOpen = vue.ref(false);
     const authStore = useAuthStore();
@@ -2699,7 +2749,7 @@ This will fail in production if not fixed.`);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.ref(["Tất cả"]);
     const creatorIndex = vue.ref(0);
-    const customerIndex = vue.ref(0);
+    vue.ref(0);
     const assigneeOptions = vue.ref(["Tất cả"]);
     const assigneeIndex = vue.ref(0);
     const sourceOptions = ["Tất cả", "Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
@@ -2716,17 +2766,6 @@ This will fail in production if not fixed.`);
       notifyFrom: "",
       notifyTo: ""
     });
-    const pageSizeOptions = ["5/trang", "10/trang", "15/trang", "20/trang"];
-    const pageSizeValues = [5, 10, 15, 20];
-    const pageSizeIndex = vue.ref(2);
-    const currentPage = vue.ref(1);
-    const totalItems = vue.ref(0);
-    const totalPages = vue.computed(() => {
-      if (totalItems.value === 0)
-        return 1;
-      const size = pageSizeValues[pageSizeIndex.value];
-      return Math.ceil(totalItems.value / size);
-    });
     const fetchFilterMembers = async () => {
       if (rawMemberList.value.length > 0)
         return;
@@ -2737,12 +2776,17 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:71", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:64", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
-    const getTodoList = async () => {
+    const fetchData = async () => {
       isLoading.value = true;
       try {
+        const params = {
+          ...filter.value,
+          pageNo: pageNo.value,
+          pageSize: pageSize.value
+        };
         let selectedCreatorId = "";
         if (creatorIndex.value > 0) {
           const member = rawMemberList.value[creatorIndex.value - 1];
@@ -2760,32 +2804,39 @@ This will fail in production if not fixed.`);
           selectedCreatorId,
           selectedAssigneeId
         );
-        const currentSize = pageSizeValues[pageSizeIndex.value];
         const [listData, countData] = await Promise.all([
           getTodos({
             ...filterParams,
-            pageNo: currentPage.value,
-            pageSize: currentSize
+            pageNo: pageNo.value,
+            pageSize: pageSize.value
           }),
           getTodoCount(filterParams)
         ]);
         todos.value = listData || [];
-        totalItems.value = countData || 0;
+        setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:111", error);
+        formatAppLog("error", "at controllers/list_todo.ts:109", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
       }
     };
+    const onChangePage = (step) => {
+      const changed = changePage(step);
+      if (changed) {
+        getTodoList();
+      }
+    };
+    const onUpdatePageSize = (newSize) => {
+      changePageSize(newSize);
+      getTodoList();
+    };
     const fetchCustomers = async (searchFilter = null) => {
       loadingCustomer.value = true;
       try {
         const token = authStore.crmToken;
-        if (!token) {
-          formatAppLog("error", "at controllers/list_todo.ts:122", "Chưa có CRM Token!");
+        if (!token)
           return;
-        }
         const fields = await getCrmFieldSearch(token);
         const nameField = fields.find((f) => f.code === "name");
         const phoneField = fields.find((f) => f.code === "phone");
@@ -2817,8 +2868,7 @@ This will fail in production if not fixed.`);
           };
         });
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:162", "Lỗi tải khách hàng:", error);
-        showError("Lỗi tải dữ liệu CRM");
+        formatAppLog("error", "at controllers/list_todo.ts:167", "Lỗi tải khách hàng:", error);
       } finally {
         loadingCustomer.value = false;
       }
@@ -2837,18 +2887,6 @@ This will fail in production if not fixed.`);
     const onFilterCustomerInModal = (filterParams) => {
       fetchCustomers(filterParams);
     };
-    const onPageSizeChange = (e) => {
-      pageSizeIndex.value = e.detail.value;
-      currentPage.value = 1;
-      getTodoList();
-    };
-    const changePage = (direction) => {
-      const newPage = currentPage.value + direction;
-      if (newPage >= 1 && newPage <= totalPages.value) {
-        currentPage.value = newPage;
-        getTodoList();
-      }
-    };
     const onRequestDelete = (item) => {
       itemToDelete.value = item;
       isConfirmDeleteOpen.value = true;
@@ -2856,6 +2894,44 @@ This will fail in production if not fixed.`);
     const cancelDelete = () => {
       isConfirmDeleteOpen.value = false;
       itemToDelete.value = null;
+    };
+    const getTodoList = async () => {
+      isLoading.value = true;
+      try {
+        let selectedCreatorId = "";
+        if (creatorIndex.value > 0) {
+          const member = rawMemberList.value[creatorIndex.value - 1];
+          selectedCreatorId = member.UID || "";
+        }
+        let selectedAssigneeId = "";
+        if (assigneeIndex.value > 0) {
+          const member = rawMemberList.value[assigneeIndex.value - 1];
+          selectedAssigneeId = member.UID || "";
+        }
+        const filterParams = buildTodoParams(
+          filter.value,
+          statusValues[statusIndex.value],
+          sourceValues[sourceIndex.value],
+          selectedCreatorId,
+          selectedAssigneeId
+        );
+        const [listData, countData] = await Promise.all([
+          getTodos({
+            ...filterParams,
+            pageNo: pageNo.value,
+            pageSize: pageSize.value
+          }),
+          getTodoCount(filterParams)
+        ]);
+        todos.value = listData || [];
+        setTotal(countData || 0);
+      } catch (error) {
+        formatAppLog("error", "at controllers/list_todo.ts:228", error);
+        showError("Lỗi tải dữ liệu");
+        todos.value = [];
+      } finally {
+        isLoading.value = false;
+      }
     };
     const confirmDelete = async () => {
       if (!itemToDelete.value)
@@ -2867,7 +2943,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:209", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:244", "Delete Error:", error);
         showError("Xóa thất bại");
       }
     };
@@ -2917,19 +2993,20 @@ This will fail in production if not fixed.`);
       };
       statusIndex.value = 0;
       creatorIndex.value = 0;
-      customerIndex.value = 0;
       assigneeIndex.value = 0;
       sourceIndex.value = 0;
-      currentPage.value = 1;
       selectedCustomerName.value = "";
+      resetPage();
     };
     const applyFilter = () => {
-      currentPage.value = 1;
+      resetPage();
+      fetchData();
       closeFilter();
-      getTodoList();
     };
-    onShow(() => {
+    vue.onMounted(() => {
       getTodoList();
+    });
+    onShow(() => {
     });
     const goToDetail = (item) => {
       uni.navigateTo({
@@ -2945,12 +3022,6 @@ This will fail in production if not fixed.`);
       isConfirmDeleteOpen,
       itemToDelete,
       pageSizeOptions,
-      pageSizeIndex,
-      currentPage,
-      totalPages,
-      totalItems,
-      onPageSizeChange,
-      changePage,
       statusOptions,
       statusIndex,
       onStatusChange,
@@ -2977,10 +3048,15 @@ This will fail in production if not fixed.`);
       selectedCustomerName,
       openCustomerPopup,
       onCustomerSelect,
-      onFilterCustomerInModal
+      onFilterCustomerInModal,
+      pageNo,
+      pageSize,
+      totalCount,
+      onChangePage,
+      onUpdatePageSize
     };
   };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -3020,7 +3096,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -3032,8 +3108,8 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
       label: { type: String, required: false, default: "" },
@@ -3057,7 +3133,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass(["app-btn", [
         `btn-${$props.type}`,
@@ -3083,8 +3159,8 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
       __expose();
@@ -3133,7 +3209,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -3168,8 +3244,8 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "ConfirmModal",
     props: {
       visible: { type: Boolean, required: true },
@@ -3196,7 +3272,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "modal-overlay",
@@ -3244,7 +3320,121 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
+  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+    __name: "Pagination",
+    props: {
+      pageNo: { type: Number, required: true },
+      pageSize: { type: Number, required: true },
+      total: { type: Number, required: true },
+      pageSizeOptions: { type: Array, required: true },
+      showTotal: { type: Boolean, required: false }
+    },
+    emits: ["changePage", "update:pageSize"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const totalPages = vue.computed(() => {
+        if (!props.pageSize || props.pageSize === 0)
+          return 1;
+        return Math.ceil(props.total / props.pageSize) || 1;
+      });
+      const pageSizeIndex = vue.computed(() => {
+        if (!props.pageSizeOptions)
+          return 0;
+        const idx = props.pageSizeOptions.indexOf(props.pageSize);
+        return idx !== -1 ? idx : 0;
+      });
+      const onPageSizeChange = (e) => {
+        const index = e.detail.value;
+        if (props.pageSizeOptions && props.pageSizeOptions[index]) {
+          const newSize = props.pageSizeOptions[index];
+          emit("update:pageSize", newSize);
+        }
+      };
+      const onPrev = () => {
+        if (props.pageNo > 1) {
+          emit("changePage", -1);
+        }
+      };
+      const onNext = () => {
+        if (props.pageNo < totalPages.value) {
+          emit("changePage", 1);
+        }
+      };
+      const __returned__ = { props, emit, totalPages, pageSizeIndex, onPageSizeChange, onPrev, onNext };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "pagination-footer" }, [
+      vue.createElementVNode("picker", {
+        mode: "selector",
+        range: $props.pageSizeOptions,
+        value: $setup.pageSizeIndex,
+        onChange: $setup.onPageSizeChange
+      }, [
+        vue.createElementVNode("view", { class: "page-size-selector" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "size-text" },
+            vue.toDisplayString($props.pageSize) + " / trang",
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("text", { class: "dropdown-arrow" }, "▼")
+        ])
+      ], 40, ["range", "value"]),
+      $props.showTotal ? (vue.openBlock(), vue.createElementBlock(
+        "text",
+        {
+          key: 0,
+          class: "total-text"
+        },
+        "Tổng: " + vue.toDisplayString($props.total),
+        1
+        /* TEXT */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode("view", { class: "pagination-controls" }, [
+        vue.createElementVNode(
+          "view",
+          {
+            class: vue.normalizeClass(["page-arrow", { "disabled": $props.pageNo <= 1 }]),
+            onClick: $setup.onPrev
+          },
+          "‹",
+          2
+          /* CLASS */
+        ),
+        vue.createElementVNode(
+          "view",
+          { class: "page-box active" },
+          vue.toDisplayString($props.pageNo),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode(
+          "view",
+          {
+            class: vue.normalizeClass(["page-arrow", { "disabled": $props.pageNo >= $setup.totalPages }]),
+            onClick: $setup.onNext
+          },
+          "›",
+          2
+          /* CLASS */
+        )
+      ]),
+      _ctx.$slots.action ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "add-btn-wrapper"
+      }, [
+        vue.renderSlot(_ctx.$slots, "action", {}, void 0, true)
+      ])) : vue.createCommentVNode("v-if", true)
+    ]);
+  }
+  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android/components/Pagination.vue"]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -3292,9 +3482,14 @@ This will fail in production if not fixed.`);
         selectedCustomerName,
         openCustomerPopup,
         onCustomerSelect,
-        onFilterCustomerInModal
+        onFilterCustomerInModal,
+        pageNo,
+        pageSize,
+        totalCount,
+        onChangePage,
+        onUpdatePageSize
       } = useListTodoController();
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -3405,77 +3600,42 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]))
         ]),
-        vue.createElementVNode("view", { class: "fixed-footer" }, [
-          vue.createElementVNode("picker", {
-            mode: "selector",
-            range: $setup.pageSizeOptions,
-            value: $setup.pageSizeIndex,
-            onChange: _cache[1] || (_cache[1] = (...args) => $setup.onPageSizeChange && $setup.onPageSizeChange(...args))
-          }, [
-            vue.createElementVNode("view", { class: "page-size-selector" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "size-text" },
-                vue.toDisplayString($setup.pageSizeOptions[$setup.pageSizeIndex]),
-                1
-                /* TEXT */
-              ),
-              vue.createElementVNode("text", { class: "dropdown-arrow" }, "▼")
+        vue.createVNode($setup["Pagination"], {
+          pageNo: $setup.pageNo,
+          pageSize: $setup.pageSize,
+          total: $setup.totalCount,
+          pageSizeOptions: $setup.pageSizeOptions,
+          onChangePage: $setup.onChangePage,
+          "onUpdate:pageSize": $setup.onUpdatePageSize
+        }, {
+          action: vue.withCtx(() => [
+            vue.createElementVNode("view", {
+              class: "add-task-simple",
+              onClick: _cache[1] || (_cache[1] = (...args) => $setup.addNewTask && $setup.addNewTask(...args))
+            }, [
+              vue.createElementVNode("text", { class: "plus-icon" }, "+"),
+              vue.createElementVNode("text", { class: "add-text" }, "Thêm công việc")
             ])
-          ], 40, ["range", "value"]),
-          vue.createElementVNode("view", { class: "pagination-controls" }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["page-arrow", { "disabled": $setup.currentPage <= 1 }]),
-                onClick: _cache[2] || (_cache[2] = ($event) => $setup.changePage(-1))
-              },
-              "‹",
-              2
-              /* CLASS */
-            ),
-            vue.createElementVNode(
-              "view",
-              { class: "page-box active" },
-              vue.toDisplayString($setup.currentPage),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["page-arrow", { "disabled": $setup.currentPage >= $setup.totalPages }]),
-                onClick: _cache[3] || (_cache[3] = ($event) => $setup.changePage(1))
-              },
-              "› ",
-              2
-              /* CLASS */
-            )
           ]),
-          vue.createElementVNode("view", {
-            class: "add-task-simple",
-            onClick: _cache[4] || (_cache[4] = (...args) => $setup.addNewTask && $setup.addNewTask(...args))
-          }, [
-            vue.createElementVNode("text", { class: "plus-icon" }, "+"),
-            vue.createElementVNode("text", { class: "add-text" }, "Thêm công việc")
-          ])
-        ])
+          _: 1
+          /* STABLE */
+        }, 8, ["pageNo", "pageSize", "total", "pageSizeOptions", "onChangePage", "onUpdate:pageSize"])
       ]),
       $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "filter-overlay",
-        onClick: _cache[20] || (_cache[20] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
+        onClick: _cache[17] || (_cache[17] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel",
-          onClick: _cache[19] || (_cache[19] = vue.withModifiers(() => {
+          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
             vue.createElementVNode("text", { class: "filter-title" }, "Bộ lọc tìm kiếm"),
             vue.createElementVNode("text", {
               class: "close-btn",
-              onClick: _cache[5] || (_cache[5] = (...args) => $setup.closeFilter && $setup.closeFilter(...args))
+              onClick: _cache[2] || (_cache[2] = (...args) => $setup.closeFilter && $setup.closeFilter(...args))
             }, "✕")
           ]),
           vue.createElementVNode("scroll-view", {
@@ -3488,7 +3648,7 @@ This will fail in production if not fixed.`);
                 "input",
                 {
                   class: "f-input",
-                  "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => $setup.filter.title = $event),
+                  "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.filter.title = $event),
                   placeholder: "Nhập từ khóa..."
                 },
                 null,
@@ -3504,7 +3664,7 @@ This will fail in production if not fixed.`);
                 "input",
                 {
                   class: "f-input",
-                  "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.filter.jobCode = $event),
+                  "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.jobCode = $event),
                   placeholder: "Ví dụ: TODO-08"
                 },
                 null,
@@ -3520,7 +3680,7 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.statusOptions,
                 value: $setup.statusIndex,
-                onChange: _cache[8] || (_cache[8] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args))
+                onChange: _cache[5] || (_cache[5] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
@@ -3538,7 +3698,7 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.creatorOptions,
                 value: $setup.creatorIndex,
-                onChange: _cache[9] || (_cache[9] = (...args) => $setup.onCreatorChange && $setup.onCreatorChange(...args))
+                onChange: _cache[6] || (_cache[6] = (...args) => $setup.onCreatorChange && $setup.onCreatorChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
@@ -3554,7 +3714,7 @@ This will fail in production if not fixed.`);
               vue.createElementVNode("text", { class: "f-label" }, "Khách hàng"),
               vue.createElementVNode("view", {
                 class: "f-input",
-                onClick: _cache[10] || (_cache[10] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
+                onClick: _cache[7] || (_cache[7] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
                 style: { "justify-content": "space-between" }
               }, [
                 vue.createElementVNode(
@@ -3575,7 +3735,7 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.assigneeOptions,
                 value: $setup.assigneeIndex,
-                onChange: _cache[11] || (_cache[11] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args))
+                onChange: _cache[8] || (_cache[8] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
@@ -3593,7 +3753,7 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.sourceOptions,
                 value: $setup.sourceIndex,
-                onChange: _cache[12] || (_cache[12] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args))
+                onChange: _cache[9] || (_cache[9] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
@@ -3608,23 +3768,23 @@ This will fail in production if not fixed.`);
             vue.createVNode($setup["DateRangeFilter"], {
               title: "Thời gian tạo",
               startDate: $setup.filter.createdFrom,
-              "onUpdate:startDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.createdFrom = $event),
+              "onUpdate:startDate": _cache[10] || (_cache[10] = ($event) => $setup.filter.createdFrom = $event),
               endDate: $setup.filter.createdTo,
-              "onUpdate:endDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.createdTo = $event)
+              "onUpdate:endDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.createdTo = $event)
             }, null, 8, ["startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: "Thời gian hết hạn",
               startDate: $setup.filter.dueDateFrom,
-              "onUpdate:startDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.dueDateFrom = $event),
+              "onUpdate:startDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.dueDateFrom = $event),
               endDate: $setup.filter.dueDateTo,
-              "onUpdate:endDate": _cache[16] || (_cache[16] = ($event) => $setup.filter.dueDateTo = $event)
+              "onUpdate:endDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.dueDateTo = $event)
             }, null, 8, ["startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: "Thời gian thông báo",
               startDate: $setup.filter.notifyFrom,
-              "onUpdate:startDate": _cache[17] || (_cache[17] = ($event) => $setup.filter.notifyFrom = $event),
+              "onUpdate:startDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.notifyFrom = $event),
               endDate: $setup.filter.notifyTo,
-              "onUpdate:endDate": _cache[18] || (_cache[18] = ($event) => $setup.filter.notifyTo = $event)
+              "onUpdate:endDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.notifyTo = $event)
             }, null, 8, ["startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
@@ -3649,13 +3809,13 @@ This will fail in production if not fixed.`);
         loading: $setup.loadingCustomer,
         customers: $setup.customerList,
         managers: [],
-        onClose: _cache[21] || (_cache[21] = ($event) => $setup.showCustomerModal = false),
+        onClose: _cache[18] || (_cache[18] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect,
         onFilter: $setup.onFilterCustomerInModal
       }, null, 8, ["visible", "loading", "customers", "onSelect", "onFilter"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
-        "onUpdate:visible": _cache[22] || (_cache[22] = ($event) => $setup.isConfirmDeleteOpen = $event),
+        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
         title: "Thông báo",
         message: `Bạn có chắc muốn xóa công việc "${(_a = $setup.itemToDelete) == null ? void 0 : _a.title}"?`,
         "confirm-type": "danger",
