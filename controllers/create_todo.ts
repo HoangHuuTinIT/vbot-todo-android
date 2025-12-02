@@ -9,6 +9,30 @@ import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_SOURCE } from '@/utils/enums';
 import { showSuccess, showError, showInfo,showLoading, hideLoading } from '@/utils/toast';
+
+const convertDateRangeToValue = (startDate: string, endDate: string): string => {
+    if (!startDate && !endDate) return "";
+    
+    let startTs = "";
+    let endTs = "";
+
+    if (startDate) {
+        const d = new Date(startDate);
+        d.setHours(0, 0, 0, 0);
+        startTs = d.getTime().toString();
+    }
+
+    if (endDate) {
+        const d = new Date(endDate);
+        d.setHours(0, 0, 0, 0);
+        endTs = d.getTime().toString();
+    }
+
+    
+    if (!startTs && !endTs) return "";
+    return `${startTs}|${endTs}`;
+};
+
 export const useCreateTodoController = () => {
 	const authStore = useAuthStore();
 	const pad = (n : number) => n.toString().padStart(2, '0');
@@ -59,65 +83,97 @@ export const useCreateTodoController = () => {
 		}
 	};
 
-	const fetchCustomers = async () => {
-		if (customerList.value.length > 0) return;
-
-		loadingCustomer.value = true;
-		try {
-			const token = authStore.crmToken;
-			if (!token) {
-				console.error("Chưa có CRM Token!");
-				return;
-			}
-			customerToken.value = token;
-			const fields = await getCrmFieldSearch(token);
-
-			const nameField = fields.find((f : any) => f.code === 'name');
-			const phoneField = fields.find((f : any) => f.code === 'phone');
-			const memberNoField = fields.find((f : any) => f.code === 'member_no');
-
-			const nameId = nameField ? nameField.id : 134;
-			const phoneId = phoneField ? phoneField.id : 135;
-			const memberNoId = memberNoField ? memberNoField.id : 136;
-
-			const requestBody = {
-				page: 1,
-				size: 20,
-				fieldSearch: [
-					{ id: -1, value: "", type: "", isSearch: false },
-					{ id: nameId, value: "", type: "", isSearch: false },
-					{ id: phoneId, value: "", type: "", isSearch: false },
-					{ id: memberNoId, value: "", type: "", isSearch: false }
-				]
-			};
-
-			const rawData = await getCrmCustomers(token, requestBody);
-			customerList.value = rawData.map((item : any) => {
-				const nameObj = item.customerFieldItems.find((f : any) => f.code === 'name');
-				const phoneObj = item.customerFieldItems.find((f : any) => f.code === 'phone');
-
-				return {
-					id: item.id,
-					uid: item.uid,
-					createAt: item.createAt,
-					name: nameObj ? nameObj.value : '(Không tên)',
-					phone: phoneObj ? phoneObj.value : '',
-				};
-			});
-
-		} catch (error) {
-			console.error('Lỗi tải khách hàng:', error);
-			showError('Lỗi tải dữ liệu CRM');
-		} finally {
-			loadingCustomer.value = false;
-		}
-	};
+	const fetchCustomers = async (filterParams: any = {}) => {
+	        loadingCustomer.value = true;
+	        
+	        try {
+	            const token = authStore.crmToken;
+	            if (!token) {
+	                console.error("Chưa có CRM Token!");
+	                return;
+	            }
+	
+	            const fields = await getCrmFieldSearch(token);
+	
+	            const createAtField = fields.find((f: any) => f.code === 'create_at'); 
+	            const nameField = fields.find((f: any) => f.code === 'name');
+	            const phoneField = fields.find((f: any) => f.code === 'phone');
+	            const memberNoField = fields.find((f: any) => f.code === 'member_no');
+	
+	            const createAtId = createAtField ? createAtField.id : -1;
+	            const nameId = nameField ? nameField.id : 154;
+	            const phoneId = phoneField ? phoneField.id : 155;
+	            const memberNoId = memberNoField ? memberNoField.id : 156;
+	
+	            const filterName = filterParams.name || "";
+	            const filterPhone = filterParams.phone || "";
+	            const filterMemberUID = filterParams.managerUID || ""; 
+	            const dateValue = convertDateRangeToValue(filterParams.startDate, filterParams.endDate);
+	
+	            const fieldSearch = [
+	                { 
+	                    id: createAtId, 
+	                    value: dateValue, 
+	                    type: "RANGER", 
+	                    isSearch: true 
+	                },
+	                { 
+	                    id: nameId, 
+	                    value: filterName, 
+	                    type: "CONTAIN", 
+	                    isSearch: true 
+	                },
+	                { 
+	                    id: phoneId, 
+	                    value: filterPhone, 
+	                    type: "CONTAIN", 
+	                    isSearch: true 
+	                },
+	                { 
+	                    id: memberNoId, 
+	                    value: filterMemberUID, 
+	                    type: "EQUAL", 
+	                    isSearch: true 
+	                }
+	            ];
+	
+	            const requestBody = {
+	                page: 1,
+	                size: 20,
+	                fieldSearch: fieldSearch
+	            };
+	
+	            const rawData = await getCrmCustomers(token, requestBody);
+	            
+	            customerList.value = rawData.map((item: any) => {
+	                const nameObj = item.customerFieldItems.find((f: any) => f.code === 'name');
+	                const phoneObj = item.customerFieldItems.find((f: any) => f.code === 'phone');
+	
+	                return {
+	                    id: item.id,
+	                    uid: item.uid,
+	                    createAt: item.createAt,
+	                    name: nameObj ? nameObj.value : '(Không tên)',
+	                    phone: phoneObj ? phoneObj.value : '',
+	                };
+	            });
+	
+	        } catch (error) {
+	            console.error('Lỗi tải khách hàng:', error);
+	            showError('Lỗi tải dữ liệu CRM');
+	        } finally {
+	            loadingCustomer.value = false;
+	        }
+	    };
 
 	const openCustomerPopup = () => {
 		showCustomerModal.value = true;
 		fetchCustomers();
 	};
-
+const onCustomerFilter = (filterData: any) => {
+        console.log("Controller nhận filter:", filterData);
+        fetchCustomers(filterData);
+    };
 	const onCustomerSelect = (customer : any) => {
 
 		form.value.customer = `${customer.name} - ${customer.phone}`;
@@ -232,5 +288,7 @@ const processDescriptionImages = async (htmlContent: string): Promise<{ newConte
 		sourceOptions,
 		sourceIndex,
 		onSourceChange,
+		memberList,
+		onCustomerFilter,
 	};
 };

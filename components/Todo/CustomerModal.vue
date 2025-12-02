@@ -4,34 +4,31 @@
             
             <view class="modal-header">
                 <text class="modal-title">Chọn khách hàng</text>
-                <text class="close-btn" @click="close">✕</text>
+                
+                <view class="header-actions">
+                    <view class="filter-toggle-btn" 
+                          :class="{ 'active': isFilterExpanded }" 
+                          @click="toggleFilter">
+                        <image src="https://img.icons8.com/ios/50/666666/filter--v1.png" class="filter-icon-img" />
+                    </view>
+                    <text class="close-btn" @click="close">✕</text>
+                </view>
             </view>
 
-            <view class="filter-section">
+            <view class="filter-section" v-if="isFilterExpanded">
                 <view class="f-item">
-                    <input 
-                        class="f-input" 
-                        v-model="filter.name" 
-                        placeholder="Nhập tên khách hàng" 
-                        placeholder-class="ph-style"
-                    />
+                    <input class="f-input" v-model="filter.name" placeholder="Nhập tên khách hàng" placeholder-class="ph-style"/>
                 </view>
 
                 <view class="f-item">
-                    <input 
-                        class="f-input" 
-                        v-model="filter.phone" 
-                        type="number" 
-                        placeholder="Nhập số điện thoại" 
-                        placeholder-class="ph-style"
-                    />
+                    <input class="f-input" v-model="filter.phone" type="number" placeholder="Nhập số điện thoại" placeholder-class="ph-style"/>
                 </view>
 
                 <view class="f-item">
-                    <picker mode="selector" :range="managerOptions" :value="filter.managerIndex" @change="onManagerChange">
+                    <picker mode="selector" :range="managerDisplayOptions" :value="filter.managerIndex" @change="onManagerChange">
                         <view class="f-picker-box">
                             <text :class="filter.managerIndex === 0 ? 'text-ph' : 'text-val'">
-                                {{ managerOptions[filter.managerIndex] }}
+                                {{ managerDisplayOptions[filter.managerIndex] }}
                             </text>
                             <text class="arrow">▼</text>
                         </view>
@@ -52,42 +49,30 @@
                     <button class="btn-submit" @click="applyFilter">Lọc</button>
                 </view>
             </view>
+
             <view v-if="loading" class="loading-state">Đang tải dữ liệu...</view>
-
             <scroll-view scroll-y class="customer-list" v-else>
-                <view 
-                    v-for="(item, index) in customers" 
-                    :key="item.id" 
-                    class="customer-item"
-                    @click="selectCustomer(item)"
-                >
-                    <UserAvatar 
-                        :name="item.name" 
-                        :size="40"
-                        class="mr-3" 
-                    />
-
+                <view v-for="(item, index) in customers" :key="item.id" class="customer-item" @click="selectCustomer(item)">
+                    <UserAvatar :name="item.name" :size="40" class="mr-3" />
                     <view class="info-column">
                         <text class="name-text">{{ item.name || '(Không tên)' }}</text>
                         <text class="phone-text">{{ item.phone || 'Không có SĐT' }}</text>
                     </view>
-
                     <view class="date-column">
                         <text class="date-text">{{ formatDate(item.createAt) }}</text>
                     </view>
                 </view>
-
                 <view v-if="customers.length === 0" class="empty-state">Không có dữ liệu</view>
             </scroll-view>
-
         </view>
     </view>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import UserAvatar from '@/components/UserAvatar.vue';
 import DateRangeFilter from '@/components/DateRangeFilter.vue'; 
+import type { ProjectMember } from '@/types/Project';
 
 interface CustomerDisplay {
     id: number;
@@ -101,35 +86,68 @@ const props = defineProps<{
     visible: boolean;
     customers: CustomerDisplay[];
     loading: boolean;
+    managers: ProjectMember[];
 }>();
 
-const emit = defineEmits(['close', 'select']);
+const emit = defineEmits(['close', 'select', 'filter']);
+
+const isFilterExpanded = ref(false);
 
 const filter = reactive({
     name: '',
     phone: '',
     managerIndex: 0,
+    selectedMemberUID: '',
     startDate: '',
     endDate: ''
 });
 
-const managerOptions = ref(['Thành viên quản lý', 'Nguyễn Văn A', 'Trần Thị B']);
+const managerDisplayOptions = computed(() => {
+    const defaultOption = 'Thành viên quản lý';
+    const list = props.managers || []; 
+    const memberNames = list.map(m => m.UserName || 'Thành viên ẩn danh');
+    return [defaultOption, ...memberNames];
+});
+
+const toggleFilter = () => {
+    isFilterExpanded.value = !isFilterExpanded.value;
+};
 
 const onManagerChange = (e: any) => {
-    filter.managerIndex = e.detail.value;
+    const index = parseInt(e.detail.value);
+    filter.managerIndex = index;
+
+    if (index === 0) {
+        filter.selectedMemberUID = '';
+    } else {
+        const selectedMember = props.managers[index - 1];
+        if (selectedMember) {
+            filter.selectedMemberUID = selectedMember.memberUID;
+        }
+    }
 };
 
 const resetFilter = () => {
     filter.name = '';
     filter.phone = '';
     filter.managerIndex = 0;
+    filter.selectedMemberUID = '';
     filter.startDate = '';
     filter.endDate = '';
+    applyFilter();
+    
     console.log('Đã đặt lại bộ lọc');
 };
 
 const applyFilter = () => {
-    console.log('Thực hiện lọc với:', filter);
+    emit('filter', {
+        name: filter.name,
+        phone: filter.phone,
+        managerUID: filter.selectedMemberUID,
+        startDate: filter.startDate,
+        endDate: filter.endDate
+    });
+    isFilterExpanded.value = false; 
 };
 
 const close = () => {
@@ -165,15 +183,47 @@ const formatDate = (timestamp: number) => {
     background-color: #fff;
 }
 .modal-title { font-weight: bold; font-size: 16px; color: #333; }
-.close-btn { font-size: 20px; padding: 5px; color: #999; }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.filter-toggle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    transition: all 0.2s;
+}
+.filter-toggle-btn.active {
+    background-color: #e0f2f1; 
+    border: 1px solid #009688;
+}
+.filter-icon-img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+}
+
+.close-btn { font-size: 20px; padding: 5px; color: #999; }
 
 .filter-section {
     padding: 15px;
     background-color: #fff;
     border-bottom: 1px solid #eee;
     flex-shrink: 0; 
+    animation: slideDown 0.3s ease-out;
 }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .f-item {
     margin-bottom: 10px;
 }
@@ -217,7 +267,6 @@ const formatDate = (timestamp: number) => {
     background-color: #009688;
     color: #fff;
 }
-
 
 .customer-list { flex: 1; height: 1px; }
 .loading-state, .empty-state { text-align: center; padding: 30px; color: #888; font-size: 14px; }

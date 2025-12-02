@@ -145,13 +145,13 @@
 			</view>
 		</view>
 <CustomerModal 
-            :visible="showCustomerModal" 
-            :loading="loadingCustomer" 
-            :customers="customerList"
-            @close="showCustomerModal = false" 
-            @select="onCustomerSelect"
-            @filter="onFilterCustomerInModal" 
-        />
+    :visible="showCustomerModal" 
+    :loading="loadingCustomer" 
+    :customers="customerList"
+    :managers="[]"  @close="showCustomerModal = false" 
+    @select="onCustomerSelect"
+    @filter="onFilterCustomerInModal" 
+/>
 		<ConfirmModal 
 		    v-model:visible="isConfirmDeleteOpen"
 		    title="Thông báo"
