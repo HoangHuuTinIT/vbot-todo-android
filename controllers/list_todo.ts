@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
-import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
 import { buildTodoParams } from '@/models/todo';
@@ -11,6 +10,8 @@ import type { TodoItem } from '@/types/todo';
 import { getAllMembers } from '@/api/project';
 import { showSuccess, showError } from '@/utils/toast';
 import { usePagination } from '@/composables/usePagination';
+import { useCustomerFilter } from '@/composables/useCustomerFilter';
+
 export const useListTodoController = () => {
 	const todos = ref<TodoItem[]>([]);
 	const {
@@ -22,8 +23,6 @@ export const useListTodoController = () => {
 	const authStore = useAuthStore();
 
 	const showCustomerModal = ref(false);
-	const loadingCustomer = ref(false);
-	const customerList = ref<any[]>([]);
 	const selectedCustomerName = ref('');
 
 	const isConfirmDeleteOpen = ref<boolean>(false);
@@ -36,8 +35,6 @@ export const useListTodoController = () => {
 	const rawMemberList = ref<any[]>([]);
 	const creatorOptions = ref(['Tất cả']);
 	const creatorIndex = ref(0);
-	const customerOptions = ['Tất cả', 'KH001', 'KH002', 'VNG'];
-	const customerIndex = ref(0);
 	const assigneeOptions = ref(['Tất cả']);
 	const assigneeIndex = ref(0);
 
@@ -64,6 +61,11 @@ export const useListTodoController = () => {
 			console.error('Lỗi lấy danh sách thành viên filter:', error);
 		}
 	};
+	const { 
+	        customerList, 
+	        loadingCustomer, 
+	        fetchCustomers 
+	    } = useCustomerFilter();
 	const fetchData = async () => {
 		isLoading.value = true;
 		try {
@@ -122,68 +124,23 @@ export const useListTodoController = () => {
 		changePageSize(newSize);
 		getTodoList();
 	};
-	const fetchCustomers = async (searchFilter : any = null) => {
-		loadingCustomer.value = true;
-		try {
-			const token = authStore.crmToken;
-			if (!token) return;
-
-			const fields = await getCrmFieldSearch(token);
-			const nameField = fields.find((f : any) => f.code === 'name');
-			const phoneField = fields.find((f : any) => f.code === 'phone');
-			const memberNoField = fields.find((f : any) => f.code === 'member_no');
-
-			const nameId = nameField ? nameField.id : 134;
-			const phoneId = phoneField ? phoneField.id : 135;
-			const memberNoId = memberNoField ? memberNoField.id : 136;
-
-			const requestBody = {
-				page: 1,
-				size: 20,
-				fieldSearch: [
-					{ id: -1, value: "", type: "", isSearch: false },
-					{ id: nameId, value: searchFilter?.name || "", type: "", isSearch: !!searchFilter?.name },
-					{ id: phoneId, value: searchFilter?.phone || "", type: "", isSearch: !!searchFilter?.phone },
-					{ id: memberNoId, value: "", type: "", isSearch: false }
-				]
-			};
-
-			const rawData = await getCrmCustomers(token, requestBody);
-
-			customerList.value = rawData.map((item : any) => {
-				const nameObj = item.customerFieldItems.find((f : any) => f.code === 'name');
-				const phoneObj = item.customerFieldItems.find((f : any) => f.code === 'phone');
-				return {
-					id: item.id,
-					uid: item.uid,
-					createAt: item.createAt,
-					name: nameObj ? nameObj.value : '(Không tên)',
-					phone: phoneObj ? phoneObj.value : '',
-					code: item.code || ''
-				};
-			});
-
-		} catch (error) {
-			console.error('Lỗi tải khách hàng:', error);
-		} finally {
-			loadingCustomer.value = false;
-		}
-	};
 	const openCustomerPopup = () => {
-		showCustomerModal.value = true;
-		if (customerList.value.length === 0) {
-			fetchCustomers();
-		}
-	};
+	        showCustomerModal.value = true;
+	        fetchFilterMembers(); 
+	        
+	        if (customerList.value.length === 0) {
+	             fetchCustomers({}); 
+	        }
+	    };
 	const onCustomerSelect = (customer : any) => {
 		filter.value.customerCode = customer.uid;
 
 		selectedCustomerName.value = customer.name;
 		showCustomerModal.value = false;
 	};
-	const onFilterCustomerInModal = (filterParams : any) => {
-		fetchCustomers(filterParams);
-	};
+	const onFilterCustomerInModal = (filterParams: any) => {
+	        fetchCustomers(filterParams);
+	    };
 
 
 
@@ -315,5 +272,7 @@ export const useListTodoController = () => {
 
 		pageNo, pageSize, totalCount,
 		onChangePage, onUpdatePageSize,
+		
+		rawMemberList,fetchCustomers,
 	};
 };

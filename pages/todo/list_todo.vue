@@ -130,8 +130,15 @@
 				</view>
 			</view>
 		</view>
-		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :customers="customerList" :managers="[]"
-			@close="showCustomerModal = false" @select="onCustomerSelect" @filter="onFilterCustomerInModal" />
+		<CustomerModal 
+		            :visible="showCustomerModal" 
+		            :loading="loadingCustomer" 
+		            :customers="customerList" 
+		            :managers="rawMemberList"  
+		            @close="showCustomerModal = false" 
+		            @select="onCustomerSelect" 
+		            @filter="onFilterCustomerInModal" 
+		        />
 		<ConfirmModal v-model:visible="isConfirmDeleteOpen" title="Thông báo"
 			:message="`Bạn có chắc muốn xóa công việc &quot;${itemToDelete?.title}&quot;?`" confirm-type="danger"
 			@confirm="confirmDelete" @cancel="cancelDelete" />
@@ -165,6 +172,7 @@
 		totalCount,
 		onChangePage,
 		onUpdatePageSize,
+		rawMemberList,
 	} = useListTodoController();
 </script>
 
