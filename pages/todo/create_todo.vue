@@ -5,10 +5,11 @@
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
 			</view>
-			<input class="item-input" v-model="form.name" placeholder="Nhập tên công việc... *" maxlength="256" />
+			<textarea class="item-input title-textarea" v-model="form.name" placeholder="Nhập tên công việc... *"
+				maxlength="256" auto-height />
 			<text class="char-count">
-							{{ form.name ? form.name.length : 0 }}/256
-						</text>
+				{{ form.name ? form.name.length : 0 }}/256
+			</text>
 		</view>
 
 		<TodoEditor v-model="form.desc" />
@@ -119,13 +120,23 @@
 		text-align: left;
 		font-size: 15px;
 		color: #333;
+		min-height: 24px;
+		line-height: 1.4;
+		padding: 5px 0;
 	}
-.char-count {
+
+	.title-textarea {
+		width: 100%;
+		overflow: hidden;
+	}
+
+	.char-count {
 		font-size: 12px;
-		color: #999;     
-		margin-left: 10px; 
-		flex-shrink: 0;   
+		color: #999;
+		margin-left: 10px;
+		flex-shrink: 0;
 	}
+
 	.full-width-picker {
 		flex: 1;
 	}

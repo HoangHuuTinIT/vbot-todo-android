@@ -4752,12 +4752,13 @@ This will fail in production if not fixed.`);
           })
         ]),
         vue.withDirectives(vue.createElementVNode(
-          "input",
+          "textarea",
           {
-            class: "item-input",
+            class: "item-input title-textarea",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.name = $event),
             placeholder: "Nhập tên công việc... *",
-            maxlength: "256"
+            maxlength: "256",
+            "auto-height": ""
           },
           null,
           512
@@ -5933,11 +5934,13 @@ This will fail in production if not fixed.`);
           )
         ]),
         vue.withDirectives(vue.createElementVNode(
-          "input",
+          "textarea",
           {
             class: "header-title-input",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
-            placeholder: "Tên công việc"
+            placeholder: "Tên công việc",
+            "auto-height": "",
+            maxlength: "256"
           },
           null,
           512

@@ -9,7 +9,8 @@
 			<view class="header-top">
 				<text class="header-code">#{{ form.code }}</text>
 			</view>
-			<input class="header-title-input" v-model="form.title" placeholder="Tên công việc" />
+			<textarea class="header-title-input" v-model="form.title" placeholder="Tên công việc" auto-height
+				maxlength="256" />
 		</view>
 
 		<scroll-view scroll-y="true" class="detail-body">
@@ -193,16 +194,9 @@
 				</view>
 			</view>
 
-			<ConfirmModal 
-			    v-model:visible="isConfirmCancelEditOpen"
-			    title="Xác nhận hủy"
-			    message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu."
-			    cancel-label="Tiếp tục sửa"
-			    confirm-label="Hủy bỏ"
-			    confirm-type="danger"
-			    @cancel="continueEditing"
-			    @confirm="confirmCancelEdit"
-			/>
+			<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy"
+				message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa"
+				confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
 
 			<view class="section-header-row">
 				<text class="section-title no-margin">Lịch sử tương tác</text>
@@ -243,14 +237,9 @@
 
 		</scroll-view>
 
-		<ConfirmModal 
-		    v-model:visible="isConfirmDeleteCommentOpen"
-		    title="Xác nhận xóa"
-		    message="Bạn có chắc muốn xóa bình luận này không?"
-		    confirm-type="danger"
-		    @confirm="confirmDeleteComment"
-		    @cancel="cancelDeleteComment"
-		/>
+		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa"
+			message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment"
+			@cancel="cancelDeleteComment" />
 
 		<view class="modal-overlay" v-if="isEmojiPickerOpen" @click="closeEmojiPicker">
 			<view class="emoji-picker-container" @click.stop>
@@ -262,7 +251,7 @@
 				</view>
 			</view>
 		</view>
-<GlobalMessage />
+		<GlobalMessage />
 	</view>
 </template>
 
@@ -278,7 +267,7 @@
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import ConfirmModal from '@/components/ConfirmModal.vue';
 	const {
-		isLoading, isLoadingCustomer, 
+		isLoading, isLoadingCustomer,
 		isLoadingHistory, historyList,
 		form,
 		statusOptions, sourceOptions, assigneeOptions,
@@ -368,6 +357,10 @@
 		font-weight: bold;
 		color: #333;
 		width: 100%;
+		min-height: 30px;
+		line-height: 1.4;
+		white-space: pre-wrap;
+		word-break: break-word;
 	}
 
 	.detail-body {
@@ -719,6 +712,7 @@
 	.flex-1 {
 		flex: 1;
 	}
+
 	.modal-btn.cancel {
 		color: #666;
 		border-right: 1px solid #eee;
