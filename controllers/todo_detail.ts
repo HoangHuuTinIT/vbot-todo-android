@@ -3,7 +3,7 @@ import { ref, nextTick, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
-import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm'; // Import API CRM
+import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm'; 
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
@@ -24,6 +24,7 @@ interface CommentItem {
 	type : string;
 	reactions : any[];
 	children : CommentItem[];
+	rootParentId ?: number;
 }
 
 interface HistoryItem {
@@ -57,7 +58,7 @@ export const useTodoDetailController = () => {
 	const isConfirmCancelEditOpen = ref(false);
 	const isReplying = ref(false);
 	const isConfirmCancelReplyOpen = ref(false);
-	const replyingCommentData = ref<any>(null);
+	const replyingCommentData = ref<CommentItem | null>(null);
 	const replyingMemberName = ref('');
 
 	const isEmojiPickerOpen = ref(false);
@@ -222,14 +223,18 @@ export const useTodoDetailController = () => {
 		try {
 			const todoId = form.value.id;
 			const senderId = authStore.uid;
+			let apiParentId = replyingCommentData.value.id;
 
+			if (replyingCommentData.value.rootParentId) {
+				apiParentId = replyingCommentData.value.rootParentId;
+			}
 			const payload = {
-				todoId: todoId,
-				senderId: senderId,
-				message: newCommentText.value,
-				files: "",
-				parentId: replyingCommentData.value.id
-			};
+							todoId: todoId,
+							senderId: senderId,
+							message: newCommentText.value,
+							files: "",
+							parentId: apiParentId
+						};
 
 			console.log(">> Gửi trả lời:", payload);
 
@@ -642,32 +647,32 @@ export const useTodoDetailController = () => {
 	};
 
 	const fetchComments = async (todoId : string | number) => {
-		isLoadingComments.value = true;
-		try {
-
-			const currentKeySearch = commentFilterValues[commentFilterIndex.value];
-
-
-			const rawData = await getTodoMessages(todoId, currentKeySearch);
-
-			if (Array.isArray(rawData)) {
-				comments.value = rawData.map((parent : any) => {
-					const parentComment = processCommentData(parent);
-					if (parent.replies && parent.replies.length > 0) {
-						parentComment.children = parent.replies.map((child : any) => processCommentData(child));
-					}
-					return parentComment;
-				});
-			} else {
-
-				comments.value = [];
+			isLoadingComments.value = true;
+			try {
+				const currentKeySearch = commentFilterValues[commentFilterIndex.value];
+				const rawData = await getTodoMessages(todoId, currentKeySearch);
+	
+				if (Array.isArray(rawData)) {
+					comments.value = rawData.map((parent : any) => {
+						const parentComment = processCommentData(parent);
+						if (parent.replies && parent.replies.length > 0) {
+							parentComment.children = parent.replies.map((child : any) => {
+	                            const childComment = processCommentData(child);
+	                            childComment.rootParentId = parent.id;
+	                            return childComment;
+	                        });
+						}
+						return parentComment;
+					});
+				} else {
+					comments.value = [];
+				}
+			} catch (error) {
+				console.error("Lỗi lấy bình luận:", error);
+			} finally {
+				isLoadingComments.value = false;
 			}
-		} catch (error) {
-			console.error("Lỗi lấy bình luận:", error);
-		} finally {
-			isLoadingComments.value = false;
-		}
-	};
+		};
 	const onCommentFilterChange = (e : any) => {
 		const newIndex = e.detail.value;
 

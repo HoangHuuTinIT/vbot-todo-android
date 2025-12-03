@@ -36,7 +36,7 @@
               </view>
           </view>
           
-          <view class="action-buttons-container" v-if="data.type !== 'UPDATE_TODO'">
+          <view class="action-buttons-container" v-if="data.type == 'COMMENT'">
               <view class="btn-icon-action" @click="$emit('react', data)">
                   <image src="https://img.icons8.com/ios/50/999999/happy--v1.png" class="icon-action"></image>
               </view>
