@@ -3,24 +3,8 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { showError } from '@/utils/toast';
+import { convertDateRangeToValue } from '@/utils/dateUtils';
 
-const convertDateRangeToValue = (startDate : string, endDate : string) : string => {
-	if (!startDate && !endDate) return "";
-	let startTs = "";
-	let endTs = "";
-	if (startDate) {
-		const d = new Date(startDate);
-		d.setHours(0, 0, 0, 0);
-		startTs = d.getTime().toString();
-	}
-	if (endDate) {
-		const d = new Date(endDate);
-		d.setHours(0, 0, 0, 0);
-		endTs = d.getTime().toString();
-	}
-	if (!startTs && !endTs) return "";
-	return `${startTs}|${endTs}`;
-};
 
 export const useCustomerFilter = () => {
 	const authStore = useAuthStore();

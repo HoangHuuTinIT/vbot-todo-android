@@ -1,7 +1,7 @@
 //models/todo.ts
 import { TODO_STATUS, STATUS_LABELS, STATUS_COLORS } from '@/utils/constants';
 import type { TodoItem } from '@/types/todo';
-
+import { getStartOfDay, getStartOfNextDay } from '@/utils/dateUtils';
 const formatFullDateTime = (timestamp: number): string => {
     if (!timestamp || timestamp === -1 || timestamp === 0) return '';
     const date = new Date(timestamp);
@@ -13,17 +13,7 @@ const formatFullDateTime = (timestamp: number): string => {
     const s = date.getSeconds().toString().padStart(2, '0'); 
     return `${d}/${m}/${y} ${h}:${min}`;
 };
-const getStartOfDay = (dateStr : string) : number => {
-	if (!dateStr) return -1;
-	const safeDate = dateStr.replace(/-/g, '/');
-	return new Date(`${safeDate} 00:00:00`).getTime();
-};
 
-const getEndOfDay = (dateStr : string) : number => {
-	if (!dateStr) return -1;
-	const safeDate = dateStr.replace(/-/g, '/');
-	return new Date(`${safeDate} 00:00:00`).getTime();
-};
 const dateToTimestamp = (dateStr : string) : number => {
 	if (!dateStr) return -1;
 	return new Date(dateStr).getTime();
@@ -52,13 +42,13 @@ export const buildTodoParams = (
 		status: statusValue || '',
 
 		startDate: getStartOfDay(filter.createdFrom),
-		endDate: getEndOfDay(filter.createdTo),
-
+		endDate: getStartOfNextDay(filter.createdTo), 
+		        
 		dueDateFrom: getStartOfDay(filter.dueDateFrom),
-		dueDateTo: getEndOfDay(filter.dueDateTo),
-
+		dueDateTo: getStartOfNextDay(filter.dueDateTo),
+		        
 		notificationReceivedAtFrom: getStartOfDay(filter.notifyFrom),
-		notificationReceivedAtTo: getEndOfDay(filter.notifyTo),
+		notificationReceivedAtTo: getStartOfNextDay(filter.notifyTo),
 
 		createdBy: creatorId || '',
 		assigneeId: assigneeId || '',

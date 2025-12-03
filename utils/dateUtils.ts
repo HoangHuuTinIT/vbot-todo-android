@@ -41,3 +41,43 @@ export const formatDateDisplay = (dateStr: string): string => {
         return dateStr;
     }
 };
+
+const parseSafeDate = (dateStr: string): Date | null => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+
+export const getStartOfDay = (dateStr: string): number => {
+    const d = parseSafeDate(dateStr);
+    if (!d) return -1;
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+};
+
+export const getStartOfNextDay = (dateStr: string): number => {
+    const d = parseSafeDate(dateStr);
+    if (!d) return -1;
+    
+    d.setDate(d.getDate() + 1);
+    
+    d.setHours(0, 0, 0, 0);
+    
+    return d.getTime();
+};
+
+
+export const convertDateRangeToValue = (startDate: string, endDate: string): string => {
+    if (!startDate && !endDate) return "";
+    
+    const startTs = getStartOfDay(startDate);
+    const endTs = getStartOfNextDay(endDate); 
+
+    if (startTs === -1 && endTs === -1) return "";
+    
+    const s = startTs === -1 ? '' : startTs;
+    const e = endTs === -1 ? '' : endTs;
+    
+    return `${s}|${e}`;
+};

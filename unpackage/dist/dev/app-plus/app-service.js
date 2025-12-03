@@ -183,6 +183,38 @@ if (uni.restoreGlobal) {
       return dateStr;
     }
   };
+  const parseSafeDate = (dateStr) => {
+    if (!dateStr)
+      return null;
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const getStartOfDay = (dateStr) => {
+    const d = parseSafeDate(dateStr);
+    if (!d)
+      return -1;
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  };
+  const getStartOfNextDay = (dateStr) => {
+    const d = parseSafeDate(dateStr);
+    if (!d)
+      return -1;
+    d.setDate(d.getDate() + 1);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  };
+  const convertDateRangeToValue = (startDate, endDate) => {
+    if (!startDate && !endDate)
+      return "";
+    const startTs = getStartOfDay(startDate);
+    const endTs = getStartOfNextDay(endDate);
+    if (startTs === -1 && endTs === -1)
+      return "";
+    const s = startTs === -1 ? "" : startTs;
+    const e = endTs === -1 ? "" : endTs;
+    return `${s}|${e}`;
+  };
   const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
@@ -2484,29 +2516,17 @@ This will fail in production if not fixed.`);
     date.getSeconds().toString().padStart(2, "0");
     return `${d}/${m}/${y} ${h}:${min}`;
   };
-  const getStartOfDay = (dateStr) => {
-    if (!dateStr)
-      return -1;
-    const safeDate = dateStr.replace(/-/g, "/");
-    return (/* @__PURE__ */ new Date(`${safeDate} 00:00:00`)).getTime();
-  };
-  const getEndOfDay = (dateStr) => {
-    if (!dateStr)
-      return -1;
-    const safeDate = dateStr.replace(/-/g, "/");
-    return (/* @__PURE__ */ new Date(`${safeDate} 00:00:00`)).getTime();
-  };
   const buildTodoParams = (filter, statusValue, sourceValue, creatorId, assigneeId) => {
     return {
       keySearch: filter.title || "",
       code: filter.jobCode || "",
       status: statusValue || "",
       startDate: getStartOfDay(filter.createdFrom),
-      endDate: getEndOfDay(filter.createdTo),
+      endDate: getStartOfNextDay(filter.createdTo),
       dueDateFrom: getStartOfDay(filter.dueDateFrom),
-      dueDateTo: getEndOfDay(filter.dueDateTo),
+      dueDateTo: getStartOfNextDay(filter.dueDateTo),
       notificationReceivedAtFrom: getStartOfDay(filter.notifyFrom),
-      notificationReceivedAtTo: getEndOfDay(filter.notifyTo),
+      notificationReceivedAtTo: getStartOfNextDay(filter.notifyTo),
       createdBy: creatorId || "",
       assigneeId: assigneeId || "",
       customerCode: filter.customerCode || "",
@@ -2743,25 +2763,6 @@ This will fail in production if not fixed.`);
       changePageSize
     };
   };
-  const convertDateRangeToValue = (startDate, endDate) => {
-    if (!startDate && !endDate)
-      return "";
-    let startTs = "";
-    let endTs = "";
-    if (startDate) {
-      const d = new Date(startDate);
-      d.setHours(0, 0, 0, 0);
-      startTs = d.getTime().toString();
-    }
-    if (endDate) {
-      const d = new Date(endDate);
-      d.setHours(0, 0, 0, 0);
-      endTs = d.getTime().toString();
-    }
-    if (!startTs && !endTs)
-      return "";
-    return `${startTs}|${endTs}`;
-  };
   const useCustomerFilter = () => {
     const authStore = useAuthStore();
     const customerList = vue.ref([]);
@@ -2834,7 +2835,7 @@ This will fail in production if not fixed.`);
           isFinished.value = true;
         }
       } catch (error) {
-        formatAppLog("error", "at composables/useCustomerFilter.ts:108", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at composables/useCustomerFilter.ts:92", "Lỗi tải khách hàng:", error);
         showError("Lỗi tải dữ liệu CRM");
       } finally {
         loadingCustomer.value = false;
