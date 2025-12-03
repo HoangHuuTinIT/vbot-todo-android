@@ -2,16 +2,16 @@
 import { TODO_STATUS, STATUS_LABELS, STATUS_COLORS } from '@/utils/constants';
 import type { TodoItem } from '@/types/todo';
 
-const formatFullDateTime = (timestamp : number) : string => {
-	if (!timestamp || timestamp === -1 || timestamp === 0) return '';
-	const date = new Date(timestamp);
-	const d = date.getDate().toString().padStart(2, '0');
-	const m = (date.getMonth() + 1).toString().padStart(2, '0');
-	const y = date.getFullYear();
-	const h = date.getHours().toString().padStart(2, '0');
-	const min = date.getMinutes().toString().padStart(2, '0');
-	const s = date.getSeconds().toString().padStart(2, '0');
-	return `${d}/${m}/${y} ${h}:${min}:${s}`;
+const formatFullDateTime = (timestamp: number): string => {
+    if (!timestamp || timestamp === -1 || timestamp === 0) return '';
+    const date = new Date(timestamp);
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    const h = date.getHours().toString().padStart(2, '0');
+    const min = date.getMinutes().toString().padStart(2, '0');
+    const s = date.getSeconds().toString().padStart(2, '0'); 
+    return `${d}/${m}/${y} ${h}:${min}`;
 };
 const getStartOfDay = (dateStr : string) : number => {
 	if (!dateStr) return -1;
@@ -83,5 +83,7 @@ export const mapTodoFromApi = (apiData : TodoItem) : TodoItem => {
 		statusLabel: STATUS_LABELS[status] || status,
 		avatarText: title.substring(0, 2).toUpperCase(),
 		createdAtFormatted: formatFullDateTime(apiData.createdAt),
+		dueDateFormatted: formatFullDateTime(apiData.dueDate),
+		notifyAtFormatted: formatFullDateTime(apiData.notificationReceivedAt),
 	} as any;
 };

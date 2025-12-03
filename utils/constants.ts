@@ -8,7 +8,7 @@ export const TODO_STATUS = {
 } as const;
 
 export const STATUS_LABELS: Record<TodoStatusType, string> = {
-    'TO_DO': 'Chờ xử lý',
+    'TO_DO': 'Chưa xử lý',
     'IN_PROGRESS': 'Đang xử lý',
     'DONE': 'Hoàn thành'
 };

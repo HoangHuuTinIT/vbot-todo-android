@@ -37,6 +37,8 @@ export interface TodoItem {
     completedAt: number | null;
     firstActionAt: number | null;
     reAssignCount: number | null;
+	dueDateFormatted?: string;     
+	notifyAtFormatted?: string;
 }
 
 export interface GetTodoParams {

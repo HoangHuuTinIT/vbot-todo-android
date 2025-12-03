@@ -248,11 +248,9 @@ export const useListTodoController = () => {
 		fetchData();
 		closeFilter();
 	};
-	onMounted(() => {
-		getTodoList();
-	});
-	onShow(() => {
 
+	onShow(() => {
+		getTodoList();
 	});
 	const goToDetail = (item : TodoItem) => {
 		uni.navigateTo({

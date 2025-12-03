@@ -881,14 +881,17 @@ to {
   letter-spacing: 1px;
   transform: rotate(90deg);
 }
-.mid-row[data-v-1b4e60ea] {
-  margin-bottom: 15px;
+.card-info-row[data-v-1b4e60ea] {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
 }
 .icon-small[data-v-1b4e60ea] {
   width: 14px;
   height: 14px;
-  margin-right: 6px;
-  opacity: 0.6;
+  margin-right: 8px;
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 .card-date[data-v-1b4e60ea] {
   font-size: 13px;
@@ -898,6 +901,9 @@ to {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
 }
 .code-tag[data-v-1b4e60ea] {
   background-color: #f0f2f5;

@@ -32,9 +32,20 @@
 									<text class="dots">•••</text>
 								</view>
 							</view>
-							<view class="card-row mid-row">
+							<view class="card-info-row">
 								<image src="https://img.icons8.com/ios/50/666666/time.png" class="icon-small"></image>
-								<text class="card-date">Ngày tạo: {{ item.createdAtFormatted }}</text>
+								<text class="card-date">Tạo: {{ item.createdAtFormatted }}</text>
+							</view>
+
+							<view class="card-info-row" v-if="item.dueDateFormatted">
+								<image src="https://img.icons8.com/ios/50/ff3b30/calendar--v1.png" class="icon-small">
+								</image>
+								<text class="card-date text-danger">Hết hạn: {{ item.dueDateFormatted }}</text>
+							</view>
+
+							<view class="card-info-row" v-if="item.notifyAtFormatted">
+								<image src="https://img.icons8.com/ios/50/007aff/alarm.png" class="icon-small"></image>
+								<text class="card-date text-primary">Thông báo: {{ item.notifyAtFormatted }}</text>
 							</view>
 							<view class="card-row bot-row">
 								<view class="code-tag">#{{ item.code }}</view>
@@ -390,26 +401,30 @@
 		transform: rotate(90deg);
 	}
 
-	.mid-row {
-		margin-bottom: 15px;
-	}
-
+.card-info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px; 
+}
 	.icon-small {
-		width: 14px;
-		height: 14px;
-		margin-right: 6px;
-		opacity: 0.6;
+	    width: 14px;
+	    height: 14px;
+	    margin-right: 8px; 
+	    opacity: 0.7;
+	    flex-shrink: 0;
 	}
-
 	.card-date {
 		font-size: 13px;
 		color: #8898aa;
 	}
 
 	.bot-row {
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0;
+	    justify-content: space-between;
+	    align-items: center;
+	    margin-bottom: 0;
+	    margin-top: 10px; 
+	    padding-top: 10px;
+	    border-top: 1px dashed #eee; 
 	}
 
 	.code-tag {

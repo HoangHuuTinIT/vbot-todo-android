@@ -2445,7 +2445,7 @@ This will fail in production if not fixed.`);
     DONE: "DONE"
   };
   const STATUS_LABELS = {
-    "TO_DO": "Chờ xử lý",
+    "TO_DO": "Chưa xử lý",
     "IN_PROGRESS": "Đang xử lý",
     "DONE": "Hoàn thành"
   };
@@ -2481,8 +2481,8 @@ This will fail in production if not fixed.`);
     const y = date.getFullYear();
     const h = date.getHours().toString().padStart(2, "0");
     const min = date.getMinutes().toString().padStart(2, "0");
-    const s = date.getSeconds().toString().padStart(2, "0");
-    return `${d}/${m}/${y} ${h}:${min}:${s}`;
+    date.getSeconds().toString().padStart(2, "0");
+    return `${d}/${m}/${y} ${h}:${min}`;
   };
   const getStartOfDay = (dateStr) => {
     if (!dateStr)
@@ -2527,7 +2527,9 @@ This will fail in production if not fixed.`);
       statusClass: STATUS_COLORS[status] || "bg-orange",
       statusLabel: STATUS_LABELS[status] || status,
       avatarText: title.substring(0, 2).toUpperCase(),
-      createdAtFormatted: formatFullDateTime(apiData.createdAt)
+      createdAtFormatted: formatFullDateTime(apiData.createdAt),
+      dueDateFormatted: formatFullDateTime(apiData.dueDate),
+      notifyAtFormatted: formatFullDateTime(apiData.notificationReceivedAt)
     };
   };
   const getTodos = async (params) => {
@@ -3094,10 +3096,8 @@ This will fail in production if not fixed.`);
       fetchData();
       closeFilter();
     };
-    vue.onMounted(() => {
-      getTodoList();
-    });
     onShow(() => {
+      getTodoList();
     });
     const goToDetail = (item) => {
       uni.navigateTo({
@@ -3664,7 +3664,7 @@ This will fail in production if not fixed.`);
                         vue.createElementVNode("text", { class: "dots" }, "•••")
                       ], 8, ["onClick"])
                     ]),
-                    vue.createElementVNode("view", { class: "card-row mid-row" }, [
+                    vue.createElementVNode("view", { class: "card-info-row" }, [
                       vue.createElementVNode("image", {
                         src: "https://img.icons8.com/ios/50/666666/time.png",
                         class: "icon-small"
@@ -3672,11 +3672,43 @@ This will fail in production if not fixed.`);
                       vue.createElementVNode(
                         "text",
                         { class: "card-date" },
-                        "Ngày tạo: " + vue.toDisplayString(item.createdAtFormatted),
+                        "Tạo: " + vue.toDisplayString(item.createdAtFormatted),
                         1
                         /* TEXT */
                       )
                     ]),
+                    item.dueDateFormatted ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 0,
+                      class: "card-info-row"
+                    }, [
+                      vue.createElementVNode("image", {
+                        src: "https://img.icons8.com/ios/50/ff3b30/calendar--v1.png",
+                        class: "icon-small"
+                      }),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "card-date text-danger" },
+                        "Hết hạn: " + vue.toDisplayString(item.dueDateFormatted),
+                        1
+                        /* TEXT */
+                      )
+                    ])) : vue.createCommentVNode("v-if", true),
+                    item.notifyAtFormatted ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 1,
+                      class: "card-info-row"
+                    }, [
+                      vue.createElementVNode("image", {
+                        src: "https://img.icons8.com/ios/50/007aff/alarm.png",
+                        class: "icon-small"
+                      }),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "card-date text-primary" },
+                        "Thông báo: " + vue.toDisplayString(item.notifyAtFormatted),
+                        1
+                        /* TEXT */
+                      )
+                    ])) : vue.createCommentVNode("v-if", true),
                     vue.createElementVNode("view", { class: "card-row bot-row" }, [
                       vue.createElementVNode(
                         "view",
@@ -4724,15 +4756,22 @@ This will fail in production if not fixed.`);
           {
             class: "item-input",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.name = $event),
-            placeholder: "Nhập tên công việc *",
-            maxlength: "29"
+            placeholder: "Nhập tên công việc... *",
+            maxlength: "256"
           },
           null,
           512
           /* NEED_PATCH */
         ), [
           [vue.vModelText, $setup.form.name]
-        ])
+        ]),
+        vue.createElementVNode(
+          "text",
+          { class: "char-count" },
+          vue.toDisplayString($setup.form.name ? $setup.form.name.length : 0) + "/256 ",
+          1
+          /* TEXT */
+        )
       ]),
       vue.createVNode($setup["TodoEditor"], {
         modelValue: $setup.form.desc,
