@@ -10,7 +10,7 @@ import { TIMELINE_TYPE_MAP } from '@/utils/constants';
 import { useAuthStore } from '@/stores/auth';
 import { formatRelativeTime } from '@/utils/dateUtils';
 import { TODO_STATUS } from '@/utils/constants';
-import { showSuccess, showError, showInfo, showLoading, hideLoading } from '@/utils/toast';
+import { showSuccess, showError, showInfo } from '@/utils/toast';
 interface CommentItem {
 	id : number;
 	senderId : string | number;
@@ -91,8 +91,8 @@ export const useTodoDetailController = () => {
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
 
-		showLoading('Đang cập nhật...');
-
+		// showLoading('Đang cập nhật...');
+isLoading.value = true;
 		try {
 			const payload = {
 				...form.value.raw,
@@ -135,7 +135,7 @@ export const useTodoDetailController = () => {
 			console.error("Lỗi cập nhật ngày:", error);
 			showError('Lỗi cập nhật');
 		} finally {
-			hideLoading();
+			isLoading.value = false;
 		}
 	};
 
@@ -224,7 +224,7 @@ export const useTodoDetailController = () => {
 			}
 	
 			isSavingDescription.value = true;
-	        showLoading('Đang lưu...');
+	        // showLoading('Đang lưu...');
 	
 			try {
 	         
@@ -261,7 +261,7 @@ export const useTodoDetailController = () => {
 				console.error("Lỗi cập nhật công việc:", error);
 				showError('Cập nhật thất bại');
 			} finally {
-	            hideLoading();
+	            // hideLoading();
 				isSavingDescription.value = false;
 			}
 		};
@@ -280,8 +280,8 @@ const onSaveTitle = async () => {
 
         if (newTitle === oldTitle) return;
 
-        showLoading('Đang cập nhật tiêu đề...');
-
+        // showLoading('Đang cập nhật tiêu đề...');
+isLoading.value = true;
         try {
        
             const payload = {
@@ -312,7 +312,8 @@ const onSaveTitle = async () => {
             showError('Lỗi cập nhật');
             form.value.title = oldTitle;
         } finally {
-            hideLoading();
+            // hideLoading();
+			isLoading.value = false;
         }
     };
 	const onRequestReply = async (item : any) => {
@@ -505,8 +506,8 @@ const onSaveTitle = async () => {
 		const todoId = form.value.id;
 		if (!todoId) return;
 
-		showLoading('Đang tải...');
-
+		// showLoading('Đang tải...');
+isLoading.value = true;
 		try {
 
 			const res = await getTodoMessageDetail(commentId, todoId);
@@ -551,7 +552,8 @@ const onSaveTitle = async () => {
 			console.error("Lỗi lấy chi tiết bình luận:", error);
 			showError('Lỗi tải dữ liệu');
 		} finally {
-			uni.hideLoading();
+			// uni.hideLoading();
+			isLoading.value = true;
 		}
 	};
 
@@ -954,8 +956,8 @@ const onSaveTitle = async () => {
 
 
 		if (!form.value.raw) return;
-		showLoading('Đang cập nhật...');
-
+		// showLoading('Đang cập nhật...');
+isLoading.value = true;
 
 		try {
 
@@ -993,7 +995,8 @@ const onSaveTitle = async () => {
 
 			showError('Lỗi cập nhật');
 		} finally {
-			uni.hideLoading();
+			isLoading.value = false;
+			// uni.hideLoading();
 		}
 	};
 	const onSourceChange = (e : any) => { form.value.sourceIndex = e.detail.value; };
@@ -1015,7 +1018,8 @@ const onSaveTitle = async () => {
 			showError('Thiếu dữ liệu gốc');
 			return;
 		}
-		showLoading('Đang cập nhật người giao...');
+		// showLoading('Đang cập nhật người giao...');
+		isLoading.value = true;
 		try {
 
 			const payload = {
@@ -1053,7 +1057,8 @@ const onSaveTitle = async () => {
 			console.error("Lỗi cập nhật người giao:", error);
 			showError('Lỗi cập nhật');
 		} finally {
-			hideLoading();
+			// hideLoading();
+			isLoading.value = false;
 		}
 	};
 	const goBack = () => { uni.navigateBack(); };
