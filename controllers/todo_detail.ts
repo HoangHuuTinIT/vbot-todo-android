@@ -14,6 +14,7 @@ import { showSuccess, showError, showInfo, showLoading, hideLoading } from '@/ut
 interface CommentItem {
 	id : number;
 	senderId : string | number;
+	
 	senderName : string;
 	senderAvatarChar : string;
 	senderAvatarColor : string;
@@ -137,7 +138,49 @@ export const useTodoDetailController = () => {
 			hideLoading();
 		}
 	};
+
+	    const processCommentInput = async (htmlContent: string): Promise<{ cleanMessage: string, fileUrl: string }> => {
+	        if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
 	
+	        const imgRegex = /<img[^>]+src="([^">]+)"[^>]*>/g;
+	        let match;
+	        let fileUrl = '';
+	        let cleanMessage = htmlContent;
+	
+	        const uploadPromises: Promise<string>[] = [];
+	        
+	        while ((match = imgRegex.exec(htmlContent)) !== null) {
+	            const fullImgTag = match[0];
+	            const src = match[1];
+	
+	            cleanMessage = cleanMessage.replace(fullImgTag, '');
+	
+	            if (!src.startsWith('http') && !src.startsWith('https')) {
+	                 const p = uploadTodoFile(src)
+	                    .then(serverUrl => serverUrl)
+	                    .catch(err => {
+	                        console.error('Upload ảnh bình luận lỗi:', err);
+	                        return '';
+	                    });
+	                uploadPromises.push(p);
+	            } else {
+
+	                fileUrl = src; 
+	            }
+	        }
+	
+	        if (uploadPromises.length > 0) {
+	            const results = await Promise.all(uploadPromises);
+	            const successfulUrl = results.find(u => u !== '');
+	            if (successfulUrl) {
+	                fileUrl = successfulUrl;
+	            }
+	        }
+	
+	        cleanMessage = cleanMessage.trim();
+	
+	        return { cleanMessage, fileUrl };
+	    };
 	const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
 			if (!htmlContent) return { newContent: '', fileUrls: [] };
 	
@@ -262,46 +305,49 @@ export const useTodoDetailController = () => {
 	};
 
 	const submitReply = async () => {
-		if (!newCommentText.value || !newCommentText.value.trim()) {
-			showInfo('Vui lòng nhập nội dung');
-			return;
-		}
-		if (!replyingCommentData.value) return;
-
-		isSubmittingComment.value = true;
-
-		try {
-			const todoId = form.value.id;
-			const senderId = authStore.uid;
-			let apiParentId = replyingCommentData.value.id;
-
-			if (replyingCommentData.value.rootParentId) {
-				apiParentId = replyingCommentData.value.rootParentId;
-			}
-			const payload = {
-							todoId: todoId,
-							senderId: senderId,
-							message: newCommentText.value,
-							files: "",
-							parentId: apiParentId
-						};
-
-			console.log(">> Gửi trả lời:", payload);
-
-			const res = await createTodoMessage(payload);
-
-			if (res) {
-				showSuccess('Đã trả lời');
-				resetReplyState();
-				await fetchComments(todoId);
-			}
-		} catch (error) {
-			console.error("Lỗi gửi trả lời:", error);
-			showError('Gửi thất bại');
-		} finally {
-			isSubmittingComment.value = false;
-		}
-	};
+	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+	             showInfo('Vui lòng nhập nội dung');
+	             return;
+	        }
+	        if (!replyingCommentData.value) return;
+	
+	        isSubmittingComment.value = true;
+	
+	        try {
+	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+	
+	            const todoId = form.value.id;
+	            const senderId = authStore.uid;
+	            let apiParentId = replyingCommentData.value.id;
+	
+	            if (replyingCommentData.value.rootParentId) {
+	                apiParentId = replyingCommentData.value.rootParentId;
+	            }
+	            
+	            const payload = {
+	                todoId: todoId,
+	                senderId: senderId,
+	                message: cleanMessage, 
+	                files: fileUrl,      
+	                parentId: apiParentId
+	            };
+	
+	            console.log(">> Gửi trả lời (đã xử lý):", payload);
+	
+	            const res = await createTodoMessage(payload);
+	
+	            if (res) {
+	                showSuccess('Đã trả lời');
+	                resetReplyState();
+	                await fetchComments(todoId);
+	            }
+	        } catch (error) {
+	            console.error("Lỗi gửi trả lời:", error);
+	            showError('Gửi thất bại');
+	        } finally {
+	            isSubmittingComment.value = false;
+	        }
+	    };
 
 	const resetReplyState = () => {
 		isReplying.value = false;
@@ -460,41 +506,42 @@ export const useTodoDetailController = () => {
 	};
 
 	const submitUpdateComment = async () => {
-		if (!editingCommentData.value) return;
-		if (!newCommentText.value || !newCommentText.value.trim()) {
-			showInfo('Nội dung không được để trống');
-			return;
-		}
+	        if (!editingCommentData.value) return;
+	        
 
-		isSubmittingComment.value = true;
-
-		try {
-
-			const payload = {
-				id: editingCommentData.value.id,
-				todoId: editingCommentData.value.todoId,
-				senderId: editingCommentData.value.senderId,
-				message: newCommentText.value,
-				files: ""
-			};
-
-			console.log("Payload Update:", payload);
-
-			await updateTodoMessage(payload);
-
-			showSuccess('Đã cập nhật');
-
-			resetEditState();
-
-			await fetchComments(form.value.id);
-
-		} catch (error) {
-			console.error("Lỗi cập nhật:", error);
-			showError('Cập nhật thất bại');
-		} finally {
-			isSubmittingComment.value = false;
-		}
-	};
+	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+	             showInfo('Nội dung không được để trống');
+	             return;
+	        }
+	
+	        isSubmittingComment.value = true;
+	
+	        try {
+	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+	
+	            const payload = {
+	                id: editingCommentData.value.id,
+	                todoId: editingCommentData.value.todoId,
+	                senderId: editingCommentData.value.senderId,
+	                message: cleanMessage,
+	                files: fileUrl 
+	            };
+	
+	            console.log("Payload Update (đã xử lý):", payload);
+	
+	            await updateTodoMessage(payload);
+	
+	            showSuccess('Đã cập nhật');
+	            resetEditState();
+	            await fetchComments(form.value.id);
+	
+	        } catch (error) {
+	            console.error("Lỗi cập nhật:", error);
+	            showError('Cập nhật thất bại');
+	        } finally {
+	            isSubmittingComment.value = false;
+	        }
+	    };
 
 
 	const onCancelEditComment = () => {
@@ -554,51 +601,45 @@ export const useTodoDetailController = () => {
 		commentToDeleteId.value = null;
 	};
 	const submitComment = async () => {
-
-		if (!newCommentText.value || !newCommentText.value.trim()) {
-			showInfo('Vui lòng nhập nội dung');
-			return;
-		}
-
-
-		isSubmittingComment.value = true;
-
-		try {
-
-			const todoId = form.value.id;
-
-			const senderId = authStore.uid;
-
-			const payload = {
-				todoId: todoId,
-				senderId: senderId,
-				message: newCommentText.value,
-				files: "",
-				parentId: -1
-			};
-
-			console.log("Đang gửi bình luận:", payload);
-
-
-			const res = await createTodoMessage(payload);
-
-			if (res) {
-				showSuccess('Đã gửi bình luận');
-
-
-				newCommentText.value = '';
-
-				await fetchComments(todoId);
-			}
-
-		} catch (error) {
-			console.error("Lỗi gửi bình luận:", error);
-			showError('Gửi thất bại');
-		} finally {
-
-			isSubmittingComment.value = false;
-		}
-	};
+	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+	            showInfo('Vui lòng nhập nội dung');
+	            return;
+	        }
+	
+	        isSubmittingComment.value = true;
+	
+	        try {
+	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+	            
+	            
+	            const todoId = form.value.id;
+	            const senderId = authStore.uid;
+	
+	            const payload = {
+	                todoId: todoId,
+	                senderId: senderId,
+	                message: cleanMessage, 
+	                files: fileUrl,       
+	                parentId: -1
+	            };
+	
+	            console.log("Đang gửi bình luận (đã xử lý):", payload);
+	
+	            const res = await createTodoMessage(payload);
+	
+	            if (res) {
+	                showSuccess('Đã gửi bình luận');
+	                newCommentText.value = '';
+	                await fetchComments(todoId);
+	            }
+	
+	        } catch (error) {
+	            console.error("Lỗi gửi bình luận:", error);
+	            showError('Gửi thất bại');
+	        } finally {
+	            isSubmittingComment.value = false;
+	        }
+	    };
 	onLoad(async (options : any) => {
 
 		await fetchMembers();

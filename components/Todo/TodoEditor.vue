@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref, watch, getCurrentInstance } from 'vue';
-// import { pathToBase64 } from '@/utils/file';
+
 const props = defineProps({
 	modelValue: String,
 	placeholder: { type: String, default: 'Nhập nội dung...' }
