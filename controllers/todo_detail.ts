@@ -640,61 +640,70 @@ export const useTodoDetailController = () => {
 	            isSubmittingComment.value = false;
 	        }
 	    };
-	onLoad(async (options : any) => {
-
-		await fetchMembers();
-
-		if (options && options.id) {
-			await fetchDetail(options.id);
-		}
-	});
+	onLoad((options : any) => {
+			
+			fetchMembers(); 
+	
+			if (options && options.id) {
+				fetchDetail(options.id); 
+			}
+		});
 
 	const fetchMembers = async () => {
-		try {
-			const data = await getAllMembers();
-			memberList.value = data;
-			assigneeOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
-		} catch (e) {
-			console.error('Lỗi lấy members', e);
-		}
-	};
+			try {
+				const data = await getAllMembers();
+				memberList.value = data;
+				assigneeOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
+	            if(form.value.assigneeId) {
+	                const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
+					if (index !== -1) form.value.assigneeIndex = index;
+	            }
+			} catch (e) {
+				console.error('Lỗi lấy members', e);
+			}
+		};
 
 	const fetchDetail = async (id : string | number) => {
-		isLoading.value = true;
-		try {
-			const rawResponse = await getTodoDetail(id);
-			const realData = (rawResponse && rawResponse.data && !rawResponse.id)
-				? rawResponse.data
-				: rawResponse;
+			isLoading.value = true; 
+	        uni.showNavigationBarLoading(); 
+	
+			try {
+				const rawResponse = await getTodoDetail(id);
+				const realData = (rawResponse && rawResponse.data && !rawResponse.id)
+					? rawResponse.data
+					: rawResponse;
+	
+				const mappedData = mapTodoDetailToForm(realData);
+	
+				if (mappedData) {
+					form.value = mappedData;
+					
+					const currentStatus = mappedData.raw.status;
+					const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
+					if (realIndex !== -1) {
+						form.value.statusIndex = realIndex;
+					}
 
-			const mappedData = mapTodoDetailToForm(realData);
-
-			if (mappedData) {
-				form.value = mappedData;
-				const currentStatus = mappedData.raw.status;
-				const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
-				if (realIndex !== -1) {
-					form.value.statusIndex = realIndex;
+					if (form.value.assigneeId && memberList.value.length > 0) {
+						const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
+						if (index !== -1) form.value.assigneeIndex = index;
+					}
+	
+					fetchComments(id); 
+	
+					if (form.value.customerCode) {
+						fetchCustomerInfo(form.value.customerCode); 
+						fetchHistoryLog(form.value.customerCode);
+					}
 				}
-				fetchComments(id);
-
-				if (form.value.assigneeId && memberList.value.length > 0) {
-					const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
-					if (index !== -1) form.value.assigneeIndex = index;
-				}
-
-				if (form.value.customerCode) {
-					await fetchCustomerInfo(form.value.customerCode);
-					fetchHistoryLog(form.value.customerCode);
-				}
+			} catch (error) {
+				console.error('Lỗi lấy chi tiết:', error);
+				showError('Lỗi kết nối');
+			} finally {
+				isLoading.value = false;
+	            uni.hideNavigationBarLoading();
 			}
-		} catch (error) {
-			console.error(' Lỗi lấy chi tiết:', error);
-			showError('Lỗi kết nối');
-		} finally {
-			isLoading.value = false;
-		}
-	};
+		};
 	const processCommentData = (item : any) : CommentItem => {
 
 		let senderName = 'Người dùng ẩn';

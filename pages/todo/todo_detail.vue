@@ -1,52 +1,41 @@
 //pages/todo/todo_detail.vue
 <template>
 	<view class="container">
-		<view v-if="isLoading" class="loading-overlay">
-			<text>Đang tải...</text>
-		</view>
+		<view class="loading-bar" v-if="isLoading"></view>
 
 		<view class="detail-header">
 			<view class="header-top">
-				<text class="header-code">#{{ form.code }}</text>
+				<text class="header-code">#{{ form.code || '...' }}</text>
 			</view>
-			<textarea class="header-title-input" v-model="form.title" placeholder="Tên công việc" auto-height
-				maxlength="256" />
+			<textarea class="header-title-input" v-model="form.title" placeholder="Đang tải tên công việc..." auto-height maxlength="256" />
 		</view>
 
-        <scroll-view 
-            scroll-y="true" 
-            class="detail-body" 
-            :scroll-into-view="scrollTarget"
-            scroll-with-animation
-        >
+		<scroll-view scroll-y="true" class="detail-body" :scroll-into-view="scrollTarget" scroll-with-animation>
 
 			<view class="section-title">Mô tả</view>
 			<view class="section-block">
 				<TodoEditor v-model="form.desc" placeholder="Nhập mô tả công việc..." />
-
 				<view class="input-actions" style="margin-top: 10px;">
 					<AppButton type="primary" size="small" :loading="isSavingDescription"
 						:label="isSavingDescription ? 'Đang lưu...' : 'Lưu lại'" @click="onSaveDescription" />
 				</view>
 			</view>
 
-            <view class="section-title">Thông tin công việc</view>
+			<view class="section-title">Thông tin công việc</view>
 			<view class="info-group">
-                <view class="flat-item">
+				<view class="flat-item">
 					<view class="item-left">
-						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon">
-						</image>
+						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon"></image>
 						<text class="item-label">Trạng thái</text>
 					</view>
-					<picker mode="selector" :range="statusOptions" :value="form.statusIndex"
-						:disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
+					<picker mode="selector" :range="statusOptions" :value="form.statusIndex" :disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
 						<view class="picker-text" :class="{ 'disabled-text': isStatusDisabled }">
-							{{ statusOptions[form.statusIndex] }}
+							{{ statusOptions[form.statusIndex] || 'Đang tải...' }}
 							<text v-if="!isStatusDisabled">▾</text>
 						</view>
 					</picker>
 				</view>
-
+				
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
@@ -54,7 +43,7 @@
 					</view>
 					<view class="item-picker-box">
 						<view class="picker-text disabled-text">
-							{{ sourceOptions[form.sourceIndex] || 'Không xác định' }}
+							{{ sourceOptions[form.sourceIndex] || '...' }}
 						</view>
 					</view>
 				</view>
@@ -64,89 +53,69 @@
 						<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
 						<text class="item-label">Người được giao</text>
 					</view>
-
-					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex"
-						@change="onAssigneeChange" class="item-picker-box">
+					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex" @change="onAssigneeChange" class="item-picker-box">
 						<view class="picker-text">
-							{{ (form.assigneeIndex > -1 && assigneeOptions[form.assigneeIndex]) 
-                                ? assigneeOptions[form.assigneeIndex] 
-                                : 'Chọn người giao' 
-                            }} ▾
+							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : 'Đang tải...' }} ▾
 						</view>
 					</picker>
 				</view>
 
-				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate"
-					v-model:notifyTime="form.notifyTime" @change="onDateUpdate" />
-            </view>
+				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate" v-model:notifyTime="form.notifyTime" @change="onDateUpdate" />
+			</view>
 
-            <view class="section-title">Thông tin khách hàng</view>
+			<view class="section-title">Thông tin khách hàng</view>
 			<view class="info-group customer-block">
-                <view v-if="isLoadingCustomer" class="loading-row">
-					<text class="loading-text">Đang tải thông tin từ CRM...</text>
+				<view v-if="isLoadingCustomer" class="loading-row">
+					<text class="loading-text">⏳ Đang tải thông tin từ CRM...</text>
 				</view>
-
 				<view v-else-if="!form.customerCode" class="empty-row">
 					<text>(Công việc này chưa gắn với khách hàng nào)</text>
 				</view>
-
 				<view v-else>
 					<view class="flat-item">
 						<view class="item-left">
-							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon">
-							</image>
-							<text class="item-label">{{ form.customerNameLabel }}</text>
+							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
+							<text class="item-label">{{ form.customerNameLabel || 'Khách hàng' }}</text>
 						</view>
 						<view class="item-right-text">{{ form.customerName }}</view>
 					</view>
-
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerPhoneLabel }}</text>
+							<text class="item-label">{{ form.customerPhoneLabel || 'SĐT' }}</text>
 						</view>
 						<view class="item-right-text phone-text">{{ form.customerPhone }}</view>
 					</view>
-
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerManagerLabel }}</text>
+							<text class="item-label">{{ form.customerManagerLabel || 'Phụ trách' }}</text>
 						</view>
 						<view class="item-right-text highlight-text">
 							{{ form.customerManagerName || '(Chưa có)' }}
 						</view>
 					</view>
 				</view>
-            </view>
+			</view>
 
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
 					<text class="section-title no-margin">Bình luận và hoạt động</text>
-					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
-						:class="{ 'open': isCommentsOpen }"></image>
+					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon" :class="{ 'open': isCommentsOpen }"></image>
 				</view>
-                <picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
-					@change="onCommentFilterChange">
-					<view class="filter-badge">
-						{{ commentFilterOptions[commentFilterIndex] }} ▾
-					</view>
+				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop @change="onCommentFilterChange">
+					<view class="filter-badge">{{ commentFilterOptions[commentFilterIndex] }} ▾</view>
 				</picker>
 			</view>
 
 			<view class="comments-section" v-if="isCommentsOpen">
-                <view class="comment-input-block" id="comment-input-anchor">
+				<view class="comment-input-block" id="comment-input-anchor">
 					<view class="editor-container">
-						<TodoEditor v-model="newCommentText"
-							:placeholder="isEditingComment ? 'Đang chỉnh sửa...' : (isReplying ? 'Viết câu trả lời...' : 'Viết bình luận')" />
+						<TodoEditor v-model="newCommentText" :placeholder="isEditingComment ? 'Đang chỉnh sửa...' : (isReplying ? 'Viết câu trả lời...' : 'Viết bình luận')" />
 					</view>
-
 					<view v-if="isEditingComment" class="editing-alert">
-						<text class="editing-text">
-							Đang chỉnh sửa bình luận của <text class="editing-name">{{ editingMemberName }}</text>
-						</text>
+						<text class="editing-text">Đang chỉnh sửa bình luận của <text class="editing-name">{{ editingMemberName }}</text></text>
 					</view>
-
 					<view v-if="isReplying && replyingCommentData" class="reply-alert">
 						<view class="reply-info">
 							<text class="reply-label">Đang trả lời bình luận của </text>
@@ -160,81 +129,45 @@
 					</view>
 
 					<view class="input-actions">
-                        <AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small"
-							:loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang lưu...' : 'Lưu lại'"
-							@click="submitComment" />
-
+						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang lưu...' : 'Lưu lại'" @click="submitComment" />
 						<view v-else-if="isEditingComment" class="edit-actions-row">
-							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment"
-								@click="onCancelEditComment" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment"
-								:label="isSubmittingComment ? 'Đang cập nhật...' : 'Cập nhật'"
-								@click="submitUpdateComment" />
+							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment" @click="onCancelEditComment" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang cập nhật...' : 'Cập nhật'" @click="submitUpdateComment" />
 						</view>
-
 						<view v-else-if="isReplying" class="edit-actions-row">
-							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment"
-								@click="onCancelReply" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment"
-								:label="isSubmittingComment ? 'Đang gửi...' : 'Trả lời'" @click="submitReply" />
+							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment" @click="onCancelReply" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang gửi...' : 'Trả lời'" @click="submitReply" />
 						</view>
-						
 					</view>
 				</view>
 
 				<view class="divider-line"></view>
 
-                <view v-if="isLoadingComments" class="loading-row">
-					<text>Đang tải bình luận...</text>
+				<view v-if="isLoadingComments" class="loading-row">
+					<text>⏳ Đang tải bình luận...</text>
 				</view>
-
 				<view v-else-if="comments.length === 0" class="empty-row">
 					<text>Chưa có bình luận nào.</text>
 				</view>
-
 				<view v-else>
-                    <CommentItem v-for="item in comments" :key="item.id" :data="item" 
-                        @react="onToggleEmojiPicker"
-						@reply="(data) => handleReply(data)" 
-                        @edit="(data) => handleEdit(data)"
-						@delete="(id) => onRequestDeleteComment(id)" />
+					<CommentItem v-for="item in comments" :key="item.id" :data="item" @react="onToggleEmojiPicker" @reply="(data) => handleReply(data)" @edit="(data) => handleEdit(data)" @delete="(id) => onRequestDeleteComment(id)" />
 				</view>
 			</view>
 
-            <ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy"
-				message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa"
-				confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
-				
-			<ConfirmModal 
-			                v-model:visible="isConfirmCancelReplyOpen" 
-			                title="Hủy trả lời"
-							message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." 
-			                cancel-label="Tiếp tục viết"
-							confirm-label="Hủy bỏ" 
-			                confirm-type="danger" 
-			                @cancel="continueReplying" 
-			                @confirm="confirmCancelReply" 
-			            />
 			<view class="section-header-row">
 				<text class="section-title no-margin">Lịch sử tương tác</text>
-
-				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex"
-					@change="onHistoryFilterChange">
-					<view class="filter-badge">
-						{{ historyFilterOptions[historyFilterIndex] }} ▾
-					</view>
+				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @change="onHistoryFilterChange">
+					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
 				</picker>
 			</view>
 
 			<view class="history-container">
 				<view v-if="isLoadingHistory" class="loading-row">
-					<text class="loading-text">Đang tải lịch sử...</text>
+					<text class="loading-text">⏳ Đang tải lịch sử...</text>
 				</view>
-
 				<view v-else-if="historyList.length === 0" class="empty-row">
 					<text>(Không tìm thấy dữ liệu)</text>
 				</view>
-
 				<view v-else class="timeline-list">
 					<view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
 						<view class="timeline-line" v-if="index !== historyList.length - 1"></view>
@@ -253,17 +186,14 @@
 			<view style="height: 50px;"></view>
 		</scroll-view>
 
-        <ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa"
-			message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment"
-			@cancel="cancelDeleteComment" />
-
+		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy" message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
+		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" title="Hủy trả lời" message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." cancel-label="Tiếp tục viết" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueReplying" @confirm="confirmCancelReply" />
+		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa" message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
+		
 		<view class="modal-overlay" v-if="isEmojiPickerOpen" @click="closeEmojiPicker">
 			<view class="emoji-picker-container" @click.stop>
 				<view class="emoji-grid">
-					<view v-for="(emoji, index) in emojiList" :key="index" class="emoji-item"
-						@click="selectEmoji(emoji)">
-						{{ emoji }}
-					</view>
+					<view v-for="(emoji, index) in emojiList" :key="index" class="emoji-item" @click="selectEmoji(emoji)">{{ emoji }}</view>
 				</view>
 			</view>
 		</view>
@@ -945,4 +875,32 @@
 		color: #007aff;
 		font-weight: bold;
 	}
+	.loading-section {
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    height: 100vh;
+	    background-color: #fff;
+	}
+	
+	.loading-text-large {
+	    color: #007aff;
+	    font-weight: 500;
+	    font-size: 16px;
+	}
+	.loading-bar {
+	        position: fixed;
+	        top: 0;
+	        left: 0;
+	        height: 3px;
+	        background-color: #007aff;
+	        z-index: 9999;
+	        animation: loading-animation 1.5s infinite ease-in-out;
+	        width: 100%;
+	    }
+	@keyframes loading-animation {
+	        0% { width: 0%; left: 0; }
+	        50% { width: 50%; left: 25%; }
+	        100% { width: 100%; left: 100%; }
+	    }
 </style>

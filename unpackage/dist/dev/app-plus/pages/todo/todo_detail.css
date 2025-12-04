@@ -1219,3 +1219,39 @@ to {
   color: #007aff;
   font-weight: bold;
 }
+.loading-section[data-v-9f96c8fe] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fff;
+}
+.loading-text-large[data-v-9f96c8fe] {
+  color: #007aff;
+  font-weight: 500;
+  font-size: 16px;
+}
+.loading-bar[data-v-9f96c8fe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background-color: #007aff;
+  z-index: 9999;
+  animation: loading-animation-9f96c8fe 1.5s infinite ease-in-out;
+  width: 100%;
+}
+@keyframes loading-animation-9f96c8fe {
+0% {
+    width: 0%;
+    left: 0;
+}
+50% {
+    width: 50%;
+    left: 25%;
+}
+100% {
+    width: 100%;
+    left: 100%;
+}
+}

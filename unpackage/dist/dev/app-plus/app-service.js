@@ -5424,10 +5424,10 @@ This will fail in production if not fixed.`);
         isSubmittingComment.value = false;
       }
     };
-    onLoad(async (options) => {
-      await fetchMembers();
+    onLoad((options) => {
+      fetchMembers();
       if (options && options.id) {
-        await fetchDetail(options.id);
+        fetchDetail(options.id);
       }
     });
     const fetchMembers = async () => {
@@ -5435,12 +5435,18 @@ This will fail in production if not fixed.`);
         const data = await getAllMembers();
         memberList.value = data;
         assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
+        if (form.value.assigneeId) {
+          const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
+          if (index !== -1)
+            form.value.assigneeIndex = index;
+        }
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:658", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:662", "Lỗi lấy members", e);
       }
     };
     const fetchDetail = async (id) => {
       isLoading.value = true;
+      uni.showNavigationBarLoading();
       try {
         const rawResponse = await getTodoDetail(id);
         const realData = rawResponse && rawResponse.data && !rawResponse.id ? rawResponse.data : rawResponse;
@@ -5452,22 +5458,23 @@ This will fail in production if not fixed.`);
           if (realIndex !== -1) {
             form.value.statusIndex = realIndex;
           }
-          fetchComments(id);
           if (form.value.assigneeId && memberList.value.length > 0) {
             const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
             if (index !== -1)
               form.value.assigneeIndex = index;
           }
+          fetchComments(id);
           if (form.value.customerCode) {
-            await fetchCustomerInfo(form.value.customerCode);
+            fetchCustomerInfo(form.value.customerCode);
             fetchHistoryLog(form.value.customerCode);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:692", " Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:700", "Lỗi lấy chi tiết:", error);
         showError("Lỗi kết nối");
       } finally {
         isLoading.value = false;
+        uni.hideNavigationBarLoading();
       }
     };
     const processCommentData = (item) => {
@@ -5530,7 +5537,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:763", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:772", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -5571,7 +5578,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:820", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:829", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -5582,7 +5589,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:832", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:841", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -5611,7 +5618,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:870", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:879", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -5642,7 +5649,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:917", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:926", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess("Đã cập nhật trạng thái");
@@ -5654,7 +5661,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:933", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:942", "Lỗi cập nhật trạng thái:", error);
         showError("Lỗi cập nhật");
       } finally {
         uni.hideLoading();
@@ -5686,7 +5693,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:976", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:985", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess("Đã đổi người thực hiện");
@@ -5697,7 +5704,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:994", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1003", "Lỗi cập nhật người giao:", error);
         showError("Lỗi cập nhật");
       } finally {
         hideLoading();
@@ -5707,7 +5714,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1002", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1011", "Lưu:", form.value);
       showSuccess("Đã lưu");
     };
     return {
@@ -6040,16 +6047,14 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
-        class: "loading-overlay"
-      }, [
-        vue.createElementVNode("text", null, "Đang tải...")
-      ])) : vue.createCommentVNode("v-if", true),
+        class: "loading-bar"
+      })) : vue.createCommentVNode("v-if", true),
       vue.createElementVNode("view", { class: "detail-header" }, [
         vue.createElementVNode("view", { class: "header-top" }, [
           vue.createElementVNode(
             "text",
             { class: "header-code" },
-            "#" + vue.toDisplayString($setup.form.code),
+            "#" + vue.toDisplayString($setup.form.code || "..."),
             1
             /* TEXT */
           )
@@ -6059,7 +6064,7 @@ This will fail in production if not fixed.`);
           {
             class: "header-title-input",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
-            placeholder: "Tên công việc",
+            placeholder: "Đang tải tên công việc...",
             "auto-height": "",
             maxlength: "256"
           },
@@ -6121,7 +6126,7 @@ This will fail in production if not fixed.`);
                 },
                 [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex]) + " ",
+                    vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || "Đang tải...") + " ",
                     1
                     /* TEXT */
                   ),
@@ -6144,7 +6149,7 @@ This will fail in production if not fixed.`);
               vue.createElementVNode(
                 "view",
                 { class: "picker-text disabled-text" },
-                vue.toDisplayString($setup.sourceOptions[$setup.form.sourceIndex] || "Không xác định"),
+                vue.toDisplayString($setup.sourceOptions[$setup.form.sourceIndex] || "..."),
                 1
                 /* TEXT */
               )
@@ -6168,9 +6173,7 @@ This will fail in production if not fixed.`);
               vue.createElementVNode(
                 "view",
                 { class: "picker-text" },
-                vue.toDisplayString(
-                  $setup.form.assigneeIndex > -1 && $setup.assigneeOptions[$setup.form.assigneeIndex] ? $setup.assigneeOptions[$setup.form.assigneeIndex] : "Chọn người giao"
-                ) + " ▾ ",
+                vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : "Đang tải...") + " ▾ ",
                 1
                 /* TEXT */
               )
@@ -6192,7 +6195,7 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", { class: "loading-text" }, "Đang tải thông tin từ CRM...")
+            vue.createElementVNode("text", { class: "loading-text" }, "⏳ Đang tải thông tin từ CRM...")
           ])) : !$setup.form.customerCode ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
@@ -6208,7 +6211,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerNameLabel),
+                  vue.toDisplayString($setup.form.customerNameLabel || "Khách hàng"),
                   1
                   /* TEXT */
                 )
@@ -6230,7 +6233,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerPhoneLabel),
+                  vue.toDisplayString($setup.form.customerPhoneLabel || "SĐT"),
                   1
                   /* TEXT */
                 )
@@ -6252,7 +6255,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerManagerLabel),
+                  vue.toDisplayString($setup.form.customerManagerLabel || "Phụ trách"),
                   1
                   /* TEXT */
                 )
@@ -6295,7 +6298,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode(
               "view",
               { class: "filter-badge" },
-              vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾ ",
+              vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾",
               1
               /* TEXT */
             )
@@ -6321,7 +6324,7 @@ This will fail in production if not fixed.`);
               class: "editing-alert"
             }, [
               vue.createElementVNode("text", { class: "editing-text" }, [
-                vue.createTextVNode(" Đang chỉnh sửa bình luận của "),
+                vue.createTextVNode("Đang chỉnh sửa bình luận của "),
                 vue.createElementVNode(
                   "text",
                   { class: "editing-name" },
@@ -6406,7 +6409,7 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", null, "Đang tải bình luận...")
+            vue.createElementVNode("text", null, "⏳ Đang tải bình luận...")
           ])) : $setup.comments.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
@@ -6431,40 +6434,18 @@ This will fail in production if not fixed.`);
             ))
           ]))
         ])) : vue.createCommentVNode("v-if", true),
-        vue.createVNode($setup["ConfirmModal"], {
-          visible: $setup.isConfirmCancelEditOpen,
-          "onUpdate:visible": _cache[13] || (_cache[13] = ($event) => $setup.isConfirmCancelEditOpen = $event),
-          title: "Xác nhận hủy",
-          message: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
-          "cancel-label": "Tiếp tục sửa",
-          "confirm-label": "Hủy bỏ",
-          "confirm-type": "danger",
-          onCancel: $setup.continueEditing,
-          onConfirm: $setup.confirmCancelEdit
-        }, null, 8, ["visible", "onCancel", "onConfirm"]),
-        vue.createVNode($setup["ConfirmModal"], {
-          visible: $setup.isConfirmCancelReplyOpen,
-          "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
-          title: "Hủy trả lời",
-          message: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
-          "cancel-label": "Tiếp tục viết",
-          "confirm-label": "Hủy bỏ",
-          "confirm-type": "danger",
-          onCancel: $setup.continueReplying,
-          onConfirm: $setup.confirmCancelReply
-        }, null, 8, ["visible", "onCancel", "onConfirm"]),
         vue.createElementVNode("view", { class: "section-header-row" }, [
           vue.createElementVNode("text", { class: "section-title no-margin" }, "Lịch sử tương tác"),
           vue.createElementVNode("picker", {
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onChange: _cache[15] || (_cache[15] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[13] || (_cache[13] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
               { class: "filter-badge" },
-              vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾ ",
+              vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾",
               1
               /* TEXT */
             )
@@ -6475,7 +6456,7 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", { class: "loading-text" }, "Đang tải lịch sử...")
+            vue.createElementVNode("text", { class: "loading-text" }, "⏳ Đang tải lịch sử...")
           ])) : $setup.historyList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
@@ -6532,6 +6513,28 @@ This will fail in production if not fixed.`);
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })
       ], 8, ["scroll-into-view"]),
+      vue.createVNode($setup["ConfirmModal"], {
+        visible: $setup.isConfirmCancelEditOpen,
+        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+        title: "Xác nhận hủy",
+        message: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
+        "cancel-label": "Tiếp tục sửa",
+        "confirm-label": "Hủy bỏ",
+        "confirm-type": "danger",
+        onCancel: $setup.continueEditing,
+        onConfirm: $setup.confirmCancelEdit
+      }, null, 8, ["visible", "onCancel", "onConfirm"]),
+      vue.createVNode($setup["ConfirmModal"], {
+        visible: $setup.isConfirmCancelReplyOpen,
+        "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
+        title: "Hủy trả lời",
+        message: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
+        "cancel-label": "Tiếp tục viết",
+        "confirm-label": "Hủy bỏ",
+        "confirm-type": "danger",
+        onCancel: $setup.continueReplying,
+        onConfirm: $setup.confirmCancelReply
+      }, null, 8, ["visible", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteCommentOpen,
         "onUpdate:visible": _cache[16] || (_cache[16] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
