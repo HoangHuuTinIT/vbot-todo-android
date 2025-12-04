@@ -138,21 +138,22 @@ export const useTodoDetailController = () => {
 		}
 	};
 	
-	const processDescriptionImages = async (htmlContent: string): Promise<string> => {
-			if (!htmlContent) return '';
+	const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
+			if (!htmlContent) return { newContent: '', fileUrls: [] };
 	
 			const imgRegex = /<img[^>]+src="([^">]+)"/g;
 			let match;
 			const promises: Promise<any>[] = [];
 			const replacements: { oldSrc: string, newSrc: string }[] = [];
+	        const uploadedUrls: string[] = []; 
 	
 			while ((match = imgRegex.exec(htmlContent)) !== null) {
 				const src = match[1];
-	            // Chỉ upload nếu là ảnh local (không có http)
 				if (!src.startsWith('http') && !src.startsWith('https')) {
 					const uploadPromise = uploadTodoFile(src)
 						.then(serverUrl => {
 							replacements.push({ oldSrc: src, newSrc: serverUrl });
+	                        uploadedUrls.push(serverUrl); 
 						})
 						.catch(err => {
 							console.error(`Upload ảnh detail lỗi:`, err);
@@ -170,7 +171,7 @@ export const useTodoDetailController = () => {
 				newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
 			});
 	
-			return newHtml;
+			return { newContent: newHtml, fileUrls: uploadedUrls };
 		};
 	
 	const onSaveDescription = async () => {
@@ -180,32 +181,37 @@ export const useTodoDetailController = () => {
 			}
 	
 			isSavingDescription.value = true;
-	        showLoading('Đang lưu...'); // Thêm loading vì upload có thể lâu
+	        showLoading('Đang lưu...');
 	
 			try {
-	            // 1. Xử lý upload ảnh (nếu có ảnh mới thêm vào)
-	            const processedDesc = await processDescriptionImages(form.value.desc);
+	         
+	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
 	            
-	            // Cập nhật lại form với HTML đã có link ảnh server
-	            form.value.desc = processedDesc;
+	            form.value.desc = newContent;
+	
+	            const filesString = fileUrls.length > 0 ? fileUrls.join(',') : '';
 	
 				const payload = {
 					...form.value.raw,
 					preFixCode: "TODO",
-					description: form.value.desc, // HTML giờ chứa link https://...
-					files: "",
+					description: form.value.desc,
+					files: filesString, 
 					tagCodes: "",
 					title: form.value.title || form.value.raw.title,
 				};
 	
-				console.log("Payload Update Todo:", payload);
+				console.log("Payload Update Description:", payload);
 	
 				const res = await updateTodo(payload);
 	
 				if (res) {
 					showSuccess('Đã cập nhật mô tả');
-	                // Cập nhật lại dữ liệu gốc để đồng bộ
+	                
+	           
 	                form.value.raw.description = form.value.desc;
+	                if(filesString) {
+	                    form.value.raw.files = filesString;
+	                }
 				}
 			} catch (error) {
 				console.error("Lỗi cập nhật công việc:", error);
