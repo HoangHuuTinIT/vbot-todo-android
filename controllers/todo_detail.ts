@@ -255,6 +255,7 @@ export const useTodoDetailController = () => {
 	                if(filesString) {
 	                    form.value.raw.files = filesString;
 	                }
+					await fetchComments(form.value.id);
 				}
 			} catch (error) {
 				console.error("Lỗi cập nhật công việc:", error);
@@ -264,7 +265,56 @@ export const useTodoDetailController = () => {
 				isSavingDescription.value = false;
 			}
 		};
+const onSaveTitle = async () => {
+       
+        if (!form.value.raw) return;
 
+        const newTitle = form.value.title ? form.value.title.trim() : '';
+        const oldTitle = form.value.raw.title;
+
+        if (!newTitle) {
+            showInfo('Tiêu đề không được để trống');
+            form.value.title = oldTitle;
+            return;
+        }
+
+        if (newTitle === oldTitle) return;
+
+        showLoading('Đang cập nhật tiêu đề...');
+
+        try {
+       
+            const payload = {
+                ...form.value.raw, 
+                title: newTitle,   
+                preFixCode: "TODO", 
+                description: form.value.raw.description, 
+                files: form.value.raw.files || "",
+                tagCodes: form.value.raw.tagCodes || ""
+            };
+
+            console.log("Payload Update Title:", payload);
+
+            const res = await updateTodo(payload);
+
+            if (res) {
+                showSuccess('Đã đổi tiêu đề');
+                
+                form.value.raw.title = newTitle;
+
+                if (form.value.customerCode) {
+                    await fetchHistoryLog(form.value.customerCode);
+                }
+                await fetchComments(form.value.id); 
+            }
+        } catch (error) {
+            console.error("Lỗi cập nhật tiêu đề:", error);
+            showError('Lỗi cập nhật');
+            form.value.title = oldTitle;
+        } finally {
+            hideLoading();
+        }
+    };
 	const onRequestReply = async (item : any) => {
 
 		isEditingComment.value = false;
@@ -1069,6 +1119,6 @@ export const useTodoDetailController = () => {
 		isStatusDisabled,
 
 		dynamicStatusOptions,
-
+		onSaveTitle,
 	};
 };

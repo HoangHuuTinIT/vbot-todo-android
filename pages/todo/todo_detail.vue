@@ -4,10 +4,20 @@
 		<view class="loading-bar" v-if="isLoading"></view>
 
 		<view class="detail-header">
-			<view class="header-top">
-				<text class="header-code">#{{ form.code || '...' }}</text>
-			</view>
-			<textarea class="header-title-input" v-model="form.title" placeholder="Đang tải tên công việc..." auto-height maxlength="256" />
+		    <view class="header-top">
+		        <text class="header-code">#{{ form.code || '...' }}</text>
+		    </view>
+		    
+		    <textarea 
+		        class="header-title-input" 
+		        v-model="form.title" 
+		        placeholder="Đang tải tên công việc..." 
+		        auto-height 
+		        maxlength="256"
+		        confirm-type="done"
+		        @confirm="onSaveTitle"
+		        @blur="onSaveTitle"
+		    />
 		</view>
 
 		<scroll-view scroll-y="true" class="detail-body" :scroll-into-view="scrollTarget" scroll-with-animation>
@@ -155,7 +165,7 @@
 			</view>
 
 			<view class="section-header-row">
-				<text class="section-title no-margin">Lịch sử tương tác</text>
+				<text class="section-title no-margin">Lịch sử tương tác khách hàng</text>
 				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @change="onHistoryFilterChange">
 					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
 				</picker>
@@ -255,6 +265,7 @@
 
 		onDateUpdate,
 		isStatusDisabled,
+		onSaveTitle,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
