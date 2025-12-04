@@ -434,6 +434,13 @@ to {
     width: 18px;
     height: 18px;
 }
+.comment-attachment-img[data-v-8cb873be] {
+    max-width: 200px;     
+    max-height: 300px;    
+    border-radius: 8px;    
+    border: 1px solid #eee; 
+    display: block;
+}
 [data-v-8cb873be] img { max-width: 100%; height: auto;
 }
 

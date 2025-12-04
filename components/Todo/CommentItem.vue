@@ -21,6 +21,14 @@
           </view>
           
           <rich-text :nodes="data.message" class="text-sm text-gray-700 leading-normal"></rich-text>
+		  <view v-if="data.files" class="mt-2">
+		               <image 
+		                  :src="data.files" 
+		                  mode="widthFix" 
+		                  class="comment-attachment-img"
+		                  @click.stop="onPreviewImage(data.files)"
+		               ></image>
+		            </view>
         </view>
         
         <view class="c-footer-actions">
@@ -90,6 +98,14 @@ const authStore = useAuthStore();
 const isMe = computed(() => {
     return String(props.data.senderId) === String(authStore.uid);
 });
+
+const onPreviewImage = (url: string) => {
+    if (!url) return;
+    uni.previewImage({
+        urls: [url],
+        current: 0
+    });
+};
 </script>
 
 <style scoped>
@@ -158,6 +174,14 @@ const isMe = computed(() => {
 .icon-action {
     width: 18px;
     height: 18px;
+}
+
+.comment-attachment-img {
+    max-width: 200px;     
+    max-height: 300px;    
+    border-radius: 8px;    
+    border: 1px solid #eee; 
+    display: block;      
 }
 :deep(img) { max-width: 100%; height: auto; }
 </style>

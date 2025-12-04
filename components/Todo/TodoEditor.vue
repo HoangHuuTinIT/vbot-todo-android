@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref, watch, getCurrentInstance } from 'vue';
-
+// import { pathToBase64 } from '@/utils/file';
 const props = defineProps({
 	modelValue: String,
 	placeholder: { type: String, default: 'Nhập nội dung...' }
@@ -271,29 +271,30 @@ const format = (name: string, value: any = null) => {
 };
 
 const insertImage = () => {
-    uni.showActionSheet({
-        itemList: ['Chụp ảnh mới', 'Chọn từ thư viện'],
-        success: (res) => {
-            const index = res.tapIndex;
-            let source: 'camera' | 'album' = 'album';
-            if (index === 0) source = 'camera';
-            if (index === 1) source = 'album';
-            
-            uni.chooseImage({
-                count: 1,
-                sourceType: [source],
-                success: (imageRes) => {
-                    if (editorCtx.value) {
-                        editorCtx.value.insertImage({ 
-                            src: imageRes.tempFilePaths[0], 
-                            width: '80%', 
-                            alt: 'image'
-                        });
-                    }
-                }
-            });
-        }
-    });
+	uni.showActionSheet({
+		itemList: ['Chụp ảnh mới', 'Chọn từ thư viện'],
+		success: (res) => {
+			const index = res.tapIndex;
+			let source: 'camera' | 'album' = 'album';
+			if (index === 0) source = 'camera';
+			if (index === 1) source = 'album';
+
+			uni.chooseImage({
+				count: 1,
+				sourceType: [source],
+				success: (imageRes) => {
+					const tempPath = imageRes.tempFilePaths[0];
+					if (editorCtx.value) {
+						editorCtx.value.insertImage({
+							src: tempPath, 
+							width: '80%',
+							alt: 'image'
+						});
+					}
+				}
+			});
+		}
+	});
 };
 
 const handleLink = () => {

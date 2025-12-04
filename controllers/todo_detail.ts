@@ -1,7 +1,7 @@
 //controllers/todo_detail.ts
 import { ref, nextTick, computed } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage } from '@/api/todo';
+import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage,uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm'; 
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
@@ -18,6 +18,7 @@ interface CommentItem {
 	senderAvatarChar : string;
 	senderAvatarColor : string;
 	message : string;
+	files: string;
 	timeDisplay : string;
 	actionText : string;
 	isEdited : boolean;
@@ -136,41 +137,84 @@ export const useTodoDetailController = () => {
 			hideLoading();
 		}
 	};
-	const onSaveDescription = async () => {
-		if (!form.value.raw) {
-			showError('Không tìm thấy dữ liệu gốc');
-			return;
-		}
-
-		isSavingDescription.value = true;
-
-		try {
-
-			const payload = {
-				...form.value.raw,
-
-				preFixCode: "TODO",
-				description: form.value.desc,
-				files: "",
-				tagCodes: "",
-
-				title: form.value.title || form.value.raw.title,
-			};
-
-			console.log("Payload Update Todo:", payload);
-
-			const res = await updateTodo(payload);
-
-			if (res) {
-				showSuccess('Đã cập nhật mô tả');
+	
+	const processDescriptionImages = async (htmlContent: string): Promise<string> => {
+			if (!htmlContent) return '';
+	
+			const imgRegex = /<img[^>]+src="([^">]+)"/g;
+			let match;
+			const promises: Promise<any>[] = [];
+			const replacements: { oldSrc: string, newSrc: string }[] = [];
+	
+			while ((match = imgRegex.exec(htmlContent)) !== null) {
+				const src = match[1];
+	            // Chỉ upload nếu là ảnh local (không có http)
+				if (!src.startsWith('http') && !src.startsWith('https')) {
+					const uploadPromise = uploadTodoFile(src)
+						.then(serverUrl => {
+							replacements.push({ oldSrc: src, newSrc: serverUrl });
+						})
+						.catch(err => {
+							console.error(`Upload ảnh detail lỗi:`, err);
+						});
+					promises.push(uploadPromise);
+				}
 			}
-		} catch (error) {
-			console.error("Lỗi cập nhật công việc:", error);
-			showError('Cập nhật thất bại');
-		} finally {
-			isSavingDescription.value = false;
-		}
-	};
+	
+			if (promises.length > 0) {
+				await Promise.all(promises);
+			}
+	
+			let newHtml = htmlContent;
+			replacements.forEach(rep => {
+				newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+			});
+	
+			return newHtml;
+		};
+	
+	const onSaveDescription = async () => {
+			if (!form.value.raw) {
+				showError('Không tìm thấy dữ liệu gốc');
+				return;
+			}
+	
+			isSavingDescription.value = true;
+	        showLoading('Đang lưu...'); // Thêm loading vì upload có thể lâu
+	
+			try {
+	            // 1. Xử lý upload ảnh (nếu có ảnh mới thêm vào)
+	            const processedDesc = await processDescriptionImages(form.value.desc);
+	            
+	            // Cập nhật lại form với HTML đã có link ảnh server
+	            form.value.desc = processedDesc;
+	
+				const payload = {
+					...form.value.raw,
+					preFixCode: "TODO",
+					description: form.value.desc, // HTML giờ chứa link https://...
+					files: "",
+					tagCodes: "",
+					title: form.value.title || form.value.raw.title,
+				};
+	
+				console.log("Payload Update Todo:", payload);
+	
+				const res = await updateTodo(payload);
+	
+				if (res) {
+					showSuccess('Đã cập nhật mô tả');
+	                // Cập nhật lại dữ liệu gốc để đồng bộ
+	                form.value.raw.description = form.value.desc;
+				}
+			} catch (error) {
+				console.error("Lỗi cập nhật công việc:", error);
+				showError('Cập nhật thất bại');
+			} finally {
+	            hideLoading();
+				isSavingDescription.value = false;
+			}
+		};
 
 	const onRequestReply = async (item : any) => {
 
@@ -637,6 +681,7 @@ export const useTodoDetailController = () => {
 			senderAvatarChar: avatarChar,
 			senderAvatarColor: avatarColor,
 			message: item.message || '',
+			files: item.files || '',
 			timeDisplay: formatRelativeTime(item.createdAt),
 			actionText,
 			isEdited: !!item.updatedAt,

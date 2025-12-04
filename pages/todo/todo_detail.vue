@@ -13,7 +13,12 @@
 				maxlength="256" />
 		</view>
 
-		<scroll-view scroll-y="true" class="detail-body">
+        <scroll-view 
+            scroll-y="true" 
+            class="detail-body" 
+            :scroll-into-view="scrollTarget"
+            scroll-with-animation
+        >
 
 			<view class="section-title">Mô tả</view>
 			<view class="section-block">
@@ -25,9 +30,9 @@
 				</view>
 			</view>
 
-			<view class="section-title">Thông tin công việc</view>
+            <view class="section-title">Thông tin công việc</view>
 			<view class="info-group">
-				<view class="flat-item">
+                <view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon">
 						</image>
@@ -63,21 +68,21 @@
 					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex"
 						@change="onAssigneeChange" class="item-picker-box">
 						<view class="picker-text">
-							{{ (form.assigneeIndex > -1 && assigneeOptions[form.assigneeIndex]) 
-                                ? assigneeOptions[form.assigneeIndex] 
-                                : 'Chọn người giao' 
-                            }} ▾
+							{{ (form.assigneeIndex > -1 && assigneeOptions[form.assigneeIndex]) 
+                                ? assigneeOptions[form.assigneeIndex] 
+                                : 'Chọn người giao' 
+                            }} ▾
 						</view>
 					</picker>
 				</view>
 
 				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate"
 					v-model:notifyTime="form.notifyTime" @change="onDateUpdate" />
-			</view>
+            </view>
 
-			<view class="section-title">Thông tin khách hàng</view>
+            <view class="section-title">Thông tin khách hàng</view>
 			<view class="info-group customer-block">
-				<view v-if="isLoadingCustomer" class="loading-row">
+                <view v-if="isLoadingCustomer" class="loading-row">
 					<text class="loading-text">Đang tải thông tin từ CRM...</text>
 				</view>
 
@@ -113,7 +118,7 @@
 						</view>
 					</view>
 				</view>
-			</view>
+            </view>
 
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
@@ -121,8 +126,7 @@
 					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
 						:class="{ 'open': isCommentsOpen }"></image>
 				</view>
-
-				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
+                <picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
 					@change="onCommentFilterChange">
 					<view class="filter-badge">
 						{{ commentFilterOptions[commentFilterIndex] }} ▾
@@ -131,7 +135,7 @@
 			</view>
 
 			<view class="comments-section" v-if="isCommentsOpen">
-				<view class="comment-input-block">
+                <view class="comment-input-block" id="comment-input-anchor">
 					<view class="editor-container">
 						<TodoEditor v-model="newCommentText"
 							:placeholder="isEditingComment ? 'Đang chỉnh sửa...' : (isReplying ? 'Viết câu trả lời...' : 'Viết bình luận')" />
@@ -156,7 +160,7 @@
 					</view>
 
 					<view class="input-actions">
-						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small"
+                        <AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small"
 							:loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang lưu...' : 'Lưu lại'"
 							@click="submitComment" />
 
@@ -174,12 +178,13 @@
 							<AppButton type="primary" size="small" :loading="isSubmittingComment"
 								:label="isSubmittingComment ? 'Đang gửi...' : 'Trả lời'" @click="submitReply" />
 						</view>
+						
 					</view>
 				</view>
 
 				<view class="divider-line"></view>
 
-				<view v-if="isLoadingComments" class="loading-row">
+                <view v-if="isLoadingComments" class="loading-row">
 					<text>Đang tải bình luận...</text>
 				</view>
 
@@ -188,16 +193,28 @@
 				</view>
 
 				<view v-else>
-					<CommentItem v-for="item in comments" :key="item.id" :data="item" @react="onToggleEmojiPicker"
-						@reply="onRequestReply" @edit="(data) => onRequestEditComment(data.id)"
+                    <CommentItem v-for="item in comments" :key="item.id" :data="item" 
+                        @react="onToggleEmojiPicker"
+						@reply="(data) => handleReply(data)" 
+                        @edit="(data) => handleEdit(data)"
 						@delete="(id) => onRequestDeleteComment(id)" />
 				</view>
 			</view>
 
-			<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy"
+            <ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy"
 				message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa"
 				confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
-
+				
+			<ConfirmModal 
+			                v-model:visible="isConfirmCancelReplyOpen" 
+			                title="Hủy trả lời"
+							message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." 
+			                cancel-label="Tiếp tục viết"
+							confirm-label="Hủy bỏ" 
+			                confirm-type="danger" 
+			                @cancel="continueReplying" 
+			                @confirm="confirmCancelReply" 
+			            />
 			<view class="section-header-row">
 				<text class="section-title no-margin">Lịch sử tương tác</text>
 
@@ -234,10 +251,9 @@
 			</view>
 
 			<view style="height: 50px;"></view>
-
 		</scroll-view>
 
-		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa"
+        <ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa"
 			message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment"
 			@cancel="cancelDeleteComment" />
 
@@ -255,9 +271,8 @@
 	</view>
 </template>
 
-
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { ref, nextTick } from 'vue';
 	import { useTodoDetailController } from '@/controllers/todo_detail';
 	import TodoEditor from '@/components/Todo/TodoEditor.vue';
 	import TodoDatePicker from '@/components/Todo/TodoDatePicker.vue';
@@ -312,9 +327,29 @@
 		isStatusDisabled,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
+	const scrollTarget = ref('');
 	const toggleComments = () => {
 		isCommentsOpen.value = !isCommentsOpen.value;
 	};
+	const scrollToInput = () => {
+	        if (!isCommentsOpen.value) {
+	            isCommentsOpen.value = true;
+	        }
+	        scrollTarget.value = '';
+	        setTimeout(() => {
+	            scrollTarget.value = 'comment-input-anchor';
+	        }, 100);
+	    };
+
+	    const handleReply = (data: any) => {
+	        onRequestReply(data);
+	        scrollToInput();
+	    };
+	
+	    const handleEdit = (data: any) => {
+	        onRequestEditComment(data.id);
+	        scrollToInput();
+	    };
 </script>
 
 <style lang="scss" scoped>
