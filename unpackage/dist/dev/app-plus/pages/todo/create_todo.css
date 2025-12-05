@@ -42,6 +42,63 @@
   color: #333;
   min-height: 150px;
 }
+.link-cards-area[data-v-7d79903f] {
+  padding: 0 15px 10px 15px;
+  background: #fff;
+}
+.link-card[data-v-7d79903f] {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.link-card-icon[data-v-7d79903f] {
+  width: 40px;
+  height: 40px;
+  background-color: #e7f1ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.card-icon-img[data-v-7d79903f] {
+  width: 20px;
+  height: 20px;
+}
+.link-card-content[data-v-7d79903f] {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.link-domain[data-v-7d79903f] {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+.link-url[data-v-7d79903f] {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.link-card-remove[data-v-7d79903f] {
+  padding: 5px;
+  margin-left: 5px;
+}
+.remove-btn[data-v-7d79903f] {
+  color: #999;
+  font-size: 16px;
+  font-weight: bold;
+}
 .toolbar[data-v-7d79903f] {
   background-color: #f5f7fa;
   border-top: 1px solid #eee;
@@ -114,6 +171,13 @@
 .modal-title[data-v-7d79903f] {
   font-size: 16px;
   font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  text-align: center;
+}
+.modal-desc[data-v-7d79903f] {
+  font-size: 13px;
+  color: #888;
   margin-bottom: 15px;
   display: block;
   text-align: center;

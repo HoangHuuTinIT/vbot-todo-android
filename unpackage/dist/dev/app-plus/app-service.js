@@ -143,7 +143,7 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android/components/UserAvatar.vue"]]);
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -290,7 +290,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android/components/DateRangeFilter.vue"]]);
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
   const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -563,7 +563,7 @@ if (uni.restoreGlobal) {
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CustomerModal.vue"]]);
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CustomerModal.vue"]]);
   var isVue2 = false;
   function set(target, key, val) {
     if (Array.isArray(target)) {
@@ -3204,7 +3204,7 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-2/components/StatusBadge.vue"]]);
   const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
@@ -3255,7 +3255,7 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android/components/AppButton.vue"]]);
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppButton.vue"]]);
   const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
@@ -3340,7 +3340,7 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android/components/GlobalMessage.vue"]]);
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalMessage.vue"]]);
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "ConfirmModal",
     props: {
@@ -3416,7 +3416,7 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android/components/ConfirmModal.vue"]]);
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-2/components/ConfirmModal.vue"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "Pagination",
     props: {
@@ -3530,7 +3530,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android/components/Pagination.vue"]]);
+  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Pagination.vue"]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -3958,7 +3958,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
       return -1;
@@ -4203,10 +4203,76 @@ This will fail in production if not fixed.`);
       const formats = vue.ref({});
       const instance = vue.getCurrentInstance();
       const isLinkSelected = vue.ref(false);
+      const lastVal = vue.ref("");
       const showLinkModal = vue.ref(false);
       const linkUrl = vue.ref("");
+      const showCardLinkModal = vue.ref(false);
+      const cardLinkUrl = vue.ref("");
       const showColorModal = vue.ref(false);
       const colorTab = vue.ref("color");
+      const insertedLinks = vue.ref([]);
+      const getDomain = (url) => {
+        try {
+          const domain = new URL(url).hostname;
+          return domain.replace("www.", "");
+        } catch (e) {
+          return "Website";
+        }
+      };
+      const openLink = (url) => {
+        plus.runtime.openURL(url);
+      };
+      const parseContent = (html) => {
+        if (!html)
+          return { cleanHtml: "", links: [] };
+        const links = [];
+        const iframeRegex = /<iframe[^>]+src="([^">]+)"[^>]*><\/iframe>/g;
+        const cleanHtml = html.replace(iframeRegex, (match, src) => {
+          if (src)
+            links.push(src);
+          return "";
+        });
+        return { cleanHtml, links };
+      };
+      const composeContent = (cleanHtml, links) => {
+        let fullContent = cleanHtml;
+        links.forEach((link) => {
+          const iframeStr = `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${link}"></iframe>`;
+          fullContent += iframeStr;
+        });
+        return fullContent;
+      };
+      const openCardLinkModal = () => {
+        cardLinkUrl.value = "";
+        showCardLinkModal.value = true;
+      };
+      const confirmCardLink = () => {
+        if (cardLinkUrl.value) {
+          let url = cardLinkUrl.value.trim();
+          if (!url.startsWith("http")) {
+            url = "https://" + url;
+          }
+          insertedLinks.value.push(url);
+          triggerUpdate();
+        }
+        showCardLinkModal.value = false;
+      };
+      const removeLink = (index) => {
+        insertedLinks.value.splice(index, 1);
+        triggerUpdate();
+      };
+      const triggerUpdate = () => {
+        if (editorCtx.value) {
+          editorCtx.value.getContents({
+            success: (res) => {
+              const html = res.html;
+              lastVal.value = html;
+              const finalContent = composeContent(html, insertedLinks.value);
+              emit("update:modelValue", finalContent);
+            }
+          });
+        }
+      };
       const getDisplayText = (item) => {
         const formatVal = formats.value[item.name];
         if (item.action === "header-menu")
@@ -4338,15 +4404,20 @@ This will fail in production if not fixed.`);
         uni.createSelectorQuery().in(instance).select(`#${editorId.value}`).context((res) => {
           if (res && res.context) {
             editorCtx.value = res.context;
-            if (props.modelValue)
-              editorCtx.value.setContents({ html: props.modelValue });
+            if (props.modelValue) {
+              const { cleanHtml, links } = parseContent(props.modelValue);
+              insertedLinks.value = links;
+              editorCtx.value.setContents({ html: cleanHtml });
+              lastVal.value = cleanHtml;
+            }
           }
         }).exec();
       };
       const onInput = (e) => {
         const val = e.detail.html;
         lastVal.value = val;
-        emit("update:modelValue", val);
+        const finalContent = composeContent(val, insertedLinks.value);
+        emit("update:modelValue", finalContent);
       };
       const onStatusChange = (e) => {
         formats.value = e.detail;
@@ -4401,20 +4472,21 @@ This will fail in production if not fixed.`);
       const clearFormat = () => {
         editorCtx.value.removeFormat();
       };
-      const lastVal = vue.ref("");
-      vue.watch(() => props.modelValue, (val) => {
-        if (val !== lastVal.value && editorCtx.value) {
-          if (!val) {
-            editorCtx.value.clear();
-          } else {
+      vue.watch(() => props.modelValue, (newVal) => {
+        if (editorCtx.value) {
+          const { cleanHtml, links } = parseContent(newVal || "");
+          if (cleanHtml !== lastVal.value) {
             editorCtx.value.setContents({
-              html: val
+              html: cleanHtml
             });
+            lastVal.value = cleanHtml;
           }
-          lastVal.value = val || "";
+          if (JSON.stringify(links) !== JSON.stringify(insertedLinks.value)) {
+            insertedLinks.value = links;
+          }
         }
       });
-      const __returned__ = { props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, showLinkModal, linkUrl, showColorModal, colorTab, getDisplayText, getDisplayImage, handleToolClick, applyColor, closeColorModal, isColorSelected, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat, lastVal };
+      const __returned__ = { props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, handleToolClick, applyColor, closeColorModal, isColorSelected, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4432,6 +4504,55 @@ This will fail in production if not fixed.`);
         onInput: $setup.onInput,
         onStatuschange: $setup.onStatusChange
       }, null, 40, ["id", "placeholder"]),
+      $setup.insertedLinks.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "link-cards-area"
+      }, [
+        (vue.openBlock(true), vue.createElementBlock(
+          vue.Fragment,
+          null,
+          vue.renderList($setup.insertedLinks, (link, index) => {
+            return vue.openBlock(), vue.createElementBlock("view", {
+              key: index,
+              class: "link-card"
+            }, [
+              vue.createElementVNode("view", { class: "link-card-icon" }, [
+                vue.createElementVNode("image", {
+                  src: "https://img.icons8.com/ios-filled/50/007aff/internet.png",
+                  class: "card-icon-img"
+                })
+              ]),
+              vue.createElementVNode("view", {
+                class: "link-card-content",
+                onClick: ($event) => $setup.openLink(link)
+              }, [
+                vue.createElementVNode(
+                  "text",
+                  { class: "link-domain" },
+                  vue.toDisplayString($setup.getDomain(link)),
+                  1
+                  /* TEXT */
+                ),
+                vue.createElementVNode(
+                  "text",
+                  { class: "link-url" },
+                  vue.toDisplayString(link),
+                  1
+                  /* TEXT */
+                )
+              ], 8, ["onClick"]),
+              vue.createElementVNode("view", {
+                class: "link-card-remove",
+                onClick: vue.withModifiers(($event) => $setup.removeLink(index), ["stop"])
+              }, [
+                vue.createElementVNode("text", { class: "remove-btn" }, "✕")
+              ], 8, ["onClick"])
+            ]);
+          }),
+          128
+          /* KEYED_FRAGMENT */
+        ))
+      ])) : vue.createCommentVNode("v-if", true),
       vue.createElementVNode("view", { class: "toolbar" }, [
         vue.createElementVNode("view", { class: "tool-list" }, [
           (vue.openBlock(), vue.createElementBlock(
@@ -4498,6 +4619,21 @@ This will fail in production if not fixed.`);
             "view",
             {
               class: "tool-item",
+              onTouchend: vue.withModifiers($setup.openCardLinkModal, ["prevent"])
+            },
+            [
+              vue.createElementVNode("image", {
+                src: "https://img.icons8.com/ios/50/666666/add-link.png",
+                class: "img-icon"
+              })
+            ],
+            32
+            /* NEED_HYDRATION */
+          ),
+          vue.createElementVNode(
+            "view",
+            {
+              class: "tool-item",
               onTouchend: vue.withModifiers($setup.clearFormat, ["prevent"])
             },
             [
@@ -4512,7 +4648,7 @@ This will fail in production if not fixed.`);
         ])
       ]),
       $setup.showLinkModal ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 0,
+        key: 1,
         class: "modal-overlay",
         onClick: _cache[3] || (_cache[3] = ($event) => $setup.showLinkModal = false)
       }, [
@@ -4521,7 +4657,7 @@ This will fail in production if not fixed.`);
           onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
-          vue.createElementVNode("text", { class: "modal-title" }, "Chèn liên kết"),
+          vue.createElementVNode("text", { class: "modal-title" }, "Chèn Hyperlink (Text)"),
           vue.withDirectives(vue.createElementVNode("input", {
             class: "modal-input",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.linkUrl = $event),
@@ -4542,14 +4678,46 @@ This will fail in production if not fixed.`);
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
+      $setup.showCardLinkModal ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 2,
+        class: "modal-overlay",
+        onClick: _cache[7] || (_cache[7] = ($event) => $setup.showCardLinkModal = false)
+      }, [
+        vue.createElementVNode("view", {
+          class: "modal-box",
+          onClick: _cache[6] || (_cache[6] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("text", { class: "modal-title" }, "Chèn Thẻ Liên Kết (Web)"),
+          vue.createElementVNode("text", { class: "modal-desc" }, "Liên kết sẽ hiển thị dạng thẻ xem trước."),
+          vue.withDirectives(vue.createElementVNode("input", {
+            class: "modal-input",
+            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.cardLinkUrl = $event),
+            placeholder: "https://youtube.com/...",
+            focus: $setup.showCardLinkModal
+          }, null, 8, ["focus"]), [
+            [vue.vModelText, $setup.cardLinkUrl]
+          ]),
+          vue.createElementVNode("view", { class: "modal-actions" }, [
+            vue.createElementVNode("button", {
+              class: "btn-cancel",
+              onClick: _cache[5] || (_cache[5] = ($event) => $setup.showCardLinkModal = false)
+            }, "Hủy"),
+            vue.createElementVNode("button", {
+              class: "btn-confirm",
+              onClick: $setup.confirmCardLink
+            }, "Thêm thẻ")
+          ])
+        ])
+      ])) : vue.createCommentVNode("v-if", true),
       $setup.showColorModal ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
+        key: 3,
         class: "modal-overlay",
         onClick: $setup.closeColorModal
       }, [
         vue.createElementVNode("view", {
           class: "modal-box color-box",
-          onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
+          onClick: _cache[11] || (_cache[11] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "color-tabs" }, [
@@ -4557,7 +4725,7 @@ This will fail in production if not fixed.`);
               "view",
               {
                 class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "color" }]),
-                onClick: _cache[4] || (_cache[4] = ($event) => $setup.colorTab = "color")
+                onClick: _cache[8] || (_cache[8] = ($event) => $setup.colorTab = "color")
               },
               " Màu chữ ",
               2
@@ -4567,7 +4735,7 @@ This will fail in production if not fixed.`);
               "view",
               {
                 class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "backgroundColor" }]),
-                onClick: _cache[5] || (_cache[5] = ($event) => $setup.colorTab = "backgroundColor")
+                onClick: _cache[9] || (_cache[9] = ($event) => $setup.colorTab = "backgroundColor")
               },
               " Màu nền ",
               2
@@ -4577,7 +4745,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "color-grid" }, [
             vue.createElementVNode("view", {
               class: "color-circle no-color",
-              onClick: _cache[6] || (_cache[6] = ($event) => $setup.applyColor(""))
+              onClick: _cache[10] || (_cache[10] = ($event) => $setup.applyColor(""))
             }, [
               vue.createElementVNode("text", { class: "x-mark" }, "✕")
             ]),
@@ -4600,7 +4768,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoEditor.vue"]]);
+  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/TodoEditor.vue"]]);
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoDatePicker",
     props: {
@@ -4713,7 +4881,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/TodoDatePicker.vue"]]);
+  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/TodoDatePicker.vue"]]);
   const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
@@ -4887,7 +5055,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
-  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/create_todo.vue"]]);
+  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/create_todo.vue"]]);
   const timestampToDateStr = (ts) => {
     if (!ts || ts <= 0)
       return "";
@@ -5831,6 +5999,30 @@ This will fail in production if not fixed.`);
       const isMe = vue.computed(() => {
         return String(props.data.senderId) === String(authStore.uid);
       });
+      const processedContent = vue.computed(() => {
+        const rawHtml = props.data.message || "";
+        const links = [];
+        const iframeRegex = /<iframe[^>]+src="([^">]+)"[^>]*><\/iframe>/g;
+        const cleanHtml = rawHtml.replace(iframeRegex, (match, src) => {
+          if (src)
+            links.push(src);
+          return "";
+        });
+        return { cleanHtml, links };
+      });
+      const getDomain = (url) => {
+        try {
+          if (!url.startsWith("http"))
+            return "Website";
+          const domain = new URL(url).hostname;
+          return domain.replace("www.", "");
+        } catch (e) {
+          return "Liên kết ngoài";
+        }
+      };
+      const openLink = (url) => {
+        plus.runtime.openURL(url);
+      };
       const onPreviewImage = (url) => {
         if (!url)
           return;
@@ -5839,7 +6031,7 @@ This will fail in production if not fixed.`);
           current: 0
         });
       };
-      const __returned__ = { props, emit, authStore, isMe, onPreviewImage, UserAvatar, CommentItem };
+      const __returned__ = { props, emit, authStore, isMe, processedContent, getDomain, openLink, onPreviewImage, UserAvatar, CommentItem };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -5878,11 +6070,52 @@ This will fail in production if not fixed.`);
               ])
             ]),
             vue.createElementVNode("rich-text", {
-              nodes: $props.data.message,
+              nodes: $setup.processedContent.cleanHtml,
               class: "text-sm text-gray-700 leading-normal"
             }, null, 8, ["nodes"]),
-            $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
+            $setup.processedContent.links.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
               key: 0,
+              class: "mt-2"
+            }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.processedContent.links, (link, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: index,
+                    class: "link-card",
+                    onClick: vue.withModifiers(($event) => $setup.openLink(link), ["stop"])
+                  }, [
+                    vue.createElementVNode("view", { class: "link-card-icon" }, [
+                      vue.createElementVNode("image", {
+                        src: "https://img.icons8.com/ios-filled/50/007aff/internet.png",
+                        class: "card-icon-img"
+                      })
+                    ]),
+                    vue.createElementVNode("view", { class: "link-card-content" }, [
+                      vue.createElementVNode(
+                        "text",
+                        { class: "link-domain" },
+                        vue.toDisplayString($setup.getDomain(link)),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "link-url" },
+                        vue.toDisplayString(link),
+                        1
+                        /* TEXT */
+                      )
+                    ])
+                  ], 8, ["onClick"]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])) : vue.createCommentVNode("v-if", true),
+            $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
               class: "mt-2"
             }, [
               vue.createElementVNode("image", {
@@ -5995,7 +6228,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const CommentItem = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-8cb873be"], ["__file", "D:/uni_app/vbot-todo-android/components/Todo/CommentItem.vue"]]);
+  const CommentItem = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-8cb873be"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CommentItem.vue"]]);
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
     __name: "todo_detail",
     setup(__props, { expose: __expose }) {
@@ -6618,7 +6851,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
-  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android/pages/todo/todo_detail.vue"]]);
+  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/todo_detail.vue"]]);
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
   __definePage("pages/todo/create_todo", PagesTodoCreateTodo);
   __definePage("pages/todo/todo_detail", PagesTodoTodoDetail);
@@ -6650,7 +6883,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android/App.vue"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android-2/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());
