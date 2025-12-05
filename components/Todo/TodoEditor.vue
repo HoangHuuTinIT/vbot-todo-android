@@ -12,21 +12,18 @@
 			@statuschange="onStatusChange">
 		</editor>
 
+	
 		<view class="link-cards-area" v-if="insertedLinks.length > 0">
-			<view v-for="(link, index) in insertedLinks" :key="index" class="link-card">
-				<view class="link-card-icon">
-					<image src="https://img.icons8.com/ios-filled/50/007aff/internet.png" class="card-icon-img"></image>
-				</view>
-				<view class="link-card-content" @tap="openLink(link)">
-					<text class="link-domain">{{ getDomain(link) }}</text>
-					<text class="link-url">{{ link }}</text>
-				</view>
-				<view class="link-card-remove" @tap.stop="removeLink(index)">
-					<text class="remove-btn">✕</text>
-				</view>
-			</view>
+			<LinkCard 
+				v-for="(link, index) in insertedLinks" 
+				:key="index" 
+				:url="link"
+				:removable="true"
+				@remove="removeLink(index)"
+			/>
 		</view>
 
+		<!-- 🔹 TOOLBAR -->
 		<view class="toolbar">
 			<view class="tool-list">
 				<view v-for="(item, index) in tools" :key="index"
@@ -54,6 +51,7 @@
 					<image src="https://img.icons8.com/ios/50/666666/link--v1.png" class="img-icon"></image>
 				</view>
 
+				
 				<view class="tool-item" @touchend.prevent="openCardLinkModal">
 					<image src="https://img.icons8.com/ios/50/666666/add-link.png" class="img-icon"></image>
 				</view>
@@ -64,6 +62,7 @@
 			</view>
 		</view>
 
+	
 		<view class="modal-overlay" v-if="showLinkModal" @tap="showLinkModal = false">
 			<view class="modal-box" @tap.stop>
 				<text class="modal-title">Chèn Hyperlink (Text)</text>
@@ -75,6 +74,7 @@
 			</view>
 		</view>
 
+		
 		<view class="modal-overlay" v-if="showCardLinkModal" @tap="showCardLinkModal = false">
 			<view class="modal-box" @tap.stop>
 				<text class="modal-title">Chèn Thẻ Liên Kết (Web)</text>
@@ -87,6 +87,7 @@
 			</view>
 		</view>
 
+		
 		<view class="modal-overlay" v-if="showColorModal" @tap="closeColorModal">
 			<view class="modal-box color-box" @tap.stop>
 				<view class="color-tabs">
@@ -115,9 +116,11 @@
 	</view>
 </template>
 
+
 <script setup lang="ts">
 import { ref, watch, getCurrentInstance, onMounted } from 'vue';
-
+import LinkCard from '@/components/Todo/LinkCard.vue';
+import { extractLinksAndCleanHtml, composeHtmlWithIframes } from '@/utils/linkHelper'; 
 const props = defineProps({
 	modelValue: String,
 	placeholder: { type: String, default: 'Nhập nội dung...' }
@@ -233,7 +236,6 @@ const confirmCardLink = () => {
 	}
 	showCardLinkModal.value = false;
 };
-
 const removeLink = (index: number) => {
 	insertedLinks.value.splice(index, 1);
 	triggerUpdate();
@@ -245,7 +247,8 @@ const triggerUpdate = () => {
 			success: (res: any) => {
 				const html = res.html;
 				lastVal.value = html; 
-				const finalContent = composeContent(html, insertedLinks.value);
+				
+				const finalContent = composeHtmlWithIframes(html, insertedLinks.value);
 				emit('update:modelValue', finalContent);
 			}
 		});
@@ -376,7 +379,7 @@ const onEditorReady = () => {
 		if (res && res.context) {
 			editorCtx.value = res.context;
 			if (props.modelValue) {
-				const { cleanHtml, links } = parseContent(props.modelValue);
+				const { cleanHtml, links } = extractLinksAndCleanHtml(props.modelValue);
 				insertedLinks.value = links;
 				editorCtx.value.setContents({ html: cleanHtml });
 				lastVal.value = cleanHtml;
@@ -388,7 +391,7 @@ const onEditorReady = () => {
 const onInput = (e: any) => {
 	const val = e.detail.html;
 	lastVal.value = val; 
-	const finalContent = composeContent(val, insertedLinks.value);
+	const finalContent = composeHtmlWithIframes(val, insertedLinks.value);
 	emit('update:modelValue', finalContent);
 };
 
@@ -452,13 +455,15 @@ const clearFormat = () => {
 
 watch(() => props.modelValue, (newVal) => {
 	if (editorCtx.value) {
-		const { cleanHtml, links } = parseContent(newVal || '');
+		const { cleanHtml, links } = extractLinksAndCleanHtml(newVal || '');
+		
+	
 		if (cleanHtml !== lastVal.value) {
-			editorCtx.value.setContents({
-				html: cleanHtml
-			});
+			editorCtx.value.setContents({ html: cleanHtml });
 			lastVal.value = cleanHtml;
 		}
+		
+		
 		if (JSON.stringify(links) !== JSON.stringify(insertedLinks.value)) {
 			insertedLinks.value = links;
 		}

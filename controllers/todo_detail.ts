@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth';
 import { formatRelativeTime } from '@/utils/dateUtils';
 import { TODO_STATUS } from '@/utils/constants';
 import { showSuccess, showError, showInfo } from '@/utils/toast';
+import { extractLinksAndCleanHtml } from '@/utils/linkHelper';
 interface CommentItem {
 	id : number;
 	senderId : string | number;
@@ -72,7 +73,7 @@ export const useTodoDetailController = () => {
 	const commentFilterValues = ['', 'COMMENT'];
 
 	const isSavingDescription = ref(false);
-
+	const replyingMessagePreview = ref('');
 
 	const convertToTimestamp = (dateStr : string, timeStr : string = '00:00') : number => {
 		if (!dateStr) return 0;
@@ -91,7 +92,7 @@ export const useTodoDetailController = () => {
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
 
-		// showLoading('Đang cập nhật...');
+	
 isLoading.value = true;
 		try {
 			const payload = {
@@ -224,7 +225,7 @@ isLoading.value = true;
 			}
 	
 			isSavingDescription.value = true;
-	        // showLoading('Đang lưu...');
+	       
 	
 			try {
 	         
@@ -261,7 +262,7 @@ isLoading.value = true;
 				console.error("Lỗi cập nhật công việc:", error);
 				showError('Cập nhật thất bại');
 			} finally {
-	            // hideLoading();
+	           
 				isSavingDescription.value = false;
 			}
 		};
@@ -280,7 +281,7 @@ const onSaveTitle = async () => {
 
         if (newTitle === oldTitle) return;
 
-        // showLoading('Đang cập nhật tiêu đề...');
+     
 isLoading.value = true;
         try {
        
@@ -312,30 +313,36 @@ isLoading.value = true;
             showError('Lỗi cập nhật');
             form.value.title = oldTitle;
         } finally {
-            // hideLoading();
+         
 			isLoading.value = false;
         }
     };
 	const onRequestReply = async (item : any) => {
-
-		isEditingComment.value = false;
-		editingCommentData.value = null;
-		newCommentText.value = '';
-
-		replyingCommentData.value = item;
-		isReplying.value = true;
-
-		const senderId = item.senderId;
-		const foundMember = memberList.value.find(m => m.UID === senderId);
-		if (foundMember) {
-			replyingMemberName.value = foundMember.UserName;
-		} else {
-			replyingMemberName.value = 'Người dùng ẩn';
-		}
-
-		await nextTick();
-
-	};
+	        isEditingComment.value = false;
+	        editingCommentData.value = null;
+	        newCommentText.value = '';
+	
+	        replyingCommentData.value = item;
+	        
+	   
+	        const rawMsg = item.message || '';
+	   
+	        const { cleanHtml } = extractLinksAndCleanHtml(rawMsg);
+	        replyingMessagePreview.value = cleanHtml;
+	     
+	
+	        isReplying.value = true;
+	
+	        const senderId = item.senderId;
+	        const foundMember = memberList.value.find(m => m.UID === senderId);
+	        if (foundMember) {
+	            replyingMemberName.value = foundMember.UserName;
+	        } else {
+	            replyingMemberName.value = 'Người dùng ẩn';
+	        }
+	
+	        await nextTick();
+	    };
 
 	const onCancelReply = () => {
 
@@ -401,11 +408,12 @@ isLoading.value = true;
 	    };
 
 	const resetReplyState = () => {
-		isReplying.value = false;
-		replyingCommentData.value = null;
-		replyingMemberName.value = '';
-		newCommentText.value = '';
-	};
+	        isReplying.value = false;
+	        replyingCommentData.value = null;
+	        replyingMessagePreview.value = ''; 
+	        replyingMemberName.value = '';
+	        newCommentText.value = '';
+	    };
 
 	const onToggleEmojiPicker = (commentItem : any) => {
 		currentReactingComment.value = commentItem;
@@ -506,7 +514,6 @@ isLoading.value = true;
 		const todoId = form.value.id;
 		if (!todoId) return;
 
-		// showLoading('Đang tải...');
 isLoading.value = true;
 		try {
 
@@ -552,7 +559,7 @@ isLoading.value = true;
 			console.error("Lỗi lấy chi tiết bình luận:", error);
 			showError('Lỗi tải dữ liệu');
 		} finally {
-			// uni.hideLoading();
+		
 			isLoading.value = true;
 		}
 	};
@@ -956,7 +963,7 @@ isLoading.value = true;
 
 
 		if (!form.value.raw) return;
-		// showLoading('Đang cập nhật...');
+		
 isLoading.value = true;
 
 		try {
@@ -996,7 +1003,7 @@ isLoading.value = true;
 			showError('Lỗi cập nhật');
 		} finally {
 			isLoading.value = false;
-			// uni.hideLoading();
+		
 		}
 	};
 	const onSourceChange = (e : any) => { form.value.sourceIndex = e.detail.value; };
@@ -1018,7 +1025,6 @@ isLoading.value = true;
 			showError('Thiếu dữ liệu gốc');
 			return;
 		}
-		// showLoading('Đang cập nhật người giao...');
 		isLoading.value = true;
 		try {
 
@@ -1057,7 +1063,7 @@ isLoading.value = true;
 			console.error("Lỗi cập nhật người giao:", error);
 			showError('Lỗi cập nhật');
 		} finally {
-			// hideLoading();
+		
 			isLoading.value = false;
 		}
 	};
@@ -1125,5 +1131,6 @@ isLoading.value = true;
 
 		dynamicStatusOptions,
 		onSaveTitle,
+		replyingMessagePreview,
 	};
 };

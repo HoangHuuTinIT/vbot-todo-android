@@ -1,4 +1,3 @@
-// components/Todo/CommentItem.vue
 <template>
 	<view class="comment-thread">
 		<view class="flex gap-3 mb-4 items-start">
@@ -23,15 +22,11 @@
 					<rich-text :nodes="processedContent.cleanHtml" class="text-sm text-gray-700 leading-normal"></rich-text>
 					
 					<view v-if="processedContent.links.length > 0" class="mt-2">
-						<view v-for="(link, index) in processedContent.links" :key="index" class="link-card" @tap.stop="openLink(link)">
-							<view class="link-card-icon">
-								<image src="https://img.icons8.com/ios-filled/50/007aff/internet.png" class="card-icon-img"></image>
-							</view>
-							<view class="link-card-content">
-								<text class="link-domain">{{ getDomain(link) }}</text>
-								<text class="link-url">{{ link }}</text>
-							</view>
-						</view>
+						<LinkCard 
+							v-for="(link, index) in processedContent.links" 
+							:key="index" 
+							:url="link"
+						/>
 					</view>
 
 					<view v-if="data.files" class="mt-2">
@@ -97,6 +92,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import UserAvatar from '@/components/UserAvatar.vue';
+import LinkCard from '@/components/Todo/LinkCard.vue'; 
+import { extractLinksAndCleanHtml } from '@/utils/linkHelper'; 
 import { useAuthStore } from '@/stores/auth';
 import CommentItem from './CommentItem.vue';
 
@@ -115,37 +112,8 @@ const isMe = computed(() => {
 
 const processedContent = computed(() => {
 	const rawHtml = props.data.message || '';
-	const links: string[] = [];
-
-	const iframeRegex = /<iframe[^>]+src="([^">]+)"[^>]*><\/iframe>/g;
-
-	const cleanHtml = rawHtml.replace(iframeRegex, (match: any, src: string) => {
-		if (src) links.push(src);
-		return ''; 
-	});
-
-	return { cleanHtml, links };
+	return extractLinksAndCleanHtml(rawHtml);
 });
-
-const getDomain = (url: string) => {
-	try {
-		if (!url.startsWith('http')) return 'Website';
-		const domain = new URL(url).hostname;
-		return domain.replace('www.', '');
-	} catch (e) {
-		return 'Liên kết ngoài';
-	}
-};
-
-const openLink = (url: string) => {
-	// #ifdef APP-PLUS
-	plus.runtime.openURL(url);
-	// #endif
-	// #ifdef H5
-	window.open(url, '_blank');
-	// #endif
-};
-
 
 const onPreviewImage = (url: string) => {
 		if (!url) return;
@@ -173,19 +141,15 @@ const onPreviewImage = (url: string) => {
 .bg-gray-50 { background-color: #f9fafb; }
 .rounded-2xl { border-radius: 16px; }
 .rounded-tl-none { border-top-left-radius: 0; }
-.rounded-full { border-radius: 9999px; }
 .p-3 { padding: 12px; }
-.px-1 { padding-left: 4px; padding-right: 4px; }
 .text-sm { font-size: 14px; }
 .text-xs { font-size: 12px; }
 .font-bold { font-weight: 700; }
-.font-medium { font-weight: 500; }
 .text-gray-900 { color: #111827; }
 .text-gray-700 { color: #374151; }
 .text-gray-400 { color: #9ca3af; }
 .italic { font-style: italic; }
 .ml-1 { margin-left: 4px; }
-.ml-2 { margin-left: 8px; }
 .mr-2 { margin-right: 8px; }
 .mr-3 { margin-right: 12px; }
 .pl-12 { padding-left: 48px; } 
@@ -205,80 +169,15 @@ const onPreviewImage = (url: string) => {
 		display: inline-block;
 }
 .action-buttons-container {
-		display: flex;
-		gap: 15px;
-		align-items: center;
-		margin-left: auto; 
+		display: flex; gap: 15px; align-items: center; margin-left: auto; 
 }
 .btn-icon-action {
-		padding: 4px;
-		opacity: 0.6;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
+		padding: 4px; opacity: 0.6; display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
 .btn-icon-action:active { opacity: 1; }
-.icon-action {
-		width: 18px;
-		height: 18px;
-}
-
+.icon-action { width: 18px; height: 18px; }
 .comment-attachment-img {
-		max-width: 200px;     
-		max-height: 300px;    
-		border-radius: 8px;    
-		border: 1px solid #eee; 
-		display: block;      
+		max-width: 200px; max-height: 300px; border-radius: 8px; border: 1px solid #eee; display: block;      
 }
 :deep(img) { max-width: 100%; height: auto; }
-
-.link-card {
-	display: flex;
-	align-items: center;
-	background-color: #fff; 
-	border: 1px solid #e5e7eb;
-	border-radius: 8px;
-	padding: 8px;
-	margin-bottom: 6px;
-	margin-top: 8px;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-}
-.link-card:active {
-	background-color: #f3f4f6;
-}
-.link-card-icon {
-	width: 36px;
-	height: 36px;
-	background-color: #eff6ff;
-	border-radius: 8px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-right: 10px;
-	flex-shrink: 0;
-}
-.card-icon-img {
-	width: 18px;
-	height: 18px;
-}
-.link-card-content {
-	flex: 1;
-	overflow: hidden;
-	display: flex;
-	flex-direction: column;
-}
-.link-domain {
-	font-size: 13px;
-	font-weight: 600;
-	color: #111827;
-	margin-bottom: 1px;
-}
-.link-url {
-	font-size: 11px;
-	color: #6b7280;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
 </style>

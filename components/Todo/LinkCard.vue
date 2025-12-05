@@ -1,14 +1,14 @@
 <template>
-	<view class="link-card" @tap="onOpenLink">
+	<view class="link-card" @tap.stop="handleOpenLink">
 		<view class="link-card-icon">
 			<image src="https://img.icons8.com/ios-filled/50/007aff/internet.png" class="card-icon-img"></image>
 		</view>
 		<view class="link-card-content">
-			<text class="link-domain">{{ domain }}</text>
+			<text class="link-domain">{{ domainDisplay }}</text>
 			<text class="link-url">{{ url }}</text>
 		</view>
 		
-		<view v-if="removable" class="link-card-remove" @tap.stop="onRemove">
+		<view v-if="removable" class="link-card-remove" @tap.stop="$emit('remove')">
 			<text class="remove-btn">✕</text>
 		</view>
 	</view>
@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { getDomainFromUrl, openExternalLink } from '@/utils/linkHelper';
 
 const props = defineProps({
 	url: {
@@ -31,31 +32,10 @@ const props = defineProps({
 
 const emit = defineEmits(['remove']);
 
+const domainDisplay = computed(() => getDomainFromUrl(props.url));
 
-const domain = computed(() => {
-	try {
-		let tempUrl = props.url;
-		if (!tempUrl.startsWith('http')) tempUrl = 'http://' + tempUrl;
-		const hostname = new URL(tempUrl).hostname;
-		return hostname.replace('www.', '');
-	} catch (e) {
-		return 'Website';
-	}
-});
-
-
-const onOpenLink = () => {
-	if (!props.url) return;
-	// #ifdef APP-PLUS
-	plus.runtime.openURL(props.url);
-	// #endif
-	// #ifdef H5
-	window.open(props.url, '_blank');
-	// #endif
-};
-
-const onRemove = () => {
-	emit('remove');
+const handleOpenLink = () => {
+    openExternalLink(props.url);
 };
 </script>
 
@@ -68,6 +48,7 @@ const onRemove = () => {
 	border-radius: 8px;
 	padding: 8px 10px;
 	margin-bottom: 8px;
+	margin-top: 4px; /* Thêm margin top để tách biệt với text */
 	box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 	transition: background-color 0.2s;
 	

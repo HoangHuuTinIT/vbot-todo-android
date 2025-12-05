@@ -127,15 +127,17 @@
 						<text class="editing-text">Đang chỉnh sửa bình luận của <text class="editing-name">{{ editingMemberName }}</text></text>
 					</view>
 					<view v-if="isReplying && replyingCommentData" class="reply-alert">
-						<view class="reply-info">
-							<text class="reply-label">Đang trả lời bình luận của </text>
-							<text class="reply-name">{{ replyingMemberName }}</text>
-						</view>
-						<view class="reply-quote">
-							<text class="quote-icon">“</text>
-							<rich-text :nodes="replyingCommentData.message" class="quote-content"></rich-text>
-							<text class="quote-icon">”</text>
-						</view>
+					    <view class="reply-info">
+					        <text class="reply-label">Đang trả lời bình luận của </text>
+					        <text class="reply-name">{{ replyingMemberName }}</text>
+					    </view>
+					    <view class="reply-quote">
+					        <text class="quote-icon">“</text>
+					        
+					        <rich-text :nodes="replyingMessagePreview" class="quote-content"></rich-text>
+					        
+					        <text class="quote-icon">”</text>
+					    </view>
 					</view>
 
 					<view class="input-actions">
@@ -266,6 +268,7 @@
 		onDateUpdate,
 		isStatusDisabled,
 		onSaveTitle,
+		replyingMessagePreview,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
