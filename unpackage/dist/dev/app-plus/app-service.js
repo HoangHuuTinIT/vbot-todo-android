@@ -2915,7 +2915,9 @@ This will fail in production if not fixed.`);
       loadMoreCustomers
     } = useCustomerFilter();
     const fetchData = async () => {
-      isLoading.value = true;
+      if (todos.value.length === 0) {
+        isLoading.value = true;
+      }
       try {
         const params = {
           ...filter.value,
@@ -2950,7 +2952,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:113", error);
+        formatAppLog("error", "at controllers/list_todo.ts:115", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -2990,7 +2992,9 @@ This will fail in production if not fixed.`);
       itemToDelete.value = null;
     };
     const getTodoList = async () => {
-      isLoading.value = true;
+      if (todos.value.length === 0) {
+        isLoading.value = true;
+      }
       try {
         let selectedCreatorId = "";
         if (creatorIndex.value > 0) {
@@ -3020,9 +3024,11 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:187", error);
+        formatAppLog("error", "at controllers/list_todo.ts:194", error);
         showError("Lỗi tải dữ liệu");
-        todos.value = [];
+        if (todos.value.length === 0) {
+          todos.value = [];
+        }
       } finally {
         isLoading.value = false;
       }
@@ -3037,7 +3043,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:203", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:213", "Delete Error:", error);
         showError("Xóa thất bại");
       }
     };

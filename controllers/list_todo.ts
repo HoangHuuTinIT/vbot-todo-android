@@ -69,7 +69,9 @@ export const useListTodoController = () => {
 		loadMoreCustomers
 	} = useCustomerFilter();
 	const fetchData = async () => {
-		isLoading.value = true;
+		if (todos.value.length === 0) {
+		            isLoading.value = true;
+		        }
 		try {
 			const params = {
 				...filter.value,
@@ -114,6 +116,7 @@ export const useListTodoController = () => {
 			showError('Lỗi tải dữ liệu');
 		} finally {
 			isLoading.value = false;
+
 		}
 	};
 	const onChangePage = (step : number) => {
@@ -149,48 +152,55 @@ export const useListTodoController = () => {
 	const onRequestDelete = (item : TodoItem) => { itemToDelete.value = item; isConfirmDeleteOpen.value = true; };
 	const cancelDelete = () => { isConfirmDeleteOpen.value = false; itemToDelete.value = null; };
 	const getTodoList = async () => {
-		isLoading.value = true;
-		try {
-			let selectedCreatorId = '';
-			if (creatorIndex.value > 0) {
-				const member = rawMemberList.value[creatorIndex.value - 1];
-				selectedCreatorId = member.UID || '';
+	
+			if (todos.value.length === 0) {
+				isLoading.value = true;
 			}
+		
+			try {
+				let selectedCreatorId = '';
+				if (creatorIndex.value > 0) {
+					const member = rawMemberList.value[creatorIndex.value - 1];
+					selectedCreatorId = member.UID || '';
+				}
+	
+				let selectedAssigneeId = '';
+				if (assigneeIndex.value > 0) {
+					const member = rawMemberList.value[assigneeIndex.value - 1];
+					selectedAssigneeId = member.UID || '';
+				}
+	
+				const filterParams = buildTodoParams(
+					filter.value,
+					statusValues[statusIndex.value],
+					sourceValues[sourceIndex.value],
+					selectedCreatorId,
+					selectedAssigneeId
+				);
+	
+				const [listData, countData] = await Promise.all([
+					getTodos({
+						...filterParams,
+						pageNo: pageNo.value,
+						pageSize: pageSize.value
+					}),
+					getTodoCount(filterParams)
+				]);
+	
+				todos.value = listData || [];
+				setTotal(countData || 0);
+	
+			} catch (error) {
+				console.error(error);
+				showError('Lỗi tải dữ liệu');
+	            if (todos.value.length === 0) {
+	                todos.value = [];
+	            }
+			} finally {
+				isLoading.value = false;
 
-			let selectedAssigneeId = '';
-			if (assigneeIndex.value > 0) {
-				const member = rawMemberList.value[assigneeIndex.value - 1];
-				selectedAssigneeId = member.UID || '';
 			}
-
-			const filterParams = buildTodoParams(
-				filter.value,
-				statusValues[statusIndex.value],
-				sourceValues[sourceIndex.value],
-				selectedCreatorId,
-				selectedAssigneeId
-			);
-
-			const [listData, countData] = await Promise.all([
-				getTodos({
-					...filterParams,
-					pageNo: pageNo.value,
-					pageSize: pageSize.value
-				}),
-				getTodoCount(filterParams)
-			]);
-
-			todos.value = listData || [];
-			setTotal(countData || 0);
-
-		} catch (error) {
-			console.error(error);
-			showError('Lỗi tải dữ liệu');
-			todos.value = [];
-		} finally {
-			isLoading.value = false;
-		}
-	};
+		};
 	const confirmDelete = async () => {
 		if (!itemToDelete.value) return;
 		try {
