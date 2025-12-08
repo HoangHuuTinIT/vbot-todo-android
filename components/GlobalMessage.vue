@@ -6,7 +6,6 @@
 	>
 		<view class="message-content" :class="msgType">
 			<image :src="iconPath" class="msg-icon" mode="aspectFit" />
-			
 			<text class="msg-text">{{ msgContent }}</text>
 		</view>
 	</view>
@@ -20,6 +19,7 @@
 	const msgType = ref('success');
 	const safeAreaTop = ref(0);
 	let timer: any = null;
+
 	const icons: Record<string, string> = {
 		success: 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23047857%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z%22%2F%3E%3C%2Fsvg%3E',
 		error: 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23b91c1c%22%3E%3Cpath%20d%3D%22M12%202C6.47%202%202%206.47%202%2012s4.47%2010%2010%2010%2010-4.47%2010-10S17.53%202%2012%202zm5%2013.59L15.59%2017%2012%2013.41%208.41%2017%207%2015.59%2010.59%2012%207%208.41%208.41%207%2012%2010.59%2015.59%207%2017%208.41%2013.41%2012%2017%2015.59z%22%2F%3E%3C%2Fsvg%3E',
@@ -31,7 +31,8 @@
 		return icons[msgType.value] || icons['info'];
 	});
 
-	const handleShowToast = (data: any) => {
+
+	const handleShowToast = (data: { message: string, type?: string }) => {
 		if (timer) {
 			clearTimeout(timer);
 			isVisible.value = false;
@@ -40,27 +41,57 @@
 		msgContent.value = data.message;
 		msgType.value = data.type || 'success';
 		
+	
 		setTimeout(() => {
 			isVisible.value = true;
 		}, 50);
 
 		timer = setTimeout(() => {
 			isVisible.value = false;
-		}, 2500);
+		}, 3000); 
 	};
 
 	onMounted(() => {
 		const sysInfo = uni.getSystemInfoSync();
 		safeAreaTop.value = sysInfo.statusBarHeight || 0;
+	
 		uni.$on('app-toast-show', handleShowToast);
+
+	
+		uni.onNetworkStatusChange((res) => {
+			if (!res.isConnected) {
+				handleShowToast({
+					message: 'Mất kết nối Internet. Vui lòng kiểm tra lại.',
+					type: 'error'
+				});
+			} else {
+				handleShowToast({
+					message: 'Đã khôi phục kết nối Internet.',
+					type: 'success'
+				});
+			}
+		});
+
+		uni.getNetworkType({
+			success: (res) => {
+				if (res.networkType === 'none') {
+					handleShowToast({
+						message: 'Không có kết nối Internet.',
+						type: 'error'
+					});
+				}
+			}
+		});
 	});
 
 	onUnmounted(() => {
 		uni.$off('app-toast-show', handleShowToast);
+
 	});
 </script>
 
 <style lang="scss" scoped>
+	/* Giữ nguyên CSS cũ của bạn */
 	.global-message-container {
 		position: fixed;
 		top: 0;
@@ -128,5 +159,4 @@
 		border: 1px solid #fde68a;
 	}
 	.message-content.warning .msg-text { color: #b45309; }
-
 </style>

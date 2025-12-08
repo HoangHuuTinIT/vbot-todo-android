@@ -32,7 +32,6 @@
   padding: 8px 10px;
   margin-bottom: 8px;
   margin-top: 4px;
-  /* Thêm margin top để tách biệt với text */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: background-color 0.2s;
 }
@@ -879,6 +878,7 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Giữ nguyên CSS cũ của bạn */
 .global-message-container[data-v-2f57c33b] {
   position: fixed;
   top: 0;

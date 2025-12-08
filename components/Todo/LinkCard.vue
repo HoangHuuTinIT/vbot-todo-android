@@ -48,7 +48,7 @@ const handleOpenLink = () => {
 	border-radius: 8px;
 	padding: 8px 10px;
 	margin-bottom: 8px;
-	margin-top: 4px; /* Thêm margin top để tách biệt với text */
+	margin-top: 4px; 
 	box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 	transition: background-color 0.2s;
 	

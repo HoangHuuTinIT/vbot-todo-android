@@ -20,10 +20,9 @@ export const getAllMembers = (): Promise<ProjectMember[]> => {
                 'Content-Type': 'application/json'
             },
             success: (res: UniApp.RequestSuccessCallbackResult) => {
-                // Ép kiểu res.data về ApiResponse chứa mảng ProjectMember
-                const body = res.data as ApiResponse<ProjectMember[]>;
                 
-                // Kiểm tra status = 1 (Success)
+                const body = res.data as ApiResponse<ProjectMember[]>;
+               
                 if (body.status === 1 && body.data) {
                     resolve(body.data);
                 } else {

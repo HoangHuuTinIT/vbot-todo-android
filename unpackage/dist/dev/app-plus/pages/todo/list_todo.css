@@ -431,6 +431,7 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Giữ nguyên CSS cũ của bạn */
 .global-message-container[data-v-2f57c33b] {
   position: fixed;
   top: 0;

@@ -1,9 +1,9 @@
 //controllers/todo_detail.ts
 import { ref, nextTick, computed } from 'vue';
-import { onLoad ,onPullDownRefresh} from '@dcloudio/uni-app';
-import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage,uploadTodoFile } from '@/api/todo';
+import { onLoad, onPullDownRefresh } from '@dcloudio/uni-app';
+import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage, uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
-import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm'; 
+import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm';
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
@@ -15,12 +15,12 @@ import { extractLinksAndCleanHtml } from '@/utils/linkHelper';
 interface CommentItem {
 	id : number;
 	senderId : string | number;
-	
+
 	senderName : string;
 	senderAvatarChar : string;
 	senderAvatarColor : string;
 	message : string;
-	files: string;
+	files : string;
 	timeDisplay : string;
 	actionText : string;
 	isEdited : boolean;
@@ -75,9 +75,9 @@ export const useTodoDetailController = () => {
 	const isSavingDescription = ref(false);
 	const replyingMessagePreview = ref('');
 
-const toggleHistory = () => {
-        isHistoryOpen.value = !isHistoryOpen.value;
-    };
+	const toggleHistory = () => {
+		isHistoryOpen.value = !isHistoryOpen.value;
+	};
 	const convertToTimestamp = (dateStr : string, timeStr : string = '00:00') : number => {
 		if (!dateStr) return 0;
 		try {
@@ -94,10 +94,10 @@ const toggleHistory = () => {
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
-	
-	
-	
-isLoading.value = true;
+
+
+
+		isLoading.value = true;
 		try {
 			const payload = {
 				...form.value.raw,
@@ -144,209 +144,209 @@ isLoading.value = true;
 		}
 	};
 
-	    const processCommentInput = async (htmlContent: string): Promise<{ cleanMessage: string, fileUrl: string }> => {
-	        if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
-	
-	        const imgRegex = /<img[^>]+src="([^">]+)"[^>]*>/g;
-	        let match;
-	        let fileUrl = '';
-	        let cleanMessage = htmlContent;
-	
-	        const uploadPromises: Promise<string>[] = [];
-	        
-	        while ((match = imgRegex.exec(htmlContent)) !== null) {
-	            const fullImgTag = match[0];
-	            const src = match[1];
-	
-	            cleanMessage = cleanMessage.replace(fullImgTag, '');
-	
-	            if (!src.startsWith('http') && !src.startsWith('https')) {
-	                 const p = uploadTodoFile(src)
-	                    .then(serverUrl => serverUrl)
-	                    .catch(err => {
-	                        console.error('Upload ảnh bình luận lỗi:', err);
-	                        return '';
-	                    });
-	                uploadPromises.push(p);
-	            } else {
+	const processCommentInput = async (htmlContent : string) : Promise<{ cleanMessage : string, fileUrl : string }> => {
+		if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
 
-	                fileUrl = src; 
-	            }
-	        }
-	
-	        if (uploadPromises.length > 0) {
-	            const results = await Promise.all(uploadPromises);
-	            const successfulUrl = results.find(u => u !== '');
-	            if (successfulUrl) {
-	                fileUrl = successfulUrl;
-	            }
-	        }
-	
-	        cleanMessage = cleanMessage.trim();
-	
-	        return { cleanMessage, fileUrl };
-	    };
-	const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
-			if (!htmlContent) return { newContent: '', fileUrls: [] };
-	
-			const imgRegex = /<img[^>]+src="([^">]+)"/g;
-			let match;
-			const promises: Promise<any>[] = [];
-			const replacements: { oldSrc: string, newSrc: string }[] = [];
-	        const uploadedUrls: string[] = []; 
-	
-			while ((match = imgRegex.exec(htmlContent)) !== null) {
-				const src = match[1];
-				if (!src.startsWith('http') && !src.startsWith('https')) {
-					const uploadPromise = uploadTodoFile(src)
-						.then(serverUrl => {
-							replacements.push({ oldSrc: src, newSrc: serverUrl });
-	                        uploadedUrls.push(serverUrl); 
-						})
-						.catch(err => {
-							console.error(`Upload ảnh detail lỗi:`, err);
-						});
-					promises.push(uploadPromise);
-				}
+		const imgRegex = /<img[^>]+src="([^">]+)"[^>]*>/g;
+		let match;
+		let fileUrl = '';
+		let cleanMessage = htmlContent;
+
+		const uploadPromises : Promise<string>[] = [];
+
+		while ((match = imgRegex.exec(htmlContent)) !== null) {
+			const fullImgTag = match[0];
+			const src = match[1];
+
+			cleanMessage = cleanMessage.replace(fullImgTag, '');
+
+			if (!src.startsWith('http') && !src.startsWith('https')) {
+				const p = uploadTodoFile(src)
+					.then(serverUrl => serverUrl)
+					.catch(err => {
+						console.error('Upload ảnh bình luận lỗi:', err);
+						return '';
+					});
+				uploadPromises.push(p);
+			} else {
+
+				fileUrl = src;
 			}
-	
-			if (promises.length > 0) {
-				await Promise.all(promises);
+		}
+
+		if (uploadPromises.length > 0) {
+			const results = await Promise.all(uploadPromises);
+			const successfulUrl = results.find(u => u !== '');
+			if (successfulUrl) {
+				fileUrl = successfulUrl;
 			}
-	
-			let newHtml = htmlContent;
-			replacements.forEach(rep => {
-				newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
-			});
-	
-			return { newContent: newHtml, fileUrls: uploadedUrls };
-		};
-	
+		}
+
+		cleanMessage = cleanMessage.trim();
+
+		return { cleanMessage, fileUrl };
+	};
+	const processDescriptionImages = async (htmlContent : string) : Promise<{ newContent : string, fileUrls : string[] }> => {
+		if (!htmlContent) return { newContent: '', fileUrls: [] };
+
+		const imgRegex = /<img[^>]+src="([^">]+)"/g;
+		let match;
+		const promises : Promise<any>[] = [];
+		const replacements : { oldSrc : string, newSrc : string }[] = [];
+		const uploadedUrls : string[] = [];
+
+		while ((match = imgRegex.exec(htmlContent)) !== null) {
+			const src = match[1];
+			if (!src.startsWith('http') && !src.startsWith('https')) {
+				const uploadPromise = uploadTodoFile(src)
+					.then(serverUrl => {
+						replacements.push({ oldSrc: src, newSrc: serverUrl });
+						uploadedUrls.push(serverUrl);
+					})
+					.catch(err => {
+						console.error(`Upload ảnh detail lỗi:`, err);
+					});
+				promises.push(uploadPromise);
+			}
+		}
+
+		if (promises.length > 0) {
+			await Promise.all(promises);
+		}
+
+		let newHtml = htmlContent;
+		replacements.forEach(rep => {
+			newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+		});
+
+		return { newContent: newHtml, fileUrls: uploadedUrls };
+	};
+
 	const onSaveDescription = async () => {
-			if (!form.value.raw) {
-				showError('Không tìm thấy dữ liệu gốc');
-				return;
-			}
-	
-			isSavingDescription.value = true;
-	       
-	
-			try {
-	         
-	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
-	            
-	            form.value.desc = newContent;
-	
-	            const filesString = fileUrls.length > 0 ? fileUrls.join(',') : '';
-	
-				const payload = {
-					...form.value.raw,
-					preFixCode: "TODO",
-					description: form.value.desc,
-					files: filesString, 
-					tagCodes: "",
-					title: form.value.title || form.value.raw.title,
-				};
-	
-				console.log("Payload Update Description:", payload);
-	
-				const res = await updateTodo(payload);
-	
-				if (res) {
-					showSuccess('Đã cập nhật mô tả');
-	                
-	           
-	                form.value.raw.description = form.value.desc;
-	                if(filesString) {
-	                    form.value.raw.files = filesString;
-	                }
-					await fetchComments(form.value.id);
+		if (!form.value.raw) {
+			showError('Không tìm thấy dữ liệu gốc');
+			return;
+		}
+
+		isSavingDescription.value = true;
+
+
+		try {
+
+			const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+
+			form.value.desc = newContent;
+
+			const filesString = fileUrls.length > 0 ? fileUrls.join(',') : '';
+
+			const payload = {
+				...form.value.raw,
+				preFixCode: "TODO",
+				description: form.value.desc,
+				files: filesString,
+				tagCodes: "",
+				title: form.value.title || form.value.raw.title,
+			};
+
+			console.log("Payload Update Description:", payload);
+
+			const res = await updateTodo(payload);
+
+			if (res) {
+				showSuccess('Đã cập nhật mô tả');
+
+
+				form.value.raw.description = form.value.desc;
+				if (filesString) {
+					form.value.raw.files = filesString;
 				}
-			} catch (error) {
-				console.error("Lỗi cập nhật công việc:", error);
-				showError('Cập nhật thất bại');
-			} finally {
-	           
-				isSavingDescription.value = false;
+				await fetchComments(form.value.id);
 			}
-		};
-const onSaveTitle = async () => {
-       
-        if (!form.value.raw) return;
+		} catch (error) {
+			console.error("Lỗi cập nhật công việc:", error);
+			showError('Cập nhật thất bại');
+		} finally {
 
-        const newTitle = form.value.title ? form.value.title.trim() : '';
-        const oldTitle = form.value.raw.title;
+			isSavingDescription.value = false;
+		}
+	};
+	const onSaveTitle = async () => {
 
-        if (!newTitle) {
-            showInfo('Tiêu đề không được để trống');
-            form.value.title = oldTitle;
-            return;
-        }
+		if (!form.value.raw) return;
 
-        if (newTitle === oldTitle) return;
+		const newTitle = form.value.title ? form.value.title.trim() : '';
+		const oldTitle = form.value.raw.title;
 
-     
-isLoading.value = true;
-        try {
-       
-            const payload = {
-                ...form.value.raw, 
-                title: newTitle,   
-                preFixCode: "TODO", 
-                description: form.value.raw.description, 
-                files: form.value.raw.files || "",
-                tagCodes: form.value.raw.tagCodes || ""
-            };
+		if (!newTitle) {
+			showInfo('Tiêu đề không được để trống');
+			form.value.title = oldTitle;
+			return;
+		}
 
-            console.log("Payload Update Title:", payload);
+		if (newTitle === oldTitle) return;
 
-            const res = await updateTodo(payload);
 
-            if (res) {
-                showSuccess('Đã đổi tiêu đề');
-                
-                form.value.raw.title = newTitle;
+		isLoading.value = true;
+		try {
 
-                if (form.value.customerCode) {
-                    await fetchHistoryLog(form.value.customerCode);
-                }
-                await fetchComments(form.value.id); 
-            }
-        } catch (error) {
-            console.error("Lỗi cập nhật tiêu đề:", error);
-            showError('Lỗi cập nhật');
-            form.value.title = oldTitle;
-        } finally {
-         
+			const payload = {
+				...form.value.raw,
+				title: newTitle,
+				preFixCode: "TODO",
+				description: form.value.raw.description,
+				files: form.value.raw.files || "",
+				tagCodes: form.value.raw.tagCodes || ""
+			};
+
+			console.log("Payload Update Title:", payload);
+
+			const res = await updateTodo(payload);
+
+			if (res) {
+				showSuccess('Đã đổi tiêu đề');
+
+				form.value.raw.title = newTitle;
+
+				if (form.value.customerCode) {
+					await fetchHistoryLog(form.value.customerCode);
+				}
+				await fetchComments(form.value.id);
+			}
+		} catch (error) {
+			console.error("Lỗi cập nhật tiêu đề:", error);
+			showError('Lỗi cập nhật');
+			form.value.title = oldTitle;
+		} finally {
+
 			isLoading.value = false;
-        }
-    };
+		}
+	};
 	const onRequestReply = async (item : any) => {
-	        isEditingComment.value = false;
-	        editingCommentData.value = null;
-	        newCommentText.value = '';
-	
-	        replyingCommentData.value = item;
-	        
-	   
-	        const rawMsg = item.message || '';
-	   
-	        const { cleanHtml } = extractLinksAndCleanHtml(rawMsg);
-	        replyingMessagePreview.value = cleanHtml;
-	     
-	
-	        isReplying.value = true;
-	
-	        const senderId = item.senderId;
-	        const foundMember = memberList.value.find(m => m.UID === senderId);
-	        if (foundMember) {
-	            replyingMemberName.value = foundMember.UserName;
-	        } else {
-	            replyingMemberName.value = 'Người dùng ẩn';
-	        }
-	
-	        await nextTick();
-	    };
+		isEditingComment.value = false;
+		editingCommentData.value = null;
+		newCommentText.value = '';
+
+		replyingCommentData.value = item;
+
+
+		const rawMsg = item.message || '';
+
+		const { cleanHtml } = extractLinksAndCleanHtml(rawMsg);
+		replyingMessagePreview.value = cleanHtml;
+
+
+		isReplying.value = true;
+
+		const senderId = item.senderId;
+		const foundMember = memberList.value.find(m => m.UID === senderId);
+		if (foundMember) {
+			replyingMemberName.value = foundMember.UserName;
+		} else {
+			replyingMemberName.value = 'Người dùng ẩn';
+		}
+
+		await nextTick();
+	};
 
 	const onCancelReply = () => {
 
@@ -367,57 +367,66 @@ isLoading.value = true;
 	};
 
 	const submitReply = async () => {
-	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-	             showInfo('Vui lòng nhập nội dung');
-	             return;
-	        }
-	        if (!replyingCommentData.value) return;
-	
-	        isSubmittingComment.value = true;
-	
-	        try {
-	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
-	
-	            const todoId = form.value.id;
-	            const senderId = authStore.uid;
-	            let apiParentId = replyingCommentData.value.id;
-	
-	            if (replyingCommentData.value.rootParentId) {
-	                apiParentId = replyingCommentData.value.rootParentId;
-	            }
-	            
-	            const payload = {
-	                todoId: todoId,
-	                senderId: senderId,
-	                message: cleanMessage, 
-	                files: fileUrl,      
-	                parentId: apiParentId
-	            };
-	
-	            console.log(">> Gửi trả lời (đã xử lý):", payload);
-	
-	            const res = await createTodoMessage(payload);
-	
-	            if (res) {
-	                showSuccess('Đã trả lời');
-	                resetReplyState();
-	                await fetchComments(todoId);
-	            }
-	        } catch (error) {
-	            console.error("Lỗi gửi trả lời:", error);
-	            showError('Gửi thất bại');
-	        } finally {
-	            isSubmittingComment.value = false;
-	        }
-	    };
+		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+			showInfo('Vui lòng nhập nội dung');
+			return;
+		}
+		if (!replyingCommentData.value) return;
+
+		isSubmittingComment.value = true;
+
+		try {
+			const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+
+			const todoId = form.value.id;
+			const senderId = authStore.uid;
+			let apiParentId = replyingCommentData.value.id;
+
+			if (replyingCommentData.value.rootParentId) {
+				apiParentId = replyingCommentData.value.rootParentId;
+			}
+
+			const payload = {
+				todoId: todoId,
+				senderId: senderId,
+				message: cleanMessage,
+				files: fileUrl,
+				parentId: apiParentId
+			};
+			const newReplyId = await createTodoMessage(payload);
+
+			if (newReplyId) {
+				showSuccess('Đã trả lời');
+				const newReplyData = await getTodoMessageDetail(newReplyId, form.value.id);
+				const processedReply = processCommentData(newReplyData);
+
+				const rootParentId = replyingCommentData.value.rootParentId || replyingCommentData.value.id;
+
+				const parentComment = comments.value.find(c => c.id === rootParentId);
+				if (parentComment) {
+					if (!parentComment.children) parentComment.children = [];
+					processedReply.rootParentId = rootParentId;
+					parentComment.children.push(processedReply);
+				}
+
+				resetReplyState();
+
+			}
+		} catch (error) {
+			console.error("Lỗi gửi trả lời:", error);
+			showError('Gửi thất bại');
+		} finally {
+			isSubmittingComment.value = false;
+		}
+	};
 
 	const resetReplyState = () => {
-	        isReplying.value = false;
-	        replyingCommentData.value = null;
-	        replyingMessagePreview.value = ''; 
-	        replyingMemberName.value = '';
-	        newCommentText.value = '';
-	    };
+		isReplying.value = false;
+		replyingCommentData.value = null;
+		replyingMessagePreview.value = '';
+		replyingMemberName.value = '';
+		newCommentText.value = '';
+	};
 
 	const onToggleEmojiPicker = (commentItem : any) => {
 		currentReactingComment.value = commentItem;
@@ -430,37 +439,80 @@ isLoading.value = true;
 	};
 
 	const selectEmoji = async (emoji : string) => {
-		if (!currentReactingComment.value) return;
+			if (!currentReactingComment.value) return;
+	
+			const messageId = currentReactingComment.value.id;
 
-		const messageId = currentReactingComment.value.id;
+			
+			closeEmojiPicker();
+	
+			const todoId = form.value.id;
+			const senderId = authStore.uid;
+	
+			const payload = {
+				todoId: Number(todoId),
+				senderId: senderId,
+				todoMessageId: Number(messageId),
+				codeEmoji: emoji
+			};
+	
+			try {
+				const res = await reactionTodoMessage(payload);
+	
+				if (res) {
+				
+					let foundComment : any = null;
+					const parentIdx = comments.value.findIndex(c => c.id === messageId);
+					if (parentIdx !== -1) {
+						foundComment = comments.value[parentIdx];
+					} else {
+						for (const parent of comments.value) {
+							if (parent.children) {
+								const child = parent.children.find(c => c.id === messageId);
+								if (child) {
+									foundComment = child;
+									break;
+								}
+							}
+						}
+					}
+	
+					if (foundComment) {
+						if (!foundComment.reactions) foundComment.reactions = [];
+	
+	                    
+	                    const existingReactionIndex = foundComment.reactions.findIndex(
+	                        (r: any) => r.senderId === senderId
+	                    );
+	
+	                    if (existingReactionIndex !== -1) {
+	                 
+	                        const currentEmoji = foundComment.reactions[existingReactionIndex].codeEmoji;
+	                        
+	                        if (currentEmoji === emoji) {
 
-		closeEmojiPicker();
-
-		const todoId = form.value.id;
-		const senderId = authStore.uid;
-
-		const payload = {
-			todoId: Number(todoId),
-			senderId: senderId,
-			todoMessageId: Number(messageId),
-			codeEmoji: emoji
-		};
-
-		console.log(">> Gửi Reaction:", payload);
-
-		try {
-			const res = await reactionTodoMessage(payload);
-
-			if (res) {
-				showSuccess('Đã thả cảm xúc');
-
-				await fetchComments(todoId);
+	                             console.log('User thả trùng emoji cũ');
+	                        } else {
+	                       
+	                            foundComment.reactions[existingReactionIndex].codeEmoji = emoji;
+	                        }
+	                    } else {
+	                      
+	                        foundComment.reactions.push({
+	                            codeEmoji: emoji,
+	                            senderId: senderId,
+	                         
+	                        });
+	                    }
+	        
+	                    foundComment.reactions = [...foundComment.reactions]; 
+					}
+				}
+			} catch (error) {
+				console.error("Lỗi thả cảm xúc:", error);
+				showError('Lỗi kết nối');
 			}
-		} catch (error) {
-			console.error("Lỗi thả cảm xúc:", error);
-			showError('Lỗi kết nối');
-		}
-	};
+		};
 	const editingCommentData = ref<{
 		id : number;
 		todoId : number;
@@ -518,7 +570,7 @@ isLoading.value = true;
 		const todoId = form.value.id;
 		if (!todoId) return;
 
-isLoading.value = true;
+		// isLoading.value = true;
 		try {
 
 			const res = await getTodoMessageDetail(commentId, todoId);
@@ -563,48 +615,67 @@ isLoading.value = true;
 			console.error("Lỗi lấy chi tiết bình luận:", error);
 			showError('Lỗi tải dữ liệu');
 		} finally {
-		
-			isLoading.value = true;
+
+			isLoading.value = false;
 		}
 	};
 
 	const submitUpdateComment = async () => {
-	        if (!editingCommentData.value) return;
-	        
+		if (!editingCommentData.value) return;
 
-	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-	             showInfo('Nội dung không được để trống');
-	             return;
-	        }
-	
-	        isSubmittingComment.value = true;
-	
-	        try {
-	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
-	
-	            const payload = {
-	                id: editingCommentData.value.id,
-	                todoId: editingCommentData.value.todoId,
-	                senderId: editingCommentData.value.senderId,
-	                message: cleanMessage,
-	                files: fileUrl 
-	            };
-	
-	            console.log("Payload Update (đã xử lý):", payload);
-	
-	            await updateTodoMessage(payload);
-	
-	            showSuccess('Đã cập nhật');
-	            resetEditState();
-	            await fetchComments(form.value.id);
-	
-	        } catch (error) {
-	            console.error("Lỗi cập nhật:", error);
-	            showError('Cập nhật thất bại');
-	        } finally {
-	            isSubmittingComment.value = false;
-	        }
-	    };
+
+		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+			showInfo('Nội dung không được để trống');
+			return;
+		}
+
+		isSubmittingComment.value = true;
+
+		try {
+			const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+
+			const payload = {
+				id: editingCommentData.value.id,
+				todoId: editingCommentData.value.todoId,
+				senderId: editingCommentData.value.senderId,
+				message: cleanMessage,
+				files: fileUrl
+			};
+			const updatedData = await updateTodoMessage(payload);
+
+			if (updatedData) {
+				showSuccess('Đã cập nhật');
+
+				const parentIndex = comments.value.findIndex(c => c.id === updatedData.id);
+				if (parentIndex !== -1) {
+
+					comments.value[parentIndex].message = updatedData.message;
+					comments.value[parentIndex].files = updatedData.files;
+					comments.value[parentIndex].isEdited = true;
+				} else {
+
+					for (const parent of comments.value) {
+						if (parent.children) {
+							const childIndex = parent.children.findIndex(c => c.id === updatedData.id);
+							if (childIndex !== -1) {
+								parent.children[childIndex].message = updatedData.message;
+								parent.children[childIndex].files = updatedData.files;
+								parent.children[childIndex].isEdited = true;
+								break;
+							}
+						}
+					}
+				}
+				resetEditState();
+			}
+
+		} catch (error) {
+			console.error("Lỗi cập nhật:", error);
+			showError('Cập nhật thất bại');
+		} finally {
+			isSubmittingComment.value = false;
+		}
+	};
 
 
 	const onCancelEditComment = () => {
@@ -641,16 +712,33 @@ isLoading.value = true;
 	const confirmDeleteComment = async () => {
 		if (!commentToDeleteId.value) return;
 
-
+		const idToDelete = commentToDeleteId.value;
 		isConfirmDeleteCommentOpen.value = false;
 
 		try {
-			await deleteTodoMessage(commentToDeleteId.value);
+			await deleteTodoMessage(idToDelete);
 			showSuccess('Đã xóa');
 
-			if (form.value.id) {
-				await fetchComments(form.value.id);
+
+
+
+			const parentIndex = comments.value.findIndex(c => c.id === idToDelete);
+			if (parentIndex !== -1) {
+				comments.value.splice(parentIndex, 1);
+			} else {
+
+				for (const parent of comments.value) {
+					if (parent.children && parent.children.length > 0) {
+						const childIndex = parent.children.findIndex(c => c.id === idToDelete);
+						if (childIndex !== -1) {
+							parent.children.splice(childIndex, 1);
+							break;
+						}
+					}
+				}
 			}
+
+
 		} catch (error) {
 			console.error("Lỗi xóa bình luận:", error);
 			showError('Xóa thất bại');
@@ -664,132 +752,137 @@ isLoading.value = true;
 		commentToDeleteId.value = null;
 	};
 	const submitComment = async () => {
-	        if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-	            showInfo('Vui lòng nhập nội dung');
-	            return;
-	        }
-	
-	        isSubmittingComment.value = true;
-	
-	        try {
-	            const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
-	            
-	            
-	            const todoId = form.value.id;
-	            const senderId = authStore.uid;
-	
-	            const payload = {
-	                todoId: todoId,
-	                senderId: senderId,
-	                message: cleanMessage, 
-	                files: fileUrl,       
-	                parentId: -1
-	            };
-	
-	            console.log("Đang gửi bình luận (đã xử lý):", payload);
-	
-	            const res = await createTodoMessage(payload);
-	
-	            if (res) {
-	                showSuccess('Đã gửi bình luận');
-	                newCommentText.value = '';
-	                await fetchComments(todoId);
-	            }
-	
-	        } catch (error) {
-	            console.error("Lỗi gửi bình luận:", error);
-	            showError('Gửi thất bại');
-	        } finally {
-	            isSubmittingComment.value = false;
-	        }
-	    };
-	onLoad((options : any) => {
-			
-			fetchMembers(); 
-	
-			if (options && options.id) {
-				fetchDetail(options.id); 
+		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+			showInfo('Vui lòng nhập nội dung');
+			return;
+		}
+
+		isSubmittingComment.value = true;
+
+		try {
+			const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
+
+
+			const todoId = form.value.id;
+			const senderId = authStore.uid;
+
+			const payload = {
+				todoId: todoId,
+				senderId: senderId,
+				message: cleanMessage,
+				files: fileUrl,
+				parentId: -1
+			};
+			const newCommentId = await createTodoMessage(payload);
+
+			if (newCommentId) {
+				showSuccess('Đã gửi bình luận');
+				newCommentText.value = '';
+
+				const newCommentData = await getTodoMessageDetail(newCommentId, todoId);
+				if (newCommentData) {
+					const processedItem = processCommentData(newCommentData);
+
+					comments.value.unshift(processedItem);
+				}
+
 			}
-		});
+
+
+		} catch (error) {
+			console.error("Lỗi gửi bình luận:", error);
+			showError('Gửi thất bại');
+		} finally {
+			isSubmittingComment.value = false;
+		}
+	};
+	onLoad((options : any) => {
+
+		fetchMembers();
+
+		if (options && options.id) {
+			fetchDetail(options.id);
+		}
+	});
 
 	const fetchMembers = async () => {
-			try {
-				const data = await getAllMembers();
-				memberList.value = data;
-				assigneeOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
-	            if(form.value.assigneeId) {
-	                const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
-					if (index !== -1) form.value.assigneeIndex = index;
-	            }
-			} catch (e) {
-				console.error('Lỗi lấy members', e);
+		try {
+			const data = await getAllMembers();
+			memberList.value = data;
+			assigneeOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
+			if (form.value.assigneeId) {
+				const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
+				if (index !== -1) form.value.assigneeIndex = index;
 			}
-		};
-const reloadDetail = async () => {
-        if (!form.value.id) {
-            uni.stopPullDownRefresh();
-            return;
-        }
+		} catch (e) {
+			console.error('Lỗi lấy members', e);
+		}
+	};
+	const reloadDetail = async () => {
+		if (!form.value.id) {
+			uni.stopPullDownRefresh();
+			return;
+		}
 
-        try {
-            await Promise.all([
-                fetchDetail(form.value.id),
-            ]);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            uni.stopPullDownRefresh();
-        }
-    };
+		try {
+			await Promise.all([
+				fetchDetail(form.value.id),
+			]);
+		} catch (e) {
+			console.error(e);
+		} finally {
+			uni.stopPullDownRefresh();
+		}
+	};
 
-    onPullDownRefresh(() => {
-        console.log('Refreshing detail...');
-        reloadDetail();
-    });
+	onPullDownRefresh(() => {
+		console.log('Refreshing detail...');
+		reloadDetail();
+	});
 	const fetchDetail = async (id : string | number) => {
-			if (!form.value.title) {
-			             isLoading.value = true;
-			        } else {
-			             uni.showNavigationBarLoading();
-			        }
-	
-			try {
-				const rawResponse = await getTodoDetail(id);
-				const realData = (rawResponse && rawResponse.data && !rawResponse.id)
-					? rawResponse.data
-					: rawResponse;
-	
-				const mappedData = mapTodoDetailToForm(realData);
-	
-				if (mappedData) {
-					form.value = mappedData;
-					
-					const currentStatus = mappedData.raw.status;
-					const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
-					if (realIndex !== -1) {
-						form.value.statusIndex = realIndex;
-					}
+		if (!form.value.title) {
+			isLoading.value = true;
+		} else {
+			uni.showNavigationBarLoading();
+		}
 
-					if (form.value.assigneeId && memberList.value.length > 0) {
-						const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
-						if (index !== -1) form.value.assigneeIndex = index;
-					}
-	
-					fetchComments(id); 
-	
-					if (form.value.customerCode) {
-						fetchCustomerInfo(form.value.customerCode); 
-						fetchHistoryLog(form.value.customerCode);
-					}
+		try {
+			const rawResponse = await getTodoDetail(id);
+			const realData = (rawResponse && rawResponse.data && !rawResponse.id)
+				? rawResponse.data
+				: rawResponse;
+
+			const mappedData = mapTodoDetailToForm(realData);
+
+			if (mappedData) {
+				form.value = mappedData;
+
+				const currentStatus = mappedData.raw.status;
+				const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
+				if (realIndex !== -1) {
+					form.value.statusIndex = realIndex;
 				}
-			} catch (error) {
-				console.error('Lỗi lấy chi tiết:', error);
-				showError('Lỗi kết nối');
-			} finally {
-				isLoading.value = false;
-	            uni.hideNavigationBarLoading();
+
+				if (form.value.assigneeId && memberList.value.length > 0) {
+					const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
+					if (index !== -1) form.value.assigneeIndex = index;
+				}
+
+				fetchComments(id);
+
+				if (form.value.customerCode) {
+					fetchCustomerInfo(form.value.customerCode);
+					fetchHistoryLog(form.value.customerCode);
+				}
 			}
-		};
+		} catch (error) {
+			console.error('Lỗi lấy chi tiết:', error);
+			showError('Lỗi kết nối');
+		} finally {
+			isLoading.value = false;
+			uni.hideNavigationBarLoading();
+		}
+	};
 	const processCommentData = (item : any) : CommentItem => {
 
 		let senderName = 'Người dùng ẩn';
@@ -834,32 +927,32 @@ const reloadDetail = async () => {
 	};
 
 	const fetchComments = async (todoId : string | number) => {
-			isLoadingComments.value = true;
-			try {
-				const currentKeySearch = commentFilterValues[commentFilterIndex.value];
-				const rawData = await getTodoMessages(todoId, currentKeySearch);
-	
-				if (Array.isArray(rawData)) {
-					comments.value = rawData.map((parent : any) => {
-						const parentComment = processCommentData(parent);
-						if (parent.replies && parent.replies.length > 0) {
-							parentComment.children = parent.replies.map((child : any) => {
-	                            const childComment = processCommentData(child);
-	                            childComment.rootParentId = parent.id;
-	                            return childComment;
-	                        });
-						}
-						return parentComment;
-					});
-				} else {
-					comments.value = [];
-				}
-			} catch (error) {
-				console.error("Lỗi lấy bình luận:", error);
-			} finally {
-				isLoadingComments.value = false;
+		isLoadingComments.value = true;
+		try {
+			const currentKeySearch = commentFilterValues[commentFilterIndex.value];
+			const rawData = await getTodoMessages(todoId, currentKeySearch);
+
+			if (Array.isArray(rawData)) {
+				comments.value = rawData.map((parent : any) => {
+					const parentComment = processCommentData(parent);
+					if (parent.replies && parent.replies.length > 0) {
+						parentComment.children = parent.replies.map((child : any) => {
+							const childComment = processCommentData(child);
+							childComment.rootParentId = parent.id;
+							return childComment;
+						});
+					}
+					return parentComment;
+				});
+			} else {
+				comments.value = [];
 			}
-		};
+		} catch (error) {
+			console.error("Lỗi lấy bình luận:", error);
+		} finally {
+			isLoadingComments.value = false;
+		}
+	};
 	const onCommentFilterChange = (e : any) => {
 		const newIndex = e.detail.value;
 
@@ -990,8 +1083,8 @@ const reloadDetail = async () => {
 
 
 		if (!form.value.raw) return;
-		
-isLoading.value = true;
+
+		isLoading.value = true;
 
 		try {
 
@@ -1030,7 +1123,7 @@ isLoading.value = true;
 			showError('Lỗi cập nhật');
 		} finally {
 			isLoading.value = false;
-		
+
 		}
 	};
 	const onSourceChange = (e : any) => { form.value.sourceIndex = e.detail.value; };
@@ -1090,7 +1183,7 @@ isLoading.value = true;
 			console.error("Lỗi cập nhật người giao:", error);
 			showError('Lỗi cập nhật');
 		} finally {
-		
+
 			isLoading.value = false;
 		}
 	};

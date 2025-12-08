@@ -32,7 +32,6 @@
   padding: 8px 10px;
   margin-bottom: 8px;
   margin-top: 4px;
-  /* Thêm margin top để tách biệt với text */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   transition: background-color 0.2s;
 }
@@ -690,6 +689,7 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Giữ nguyên CSS cũ của bạn */
 .global-message-container[data-v-2f57c33b] {
   position: fixed;
   top: 0;
@@ -1248,6 +1248,7 @@ to {
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
   width: 80%;
   max-width: 300px;
   animation: popIn 0.2s ease-out;
@@ -1350,6 +1351,26 @@ to {
   align-items: center;
   color: #007aff;
   font-weight: bold;
+}
+.loading-overlay[data-v-9f96c8fe] {
+  /* Gộp chung hoặc sửa riêng */
+  /* ... */
+  z-index: 9999 !important;
+  /* Đảm bảo nó nằm trên cùng */
+}
+.modal-overlay[data-v-9f96c8fe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  /* Thêm màu nền tối mờ để dễ nhìn */
+  z-index: 9999;
+  /* Tăng lên cao hơn Header (100) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .loading-section[data-v-9f96c8fe] {
   display: flex;

@@ -279,8 +279,8 @@
 		isStatusDisabled,
 		onSaveTitle,
 		replyingMessagePreview,
-		isHistoryOpen,  // <-- Thêm vào đây
-		        toggleHistory,
+		isHistoryOpen,  
+		toggleHistory,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
@@ -780,7 +780,7 @@
 		border-radius: 12px;
 		padding: 15px;
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
+		z-index: 10000;
 		width: 80%;
 		max-width: 300px;
 		animation: popIn 0.2s ease-out;
@@ -904,6 +904,22 @@
 		align-items: center;
 		color: #007aff;
 		font-weight: bold;
+	}
+	.loading-overlay { /* Gộp chung hoặc sửa riêng */
+	    /* ... */
+	    z-index: 9999 !important; /* Đảm bảo nó nằm trên cùng */
+	}
+	.modal-overlay {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    background: rgba(0, 0, 0, 0.5); /* Thêm màu nền tối mờ để dễ nhìn */
+	    z-index: 9999; /* Tăng lên cao hơn Header (100) */
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
 	}
 	.loading-section {
 	    display: flex;
