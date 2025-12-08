@@ -1,6 +1,6 @@
 //controllers/list_todo.ts
 import { ref, computed, onMounted } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
+import { onShow ,onPullDownRefresh} from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
@@ -198,9 +198,14 @@ export const useListTodoController = () => {
 	            }
 			} finally {
 				isLoading.value = false;
-
+uni.stopPullDownRefresh();
 			}
 		};
+		onPullDownRefresh(() => {
+		        console.log('Đang làm mới trang...');
+		        resetPage(); 
+		        getTodoList(); 
+		    });
 	const confirmDelete = async () => {
 		if (!itemToDelete.value) return;
 		try {

@@ -1,6 +1,6 @@
 //controllers/todo_detail.ts
 import { ref, nextTick, computed } from 'vue';
-import { onLoad } from '@dcloudio/uni-app';
+import { onLoad ,onPullDownRefresh} from '@dcloudio/uni-app';
 import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTodoMessage, getTodoMessageDetail, updateTodoMessage, reactionTodoMessage,uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm'; 
@@ -721,10 +721,33 @@ isLoading.value = true;
 				console.error('Lỗi lấy members', e);
 			}
 		};
+const reloadDetail = async () => {
+        if (!form.value.id) {
+            uni.stopPullDownRefresh();
+            return;
+        }
 
+        try {
+            await Promise.all([
+                fetchDetail(form.value.id),
+            ]);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            uni.stopPullDownRefresh();
+        }
+    };
+
+    onPullDownRefresh(() => {
+        console.log('Refreshing detail...');
+        reloadDetail();
+    });
 	const fetchDetail = async (id : string | number) => {
-			isLoading.value = true; 
-	        uni.showNavigationBarLoading(); 
+			if (!form.value.title) {
+			             isLoading.value = true;
+			        } else {
+			             uni.showNavigationBarLoading();
+			        }
 	
 			try {
 				const rawResponse = await getTodoDetail(id);

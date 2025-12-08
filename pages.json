@@ -3,7 +3,9 @@
 		{
 			"path": "pages/todo/list_todo",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "uni-app",
+				"enablePullDownRefresh": true
+				               
 			}
 		},
 		{
@@ -15,7 +17,8 @@
 		{
 			"path": "pages/todo/todo_detail",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "uni-app",
+				"enablePullDownRefresh": true
 			}
 		}
 	],

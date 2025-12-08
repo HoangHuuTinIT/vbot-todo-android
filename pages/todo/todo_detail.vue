@@ -20,7 +20,7 @@
 		    />
 		</view>
 
-		<scroll-view scroll-y="true" class="detail-body" :scroll-into-view="scrollTarget" scroll-with-animation>
+		<view class="detail-body">
 
 			<view class="section-title">Mô tả</view>
 			<view class="section-block">
@@ -196,8 +196,7 @@
 			</view>
 
 			<view style="height: 50px;"></view>
-		</scroll-view>
-
+		</view>
 		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy" message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
 		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" title="Hủy trả lời" message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." cancel-label="Tiếp tục viết" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueReplying" @confirm="confirmCancelReply" />
 		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa" message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
@@ -298,17 +297,23 @@
 
 <style lang="scss" scoped>
 	.container {
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-		background-color: #f5f5f7;
-	}
+	        /* Bỏ height: 100vh để trang có thể dài ra và cuộn được */
+			min-height: 100vh; 
+			display: flex;
+			flex-direction: column;
+			background-color: #f5f5f7;
+		}
 
 	.detail-header {
-		background-color: #fff;
-		padding: 15px 15px 10px 15px;
-		border-bottom: 1px solid #eee;
-	}
+			background-color: #fff;
+			padding: 15px 15px 10px 15px;
+			border-bottom: 1px solid #eee;
+	        
+	        /* QUAN TRỌNG: Giữ header dính trên cùng khi cuộn */
+	        position: sticky; 
+	        top: 0;
+	        z-index: 100;
+		}
 
 	.header-top {
 		display: flex;
@@ -343,11 +348,12 @@
 	}
 
 	.detail-body {
-		flex: 1;
-		padding: 15px;
-		box-sizing: border-box;
-		overflow-y: auto;
-	}
+			flex: 1;
+			padding: 15px;
+			box-sizing: border-box;
+	        /* Xóa overflow-y: auto vì giờ là cuộn trang window */
+	        /* overflow-y: auto; <--- XÓA DÒNG NÀY */
+		}
 
 	.section-block {
 		margin-bottom: 20px;

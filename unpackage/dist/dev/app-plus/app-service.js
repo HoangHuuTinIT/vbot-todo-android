@@ -35,6 +35,7 @@ if (uni.restoreGlobal) {
   const ON_HIDE = "onHide";
   const ON_LAUNCH = "onLaunch";
   const ON_LOAD = "onLoad";
+  const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
   function formatAppLog(type, filename, ...args) {
     if (uni.__log__) {
       uni.__log__(type, filename, ...args);
@@ -62,6 +63,11 @@ if (uni.restoreGlobal) {
   );
   const onLoad = /* @__PURE__ */ createLifeCycleHook(
     ON_LOAD,
+    2
+    /* HookFlags.PAGE */
+  );
+  const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
+    ON_PULL_DOWN_REFRESH,
     2
     /* HookFlags.PAGE */
   );
@@ -2197,13 +2203,13 @@ This will fail in production if not fixed.`);
     CUSTOMER_CODE: "",
     PHONE_PLACEHOLDER: "072836272322"
   };
-  const SERVER_BASE_URL = "https://api-staging.vbot.vn/v1.0";
+  const SERVER_BASE_URL = "https://api-sandbox-h01.vbot.vn/v1.0";
   const AUTH_API_URL = SERVER_BASE_URL;
   const CRM_API_URL = `${SERVER_BASE_URL}/api/module-crm`;
   const PROJECT_API_URL = `${SERVER_BASE_URL}/api/project`;
   const TODO_API_URL = `${SERVER_BASE_URL}/api/module-todo/todo`;
-  const PROJECT_CODE = "PR202511170947436134";
-  const UID = "77b7675d29d74cafa23771e46881db7c";
+  const PROJECT_CODE = "PR202511211001129372";
+  const UID = "87d90802634146e29721476337bce64b";
   const systemLogin = (username, password) => {
     return new Promise((resolve, reject) => {
       uni.request({
@@ -2370,10 +2376,10 @@ This will fail in production if not fixed.`);
         }
       },
       async loginDevMode() {
-        const devUser = "647890427";
-        const devPass = "53496785941d8dc2f5aa3e98e753eb3d0780de9fda3d9ac1761c47eaae28ae39";
-        const devUid = "77b7675d29d74cafa23771e46881db7c";
-        const devProject = "PR202511170947436134";
+        const devUser = "hoangtinvpm";
+        const devPass = "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f";
+        const devUid = "87d90802634146e29721476337bce64b";
+        const devProject = "PR202511211001129372";
         try {
           formatAppLog("log", "at stores/auth.ts:97", "Store: Đang gọi API đăng nhập hệ thống...");
           const loginData = await systemLogin(devUser, devPass);
@@ -3031,8 +3037,14 @@ This will fail in production if not fixed.`);
         }
       } finally {
         isLoading.value = false;
+        uni.stopPullDownRefresh();
       }
     };
+    onPullDownRefresh(() => {
+      formatAppLog("log", "at controllers/list_todo.ts:205", "Đang làm mới trang...");
+      resetPage();
+      getTodoList();
+    });
     const confirmDelete = async () => {
       if (!itemToDelete.value)
         return;
@@ -3043,7 +3055,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:213", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:218", "Delete Error:", error);
         showError("Xóa thất bại");
       }
     };
@@ -5730,9 +5742,31 @@ This will fail in production if not fixed.`);
         formatAppLog("error", "at controllers/todo_detail.ts:721", "Lỗi lấy members", e);
       }
     };
+    const reloadDetail = async () => {
+      if (!form.value.id) {
+        uni.stopPullDownRefresh();
+        return;
+      }
+      try {
+        await Promise.all([
+          fetchDetail(form.value.id)
+        ]);
+      } catch (e) {
+        formatAppLog("error", "at controllers/todo_detail.ts:735", e);
+      } finally {
+        uni.stopPullDownRefresh();
+      }
+    };
+    onPullDownRefresh(() => {
+      formatAppLog("log", "at controllers/todo_detail.ts:742", "Refreshing detail...");
+      reloadDetail();
+    });
     const fetchDetail = async (id) => {
-      isLoading.value = true;
-      uni.showNavigationBarLoading();
+      if (!form.value.title) {
+        isLoading.value = true;
+      } else {
+        uni.showNavigationBarLoading();
+      }
       try {
         const rawResponse = await getTodoDetail(id);
         const realData = rawResponse && rawResponse.data && !rawResponse.id ? rawResponse.data : rawResponse;
@@ -5756,7 +5790,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:759", "Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:782", "Lỗi lấy chi tiết:", error);
         showError("Lỗi kết nối");
       } finally {
         isLoading.value = false;
@@ -5823,7 +5857,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:831", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:854", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -5864,7 +5898,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:888", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:911", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -5875,7 +5909,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:900", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:923", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -5904,7 +5938,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:938", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:961", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -5935,7 +5969,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:985", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1008", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess("Đã cập nhật trạng thái");
@@ -5947,7 +5981,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1001", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1024", "Lỗi cập nhật trạng thái:", error);
         showError("Lỗi cập nhật");
       } finally {
         isLoading.value = false;
@@ -5979,7 +6013,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1045", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1068", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess("Đã đổi người thực hiện");
@@ -5990,7 +6024,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1063", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1086", "Lỗi cập nhật người giao:", error);
         showError("Lỗi cập nhật");
       } finally {
         isLoading.value = false;
@@ -6000,7 +6034,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1072", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1095", "Lưu:", form.value);
       showSuccess("Đã lưu");
     };
     return {
@@ -6389,12 +6423,7 @@ This will fail in production if not fixed.`);
           [vue.vModelText, $setup.form.title]
         ])
       ]),
-      vue.createElementVNode("scroll-view", {
-        "scroll-y": "true",
-        class: "detail-body",
-        "scroll-into-view": $setup.scrollTarget,
-        "scroll-with-animation": ""
-      }, [
+      vue.createElementVNode("view", { class: "detail-body" }, [
         vue.createElementVNode("view", { class: "section-title" }, "Mô tả"),
         vue.createElementVNode("view", { class: "section-block" }, [
           vue.createVNode($setup["TodoEditor"], {
@@ -6826,7 +6855,7 @@ This will fail in production if not fixed.`);
           ]))
         ]),
         vue.createElementVNode("view", { style: { "height": "50px" } })
-      ], 8, ["scroll-into-view"]),
+      ]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelEditOpen,
         "onUpdate:visible": _cache[16] || (_cache[16] = ($event) => $setup.isConfirmCancelEditOpen = $event),
