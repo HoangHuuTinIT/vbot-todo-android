@@ -5,21 +5,21 @@
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
 			</view>
-			<textarea class="item-input title-textarea" v-model="form.name" placeholder="Nhập tên công việc... *"
+            <textarea class="item-input title-textarea" v-model="form.name" :placeholder="$t('todo.enter_task_name')"
 				maxlength="256" auto-height />
 			<text class="char-count">
-				{{ form.name ? form.name.length : 0 }}/256
+                {{ $t('todo.char_count', { current: form.name ? form.name.length : 0, max: 256 }) }}
 			</text>
 		</view>
 
-		<TodoEditor v-model="form.desc" />
+        <TodoEditor v-model="form.desc" :placeholder="$t('editor.placeholder')" />
 
 		<view class="flat-item" @click="openCustomerPopup">
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/price-tag.png" class="item-icon"></image>
 			</view>
 			<view class="input-trigger" :class="{ 'placeholder': !form.customer }">
-				{{ form.customer || 'Chọn khách hàng' }}
+				{{ form.customer || $t('todo.select_customer') }}
 			</view>
 			<text class="arrow-icon">›</text>
 		</view>
@@ -27,14 +27,15 @@
 		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
 			:customers="customerList" :managers="memberList" @close="showCustomerModal = false"
 			@select="onCustomerSelect" @filter="onCustomerFilter" @loadMore="loadMoreCustomers" />
-		<view class="flat-item">
+		
+        <view class="flat-item">
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
 			</view>
 
 			<picker mode="selector" :range="sourceOptions" @change="onSourceChange" class="full-width-picker">
 				<view class="picker-display" :class="{ 'placeholder-color': sourceIndex === -1 }">
-					{{ sourceIndex > -1 ? sourceOptions[sourceIndex] : 'Chọn nguồn' }}
+					{{ sourceIndex > -1 ? sourceOptions[sourceIndex] : $t('todo.select_source') }}
 				</view>
 			</picker>
 
@@ -48,7 +49,7 @@
 
 			<picker mode="selector" :range="memberOptions" @change="onMemberChange" class="full-width-picker">
 				<view class="picker-display" :class="{ 'placeholder-color': !currentAssigneeName }">
-					{{ currentAssigneeName ? currentAssigneeName : 'Người được giao' }}
+					{{ currentAssigneeName ? currentAssigneeName : $t('todo.assignee') }}
 				</view>
 			</picker>
 		</view>
@@ -57,8 +58,8 @@
 			v-model:notifyTime="form.notifyTime" />
 
 		<view class="footer-action">
-			<AppButton type="secondary" label="Hủy bỏ" class="btn-cancel" @click="goBack" />
-			<AppButton type="primary" :label="loading ? 'Đang lưu...' : 'Lưu công việc'" :loading="loading"
+			<AppButton type="secondary" :label="$t('common.cancel_action')" class="btn-cancel" @click="goBack" />
+			<AppButton type="primary" :label="loading ? $t('common.saving') : $t('common.save')" :loading="loading"
 				class="btn-submit" @click="submitForm" />
 		</view>
 		<GlobalMessage />

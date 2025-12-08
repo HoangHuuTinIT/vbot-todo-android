@@ -4,43 +4,41 @@
 		<view class="loading-bar" v-if="isLoading"></view>
 
 		<view class="detail-header">
-		    <view class="header-top">
-		        <text class="header-code">#{{ form.code || '...' }}</text>
-		    </view>
-		    
-		    <textarea 
-		        class="header-title-input" 
-		        v-model="form.title" 
-		        placeholder="Đang tải tên công việc..." 
-		        auto-height 
-		        maxlength="256"
-		        confirm-type="done"
-		        @confirm="onSaveTitle"
-		        @blur="onSaveTitle"
-		    />
+			<view class="header-top">
+				<text class="header-code">#{{ form.code || '...' }}</text>
+			</view>
+			<textarea 
+				class="header-title-input" 
+				v-model="form.title" 
+				:placeholder="$t('todo.header_loading')"
+				auto-height 
+				maxlength="256"
+				confirm-type="done"
+				@confirm="onSaveTitle"
+				@blur="onSaveTitle"
+			/>
 		</view>
 
 		<view class="detail-body">
-
-			<view class="section-title">Mô tả</view>
+			<view class="section-title">{{ $t('todo.desc_section') }}</view>
 			<view class="section-block">
-				<TodoEditor v-model="form.desc" placeholder="Nhập mô tả công việc..." />
+				<TodoEditor v-model="form.desc" :placeholder="$t('todo.desc_placeholder')" />
 				<view class="input-actions" style="margin-top: 10px;">
 					<AppButton type="primary" size="small" :loading="isSavingDescription"
-						:label="isSavingDescription ? 'Đang lưu...' : 'Lưu lại'" @click="onSaveDescription" />
+						:label="isSavingDescription ? $t('common.saving') : $t('common.save')" @click="onSaveDescription" />
 				</view>
 			</view>
 
-			<view class="section-title">Thông tin công việc</view>
+			<view class="section-title">{{ $t('todo.info_section') }}</view>
 			<view class="info-group">
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon"></image>
-						<text class="item-label">Trạng thái</text>
+						<text class="item-label">{{ $t('todo.status') }}</text>
 					</view>
 					<picker mode="selector" :range="statusOptions" :value="form.statusIndex" :disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
 						<view class="picker-text" :class="{ 'disabled-text': isStatusDisabled }">
-							{{ statusOptions[form.statusIndex] || 'Đang tải...' }}
+							{{ statusOptions[form.statusIndex] || $t('common.loading') }}
 							<text v-if="!isStatusDisabled">▾</text>
 						</view>
 					</picker>
@@ -49,7 +47,7 @@
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
-						<text class="item-label">Nguồn</text>
+						<text class="item-label">{{ $t('todo.source') }}</text>
 					</view>
 					<view class="item-picker-box">
 						<view class="picker-text disabled-text">
@@ -61,11 +59,11 @@
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
-						<text class="item-label">Người được giao</text>
+						<text class="item-label">{{ $t('todo.assignee') }}</text>
 					</view>
 					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex" @change="onAssigneeChange" class="item-picker-box">
 						<view class="picker-text">
-							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : 'Đang tải...' }} ▾
+							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : $t('common.loading') }} ▾
 						</view>
 					</picker>
 				</view>
@@ -73,36 +71,36 @@
 				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate" v-model:notifyTime="form.notifyTime" @change="onDateUpdate" />
 			</view>
 
-			<view class="section-title">Thông tin khách hàng</view>
+			<view class="section-title">{{ $t('todo.customer_section') }}</view>
 			<view class="info-group customer-block">
 				<view v-if="isLoadingCustomer" class="loading-row">
-					<text class="loading-text">⏳ Đang tải thông tin từ CRM...</text>
+					<text class="loading-text">{{ $t('todo.loading_crm') }}</text>
 				</view>
 				<view v-else-if="!form.customerCode" class="empty-row">
-					<text>(Công việc này chưa gắn với khách hàng nào)</text>
+					<text>{{ $t('todo.no_customer_attached') }}</text>
 				</view>
 				<view v-else>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerNameLabel || 'Khách hàng' }}</text>
+							<text class="item-label">{{ form.customerNameLabel || $t('todo.customer_name_label') }}</text>
 						</view>
 						<view class="item-right-text">{{ form.customerName }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerPhoneLabel || 'SĐT' }}</text>
+							<text class="item-label">{{ form.customerPhoneLabel || $t('todo.customer_phone_label') }}</text>
 						</view>
 						<view class="item-right-text phone-text">{{ form.customerPhone }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerManagerLabel || 'Phụ trách' }}</text>
+							<text class="item-label">{{ form.customerManagerLabel || $t('todo.customer_manager_label') }}</text>
 						</view>
 						<view class="item-right-text highlight-text">
-							{{ form.customerManagerName || '(Chưa có)' }}
+							{{ form.customerManagerName || $t('todo.manager_none') }}
 						</view>
 					</view>
 				</view>
@@ -110,7 +108,7 @@
 
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
-					<text class="section-title no-margin">Bình luận và hoạt động</text>
+					<text class="section-title no-margin">{{ $t('todo.comments_activities') }}</text>
 					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon" :class="{ 'open': isCommentsOpen }"></image>
 				</view>
 				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop @change="onCommentFilterChange">
@@ -121,34 +119,33 @@
 			<view class="comments-section" v-if="isCommentsOpen">
 				<view class="comment-input-block" id="comment-input-anchor">
 					<view class="editor-container">
-						<TodoEditor v-model="newCommentText" :placeholder="isEditingComment ? 'Đang chỉnh sửa...' : (isReplying ? 'Viết câu trả lời...' : 'Viết bình luận')" />
+						<TodoEditor v-model="newCommentText" 
+							:placeholder="isEditingComment ? $t('todo.comment_placeholder_edit') : (isReplying ? $t('todo.comment_placeholder_reply') : $t('todo.comment_placeholder_write'))" />
 					</view>
 					<view v-if="isEditingComment" class="editing-alert">
-						<text class="editing-text">Đang chỉnh sửa bình luận của <text class="editing-name">{{ editingMemberName }}</text></text>
+						<text class="editing-text">{{ $t('todo.editing_alert') }} <text class="editing-name">{{ editingMemberName }}</text></text>
 					</view>
 					<view v-if="isReplying && replyingCommentData" class="reply-alert">
-					    <view class="reply-info">
-					        <text class="reply-label">Đang trả lời bình luận của </text>
-					        <text class="reply-name">{{ replyingMemberName }}</text>
-					    </view>
-					    <view class="reply-quote">
-					        <text class="quote-icon">“</text>
-					        
-					        <rich-text :nodes="replyingMessagePreview" class="quote-content"></rich-text>
-					        
-					        <text class="quote-icon">”</text>
-					    </view>
+						<view class="reply-info">
+							<text class="reply-label">{{ $t('todo.replying_alert') }} </text>
+							<text class="reply-name">{{ replyingMemberName }}</text>
+						</view>
+						<view class="reply-quote">
+							<text class="quote-icon">“</text>
+							<rich-text :nodes="replyingMessagePreview" class="quote-content"></rich-text>
+							<text class="quote-icon">”</text>
+						</view>
 					</view>
 
 					<view class="input-actions">
-						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang lưu...' : 'Lưu lại'" @click="submitComment" />
+						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('common.save')" @click="submitComment" />
 						<view v-else-if="isEditingComment" class="edit-actions-row">
-							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment" @click="onCancelEditComment" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang cập nhật...' : 'Cập nhật'" @click="submitUpdateComment" />
+							<AppButton type="secondary" size="small" :label="$t('common.cancel')" :disabled="isSubmittingComment" @click="onCancelEditComment" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('todo.update_btn')" @click="submitUpdateComment" />
 						</view>
 						<view v-else-if="isReplying" class="edit-actions-row">
-							<AppButton type="secondary" size="small" label="Hủy" :disabled="isSubmittingComment" @click="onCancelReply" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? 'Đang gửi...' : 'Trả lời'" @click="submitReply" />
+							<AppButton type="secondary" size="small" :label="$t('common.cancel')" :disabled="isSubmittingComment" @click="onCancelReply" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('todo.reply_btn')" @click="submitReply" />
 						</view>
 					</view>
 				</view>
@@ -156,10 +153,10 @@
 				<view class="divider-line"></view>
 
 				<view v-if="isLoadingComments" class="loading-row">
-					<text>⏳ Đang tải bình luận...</text>
+					<text>{{ $t('todo.loading_comments') }}</text>
 				</view>
 				<view v-else-if="comments.length === 0" class="empty-row">
-					<text>Chưa có bình luận nào.</text>
+					<text>{{ $t('todo.no_comments') }}</text>
 				</view>
 				<view v-else>
 					<CommentItem v-for="item in comments" :key="item.id" :data="item" @react="onToggleEmojiPicker" @reply="(data) => handleReply(data)" @edit="(data) => handleEdit(data)" @delete="(id) => onRequestDeleteComment(id)" />
@@ -167,50 +164,63 @@
 			</view>
 
 			<view class="section-header-row">
-			    <view class="toggle-header" @click="toggleHistory">
-			        <text class="section-title no-margin">Lịch sử tương tác khách hàng</text>
-			        <image 
-			            src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" 
-			            class="toggle-icon" 
-			            :class="{ 'open': isHistoryOpen }"
-			        ></image>
-			    </view>
-			    
-			    <picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop @change="onHistoryFilterChange">
-			        <view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
-			    </picker>
+				<view class="toggle-header" @click="toggleHistory">
+					<text class="section-title no-margin">{{ $t('todo.history_section') }}</text>
+					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon" :class="{ 'open': isHistoryOpen }"></image>
+				</view>
+				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop @change="onHistoryFilterChange">
+					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
+				</picker>
 			</view>
 			
 			<view class="history-container" v-if="isHistoryOpen">
-			                <view v-if="isLoadingHistory" class="loading-row">
-								<text class="loading-text">⏳ Đang tải lịch sử...</text>
+				<view v-if="isLoadingHistory" class="loading-row">
+					<text class="loading-text">{{ $t('todo.loading_history') }}</text>
+				</view>
+
+				<view v-else-if="historyList.length === 0" class="empty-row">
+					<text>{{ $t('todo.no_history') }}</text>
+				</view>
+
+				<view v-else class="timeline-list">
+					<view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
+						<view class="timeline-line" v-if="index !== historyList.length - 1"></view>
+						<view class="timeline-dot"></view>
+						<view class="timeline-content">
+							<view class="timeline-header">
+								<text class="t-actor">{{ item.actorName }}</text>
+								<text class="t-time">{{ item.timeStr }}</text>
 							</view>
-			
-			                <view v-else-if="historyList.length === 0" class="empty-row">
-								<text>(Không tìm thấy dữ liệu)</text>
-							</view>
-			
-			                <view v-else class="timeline-list">
-								<view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
-									<view class="timeline-line" v-if="index !== historyList.length - 1"></view>
-									<view class="timeline-dot"></view>
-									<view class="timeline-content">
-										<view class="timeline-header">
-											<text class="t-actor">{{ item.actorName }}</text>
-											<text class="t-time">{{ item.timeStr }}</text>
-										</view>
-										<text class="t-action">{{ item.content }}</text>
-									</view>
-								</view>
-							</view>
+							<text class="t-action">{{ item.content }}</text>
 						</view>
+					</view>
+				</view>
+			</view>
 
 			<view style="height: 50px;"></view>
 		</view>
 
-		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy" message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
-		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" title="Hủy trả lời" message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." cancel-label="Tiếp tục viết" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueReplying" @confirm="confirmCancelReply" />
-		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa" message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
+		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" 
+			:title="$t('todo.cancel_edit_title')" 
+			:message="$t('todo.cancel_edit_msg')" 
+			:cancel-label="$t('todo.continue_edit')" 
+			:confirm-label="$t('common.cancel_action')" 
+			confirm-type="danger" 
+			@cancel="continueEditing" @confirm="confirmCancelEdit" />
+
+		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" 
+			:title="$t('todo.cancel_reply_title')" 
+			:message="$t('todo.cancel_reply_msg')" 
+			:cancel-label="$t('todo.continue_reply')" 
+			:confirm-label="$t('common.cancel_action')" 
+			confirm-type="danger" 
+			@cancel="continueReplying" @confirm="confirmCancelReply" />
+
+		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" 
+			:title="$t('todo.delete_comment_title')" 
+			:message="$t('todo.delete_comment_msg')" 
+			confirm-type="danger" 
+			@confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
 		
 		<view class="modal-overlay" v-if="isEmojiPickerOpen" @click="closeEmojiPicker">
 			<view class="emoji-picker-container" @click.stop>
@@ -279,7 +289,7 @@
 		isStatusDisabled,
 		onSaveTitle,
 		replyingMessagePreview,
-		isHistoryOpen,  
+		isHistoryOpen,
 		toggleHistory,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
@@ -288,43 +298,43 @@
 		isCommentsOpen.value = !isCommentsOpen.value;
 	};
 	const scrollToInput = () => {
-	        if (!isCommentsOpen.value) {
-	            isCommentsOpen.value = true;
-	        }
-	        scrollTarget.value = '';
-	        setTimeout(() => {
-	            scrollTarget.value = 'comment-input-anchor';
-	        }, 100);
-	    };
+		if (!isCommentsOpen.value) {
+			isCommentsOpen.value = true;
+		}
+		scrollTarget.value = '';
+		setTimeout(() => {
+			scrollTarget.value = 'comment-input-anchor';
+		}, 100);
+	};
 
-	    const handleReply = (data: any) => {
-	        onRequestReply(data);
-	        scrollToInput();
-	    };
-	
-	    const handleEdit = (data: any) => {
-	        onRequestEditComment(data.id);
-	        scrollToInput();
-	    };
+	const handleReply = (data : any) => {
+		onRequestReply(data);
+		scrollToInput();
+	};
+
+	const handleEdit = (data : any) => {
+		onRequestEditComment(data.id);
+		scrollToInput();
+	};
 </script>
 
 <style lang="scss" scoped>
 	.container {
-	     
-			min-height: 100vh; 
-			display: flex;
-			flex-direction: column;
-			background-color: #f5f5f7;
-		}
+
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background-color: #f5f5f7;
+	}
 
 	.detail-header {
-			background-color: #fff;
-			padding: 15px 15px 10px 15px;
-			border-bottom: 1px solid #eee;
-	        position: sticky; 
-	        top: 0;
-	        z-index: 100;
-		}
+		background-color: #fff;
+		padding: 15px 15px 10px 15px;
+		border-bottom: 1px solid #eee;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
 
 	.header-top {
 		display: flex;
@@ -359,11 +369,11 @@
 	}
 
 	.detail-body {
-			flex: 1;
-			padding: 15px;
-			box-sizing: border-box;
-	    
-		}
+		flex: 1;
+		padding: 15px;
+		box-sizing: border-box;
+
+	}
 
 	.section-block {
 		margin-bottom: 20px;
@@ -905,48 +915,68 @@
 		color: #007aff;
 		font-weight: bold;
 	}
-	.loading-overlay { /* Gộp chung hoặc sửa riêng */
-	    /* ... */
-	    z-index: 9999 !important; /* Đảm bảo nó nằm trên cùng */
+
+	.loading-overlay {
+		/* Gộp chung hoặc sửa riêng */
+		/* ... */
+		z-index: 9999 !important;
+		/* Đảm bảo nó nằm trên cùng */
 	}
+
 	.modal-overlay {
-	    position: fixed;
-	    top: 0;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-	    background: rgba(0, 0, 0, 0.5); /* Thêm màu nền tối mờ để dễ nhìn */
-	    z-index: 9999; /* Tăng lên cao hơn Header (100) */
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		/* Thêm màu nền tối mờ để dễ nhìn */
+		z-index: 9999;
+		/* Tăng lên cao hơn Header (100) */
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
+
 	.loading-section {
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
-	    height: 100vh;
-	    background-color: #fff;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		background-color: #fff;
 	}
-	
+
 	.loading-text-large {
-	    color: #007aff;
-	    font-weight: 500;
-	    font-size: 16px;
+		color: #007aff;
+		font-weight: 500;
+		font-size: 16px;
 	}
+
 	.loading-bar {
-	        position: fixed;
-	        top: 0;
-	        left: 0;
-	        height: 3px;
-	        background-color: #007aff;
-	        z-index: 9999;
-	        animation: loading-animation 1.5s infinite ease-in-out;
-	        width: 100%;
-	    }
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 3px;
+		background-color: #007aff;
+		z-index: 9999;
+		animation: loading-animation 1.5s infinite ease-in-out;
+		width: 100%;
+	}
+
 	@keyframes loading-animation {
-	        0% { width: 0%; left: 0; }
-	        50% { width: 50%; left: 25%; }
-	        100% { width: 100%; left: 100%; }
-	    }
+		0% {
+			width: 0%;
+			left: 0;
+		}
+
+		50% {
+			width: 50%;
+			left: 25%;
+		}
+
+		100% {
+			width: 100%;
+			left: 100%;
+		}
+	}
 </style>

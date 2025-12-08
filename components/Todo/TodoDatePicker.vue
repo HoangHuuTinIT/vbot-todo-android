@@ -1,12 +1,16 @@
 //components/Todo/TodoDatePicker.vue
 <template>
     <view class="flat-item date-compound-block">
+        <view class="item-left icon-top-aligned">
+            <image src="https://img.icons8.com/ios/50/666666/clock--v1.png" class="item-icon"></image>
+        </view>
         <view class="right-column">
             
             <view class="date-row">
                 <picker mode="date" :value="dueDate" @change="onDateChange($event, 'dueDate')" @cancel="() => {}" class="full-width-picker">
                     <view class="item-picker" :class="{ 'placeholder-color': !dueDate }">
-                        <text class="picker-label">Hạn xử lý:</text> {{ dueDate ? formatDateDisplay(dueDate) : 'Chọn ngày' }}
+                        <text class="picker-label">{{ $t('todo.due_date_label') }}</text> 
+                        {{ dueDate ? formatDateDisplay(dueDate) : $t('todo.select_date') }}
                     </view>
                 </picker>
             </view>
@@ -16,7 +20,8 @@
             <view class="date-row split-row">
                 <picker mode="date" :value="notifyDate" @change="onDateChange($event, 'notifyDate')" class="half-picker">
                     <view class="item-picker" :class="{ 'placeholder-color': !notifyDate }">
-                        <text class="picker-label">Ngày thông báo:</text> {{ notifyDate ? formatDateDisplay(notifyDate) : 'Ngày' }}
+                        <text class="picker-label">{{ $t('todo.notify_date_label') }}</text> 
+                        {{ notifyDate ? formatDateDisplay(notifyDate) : $t('todo.date_text') }}
                     </view>
                 </picker>
 
@@ -24,7 +29,7 @@
 
                 <picker mode="time" :value="notifyTime" @change="onDateChange($event, 'notifyTime')" class="half-picker">
                     <view class="item-picker" :class="{ 'placeholder-color': !notifyTime }">
-                        {{ notifyTime ? notifyTime : 'Giờ' }}
+                        {{ notifyTime ? notifyTime : $t('todo.time_text') }}
                     </view>
                 </picker>
             </view>

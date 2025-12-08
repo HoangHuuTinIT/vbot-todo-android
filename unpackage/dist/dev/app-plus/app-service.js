@@ -297,6 +297,3517 @@ if (uni.restoreGlobal) {
     ]);
   }
   const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
+  /*!
+    * @intlify/shared v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const inBrowser = typeof window !== "undefined";
+  let mark;
+  let measure;
+  {
+    const perf2 = inBrowser && window.performance;
+    if (perf2 && perf2.mark && perf2.measure && perf2.clearMarks && perf2.clearMeasures) {
+      mark = (tag) => perf2.mark(tag);
+      measure = (name, startTag, endTag) => {
+        perf2.measure(name, startTag, endTag);
+        perf2.clearMarks(startTag);
+        perf2.clearMarks(endTag);
+      };
+    }
+  }
+  const RE_ARGS = /\{([0-9a-zA-Z]+)\}/g;
+  function format(message, ...args) {
+    if (args.length === 1 && isObject$1(args[0])) {
+      args = args[0];
+    }
+    if (!args || !args.hasOwnProperty) {
+      args = {};
+    }
+    return message.replace(RE_ARGS, (match, identifier) => {
+      return args.hasOwnProperty(identifier) ? args[identifier] : "";
+    });
+  }
+  const hasSymbol = typeof Symbol === "function" && typeof Symbol.toStringTag === "symbol";
+  const makeSymbol = (name) => hasSymbol ? Symbol(name) : name;
+  const generateFormatCacheKey = (locale, key, source2) => friendlyJSONstringify({ l: locale, k: key, s: source2 });
+  const friendlyJSONstringify = (json) => JSON.stringify(json).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029").replace(/\u0027/g, "\\u0027");
+  const isNumber = (val) => typeof val === "number" && isFinite(val);
+  const isDate = (val) => toTypeString(val) === "[object Date]";
+  const isRegExp = (val) => toTypeString(val) === "[object RegExp]";
+  const isEmptyObject = (val) => isPlainObject$1(val) && Object.keys(val).length === 0;
+  function warn(msg, err) {
+    if (typeof console !== "undefined") {
+      console.warn(`[intlify] ` + msg);
+      if (err) {
+        console.warn(err.stack);
+      }
+    }
+  }
+  const assign$2 = Object.assign;
+  let _globalThis;
+  const getGlobalThis = () => {
+    return _globalThis || (_globalThis = typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {});
+  };
+  function escapeHtml(rawText) {
+    return rawText.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+  }
+  const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+  function hasOwn$1(obj, key) {
+    return hasOwnProperty$1.call(obj, key);
+  }
+  const isArray = Array.isArray;
+  const isFunction = (val) => typeof val === "function";
+  const isString = (val) => typeof val === "string";
+  const isBoolean = (val) => typeof val === "boolean";
+  const isObject$1 = (val) => (
+    // eslint-disable-line
+    val !== null && typeof val === "object"
+  );
+  const objectToString = Object.prototype.toString;
+  const toTypeString = (value) => objectToString.call(value);
+  const isPlainObject$1 = (val) => toTypeString(val) === "[object Object]";
+  const toDisplayString = (val) => {
+    return val == null ? "" : isArray(val) || isPlainObject$1(val) && val.toString === objectToString ? JSON.stringify(val, null, 2) : String(val);
+  };
+  const RANGE = 2;
+  function generateCodeFrame(source2, start = 0, end = source2.length) {
+    const lines = source2.split(/\r?\n/);
+    let count = 0;
+    const res = [];
+    for (let i = 0; i < lines.length; i++) {
+      count += lines[i].length + 1;
+      if (count >= start) {
+        for (let j = i - RANGE; j <= i + RANGE || end > count; j++) {
+          if (j < 0 || j >= lines.length)
+            continue;
+          const line = j + 1;
+          res.push(`${line}${" ".repeat(3 - String(line).length)}|  ${lines[j]}`);
+          const lineLength = lines[j].length;
+          if (j === i) {
+            const pad = start - (count - lineLength) + 1;
+            const length = Math.max(1, end > count ? lineLength - pad : end - start);
+            res.push(`   |  ` + " ".repeat(pad) + "^".repeat(length));
+          } else if (j > i) {
+            if (end > count) {
+              const length = Math.max(Math.min(end - count, lineLength), 1);
+              res.push(`   |  ` + "^".repeat(length));
+            }
+            count += lineLength + 1;
+          }
+        }
+        break;
+      }
+    }
+    return res.join("\n");
+  }
+  function createEmitter() {
+    const events = /* @__PURE__ */ new Map();
+    const emitter = {
+      events,
+      on(event, handler) {
+        const handlers = events.get(event);
+        const added = handlers && handlers.push(handler);
+        if (!added) {
+          events.set(event, [handler]);
+        }
+      },
+      off(event, handler) {
+        const handlers = events.get(event);
+        if (handlers) {
+          handlers.splice(handlers.indexOf(handler) >>> 0, 1);
+        }
+      },
+      emit(event, payload) {
+        (events.get(event) || []).slice().map((handler) => handler(payload));
+        (events.get("*") || []).slice().map((handler) => handler(event, payload));
+      }
+    };
+    return emitter;
+  }
+  /*!
+    * @intlify/message-resolver v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const hasOwnProperty = Object.prototype.hasOwnProperty;
+  function hasOwn(obj, key) {
+    return hasOwnProperty.call(obj, key);
+  }
+  const isObject = (val) => (
+    // eslint-disable-line
+    val !== null && typeof val === "object"
+  );
+  const pathStateMachine = [];
+  pathStateMachine[
+    0
+    /* BEFORE_PATH */
+  ] = {
+    [
+      "w"
+      /* WORKSPACE */
+    ]: [
+      0
+      /* BEFORE_PATH */
+    ],
+    [
+      "i"
+      /* IDENT */
+    ]: [
+      3,
+      0
+      /* APPEND */
+    ],
+    [
+      "["
+      /* LEFT_BRACKET */
+    ]: [
+      4
+      /* IN_SUB_PATH */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: [
+      7
+      /* AFTER_PATH */
+    ]
+  };
+  pathStateMachine[
+    1
+    /* IN_PATH */
+  ] = {
+    [
+      "w"
+      /* WORKSPACE */
+    ]: [
+      1
+      /* IN_PATH */
+    ],
+    [
+      "."
+      /* DOT */
+    ]: [
+      2
+      /* BEFORE_IDENT */
+    ],
+    [
+      "["
+      /* LEFT_BRACKET */
+    ]: [
+      4
+      /* IN_SUB_PATH */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: [
+      7
+      /* AFTER_PATH */
+    ]
+  };
+  pathStateMachine[
+    2
+    /* BEFORE_IDENT */
+  ] = {
+    [
+      "w"
+      /* WORKSPACE */
+    ]: [
+      2
+      /* BEFORE_IDENT */
+    ],
+    [
+      "i"
+      /* IDENT */
+    ]: [
+      3,
+      0
+      /* APPEND */
+    ],
+    [
+      "0"
+      /* ZERO */
+    ]: [
+      3,
+      0
+      /* APPEND */
+    ]
+  };
+  pathStateMachine[
+    3
+    /* IN_IDENT */
+  ] = {
+    [
+      "i"
+      /* IDENT */
+    ]: [
+      3,
+      0
+      /* APPEND */
+    ],
+    [
+      "0"
+      /* ZERO */
+    ]: [
+      3,
+      0
+      /* APPEND */
+    ],
+    [
+      "w"
+      /* WORKSPACE */
+    ]: [
+      1,
+      1
+      /* PUSH */
+    ],
+    [
+      "."
+      /* DOT */
+    ]: [
+      2,
+      1
+      /* PUSH */
+    ],
+    [
+      "["
+      /* LEFT_BRACKET */
+    ]: [
+      4,
+      1
+      /* PUSH */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: [
+      7,
+      1
+      /* PUSH */
+    ]
+  };
+  pathStateMachine[
+    4
+    /* IN_SUB_PATH */
+  ] = {
+    [
+      "'"
+      /* SINGLE_QUOTE */
+    ]: [
+      5,
+      0
+      /* APPEND */
+    ],
+    [
+      '"'
+      /* DOUBLE_QUOTE */
+    ]: [
+      6,
+      0
+      /* APPEND */
+    ],
+    [
+      "["
+      /* LEFT_BRACKET */
+    ]: [
+      4,
+      2
+      /* INC_SUB_PATH_DEPTH */
+    ],
+    [
+      "]"
+      /* RIGHT_BRACKET */
+    ]: [
+      1,
+      3
+      /* PUSH_SUB_PATH */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: 8,
+    [
+      "l"
+      /* ELSE */
+    ]: [
+      4,
+      0
+      /* APPEND */
+    ]
+  };
+  pathStateMachine[
+    5
+    /* IN_SINGLE_QUOTE */
+  ] = {
+    [
+      "'"
+      /* SINGLE_QUOTE */
+    ]: [
+      4,
+      0
+      /* APPEND */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: 8,
+    [
+      "l"
+      /* ELSE */
+    ]: [
+      5,
+      0
+      /* APPEND */
+    ]
+  };
+  pathStateMachine[
+    6
+    /* IN_DOUBLE_QUOTE */
+  ] = {
+    [
+      '"'
+      /* DOUBLE_QUOTE */
+    ]: [
+      4,
+      0
+      /* APPEND */
+    ],
+    [
+      "o"
+      /* END_OF_FAIL */
+    ]: 8,
+    [
+      "l"
+      /* ELSE */
+    ]: [
+      6,
+      0
+      /* APPEND */
+    ]
+  };
+  const literalValueRE = /^\s?(?:true|false|-?[\d.]+|'[^']*'|"[^"]*")\s?$/;
+  function isLiteral(exp) {
+    return literalValueRE.test(exp);
+  }
+  function stripQuotes(str) {
+    const a = str.charCodeAt(0);
+    const b = str.charCodeAt(str.length - 1);
+    return a === b && (a === 34 || a === 39) ? str.slice(1, -1) : str;
+  }
+  function getPathCharType(ch) {
+    if (ch === void 0 || ch === null) {
+      return "o";
+    }
+    const code = ch.charCodeAt(0);
+    switch (code) {
+      case 91:
+      case 93:
+      case 46:
+      case 34:
+      case 39:
+        return ch;
+      case 95:
+      case 36:
+      case 45:
+        return "i";
+      case 9:
+      case 10:
+      case 13:
+      case 160:
+      case 65279:
+      case 8232:
+      case 8233:
+        return "w";
+    }
+    return "i";
+  }
+  function formatSubPath(path) {
+    const trimmed = path.trim();
+    if (path.charAt(0) === "0" && isNaN(parseInt(path))) {
+      return false;
+    }
+    return isLiteral(trimmed) ? stripQuotes(trimmed) : "*" + trimmed;
+  }
+  function parse(path) {
+    const keys = [];
+    let index = -1;
+    let mode = 0;
+    let subPathDepth = 0;
+    let c;
+    let key;
+    let newChar;
+    let type;
+    let transition;
+    let action;
+    let typeMap;
+    const actions = [];
+    actions[
+      0
+      /* APPEND */
+    ] = () => {
+      if (key === void 0) {
+        key = newChar;
+      } else {
+        key += newChar;
+      }
+    };
+    actions[
+      1
+      /* PUSH */
+    ] = () => {
+      if (key !== void 0) {
+        keys.push(key);
+        key = void 0;
+      }
+    };
+    actions[
+      2
+      /* INC_SUB_PATH_DEPTH */
+    ] = () => {
+      actions[
+        0
+        /* APPEND */
+      ]();
+      subPathDepth++;
+    };
+    actions[
+      3
+      /* PUSH_SUB_PATH */
+    ] = () => {
+      if (subPathDepth > 0) {
+        subPathDepth--;
+        mode = 4;
+        actions[
+          0
+          /* APPEND */
+        ]();
+      } else {
+        subPathDepth = 0;
+        if (key === void 0) {
+          return false;
+        }
+        key = formatSubPath(key);
+        if (key === false) {
+          return false;
+        } else {
+          actions[
+            1
+            /* PUSH */
+          ]();
+        }
+      }
+    };
+    function maybeUnescapeQuote() {
+      const nextChar = path[index + 1];
+      if (mode === 5 && nextChar === "'" || mode === 6 && nextChar === '"') {
+        index++;
+        newChar = "\\" + nextChar;
+        actions[
+          0
+          /* APPEND */
+        ]();
+        return true;
+      }
+    }
+    while (mode !== null) {
+      index++;
+      c = path[index];
+      if (c === "\\" && maybeUnescapeQuote()) {
+        continue;
+      }
+      type = getPathCharType(c);
+      typeMap = pathStateMachine[mode];
+      transition = typeMap[type] || typeMap[
+        "l"
+        /* ELSE */
+      ] || 8;
+      if (transition === 8) {
+        return;
+      }
+      mode = transition[0];
+      if (transition[1] !== void 0) {
+        action = actions[transition[1]];
+        if (action) {
+          newChar = c;
+          if (action() === false) {
+            return;
+          }
+        }
+      }
+      if (mode === 7) {
+        return keys;
+      }
+    }
+  }
+  const cache = /* @__PURE__ */ new Map();
+  function resolveValue(obj, path) {
+    if (!isObject(obj)) {
+      return null;
+    }
+    let hit = cache.get(path);
+    if (!hit) {
+      hit = parse(path);
+      if (hit) {
+        cache.set(path, hit);
+      }
+    }
+    if (!hit) {
+      return null;
+    }
+    const len = hit.length;
+    let last = obj;
+    let i = 0;
+    while (i < len) {
+      const val = last[hit[i]];
+      if (val === void 0) {
+        return null;
+      }
+      last = val;
+      i++;
+    }
+    return last;
+  }
+  function handleFlatJson(obj) {
+    if (!isObject(obj)) {
+      return obj;
+    }
+    for (const key in obj) {
+      if (!hasOwn(obj, key)) {
+        continue;
+      }
+      if (!key.includes(
+        "."
+        /* DOT */
+      )) {
+        if (isObject(obj[key])) {
+          handleFlatJson(obj[key]);
+        }
+      } else {
+        const subKeys = key.split(
+          "."
+          /* DOT */
+        );
+        const lastIndex = subKeys.length - 1;
+        let currentObj = obj;
+        for (let i = 0; i < lastIndex; i++) {
+          if (!(subKeys[i] in currentObj)) {
+            currentObj[subKeys[i]] = {};
+          }
+          currentObj = currentObj[subKeys[i]];
+        }
+        currentObj[subKeys[lastIndex]] = obj[key];
+        delete obj[key];
+        if (isObject(currentObj[subKeys[lastIndex]])) {
+          handleFlatJson(currentObj[subKeys[lastIndex]]);
+        }
+      }
+    }
+    return obj;
+  }
+  /*!
+    * @intlify/runtime v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const DEFAULT_MODIFIER = (str) => str;
+  const DEFAULT_MESSAGE = (ctx) => "";
+  const DEFAULT_MESSAGE_DATA_TYPE = "text";
+  const DEFAULT_NORMALIZE = (values) => values.length === 0 ? "" : values.join("");
+  const DEFAULT_INTERPOLATE = toDisplayString;
+  function pluralDefault(choice, choicesLength) {
+    choice = Math.abs(choice);
+    if (choicesLength === 2) {
+      return choice ? choice > 1 ? 1 : 0 : 1;
+    }
+    return choice ? Math.min(choice, 2) : 0;
+  }
+  function getPluralIndex(options) {
+    const index = isNumber(options.pluralIndex) ? options.pluralIndex : -1;
+    return options.named && (isNumber(options.named.count) || isNumber(options.named.n)) ? isNumber(options.named.count) ? options.named.count : isNumber(options.named.n) ? options.named.n : index : index;
+  }
+  function normalizeNamed(pluralIndex, props) {
+    if (!props.count) {
+      props.count = pluralIndex;
+    }
+    if (!props.n) {
+      props.n = pluralIndex;
+    }
+  }
+  function createMessageContext(options = {}) {
+    const locale = options.locale;
+    const pluralIndex = getPluralIndex(options);
+    const pluralRule = isObject$1(options.pluralRules) && isString(locale) && isFunction(options.pluralRules[locale]) ? options.pluralRules[locale] : pluralDefault;
+    const orgPluralRule = isObject$1(options.pluralRules) && isString(locale) && isFunction(options.pluralRules[locale]) ? pluralDefault : void 0;
+    const plural = (messages) => messages[pluralRule(pluralIndex, messages.length, orgPluralRule)];
+    const _list = options.list || [];
+    const list = (index) => _list[index];
+    const _named = options.named || {};
+    isNumber(options.pluralIndex) && normalizeNamed(pluralIndex, _named);
+    const named = (key) => _named[key];
+    function message(key) {
+      const msg = isFunction(options.messages) ? options.messages(key) : isObject$1(options.messages) ? options.messages[key] : false;
+      return !msg ? options.parent ? options.parent.message(key) : DEFAULT_MESSAGE : msg;
+    }
+    const _modifier = (name) => options.modifiers ? options.modifiers[name] : DEFAULT_MODIFIER;
+    const normalize = isPlainObject$1(options.processor) && isFunction(options.processor.normalize) ? options.processor.normalize : DEFAULT_NORMALIZE;
+    const interpolate = isPlainObject$1(options.processor) && isFunction(options.processor.interpolate) ? options.processor.interpolate : DEFAULT_INTERPOLATE;
+    const type = isPlainObject$1(options.processor) && isString(options.processor.type) ? options.processor.type : DEFAULT_MESSAGE_DATA_TYPE;
+    const ctx = {
+      [
+        "list"
+        /* LIST */
+      ]: list,
+      [
+        "named"
+        /* NAMED */
+      ]: named,
+      [
+        "plural"
+        /* PLURAL */
+      ]: plural,
+      [
+        "linked"
+        /* LINKED */
+      ]: (key, modifier) => {
+        const msg = message(key)(ctx);
+        return isString(modifier) ? _modifier(modifier)(msg) : msg;
+      },
+      [
+        "message"
+        /* MESSAGE */
+      ]: message,
+      [
+        "type"
+        /* TYPE */
+      ]: type,
+      [
+        "interpolate"
+        /* INTERPOLATE */
+      ]: interpolate,
+      [
+        "normalize"
+        /* NORMALIZE */
+      ]: normalize
+    };
+    return ctx;
+  }
+  /*!
+    * @intlify/message-compiler v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const errorMessages$2 = {
+    // tokenizer error messages
+    [
+      0
+      /* EXPECTED_TOKEN */
+    ]: `Expected token: '{0}'`,
+    [
+      1
+      /* INVALID_TOKEN_IN_PLACEHOLDER */
+    ]: `Invalid token in placeholder: '{0}'`,
+    [
+      2
+      /* UNTERMINATED_SINGLE_QUOTE_IN_PLACEHOLDER */
+    ]: `Unterminated single quote in placeholder`,
+    [
+      3
+      /* UNKNOWN_ESCAPE_SEQUENCE */
+    ]: `Unknown escape sequence: \\{0}`,
+    [
+      4
+      /* INVALID_UNICODE_ESCAPE_SEQUENCE */
+    ]: `Invalid unicode escape sequence: {0}`,
+    [
+      5
+      /* UNBALANCED_CLOSING_BRACE */
+    ]: `Unbalanced closing brace`,
+    [
+      6
+      /* UNTERMINATED_CLOSING_BRACE */
+    ]: `Unterminated closing brace`,
+    [
+      7
+      /* EMPTY_PLACEHOLDER */
+    ]: `Empty placeholder`,
+    [
+      8
+      /* NOT_ALLOW_NEST_PLACEHOLDER */
+    ]: `Not allowed nest placeholder`,
+    [
+      9
+      /* INVALID_LINKED_FORMAT */
+    ]: `Invalid linked format`,
+    // parser error messages
+    [
+      10
+      /* MUST_HAVE_MESSAGES_IN_PLURAL */
+    ]: `Plural must have messages`,
+    [
+      11
+      /* UNEXPECTED_EMPTY_LINKED_MODIFIER */
+    ]: `Unexpected empty linked modifier`,
+    [
+      12
+      /* UNEXPECTED_EMPTY_LINKED_KEY */
+    ]: `Unexpected empty linked key`,
+    [
+      13
+      /* UNEXPECTED_LEXICAL_ANALYSIS */
+    ]: `Unexpected lexical analysis in token: '{0}'`
+  };
+  function createCompileError(code, loc, options = {}) {
+    const { domain, messages, args } = options;
+    const msg = format((messages || errorMessages$2)[code] || "", ...args || []);
+    const error = new SyntaxError(String(msg));
+    error.code = code;
+    if (loc) {
+      error.location = loc;
+    }
+    error.domain = domain;
+    return error;
+  }
+  /*!
+    * @intlify/devtools-if v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const IntlifyDevToolsHooks = {
+    I18nInit: "i18n:init",
+    FunctionTranslate: "function:translate"
+  };
+  /*!
+    * @intlify/core-base v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  let devtools = null;
+  function setDevToolsHook(hook) {
+    devtools = hook;
+  }
+  function initI18nDevTools(i18n2, version, meta) {
+    devtools && devtools.emit(IntlifyDevToolsHooks.I18nInit, {
+      timestamp: Date.now(),
+      i18n: i18n2,
+      version,
+      meta
+    });
+  }
+  const translateDevTools = /* @__PURE__ */ createDevToolsHook(IntlifyDevToolsHooks.FunctionTranslate);
+  function createDevToolsHook(hook) {
+    return (payloads) => devtools && devtools.emit(hook, payloads);
+  }
+  const warnMessages$1 = {
+    [
+      0
+      /* NOT_FOUND_KEY */
+    ]: `Not found '{key}' key in '{locale}' locale messages.`,
+    [
+      1
+      /* FALLBACK_TO_TRANSLATE */
+    ]: `Fall back to translate '{key}' key with '{target}' locale.`,
+    [
+      2
+      /* CANNOT_FORMAT_NUMBER */
+    ]: `Cannot format a number value due to not supported Intl.NumberFormat.`,
+    [
+      3
+      /* FALLBACK_TO_NUMBER_FORMAT */
+    ]: `Fall back to number format '{key}' key with '{target}' locale.`,
+    [
+      4
+      /* CANNOT_FORMAT_DATE */
+    ]: `Cannot format a date value due to not supported Intl.DateTimeFormat.`,
+    [
+      5
+      /* FALLBACK_TO_DATE_FORMAT */
+    ]: `Fall back to datetime format '{key}' key with '{target}' locale.`
+  };
+  function getWarnMessage$1(code, ...args) {
+    return format(warnMessages$1[code], ...args);
+  }
+  const VERSION$1 = "9.1.9";
+  const NOT_REOSLVED = -1;
+  const MISSING_RESOLVE_VALUE = "";
+  function getDefaultLinkedModifiers() {
+    return {
+      upper: (val) => isString(val) ? val.toUpperCase() : val,
+      lower: (val) => isString(val) ? val.toLowerCase() : val,
+      // prettier-ignore
+      capitalize: (val) => isString(val) ? `${val.charAt(0).toLocaleUpperCase()}${val.substr(1)}` : val
+    };
+  }
+  let _compiler;
+  let _additionalMeta = null;
+  const setAdditionalMeta = (meta) => {
+    _additionalMeta = meta;
+  };
+  const getAdditionalMeta = () => _additionalMeta;
+  let _cid = 0;
+  function createCoreContext(options = {}) {
+    const version = isString(options.version) ? options.version : VERSION$1;
+    const locale = isString(options.locale) ? options.locale : "en-US";
+    const fallbackLocale = isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || isString(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : locale;
+    const messages = isPlainObject$1(options.messages) ? options.messages : { [locale]: {} };
+    const datetimeFormats = isPlainObject$1(options.datetimeFormats) ? options.datetimeFormats : { [locale]: {} };
+    const numberFormats = isPlainObject$1(options.numberFormats) ? options.numberFormats : { [locale]: {} };
+    const modifiers = assign$2({}, options.modifiers || {}, getDefaultLinkedModifiers());
+    const pluralRules = options.pluralRules || {};
+    const missing = isFunction(options.missing) ? options.missing : null;
+    const missingWarn = isBoolean(options.missingWarn) || isRegExp(options.missingWarn) ? options.missingWarn : true;
+    const fallbackWarn = isBoolean(options.fallbackWarn) || isRegExp(options.fallbackWarn) ? options.fallbackWarn : true;
+    const fallbackFormat = !!options.fallbackFormat;
+    const unresolving = !!options.unresolving;
+    const postTranslation = isFunction(options.postTranslation) ? options.postTranslation : null;
+    const processor = isPlainObject$1(options.processor) ? options.processor : null;
+    const warnHtmlMessage = isBoolean(options.warnHtmlMessage) ? options.warnHtmlMessage : true;
+    const escapeParameter = !!options.escapeParameter;
+    const messageCompiler = isFunction(options.messageCompiler) ? options.messageCompiler : _compiler;
+    const onWarn = isFunction(options.onWarn) ? options.onWarn : warn;
+    const internalOptions = options;
+    const __datetimeFormatters = isObject$1(internalOptions.__datetimeFormatters) ? internalOptions.__datetimeFormatters : /* @__PURE__ */ new Map();
+    const __numberFormatters = isObject$1(internalOptions.__numberFormatters) ? internalOptions.__numberFormatters : /* @__PURE__ */ new Map();
+    const __meta = isObject$1(internalOptions.__meta) ? internalOptions.__meta : {};
+    _cid++;
+    const context = {
+      version,
+      cid: _cid,
+      locale,
+      fallbackLocale,
+      messages,
+      datetimeFormats,
+      numberFormats,
+      modifiers,
+      pluralRules,
+      missing,
+      missingWarn,
+      fallbackWarn,
+      fallbackFormat,
+      unresolving,
+      postTranslation,
+      processor,
+      warnHtmlMessage,
+      escapeParameter,
+      messageCompiler,
+      onWarn,
+      __datetimeFormatters,
+      __numberFormatters,
+      __meta
+    };
+    {
+      context.__v_emitter = internalOptions.__v_emitter != null ? internalOptions.__v_emitter : void 0;
+    }
+    {
+      initI18nDevTools(context, version, __meta);
+    }
+    return context;
+  }
+  function isTranslateFallbackWarn(fallback, key) {
+    return fallback instanceof RegExp ? fallback.test(key) : fallback;
+  }
+  function isTranslateMissingWarn(missing, key) {
+    return missing instanceof RegExp ? missing.test(key) : missing;
+  }
+  function handleMissing(context, key, locale, missingWarn, type) {
+    const { missing, onWarn } = context;
+    {
+      const emitter = context.__v_emitter;
+      if (emitter) {
+        emitter.emit("missing", {
+          locale,
+          key,
+          type,
+          groupId: `${type}:${key}`
+        });
+      }
+    }
+    if (missing !== null) {
+      const ret = missing(context, locale, key, type);
+      return isString(ret) ? ret : key;
+    } else {
+      if (isTranslateMissingWarn(missingWarn, key)) {
+        onWarn(getWarnMessage$1(0, { key, locale }));
+      }
+      return key;
+    }
+  }
+  function getLocaleChain(ctx, fallback, start) {
+    const context = ctx;
+    if (!context.__localeChainCache) {
+      context.__localeChainCache = /* @__PURE__ */ new Map();
+    }
+    let chain = context.__localeChainCache.get(start);
+    if (!chain) {
+      chain = [];
+      let block = [start];
+      while (isArray(block)) {
+        block = appendBlockToChain(chain, block, fallback);
+      }
+      const defaults = isArray(fallback) ? fallback : isPlainObject$1(fallback) ? fallback["default"] ? fallback["default"] : null : fallback;
+      block = isString(defaults) ? [defaults] : defaults;
+      if (isArray(block)) {
+        appendBlockToChain(chain, block, false);
+      }
+      context.__localeChainCache.set(start, chain);
+    }
+    return chain;
+  }
+  function appendBlockToChain(chain, block, blocks) {
+    let follow = true;
+    for (let i = 0; i < block.length && isBoolean(follow); i++) {
+      const locale = block[i];
+      if (isString(locale)) {
+        follow = appendLocaleToChain(chain, block[i], blocks);
+      }
+    }
+    return follow;
+  }
+  function appendLocaleToChain(chain, locale, blocks) {
+    let follow;
+    const tokens = locale.split("-");
+    do {
+      const target = tokens.join("-");
+      follow = appendItemToChain(chain, target, blocks);
+      tokens.splice(-1, 1);
+    } while (tokens.length && follow === true);
+    return follow;
+  }
+  function appendItemToChain(chain, target, blocks) {
+    let follow = false;
+    if (!chain.includes(target)) {
+      follow = true;
+      if (target) {
+        follow = target[target.length - 1] !== "!";
+        const locale = target.replace(/!/g, "");
+        chain.push(locale);
+        if ((isArray(blocks) || isPlainObject$1(blocks)) && blocks[locale]) {
+          follow = blocks[locale];
+        }
+      }
+    }
+    return follow;
+  }
+  function updateFallbackLocale(ctx, locale, fallback) {
+    const context = ctx;
+    context.__localeChainCache = /* @__PURE__ */ new Map();
+    getLocaleChain(ctx, fallback, locale);
+  }
+  function createCoreError(code) {
+    return createCompileError(code, null, { messages: errorMessages$1 });
+  }
+  const errorMessages$1 = {
+    [
+      14
+      /* INVALID_ARGUMENT */
+    ]: "Invalid arguments",
+    [
+      15
+      /* INVALID_DATE_ARGUMENT */
+    ]: "The date provided is an invalid Date object.Make sure your Date represents a valid date.",
+    [
+      16
+      /* INVALID_ISO_DATE_ARGUMENT */
+    ]: "The argument provided is not a valid ISO date string"
+  };
+  const NOOP_MESSAGE_FUNCTION = () => "";
+  const isMessageFunction = (val) => isFunction(val);
+  function translate(context, ...args) {
+    const { fallbackFormat, postTranslation, unresolving, fallbackLocale, messages } = context;
+    const [key, options] = parseTranslateArgs(...args);
+    const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+    const fallbackWarn = isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+    const escapeParameter = isBoolean(options.escapeParameter) ? options.escapeParameter : context.escapeParameter;
+    const resolvedMessage = !!options.resolvedMessage;
+    const defaultMsgOrKey = isString(options.default) || isBoolean(options.default) ? !isBoolean(options.default) ? options.default : key : fallbackFormat ? key : "";
+    const enableDefaultMsg = fallbackFormat || defaultMsgOrKey !== "";
+    const locale = isString(options.locale) ? options.locale : context.locale;
+    escapeParameter && escapeParams(options);
+    let [format2, targetLocale, message] = !resolvedMessage ? resolveMessageFormat(context, key, locale, fallbackLocale, fallbackWarn, missingWarn) : [
+      key,
+      locale,
+      messages[locale] || {}
+    ];
+    let cacheBaseKey = key;
+    if (!resolvedMessage && !(isString(format2) || isMessageFunction(format2))) {
+      if (enableDefaultMsg) {
+        format2 = defaultMsgOrKey;
+        cacheBaseKey = format2;
+      }
+    }
+    if (!resolvedMessage && (!(isString(format2) || isMessageFunction(format2)) || !isString(targetLocale))) {
+      return unresolving ? NOT_REOSLVED : key;
+    }
+    if (isString(format2) && context.messageCompiler == null) {
+      warn(`The message format compilation is not supported in this build. Because message compiler isn't included. You need to pre-compilation all message format. So translate function return '${key}'.`);
+      return key;
+    }
+    let occurred = false;
+    const errorDetector = () => {
+      occurred = true;
+    };
+    const msg = !isMessageFunction(format2) ? compileMessageFormat(context, key, targetLocale, format2, cacheBaseKey, errorDetector) : format2;
+    if (occurred) {
+      return format2;
+    }
+    const ctxOptions = getMessageContextOptions(context, targetLocale, message, options);
+    const msgContext = createMessageContext(ctxOptions);
+    const messaged = evaluateMessage(context, msg, msgContext);
+    const ret = postTranslation ? postTranslation(messaged) : messaged;
+    {
+      const payloads = {
+        timestamp: Date.now(),
+        key: isString(key) ? key : isMessageFunction(format2) ? format2.key : "",
+        locale: targetLocale || (isMessageFunction(format2) ? format2.locale : ""),
+        format: isString(format2) ? format2 : isMessageFunction(format2) ? format2.source : "",
+        message: ret
+      };
+      payloads.meta = assign$2({}, context.__meta, getAdditionalMeta() || {});
+      translateDevTools(payloads);
+    }
+    return ret;
+  }
+  function escapeParams(options) {
+    if (isArray(options.list)) {
+      options.list = options.list.map((item) => isString(item) ? escapeHtml(item) : item);
+    } else if (isObject$1(options.named)) {
+      Object.keys(options.named).forEach((key) => {
+        if (isString(options.named[key])) {
+          options.named[key] = escapeHtml(options.named[key]);
+        }
+      });
+    }
+  }
+  function resolveMessageFormat(context, key, locale, fallbackLocale, fallbackWarn, missingWarn) {
+    const { messages, onWarn } = context;
+    const locales = getLocaleChain(context, fallbackLocale, locale);
+    let message = {};
+    let targetLocale;
+    let format2 = null;
+    let from = locale;
+    let to = null;
+    const type = "translate";
+    for (let i = 0; i < locales.length; i++) {
+      targetLocale = to = locales[i];
+      if (locale !== targetLocale && isTranslateFallbackWarn(fallbackWarn, key)) {
+        onWarn(getWarnMessage$1(1, {
+          key,
+          target: targetLocale
+        }));
+      }
+      if (locale !== targetLocale) {
+        const emitter = context.__v_emitter;
+        if (emitter) {
+          emitter.emit("fallback", {
+            type,
+            key,
+            from,
+            to,
+            groupId: `${type}:${key}`
+          });
+        }
+      }
+      message = messages[targetLocale] || {};
+      let start = null;
+      let startTag;
+      let endTag;
+      if (inBrowser) {
+        start = window.performance.now();
+        startTag = "intlify-message-resolve-start";
+        endTag = "intlify-message-resolve-end";
+        mark && mark(startTag);
+      }
+      if ((format2 = resolveValue(message, key)) === null) {
+        format2 = message[key];
+      }
+      if (inBrowser) {
+        const end = window.performance.now();
+        const emitter = context.__v_emitter;
+        if (emitter && start && format2) {
+          emitter.emit("message-resolve", {
+            type: "message-resolve",
+            key,
+            message: format2,
+            time: end - start,
+            groupId: `${type}:${key}`
+          });
+        }
+        if (startTag && endTag && mark && measure) {
+          mark(endTag);
+          measure("intlify message resolve", startTag, endTag);
+        }
+      }
+      if (isString(format2) || isFunction(format2))
+        break;
+      const missingRet = handleMissing(context, key, targetLocale, missingWarn, type);
+      if (missingRet !== key) {
+        format2 = missingRet;
+      }
+      from = to;
+    }
+    return [format2, targetLocale, message];
+  }
+  function compileMessageFormat(context, key, targetLocale, format2, cacheBaseKey, errorDetector) {
+    const { messageCompiler, warnHtmlMessage } = context;
+    if (isMessageFunction(format2)) {
+      const msg2 = format2;
+      msg2.locale = msg2.locale || targetLocale;
+      msg2.key = msg2.key || key;
+      return msg2;
+    }
+    let start = null;
+    let startTag;
+    let endTag;
+    if (inBrowser) {
+      start = window.performance.now();
+      startTag = "intlify-message-compilation-start";
+      endTag = "intlify-message-compilation-end";
+      mark && mark(startTag);
+    }
+    const msg = messageCompiler(format2, getCompileOptions(context, targetLocale, cacheBaseKey, format2, warnHtmlMessage, errorDetector));
+    if (inBrowser) {
+      const end = window.performance.now();
+      const emitter = context.__v_emitter;
+      if (emitter && start) {
+        emitter.emit("message-compilation", {
+          type: "message-compilation",
+          message: format2,
+          time: end - start,
+          groupId: `${"translate"}:${key}`
+        });
+      }
+      if (startTag && endTag && mark && measure) {
+        mark(endTag);
+        measure("intlify message compilation", startTag, endTag);
+      }
+    }
+    msg.locale = targetLocale;
+    msg.key = key;
+    msg.source = format2;
+    return msg;
+  }
+  function evaluateMessage(context, msg, msgCtx) {
+    let start = null;
+    let startTag;
+    let endTag;
+    if (inBrowser) {
+      start = window.performance.now();
+      startTag = "intlify-message-evaluation-start";
+      endTag = "intlify-message-evaluation-end";
+      mark && mark(startTag);
+    }
+    const messaged = msg(msgCtx);
+    if (inBrowser) {
+      const end = window.performance.now();
+      const emitter = context.__v_emitter;
+      if (emitter && start) {
+        emitter.emit("message-evaluation", {
+          type: "message-evaluation",
+          value: messaged,
+          time: end - start,
+          groupId: `${"translate"}:${msg.key}`
+        });
+      }
+      if (startTag && endTag && mark && measure) {
+        mark(endTag);
+        measure("intlify message evaluation", startTag, endTag);
+      }
+    }
+    return messaged;
+  }
+  function parseTranslateArgs(...args) {
+    const [arg1, arg2, arg3] = args;
+    const options = {};
+    if (!isString(arg1) && !isNumber(arg1) && !isMessageFunction(arg1)) {
+      throw createCoreError(
+        14
+        /* INVALID_ARGUMENT */
+      );
+    }
+    const key = isNumber(arg1) ? String(arg1) : isMessageFunction(arg1) ? arg1 : arg1;
+    if (isNumber(arg2)) {
+      options.plural = arg2;
+    } else if (isString(arg2)) {
+      options.default = arg2;
+    } else if (isPlainObject$1(arg2) && !isEmptyObject(arg2)) {
+      options.named = arg2;
+    } else if (isArray(arg2)) {
+      options.list = arg2;
+    }
+    if (isNumber(arg3)) {
+      options.plural = arg3;
+    } else if (isString(arg3)) {
+      options.default = arg3;
+    } else if (isPlainObject$1(arg3)) {
+      assign$2(options, arg3);
+    }
+    return [key, options];
+  }
+  function getCompileOptions(context, locale, key, source2, warnHtmlMessage, errorDetector) {
+    return {
+      warnHtmlMessage,
+      onError: (err) => {
+        errorDetector && errorDetector(err);
+        {
+          const message = `Message compilation error: ${err.message}`;
+          const codeFrame = err.location && generateCodeFrame(source2, err.location.start.offset, err.location.end.offset);
+          const emitter = context.__v_emitter;
+          if (emitter) {
+            emitter.emit("compile-error", {
+              message: source2,
+              error: err.message,
+              start: err.location && err.location.start.offset,
+              end: err.location && err.location.end.offset,
+              groupId: `${"translate"}:${key}`
+            });
+          }
+          console.error(codeFrame ? `${message}
+${codeFrame}` : message);
+        }
+      },
+      onCacheKey: (source22) => generateFormatCacheKey(locale, key, source22)
+    };
+  }
+  function getMessageContextOptions(context, locale, message, options) {
+    const { modifiers, pluralRules } = context;
+    const resolveMessage = (key) => {
+      const val = resolveValue(message, key);
+      if (isString(val)) {
+        let occurred = false;
+        const errorDetector = () => {
+          occurred = true;
+        };
+        const msg = compileMessageFormat(context, key, locale, val, key, errorDetector);
+        return !occurred ? msg : NOOP_MESSAGE_FUNCTION;
+      } else if (isMessageFunction(val)) {
+        return val;
+      } else {
+        return NOOP_MESSAGE_FUNCTION;
+      }
+    };
+    const ctxOptions = {
+      locale,
+      modifiers,
+      pluralRules,
+      messages: resolveMessage
+    };
+    if (context.processor) {
+      ctxOptions.processor = context.processor;
+    }
+    if (options.list) {
+      ctxOptions.list = options.list;
+    }
+    if (options.named) {
+      ctxOptions.named = options.named;
+    }
+    if (isNumber(options.plural)) {
+      ctxOptions.pluralIndex = options.plural;
+    }
+    return ctxOptions;
+  }
+  const intlDefined = typeof Intl !== "undefined";
+  const Availabilities = {
+    dateTimeFormat: intlDefined && typeof Intl.DateTimeFormat !== "undefined",
+    numberFormat: intlDefined && typeof Intl.NumberFormat !== "undefined"
+  };
+  function datetime(context, ...args) {
+    const { datetimeFormats, unresolving, fallbackLocale, onWarn } = context;
+    const { __datetimeFormatters } = context;
+    if (!Availabilities.dateTimeFormat) {
+      onWarn(getWarnMessage$1(
+        4
+        /* CANNOT_FORMAT_DATE */
+      ));
+      return MISSING_RESOLVE_VALUE;
+    }
+    const [key, value, options, overrides] = parseDateTimeArgs(...args);
+    const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+    const fallbackWarn = isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+    const part = !!options.part;
+    const locale = isString(options.locale) ? options.locale : context.locale;
+    const locales = getLocaleChain(context, fallbackLocale, locale);
+    if (!isString(key) || key === "") {
+      return new Intl.DateTimeFormat(locale).format(value);
+    }
+    let datetimeFormat = {};
+    let targetLocale;
+    let format2 = null;
+    let from = locale;
+    let to = null;
+    const type = "datetime format";
+    for (let i = 0; i < locales.length; i++) {
+      targetLocale = to = locales[i];
+      if (locale !== targetLocale && isTranslateFallbackWarn(fallbackWarn, key)) {
+        onWarn(getWarnMessage$1(5, {
+          key,
+          target: targetLocale
+        }));
+      }
+      if (locale !== targetLocale) {
+        const emitter = context.__v_emitter;
+        if (emitter) {
+          emitter.emit("fallback", {
+            type,
+            key,
+            from,
+            to,
+            groupId: `${type}:${key}`
+          });
+        }
+      }
+      datetimeFormat = datetimeFormats[targetLocale] || {};
+      format2 = datetimeFormat[key];
+      if (isPlainObject$1(format2))
+        break;
+      handleMissing(context, key, targetLocale, missingWarn, type);
+      from = to;
+    }
+    if (!isPlainObject$1(format2) || !isString(targetLocale)) {
+      return unresolving ? NOT_REOSLVED : key;
+    }
+    let id = `${targetLocale}__${key}`;
+    if (!isEmptyObject(overrides)) {
+      id = `${id}__${JSON.stringify(overrides)}`;
+    }
+    let formatter = __datetimeFormatters.get(id);
+    if (!formatter) {
+      formatter = new Intl.DateTimeFormat(targetLocale, assign$2({}, format2, overrides));
+      __datetimeFormatters.set(id, formatter);
+    }
+    return !part ? formatter.format(value) : formatter.formatToParts(value);
+  }
+  function parseDateTimeArgs(...args) {
+    const [arg1, arg2, arg3, arg4] = args;
+    let options = {};
+    let overrides = {};
+    let value;
+    if (isString(arg1)) {
+      if (!/\d{4}-\d{2}-\d{2}(T.*)?/.test(arg1)) {
+        throw createCoreError(
+          16
+          /* INVALID_ISO_DATE_ARGUMENT */
+        );
+      }
+      value = new Date(arg1);
+      try {
+        value.toISOString();
+      } catch (e) {
+        throw createCoreError(
+          16
+          /* INVALID_ISO_DATE_ARGUMENT */
+        );
+      }
+    } else if (isDate(arg1)) {
+      if (isNaN(arg1.getTime())) {
+        throw createCoreError(
+          15
+          /* INVALID_DATE_ARGUMENT */
+        );
+      }
+      value = arg1;
+    } else if (isNumber(arg1)) {
+      value = arg1;
+    } else {
+      throw createCoreError(
+        14
+        /* INVALID_ARGUMENT */
+      );
+    }
+    if (isString(arg2)) {
+      options.key = arg2;
+    } else if (isPlainObject$1(arg2)) {
+      options = arg2;
+    }
+    if (isString(arg3)) {
+      options.locale = arg3;
+    } else if (isPlainObject$1(arg3)) {
+      overrides = arg3;
+    }
+    if (isPlainObject$1(arg4)) {
+      overrides = arg4;
+    }
+    return [options.key || "", value, options, overrides];
+  }
+  function clearDateTimeFormat(ctx, locale, format2) {
+    const context = ctx;
+    for (const key in format2) {
+      const id = `${locale}__${key}`;
+      if (!context.__datetimeFormatters.has(id)) {
+        continue;
+      }
+      context.__datetimeFormatters.delete(id);
+    }
+  }
+  function number(context, ...args) {
+    const { numberFormats, unresolving, fallbackLocale, onWarn } = context;
+    const { __numberFormatters } = context;
+    if (!Availabilities.numberFormat) {
+      onWarn(getWarnMessage$1(
+        2
+        /* CANNOT_FORMAT_NUMBER */
+      ));
+      return MISSING_RESOLVE_VALUE;
+    }
+    const [key, value, options, overrides] = parseNumberArgs(...args);
+    const missingWarn = isBoolean(options.missingWarn) ? options.missingWarn : context.missingWarn;
+    const fallbackWarn = isBoolean(options.fallbackWarn) ? options.fallbackWarn : context.fallbackWarn;
+    const part = !!options.part;
+    const locale = isString(options.locale) ? options.locale : context.locale;
+    const locales = getLocaleChain(context, fallbackLocale, locale);
+    if (!isString(key) || key === "") {
+      return new Intl.NumberFormat(locale).format(value);
+    }
+    let numberFormat = {};
+    let targetLocale;
+    let format2 = null;
+    let from = locale;
+    let to = null;
+    const type = "number format";
+    for (let i = 0; i < locales.length; i++) {
+      targetLocale = to = locales[i];
+      if (locale !== targetLocale && isTranslateFallbackWarn(fallbackWarn, key)) {
+        onWarn(getWarnMessage$1(3, {
+          key,
+          target: targetLocale
+        }));
+      }
+      if (locale !== targetLocale) {
+        const emitter = context.__v_emitter;
+        if (emitter) {
+          emitter.emit("fallback", {
+            type,
+            key,
+            from,
+            to,
+            groupId: `${type}:${key}`
+          });
+        }
+      }
+      numberFormat = numberFormats[targetLocale] || {};
+      format2 = numberFormat[key];
+      if (isPlainObject$1(format2))
+        break;
+      handleMissing(context, key, targetLocale, missingWarn, type);
+      from = to;
+    }
+    if (!isPlainObject$1(format2) || !isString(targetLocale)) {
+      return unresolving ? NOT_REOSLVED : key;
+    }
+    let id = `${targetLocale}__${key}`;
+    if (!isEmptyObject(overrides)) {
+      id = `${id}__${JSON.stringify(overrides)}`;
+    }
+    let formatter = __numberFormatters.get(id);
+    if (!formatter) {
+      formatter = new Intl.NumberFormat(targetLocale, assign$2({}, format2, overrides));
+      __numberFormatters.set(id, formatter);
+    }
+    return !part ? formatter.format(value) : formatter.formatToParts(value);
+  }
+  function parseNumberArgs(...args) {
+    const [arg1, arg2, arg3, arg4] = args;
+    let options = {};
+    let overrides = {};
+    if (!isNumber(arg1)) {
+      throw createCoreError(
+        14
+        /* INVALID_ARGUMENT */
+      );
+    }
+    const value = arg1;
+    if (isString(arg2)) {
+      options.key = arg2;
+    } else if (isPlainObject$1(arg2)) {
+      options = arg2;
+    }
+    if (isString(arg3)) {
+      options.locale = arg3;
+    } else if (isPlainObject$1(arg3)) {
+      overrides = arg3;
+    }
+    if (isPlainObject$1(arg4)) {
+      overrides = arg4;
+    }
+    return [options.key || "", value, options, overrides];
+  }
+  function clearNumberFormat(ctx, locale, format2) {
+    const context = ctx;
+    for (const key in format2) {
+      const id = `${locale}__${key}`;
+      if (!context.__numberFormatters.has(id)) {
+        continue;
+      }
+      context.__numberFormatters.delete(id);
+    }
+  }
+  function getDevtoolsGlobalHook$1() {
+    return getTarget$1().__VUE_DEVTOOLS_GLOBAL_HOOK__;
+  }
+  function getTarget$1() {
+    return typeof navigator !== "undefined" && typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : {};
+  }
+  const isProxyAvailable$1 = typeof Proxy === "function";
+  const HOOK_SETUP$1 = "devtools-plugin:setup";
+  const HOOK_PLUGIN_SETTINGS_SET$1 = "plugin:settings:set";
+  let ApiProxy$1 = class ApiProxy {
+    constructor(plugin, hook) {
+      this.target = null;
+      this.targetQueue = [];
+      this.onQueue = [];
+      this.plugin = plugin;
+      this.hook = hook;
+      const defaultSettings = {};
+      if (plugin.settings) {
+        for (const id in plugin.settings) {
+          const item = plugin.settings[id];
+          defaultSettings[id] = item.defaultValue;
+        }
+      }
+      const localSettingsSaveId = `__vue-devtools-plugin-settings__${plugin.id}`;
+      let currentSettings = { ...defaultSettings };
+      try {
+        const raw = localStorage.getItem(localSettingsSaveId);
+        const data = JSON.parse(raw);
+        Object.assign(currentSettings, data);
+      } catch (e) {
+      }
+      this.fallbacks = {
+        getSettings() {
+          return currentSettings;
+        },
+        setSettings(value) {
+          try {
+            localStorage.setItem(localSettingsSaveId, JSON.stringify(value));
+          } catch (e) {
+          }
+          currentSettings = value;
+        }
+      };
+      hook.on(HOOK_PLUGIN_SETTINGS_SET$1, (pluginId, value) => {
+        if (pluginId === this.plugin.id) {
+          this.fallbacks.setSettings(value);
+        }
+      });
+      this.proxiedOn = new Proxy({}, {
+        get: (_target, prop) => {
+          if (this.target) {
+            return this.target.on[prop];
+          } else {
+            return (...args) => {
+              this.onQueue.push({
+                method: prop,
+                args
+              });
+            };
+          }
+        }
+      });
+      this.proxiedTarget = new Proxy({}, {
+        get: (_target, prop) => {
+          if (this.target) {
+            return this.target[prop];
+          } else if (prop === "on") {
+            return this.proxiedOn;
+          } else if (Object.keys(this.fallbacks).includes(prop)) {
+            return (...args) => {
+              this.targetQueue.push({
+                method: prop,
+                args,
+                resolve: () => {
+                }
+              });
+              return this.fallbacks[prop](...args);
+            };
+          } else {
+            return (...args) => {
+              return new Promise((resolve) => {
+                this.targetQueue.push({
+                  method: prop,
+                  args,
+                  resolve
+                });
+              });
+            };
+          }
+        }
+      });
+    }
+    async setRealTarget(target) {
+      this.target = target;
+      for (const item of this.onQueue) {
+        this.target.on[item.method](...item.args);
+      }
+      for (const item of this.targetQueue) {
+        item.resolve(await this.target[item.method](...item.args));
+      }
+    }
+  };
+  function setupDevtoolsPlugin$1(pluginDescriptor, setupFn) {
+    const target = getTarget$1();
+    const hook = getDevtoolsGlobalHook$1();
+    const enableProxy = isProxyAvailable$1 && pluginDescriptor.enableEarlyProxy;
+    if (hook && (target.__VUE_DEVTOOLS_PLUGIN_API_AVAILABLE__ || !enableProxy)) {
+      hook.emit(HOOK_SETUP$1, pluginDescriptor, setupFn);
+    } else {
+      const proxy = enableProxy ? new ApiProxy$1(pluginDescriptor, hook) : null;
+      const list = target.__VUE_DEVTOOLS_PLUGINS__ = target.__VUE_DEVTOOLS_PLUGINS__ || [];
+      list.push({
+        pluginDescriptor,
+        setupFn,
+        proxy
+      });
+      if (proxy)
+        setupFn(proxy.proxiedTarget);
+    }
+  }
+  /*!
+    * @intlify/vue-devtools v9.1.9
+    * (c) 2021 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const VueDevToolsLabels = {
+    [
+      "vue-devtools-plugin-vue-i18n"
+      /* PLUGIN */
+    ]: "Vue I18n devtools",
+    [
+      "vue-i18n-resource-inspector"
+      /* CUSTOM_INSPECTOR */
+    ]: "I18n Resources",
+    [
+      "vue-i18n-timeline"
+      /* TIMELINE */
+    ]: "Vue I18n"
+  };
+  const VueDevToolsPlaceholders = {
+    [
+      "vue-i18n-resource-inspector"
+      /* CUSTOM_INSPECTOR */
+    ]: "Search for scopes ..."
+  };
+  const VueDevToolsTimelineColors = {
+    [
+      "vue-i18n-timeline"
+      /* TIMELINE */
+    ]: 16764185
+  };
+  /*!
+    * vue-i18n v9.1.9
+    * (c) 2022 kazuya kawaguchi
+    * Released under the MIT License.
+    */
+  const VERSION = "9.1.9";
+  function initFeatureFlags() {
+    let needWarn = false;
+    {
+      needWarn = true;
+    }
+    if (needWarn) {
+      console.warn(`You are running the esm-bundler build of vue-i18n. It is recommended to configure your bundler to explicitly replace feature flag globals with boolean literals to get proper tree-shaking in the final bundle.`);
+    }
+  }
+  const warnMessages = {
+    [
+      6
+      /* FALLBACK_TO_ROOT */
+    ]: `Fall back to {type} '{key}' with root locale.`,
+    [
+      7
+      /* NOT_SUPPORTED_PRESERVE */
+    ]: `Not supported 'preserve'.`,
+    [
+      8
+      /* NOT_SUPPORTED_FORMATTER */
+    ]: `Not supported 'formatter'.`,
+    [
+      9
+      /* NOT_SUPPORTED_PRESERVE_DIRECTIVE */
+    ]: `Not supported 'preserveDirectiveContent'.`,
+    [
+      10
+      /* NOT_SUPPORTED_GET_CHOICE_INDEX */
+    ]: `Not supported 'getChoiceIndex'.`,
+    [
+      11
+      /* COMPONENT_NAME_LEGACY_COMPATIBLE */
+    ]: `Component name legacy compatible: '{name}' -> 'i18n'`,
+    [
+      12
+      /* NOT_FOUND_PARENT_SCOPE */
+    ]: `Not found parent scope. use the global scope.`
+  };
+  function getWarnMessage(code, ...args) {
+    return format(warnMessages[code], ...args);
+  }
+  function createI18nError(code, ...args) {
+    return createCompileError(code, null, { messages: errorMessages, args });
+  }
+  const errorMessages = {
+    [
+      14
+      /* UNEXPECTED_RETURN_TYPE */
+    ]: "Unexpected return type in composer",
+    [
+      15
+      /* INVALID_ARGUMENT */
+    ]: "Invalid argument",
+    [
+      16
+      /* MUST_BE_CALL_SETUP_TOP */
+    ]: "Must be called at the top of a `setup` function",
+    [
+      17
+      /* NOT_INSLALLED */
+    ]: "Need to install with `app.use` function",
+    [
+      22
+      /* UNEXPECTED_ERROR */
+    ]: "Unexpected error",
+    [
+      18
+      /* NOT_AVAILABLE_IN_LEGACY_MODE */
+    ]: "Not available in legacy mode",
+    [
+      19
+      /* REQUIRED_VALUE */
+    ]: `Required in value: {0}`,
+    [
+      20
+      /* INVALID_VALUE */
+    ]: `Invalid value`,
+    [
+      21
+      /* CANNOT_SETUP_VUE_DEVTOOLS_PLUGIN */
+    ]: `Cannot setup vue-devtools plugin`
+  };
+  const DEVTOOLS_META = "__INTLIFY_META__";
+  const TransrateVNodeSymbol = makeSymbol("__transrateVNode");
+  const DatetimePartsSymbol = makeSymbol("__datetimeParts");
+  const NumberPartsSymbol = makeSymbol("__numberParts");
+  const EnableEmitter = makeSymbol("__enableEmitter");
+  const DisableEmitter = makeSymbol("__disableEmitter");
+  const SetPluralRulesSymbol = makeSymbol("__setPluralRules");
+  const InejctWithOption = makeSymbol("__injectWithOption");
+  let composerID = 0;
+  function defineCoreMissingHandler(missing) {
+    return (ctx, locale, key, type) => {
+      return missing(locale, key, vue.getCurrentInstance() || void 0, type);
+    };
+  }
+  function getLocaleMessages(locale, options) {
+    const { messages, __i18n } = options;
+    const ret = isPlainObject$1(messages) ? messages : isArray(__i18n) ? {} : { [locale]: {} };
+    if (isArray(__i18n)) {
+      __i18n.forEach(({ locale: locale2, resource }) => {
+        if (locale2) {
+          ret[locale2] = ret[locale2] || {};
+          deepCopy(resource, ret[locale2]);
+        } else {
+          deepCopy(resource, ret);
+        }
+      });
+    }
+    if (options.flatJson) {
+      for (const key in ret) {
+        if (hasOwn$1(ret, key)) {
+          handleFlatJson(ret[key]);
+        }
+      }
+    }
+    return ret;
+  }
+  const isNotObjectOrIsArray = (val) => !isObject$1(val) || isArray(val);
+  function deepCopy(src, des) {
+    if (isNotObjectOrIsArray(src) || isNotObjectOrIsArray(des)) {
+      throw createI18nError(
+        20
+        /* INVALID_VALUE */
+      );
+    }
+    for (const key in src) {
+      if (hasOwn$1(src, key)) {
+        if (isNotObjectOrIsArray(src[key]) || isNotObjectOrIsArray(des[key])) {
+          des[key] = src[key];
+        } else {
+          deepCopy(src[key], des[key]);
+        }
+      }
+    }
+  }
+  const getMetaInfo = () => {
+    const instance = vue.getCurrentInstance();
+    return instance && instance.type[DEVTOOLS_META] ? { [DEVTOOLS_META]: instance.type[DEVTOOLS_META] } : null;
+  };
+  function createComposer(options = {}) {
+    const { __root } = options;
+    const _isGlobal = __root === void 0;
+    let _inheritLocale = isBoolean(options.inheritLocale) ? options.inheritLocale : true;
+    const _locale = vue.ref(
+      // prettier-ignore
+      __root && _inheritLocale ? __root.locale.value : isString(options.locale) ? options.locale : "en-US"
+    );
+    const _fallbackLocale = vue.ref(
+      // prettier-ignore
+      __root && _inheritLocale ? __root.fallbackLocale.value : isString(options.fallbackLocale) || isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : _locale.value
+    );
+    const _messages = vue.ref(getLocaleMessages(_locale.value, options));
+    const _datetimeFormats = vue.ref(isPlainObject$1(options.datetimeFormats) ? options.datetimeFormats : { [_locale.value]: {} });
+    const _numberFormats = vue.ref(isPlainObject$1(options.numberFormats) ? options.numberFormats : { [_locale.value]: {} });
+    let _missingWarn = __root ? __root.missingWarn : isBoolean(options.missingWarn) || isRegExp(options.missingWarn) ? options.missingWarn : true;
+    let _fallbackWarn = __root ? __root.fallbackWarn : isBoolean(options.fallbackWarn) || isRegExp(options.fallbackWarn) ? options.fallbackWarn : true;
+    let _fallbackRoot = __root ? __root.fallbackRoot : isBoolean(options.fallbackRoot) ? options.fallbackRoot : true;
+    let _fallbackFormat = !!options.fallbackFormat;
+    let _missing = isFunction(options.missing) ? options.missing : null;
+    let _runtimeMissing = isFunction(options.missing) ? defineCoreMissingHandler(options.missing) : null;
+    let _postTranslation = isFunction(options.postTranslation) ? options.postTranslation : null;
+    let _warnHtmlMessage = isBoolean(options.warnHtmlMessage) ? options.warnHtmlMessage : true;
+    let _escapeParameter = !!options.escapeParameter;
+    const _modifiers = __root ? __root.modifiers : isPlainObject$1(options.modifiers) ? options.modifiers : {};
+    let _pluralRules = options.pluralRules || __root && __root.pluralRules;
+    let _context;
+    function getCoreContext() {
+      return createCoreContext({
+        version: VERSION,
+        locale: _locale.value,
+        fallbackLocale: _fallbackLocale.value,
+        messages: _messages.value,
+        messageCompiler: function compileToFunction(source2) {
+          return (ctx) => {
+            return ctx.normalize([source2]);
+          };
+        },
+        datetimeFormats: _datetimeFormats.value,
+        numberFormats: _numberFormats.value,
+        modifiers: _modifiers,
+        pluralRules: _pluralRules,
+        missing: _runtimeMissing === null ? void 0 : _runtimeMissing,
+        missingWarn: _missingWarn,
+        fallbackWarn: _fallbackWarn,
+        fallbackFormat: _fallbackFormat,
+        unresolving: true,
+        postTranslation: _postTranslation === null ? void 0 : _postTranslation,
+        warnHtmlMessage: _warnHtmlMessage,
+        escapeParameter: _escapeParameter,
+        __datetimeFormatters: isPlainObject$1(_context) ? _context.__datetimeFormatters : void 0,
+        __numberFormatters: isPlainObject$1(_context) ? _context.__numberFormatters : void 0,
+        __v_emitter: isPlainObject$1(_context) ? _context.__v_emitter : void 0,
+        __meta: { framework: "vue" }
+      });
+    }
+    _context = getCoreContext();
+    updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+    function trackReactivityValues() {
+      return [
+        _locale.value,
+        _fallbackLocale.value,
+        _messages.value,
+        _datetimeFormats.value,
+        _numberFormats.value
+      ];
+    }
+    const locale = vue.computed({
+      get: () => _locale.value,
+      set: (val) => {
+        _locale.value = val;
+        _context.locale = _locale.value;
+      }
+    });
+    const fallbackLocale = vue.computed({
+      get: () => _fallbackLocale.value,
+      set: (val) => {
+        _fallbackLocale.value = val;
+        _context.fallbackLocale = _fallbackLocale.value;
+        updateFallbackLocale(_context, _locale.value, val);
+      }
+    });
+    const messages = vue.computed(() => _messages.value);
+    const datetimeFormats = vue.computed(() => _datetimeFormats.value);
+    const numberFormats = vue.computed(() => _numberFormats.value);
+    function getPostTranslationHandler() {
+      return isFunction(_postTranslation) ? _postTranslation : null;
+    }
+    function setPostTranslationHandler(handler) {
+      _postTranslation = handler;
+      _context.postTranslation = handler;
+    }
+    function getMissingHandler() {
+      return _missing;
+    }
+    function setMissingHandler(handler) {
+      if (handler !== null) {
+        _runtimeMissing = defineCoreMissingHandler(handler);
+      }
+      _missing = handler;
+      _context.missing = _runtimeMissing;
+    }
+    function isResolvedTranslateMessage(type, arg) {
+      return type !== "translate" || !!arg.resolvedMessage === false;
+    }
+    function wrapWithDeps(fn, argumentParser, warnType, fallbackSuccess, fallbackFail, successCondition) {
+      trackReactivityValues();
+      let ret;
+      {
+        try {
+          setAdditionalMeta(getMetaInfo());
+          ret = fn(_context);
+        } finally {
+          setAdditionalMeta(null);
+        }
+      }
+      if (isNumber(ret) && ret === NOT_REOSLVED) {
+        const [key, arg2] = argumentParser();
+        if (__root && isString(key) && isResolvedTranslateMessage(warnType, arg2)) {
+          if (_fallbackRoot && (isTranslateFallbackWarn(_fallbackWarn, key) || isTranslateMissingWarn(_missingWarn, key))) {
+            warn(getWarnMessage(6, {
+              key,
+              type: warnType
+            }));
+          }
+          {
+            const { __v_emitter: emitter } = _context;
+            if (emitter && _fallbackRoot) {
+              emitter.emit("fallback", {
+                type: warnType,
+                key,
+                to: "global",
+                groupId: `${warnType}:${key}`
+              });
+            }
+          }
+        }
+        return __root && _fallbackRoot ? fallbackSuccess(__root) : fallbackFail(key);
+      } else if (successCondition(ret)) {
+        return ret;
+      } else {
+        throw createI18nError(
+          14
+          /* UNEXPECTED_RETURN_TYPE */
+        );
+      }
+    }
+    function t(...args) {
+      return wrapWithDeps((context) => translate(context, ...args), () => parseTranslateArgs(...args), "translate", (root) => root.t(...args), (key) => key, (val) => isString(val));
+    }
+    function rt(...args) {
+      const [arg1, arg2, arg3] = args;
+      if (arg3 && !isObject$1(arg3)) {
+        throw createI18nError(
+          15
+          /* INVALID_ARGUMENT */
+        );
+      }
+      return t(...[arg1, arg2, assign$2({ resolvedMessage: true }, arg3 || {})]);
+    }
+    function d(...args) {
+      return wrapWithDeps((context) => datetime(context, ...args), () => parseDateTimeArgs(...args), "datetime format", (root) => root.d(...args), () => MISSING_RESOLVE_VALUE, (val) => isString(val));
+    }
+    function n(...args) {
+      return wrapWithDeps((context) => number(context, ...args), () => parseNumberArgs(...args), "number format", (root) => root.n(...args), () => MISSING_RESOLVE_VALUE, (val) => isString(val));
+    }
+    function normalize(values) {
+      return values.map((val) => isString(val) ? vue.createVNode(vue.Text, null, val, 0) : val);
+    }
+    const interpolate = (val) => val;
+    const processor = {
+      normalize,
+      interpolate,
+      type: "vnode"
+    };
+    function transrateVNode(...args) {
+      return wrapWithDeps(
+        (context) => {
+          let ret;
+          const _context2 = context;
+          try {
+            _context2.processor = processor;
+            ret = translate(_context2, ...args);
+          } finally {
+            _context2.processor = null;
+          }
+          return ret;
+        },
+        () => parseTranslateArgs(...args),
+        "translate",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (root) => root[TransrateVNodeSymbol](...args),
+        (key) => [vue.createVNode(vue.Text, null, key, 0)],
+        (val) => isArray(val)
+      );
+    }
+    function numberParts(...args) {
+      return wrapWithDeps(
+        (context) => number(context, ...args),
+        () => parseNumberArgs(...args),
+        "number format",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (root) => root[NumberPartsSymbol](...args),
+        () => [],
+        (val) => isString(val) || isArray(val)
+      );
+    }
+    function datetimeParts(...args) {
+      return wrapWithDeps(
+        (context) => datetime(context, ...args),
+        () => parseDateTimeArgs(...args),
+        "datetime format",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (root) => root[DatetimePartsSymbol](...args),
+        () => [],
+        (val) => isString(val) || isArray(val)
+      );
+    }
+    function setPluralRules(rules) {
+      _pluralRules = rules;
+      _context.pluralRules = _pluralRules;
+    }
+    function te(key, locale2) {
+      const targetLocale = isString(locale2) ? locale2 : _locale.value;
+      const message = getLocaleMessage(targetLocale);
+      return resolveValue(message, key) !== null;
+    }
+    function resolveMessages(key) {
+      let messages2 = null;
+      const locales = getLocaleChain(_context, _fallbackLocale.value, _locale.value);
+      for (let i = 0; i < locales.length; i++) {
+        const targetLocaleMessages = _messages.value[locales[i]] || {};
+        const messageValue = resolveValue(targetLocaleMessages, key);
+        if (messageValue != null) {
+          messages2 = messageValue;
+          break;
+        }
+      }
+      return messages2;
+    }
+    function tm(key) {
+      const messages2 = resolveMessages(key);
+      return messages2 != null ? messages2 : __root ? __root.tm(key) || {} : {};
+    }
+    function getLocaleMessage(locale2) {
+      return _messages.value[locale2] || {};
+    }
+    function setLocaleMessage(locale2, message) {
+      _messages.value[locale2] = message;
+      _context.messages = _messages.value;
+    }
+    function mergeLocaleMessage(locale2, message) {
+      _messages.value[locale2] = _messages.value[locale2] || {};
+      deepCopy(message, _messages.value[locale2]);
+      _context.messages = _messages.value;
+    }
+    function getDateTimeFormat(locale2) {
+      return _datetimeFormats.value[locale2] || {};
+    }
+    function setDateTimeFormat(locale2, format2) {
+      _datetimeFormats.value[locale2] = format2;
+      _context.datetimeFormats = _datetimeFormats.value;
+      clearDateTimeFormat(_context, locale2, format2);
+    }
+    function mergeDateTimeFormat(locale2, format2) {
+      _datetimeFormats.value[locale2] = assign$2(_datetimeFormats.value[locale2] || {}, format2);
+      _context.datetimeFormats = _datetimeFormats.value;
+      clearDateTimeFormat(_context, locale2, format2);
+    }
+    function getNumberFormat(locale2) {
+      return _numberFormats.value[locale2] || {};
+    }
+    function setNumberFormat(locale2, format2) {
+      _numberFormats.value[locale2] = format2;
+      _context.numberFormats = _numberFormats.value;
+      clearNumberFormat(_context, locale2, format2);
+    }
+    function mergeNumberFormat(locale2, format2) {
+      _numberFormats.value[locale2] = assign$2(_numberFormats.value[locale2] || {}, format2);
+      _context.numberFormats = _numberFormats.value;
+      clearNumberFormat(_context, locale2, format2);
+    }
+    composerID++;
+    if (__root) {
+      vue.watch(__root.locale, (val) => {
+        if (_inheritLocale) {
+          _locale.value = val;
+          _context.locale = val;
+          updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+        }
+      });
+      vue.watch(__root.fallbackLocale, (val) => {
+        if (_inheritLocale) {
+          _fallbackLocale.value = val;
+          _context.fallbackLocale = val;
+          updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+        }
+      });
+    }
+    const composer = {
+      id: composerID,
+      locale,
+      fallbackLocale,
+      get inheritLocale() {
+        return _inheritLocale;
+      },
+      set inheritLocale(val) {
+        _inheritLocale = val;
+        if (val && __root) {
+          _locale.value = __root.locale.value;
+          _fallbackLocale.value = __root.fallbackLocale.value;
+          updateFallbackLocale(_context, _locale.value, _fallbackLocale.value);
+        }
+      },
+      get availableLocales() {
+        return Object.keys(_messages.value).sort();
+      },
+      messages,
+      datetimeFormats,
+      numberFormats,
+      get modifiers() {
+        return _modifiers;
+      },
+      get pluralRules() {
+        return _pluralRules || {};
+      },
+      get isGlobal() {
+        return _isGlobal;
+      },
+      get missingWarn() {
+        return _missingWarn;
+      },
+      set missingWarn(val) {
+        _missingWarn = val;
+        _context.missingWarn = _missingWarn;
+      },
+      get fallbackWarn() {
+        return _fallbackWarn;
+      },
+      set fallbackWarn(val) {
+        _fallbackWarn = val;
+        _context.fallbackWarn = _fallbackWarn;
+      },
+      get fallbackRoot() {
+        return _fallbackRoot;
+      },
+      set fallbackRoot(val) {
+        _fallbackRoot = val;
+      },
+      get fallbackFormat() {
+        return _fallbackFormat;
+      },
+      set fallbackFormat(val) {
+        _fallbackFormat = val;
+        _context.fallbackFormat = _fallbackFormat;
+      },
+      get warnHtmlMessage() {
+        return _warnHtmlMessage;
+      },
+      set warnHtmlMessage(val) {
+        _warnHtmlMessage = val;
+        _context.warnHtmlMessage = val;
+      },
+      get escapeParameter() {
+        return _escapeParameter;
+      },
+      set escapeParameter(val) {
+        _escapeParameter = val;
+        _context.escapeParameter = val;
+      },
+      t,
+      rt,
+      d,
+      n,
+      te,
+      tm,
+      getLocaleMessage,
+      setLocaleMessage,
+      mergeLocaleMessage,
+      getDateTimeFormat,
+      setDateTimeFormat,
+      mergeDateTimeFormat,
+      getNumberFormat,
+      setNumberFormat,
+      mergeNumberFormat,
+      getPostTranslationHandler,
+      setPostTranslationHandler,
+      getMissingHandler,
+      setMissingHandler,
+      [TransrateVNodeSymbol]: transrateVNode,
+      [NumberPartsSymbol]: numberParts,
+      [DatetimePartsSymbol]: datetimeParts,
+      [SetPluralRulesSymbol]: setPluralRules,
+      [InejctWithOption]: options.__injectWithOption
+      // eslint-disable-line @typescript-eslint/no-explicit-any
+    };
+    {
+      composer[EnableEmitter] = (emitter) => {
+        _context.__v_emitter = emitter;
+      };
+      composer[DisableEmitter] = () => {
+        _context.__v_emitter = void 0;
+      };
+    }
+    return composer;
+  }
+  function convertComposerOptions(options) {
+    const locale = isString(options.locale) ? options.locale : "en-US";
+    const fallbackLocale = isString(options.fallbackLocale) || isArray(options.fallbackLocale) || isPlainObject$1(options.fallbackLocale) || options.fallbackLocale === false ? options.fallbackLocale : locale;
+    const missing = isFunction(options.missing) ? options.missing : void 0;
+    const missingWarn = isBoolean(options.silentTranslationWarn) || isRegExp(options.silentTranslationWarn) ? !options.silentTranslationWarn : true;
+    const fallbackWarn = isBoolean(options.silentFallbackWarn) || isRegExp(options.silentFallbackWarn) ? !options.silentFallbackWarn : true;
+    const fallbackRoot = isBoolean(options.fallbackRoot) ? options.fallbackRoot : true;
+    const fallbackFormat = !!options.formatFallbackMessages;
+    const modifiers = isPlainObject$1(options.modifiers) ? options.modifiers : {};
+    const pluralizationRules = options.pluralizationRules;
+    const postTranslation = isFunction(options.postTranslation) ? options.postTranslation : void 0;
+    const warnHtmlMessage = isString(options.warnHtmlInMessage) ? options.warnHtmlInMessage !== "off" : true;
+    const escapeParameter = !!options.escapeParameterHtml;
+    const inheritLocale = isBoolean(options.sync) ? options.sync : true;
+    if (options.formatter) {
+      warn(getWarnMessage(
+        8
+        /* NOT_SUPPORTED_FORMATTER */
+      ));
+    }
+    if (options.preserveDirectiveContent) {
+      warn(getWarnMessage(
+        9
+        /* NOT_SUPPORTED_PRESERVE_DIRECTIVE */
+      ));
+    }
+    let messages = options.messages;
+    if (isPlainObject$1(options.sharedMessages)) {
+      const sharedMessages = options.sharedMessages;
+      const locales = Object.keys(sharedMessages);
+      messages = locales.reduce((messages2, locale2) => {
+        const message = messages2[locale2] || (messages2[locale2] = {});
+        assign$2(message, sharedMessages[locale2]);
+        return messages2;
+      }, messages || {});
+    }
+    const { __i18n, __root, __injectWithOption } = options;
+    const datetimeFormats = options.datetimeFormats;
+    const numberFormats = options.numberFormats;
+    const flatJson = options.flatJson;
+    return {
+      locale,
+      fallbackLocale,
+      messages,
+      flatJson,
+      datetimeFormats,
+      numberFormats,
+      missing,
+      missingWarn,
+      fallbackWarn,
+      fallbackRoot,
+      fallbackFormat,
+      modifiers,
+      pluralRules: pluralizationRules,
+      postTranslation,
+      warnHtmlMessage,
+      escapeParameter,
+      inheritLocale,
+      __i18n,
+      __root,
+      __injectWithOption
+    };
+  }
+  function createVueI18n(options = {}) {
+    const composer = createComposer(convertComposerOptions(options));
+    const vueI18n = {
+      // id
+      id: composer.id,
+      // locale
+      get locale() {
+        return composer.locale.value;
+      },
+      set locale(val) {
+        composer.locale.value = val;
+      },
+      // fallbackLocale
+      get fallbackLocale() {
+        return composer.fallbackLocale.value;
+      },
+      set fallbackLocale(val) {
+        composer.fallbackLocale.value = val;
+      },
+      // messages
+      get messages() {
+        return composer.messages.value;
+      },
+      // datetimeFormats
+      get datetimeFormats() {
+        return composer.datetimeFormats.value;
+      },
+      // numberFormats
+      get numberFormats() {
+        return composer.numberFormats.value;
+      },
+      // availableLocales
+      get availableLocales() {
+        return composer.availableLocales;
+      },
+      // formatter
+      get formatter() {
+        warn(getWarnMessage(
+          8
+          /* NOT_SUPPORTED_FORMATTER */
+        ));
+        return {
+          interpolate() {
+            return [];
+          }
+        };
+      },
+      set formatter(val) {
+        warn(getWarnMessage(
+          8
+          /* NOT_SUPPORTED_FORMATTER */
+        ));
+      },
+      // missing
+      get missing() {
+        return composer.getMissingHandler();
+      },
+      set missing(handler) {
+        composer.setMissingHandler(handler);
+      },
+      // silentTranslationWarn
+      get silentTranslationWarn() {
+        return isBoolean(composer.missingWarn) ? !composer.missingWarn : composer.missingWarn;
+      },
+      set silentTranslationWarn(val) {
+        composer.missingWarn = isBoolean(val) ? !val : val;
+      },
+      // silentFallbackWarn
+      get silentFallbackWarn() {
+        return isBoolean(composer.fallbackWarn) ? !composer.fallbackWarn : composer.fallbackWarn;
+      },
+      set silentFallbackWarn(val) {
+        composer.fallbackWarn = isBoolean(val) ? !val : val;
+      },
+      // modifiers
+      get modifiers() {
+        return composer.modifiers;
+      },
+      // formatFallbackMessages
+      get formatFallbackMessages() {
+        return composer.fallbackFormat;
+      },
+      set formatFallbackMessages(val) {
+        composer.fallbackFormat = val;
+      },
+      // postTranslation
+      get postTranslation() {
+        return composer.getPostTranslationHandler();
+      },
+      set postTranslation(handler) {
+        composer.setPostTranslationHandler(handler);
+      },
+      // sync
+      get sync() {
+        return composer.inheritLocale;
+      },
+      set sync(val) {
+        composer.inheritLocale = val;
+      },
+      // warnInHtmlMessage
+      get warnHtmlInMessage() {
+        return composer.warnHtmlMessage ? "warn" : "off";
+      },
+      set warnHtmlInMessage(val) {
+        composer.warnHtmlMessage = val !== "off";
+      },
+      // escapeParameterHtml
+      get escapeParameterHtml() {
+        return composer.escapeParameter;
+      },
+      set escapeParameterHtml(val) {
+        composer.escapeParameter = val;
+      },
+      // preserveDirectiveContent
+      get preserveDirectiveContent() {
+        warn(getWarnMessage(
+          9
+          /* NOT_SUPPORTED_PRESERVE_DIRECTIVE */
+        ));
+        return true;
+      },
+      set preserveDirectiveContent(val) {
+        warn(getWarnMessage(
+          9
+          /* NOT_SUPPORTED_PRESERVE_DIRECTIVE */
+        ));
+      },
+      // pluralizationRules
+      get pluralizationRules() {
+        return composer.pluralRules || {};
+      },
+      // for internal
+      __composer: composer,
+      // t
+      t(...args) {
+        const [arg1, arg2, arg3] = args;
+        const options2 = {};
+        let list = null;
+        let named = null;
+        if (!isString(arg1)) {
+          throw createI18nError(
+            15
+            /* INVALID_ARGUMENT */
+          );
+        }
+        const key = arg1;
+        if (isString(arg2)) {
+          options2.locale = arg2;
+        } else if (isArray(arg2)) {
+          list = arg2;
+        } else if (isPlainObject$1(arg2)) {
+          named = arg2;
+        }
+        if (isArray(arg3)) {
+          list = arg3;
+        } else if (isPlainObject$1(arg3)) {
+          named = arg3;
+        }
+        return composer.t(key, list || named || {}, options2);
+      },
+      rt(...args) {
+        return composer.rt(...args);
+      },
+      // tc
+      tc(...args) {
+        const [arg1, arg2, arg3] = args;
+        const options2 = { plural: 1 };
+        let list = null;
+        let named = null;
+        if (!isString(arg1)) {
+          throw createI18nError(
+            15
+            /* INVALID_ARGUMENT */
+          );
+        }
+        const key = arg1;
+        if (isString(arg2)) {
+          options2.locale = arg2;
+        } else if (isNumber(arg2)) {
+          options2.plural = arg2;
+        } else if (isArray(arg2)) {
+          list = arg2;
+        } else if (isPlainObject$1(arg2)) {
+          named = arg2;
+        }
+        if (isString(arg3)) {
+          options2.locale = arg3;
+        } else if (isArray(arg3)) {
+          list = arg3;
+        } else if (isPlainObject$1(arg3)) {
+          named = arg3;
+        }
+        return composer.t(key, list || named || {}, options2);
+      },
+      // te
+      te(key, locale) {
+        return composer.te(key, locale);
+      },
+      // tm
+      tm(key) {
+        return composer.tm(key);
+      },
+      // getLocaleMessage
+      getLocaleMessage(locale) {
+        return composer.getLocaleMessage(locale);
+      },
+      // setLocaleMessage
+      setLocaleMessage(locale, message) {
+        composer.setLocaleMessage(locale, message);
+      },
+      // mergeLocaleMessage
+      mergeLocaleMessage(locale, message) {
+        composer.mergeLocaleMessage(locale, message);
+      },
+      // d
+      d(...args) {
+        return composer.d(...args);
+      },
+      // getDateTimeFormat
+      getDateTimeFormat(locale) {
+        return composer.getDateTimeFormat(locale);
+      },
+      // setDateTimeFormat
+      setDateTimeFormat(locale, format2) {
+        composer.setDateTimeFormat(locale, format2);
+      },
+      // mergeDateTimeFormat
+      mergeDateTimeFormat(locale, format2) {
+        composer.mergeDateTimeFormat(locale, format2);
+      },
+      // n
+      n(...args) {
+        return composer.n(...args);
+      },
+      // getNumberFormat
+      getNumberFormat(locale) {
+        return composer.getNumberFormat(locale);
+      },
+      // setNumberFormat
+      setNumberFormat(locale, format2) {
+        composer.setNumberFormat(locale, format2);
+      },
+      // mergeNumberFormat
+      mergeNumberFormat(locale, format2) {
+        composer.mergeNumberFormat(locale, format2);
+      },
+      // getChoiceIndex
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getChoiceIndex(choice, choicesLength) {
+        warn(getWarnMessage(
+          10
+          /* NOT_SUPPORTED_GET_CHOICE_INDEX */
+        ));
+        return -1;
+      },
+      // for internal
+      __onComponentInstanceCreated(target) {
+        const { componentInstanceCreatedListener } = options;
+        if (componentInstanceCreatedListener) {
+          componentInstanceCreatedListener(target, vueI18n);
+        }
+      }
+    };
+    {
+      vueI18n.__enableEmitter = (emitter) => {
+        const __composer = composer;
+        __composer[EnableEmitter] && __composer[EnableEmitter](emitter);
+      };
+      vueI18n.__disableEmitter = () => {
+        const __composer = composer;
+        __composer[DisableEmitter] && __composer[DisableEmitter]();
+      };
+    }
+    return vueI18n;
+  }
+  const baseFormatProps = {
+    tag: {
+      type: [String, Object]
+    },
+    locale: {
+      type: String
+    },
+    scope: {
+      type: String,
+      validator: (val) => val === "parent" || val === "global",
+      default: "parent"
+    },
+    i18n: {
+      type: Object
+    }
+  };
+  const Translation = {
+    /* eslint-disable */
+    name: "i18n-t",
+    props: assign$2({
+      keypath: {
+        type: String,
+        required: true
+      },
+      plural: {
+        type: [Number, String],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        validator: (val) => isNumber(val) || !isNaN(val)
+      }
+    }, baseFormatProps),
+    /* eslint-enable */
+    setup(props, context) {
+      const { slots, attrs } = context;
+      const i18n2 = props.i18n || useI18n({
+        useScope: props.scope,
+        __useComponent: true
+      });
+      const keys = Object.keys(slots).filter((key) => key !== "_");
+      return () => {
+        const options = {};
+        if (props.locale) {
+          options.locale = props.locale;
+        }
+        if (props.plural !== void 0) {
+          options.plural = isString(props.plural) ? +props.plural : props.plural;
+        }
+        const arg = getInterpolateArg(context, keys);
+        const children = i18n2[TransrateVNodeSymbol](props.keypath, arg, options);
+        const assignedAttrs = assign$2({}, attrs);
+        return isString(props.tag) ? vue.h(props.tag, assignedAttrs, children) : isObject$1(props.tag) ? vue.h(props.tag, assignedAttrs, children) : vue.h(vue.Fragment, assignedAttrs, children);
+      };
+    }
+  };
+  function getInterpolateArg({ slots }, keys) {
+    if (keys.length === 1 && keys[0] === "default") {
+      return slots.default ? slots.default() : [];
+    } else {
+      return keys.reduce((arg, key) => {
+        const slot = slots[key];
+        if (slot) {
+          arg[key] = slot();
+        }
+        return arg;
+      }, {});
+    }
+  }
+  function renderFormatter(props, context, slotKeys, partFormatter) {
+    const { slots, attrs } = context;
+    return () => {
+      const options = { part: true };
+      let overrides = {};
+      if (props.locale) {
+        options.locale = props.locale;
+      }
+      if (isString(props.format)) {
+        options.key = props.format;
+      } else if (isObject$1(props.format)) {
+        if (isString(props.format.key)) {
+          options.key = props.format.key;
+        }
+        overrides = Object.keys(props.format).reduce((options2, prop) => {
+          return slotKeys.includes(prop) ? assign$2({}, options2, { [prop]: props.format[prop] }) : options2;
+        }, {});
+      }
+      const parts = partFormatter(...[props.value, options, overrides]);
+      let children = [options.key];
+      if (isArray(parts)) {
+        children = parts.map((part, index) => {
+          const slot = slots[part.type];
+          return slot ? slot({ [part.type]: part.value, index, parts }) : [part.value];
+        });
+      } else if (isString(parts)) {
+        children = [parts];
+      }
+      const assignedAttrs = assign$2({}, attrs);
+      return isString(props.tag) ? vue.h(props.tag, assignedAttrs, children) : isObject$1(props.tag) ? vue.h(props.tag, assignedAttrs, children) : vue.h(vue.Fragment, assignedAttrs, children);
+    };
+  }
+  const NUMBER_FORMAT_KEYS = [
+    "localeMatcher",
+    "style",
+    "unit",
+    "unitDisplay",
+    "currency",
+    "currencyDisplay",
+    "useGrouping",
+    "numberingSystem",
+    "minimumIntegerDigits",
+    "minimumFractionDigits",
+    "maximumFractionDigits",
+    "minimumSignificantDigits",
+    "maximumSignificantDigits",
+    "notation",
+    "formatMatcher"
+  ];
+  const NumberFormat = {
+    /* eslint-disable */
+    name: "i18n-n",
+    props: assign$2({
+      value: {
+        type: Number,
+        required: true
+      },
+      format: {
+        type: [String, Object]
+      }
+    }, baseFormatProps),
+    /* eslint-enable */
+    setup(props, context) {
+      const i18n2 = props.i18n || useI18n({ useScope: "parent", __useComponent: true });
+      return renderFormatter(props, context, NUMBER_FORMAT_KEYS, (...args) => (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        i18n2[NumberPartsSymbol](...args)
+      ));
+    }
+  };
+  const DATETIME_FORMAT_KEYS = [
+    "dateStyle",
+    "timeStyle",
+    "fractionalSecondDigits",
+    "calendar",
+    "dayPeriod",
+    "numberingSystem",
+    "localeMatcher",
+    "timeZone",
+    "hour12",
+    "hourCycle",
+    "formatMatcher",
+    "weekday",
+    "era",
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "second",
+    "timeZoneName"
+  ];
+  const DatetimeFormat = {
+    /* eslint-disable */
+    name: "i18n-d",
+    props: assign$2({
+      value: {
+        type: [Number, Date],
+        required: true
+      },
+      format: {
+        type: [String, Object]
+      }
+    }, baseFormatProps),
+    /* eslint-enable */
+    setup(props, context) {
+      const i18n2 = props.i18n || useI18n({ useScope: "parent", __useComponent: true });
+      return renderFormatter(props, context, DATETIME_FORMAT_KEYS, (...args) => (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        i18n2[DatetimePartsSymbol](...args)
+      ));
+    }
+  };
+  function getComposer$2(i18n2, instance) {
+    const i18nInternal = i18n2;
+    if (i18n2.mode === "composition") {
+      return i18nInternal.__getInstance(instance) || i18n2.global;
+    } else {
+      const vueI18n = i18nInternal.__getInstance(instance);
+      return vueI18n != null ? vueI18n.__composer : i18n2.global.__composer;
+    }
+  }
+  function vTDirective(i18n2) {
+    const bind = (el, { instance, value, modifiers }) => {
+      if (!instance || !instance.$) {
+        throw createI18nError(
+          22
+          /* UNEXPECTED_ERROR */
+        );
+      }
+      const composer = getComposer$2(i18n2, instance.$);
+      if (modifiers.preserve) {
+        warn(getWarnMessage(
+          7
+          /* NOT_SUPPORTED_PRESERVE */
+        ));
+      }
+      const parsedValue = parseValue(value);
+      el.textContent = composer.t(...makeParams(parsedValue));
+    };
+    return {
+      beforeMount: bind,
+      beforeUpdate: bind
+    };
+  }
+  function parseValue(value) {
+    if (isString(value)) {
+      return { path: value };
+    } else if (isPlainObject$1(value)) {
+      if (!("path" in value)) {
+        throw createI18nError(19, "path");
+      }
+      return value;
+    } else {
+      throw createI18nError(
+        20
+        /* INVALID_VALUE */
+      );
+    }
+  }
+  function makeParams(value) {
+    const { path, locale, args, choice, plural } = value;
+    const options = {};
+    const named = args || {};
+    if (isString(locale)) {
+      options.locale = locale;
+    }
+    if (isNumber(choice)) {
+      options.plural = choice;
+    }
+    if (isNumber(plural)) {
+      options.plural = plural;
+    }
+    return [path, named, options];
+  }
+  function apply(app, i18n2, ...options) {
+    const pluginOptions = isPlainObject$1(options[0]) ? options[0] : {};
+    const useI18nComponentName = !!pluginOptions.useI18nComponentName;
+    const globalInstall = isBoolean(pluginOptions.globalInstall) ? pluginOptions.globalInstall : true;
+    if (globalInstall && useI18nComponentName) {
+      warn(getWarnMessage(11, {
+        name: Translation.name
+      }));
+    }
+    if (globalInstall) {
+      app.component(!useI18nComponentName ? Translation.name : "i18n", Translation);
+      app.component(NumberFormat.name, NumberFormat);
+      app.component(DatetimeFormat.name, DatetimeFormat);
+    }
+    app.directive("t", vTDirective(i18n2));
+  }
+  const VUE_I18N_COMPONENT_TYPES = "vue-i18n: composer properties";
+  let devtoolsApi;
+  async function enableDevTools(app, i18n2) {
+    return new Promise((resolve, reject) => {
+      try {
+        setupDevtoolsPlugin$1({
+          id: "vue-devtools-plugin-vue-i18n",
+          label: VueDevToolsLabels[
+            "vue-devtools-plugin-vue-i18n"
+            /* PLUGIN */
+          ],
+          packageName: "vue-i18n",
+          homepage: "https://vue-i18n.intlify.dev",
+          logo: "https://vue-i18n.intlify.dev/vue-i18n-devtools-logo.png",
+          componentStateTypes: [VUE_I18N_COMPONENT_TYPES],
+          app
+        }, (api) => {
+          devtoolsApi = api;
+          api.on.visitComponentTree(({ componentInstance, treeNode }) => {
+            updateComponentTreeTags(componentInstance, treeNode, i18n2);
+          });
+          api.on.inspectComponent(({ componentInstance, instanceData }) => {
+            if (componentInstance.vnode.el.__VUE_I18N__ && instanceData) {
+              if (i18n2.mode === "legacy") {
+                if (componentInstance.vnode.el.__VUE_I18N__ !== i18n2.global.__composer) {
+                  inspectComposer(instanceData, componentInstance.vnode.el.__VUE_I18N__);
+                }
+              } else {
+                inspectComposer(instanceData, componentInstance.vnode.el.__VUE_I18N__);
+              }
+            }
+          });
+          api.addInspector({
+            id: "vue-i18n-resource-inspector",
+            label: VueDevToolsLabels[
+              "vue-i18n-resource-inspector"
+              /* CUSTOM_INSPECTOR */
+            ],
+            icon: "language",
+            treeFilterPlaceholder: VueDevToolsPlaceholders[
+              "vue-i18n-resource-inspector"
+              /* CUSTOM_INSPECTOR */
+            ]
+          });
+          api.on.getInspectorTree((payload) => {
+            if (payload.app === app && payload.inspectorId === "vue-i18n-resource-inspector") {
+              registerScope(payload, i18n2);
+            }
+          });
+          api.on.getInspectorState((payload) => {
+            if (payload.app === app && payload.inspectorId === "vue-i18n-resource-inspector") {
+              inspectScope(payload, i18n2);
+            }
+          });
+          api.on.editInspectorState((payload) => {
+            if (payload.app === app && payload.inspectorId === "vue-i18n-resource-inspector") {
+              editScope(payload, i18n2);
+            }
+          });
+          api.addTimelineLayer({
+            id: "vue-i18n-timeline",
+            label: VueDevToolsLabels[
+              "vue-i18n-timeline"
+              /* TIMELINE */
+            ],
+            color: VueDevToolsTimelineColors[
+              "vue-i18n-timeline"
+              /* TIMELINE */
+            ]
+          });
+          resolve(true);
+        });
+      } catch (e) {
+        console.error(e);
+        reject(false);
+      }
+    });
+  }
+  function updateComponentTreeTags(instance, treeNode, i18n2) {
+    const global2 = i18n2.mode === "composition" ? i18n2.global : i18n2.global.__composer;
+    if (instance && instance.vnode.el.__VUE_I18N__) {
+      if (instance.vnode.el.__VUE_I18N__ !== global2) {
+        const label = instance.type.name || instance.type.displayName || instance.type.__file;
+        const tag = {
+          label: `i18n (${label} Scope)`,
+          textColor: 0,
+          backgroundColor: 16764185
+        };
+        treeNode.tags.push(tag);
+      }
+    }
+  }
+  function inspectComposer(instanceData, composer) {
+    const type = VUE_I18N_COMPONENT_TYPES;
+    instanceData.state.push({
+      type,
+      key: "locale",
+      editable: true,
+      value: composer.locale.value
+    });
+    instanceData.state.push({
+      type,
+      key: "availableLocales",
+      editable: false,
+      value: composer.availableLocales
+    });
+    instanceData.state.push({
+      type,
+      key: "fallbackLocale",
+      editable: true,
+      value: composer.fallbackLocale.value
+    });
+    instanceData.state.push({
+      type,
+      key: "inheritLocale",
+      editable: true,
+      value: composer.inheritLocale
+    });
+    instanceData.state.push({
+      type,
+      key: "messages",
+      editable: false,
+      value: getLocaleMessageValue(composer.messages.value)
+    });
+    instanceData.state.push({
+      type,
+      key: "datetimeFormats",
+      editable: false,
+      value: composer.datetimeFormats.value
+    });
+    instanceData.state.push({
+      type,
+      key: "numberFormats",
+      editable: false,
+      value: composer.numberFormats.value
+    });
+  }
+  function getLocaleMessageValue(messages) {
+    const value = {};
+    Object.keys(messages).forEach((key) => {
+      const v = messages[key];
+      if (isFunction(v) && "source" in v) {
+        value[key] = getMessageFunctionDetails(v);
+      } else if (isObject$1(v)) {
+        value[key] = getLocaleMessageValue(v);
+      } else {
+        value[key] = v;
+      }
+    });
+    return value;
+  }
+  const ESC = {
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "&": "&amp;"
+  };
+  function escape(s) {
+    return s.replace(/[<>"&]/g, escapeChar);
+  }
+  function escapeChar(a) {
+    return ESC[a] || a;
+  }
+  function getMessageFunctionDetails(func) {
+    const argString = func.source ? `("${escape(func.source)}")` : `(?)`;
+    return {
+      _custom: {
+        type: "function",
+        display: `<span>ƒ</span> ${argString}`
+      }
+    };
+  }
+  function registerScope(payload, i18n2) {
+    payload.rootNodes.push({
+      id: "global",
+      label: "Global Scope"
+    });
+    const global2 = i18n2.mode === "composition" ? i18n2.global : i18n2.global.__composer;
+    for (const [keyInstance, instance] of i18n2.__instances) {
+      const composer = i18n2.mode === "composition" ? instance : instance.__composer;
+      if (global2 === composer) {
+        continue;
+      }
+      const label = keyInstance.type.name || keyInstance.type.displayName || keyInstance.type.__file;
+      payload.rootNodes.push({
+        id: composer.id.toString(),
+        label: `${label} Scope`
+      });
+    }
+  }
+  function getComposer$1(nodeId, i18n2) {
+    if (nodeId === "global") {
+      return i18n2.mode === "composition" ? i18n2.global : i18n2.global.__composer;
+    } else {
+      const instance = Array.from(i18n2.__instances.values()).find((item) => item.id.toString() === nodeId);
+      if (instance) {
+        return i18n2.mode === "composition" ? instance : instance.__composer;
+      } else {
+        return null;
+      }
+    }
+  }
+  function inspectScope(payload, i18n2) {
+    const composer = getComposer$1(payload.nodeId, i18n2);
+    if (composer) {
+      payload.state = makeScopeInspectState(composer);
+    }
+  }
+  function makeScopeInspectState(composer) {
+    const state = {};
+    const localeType = "Locale related info";
+    const localeStates = [
+      {
+        type: localeType,
+        key: "locale",
+        editable: true,
+        value: composer.locale.value
+      },
+      {
+        type: localeType,
+        key: "fallbackLocale",
+        editable: true,
+        value: composer.fallbackLocale.value
+      },
+      {
+        type: localeType,
+        key: "availableLocales",
+        editable: false,
+        value: composer.availableLocales
+      },
+      {
+        type: localeType,
+        key: "inheritLocale",
+        editable: true,
+        value: composer.inheritLocale
+      }
+    ];
+    state[localeType] = localeStates;
+    const localeMessagesType = "Locale messages info";
+    const localeMessagesStates = [
+      {
+        type: localeMessagesType,
+        key: "messages",
+        editable: false,
+        value: getLocaleMessageValue(composer.messages.value)
+      }
+    ];
+    state[localeMessagesType] = localeMessagesStates;
+    const datetimeFormatsType = "Datetime formats info";
+    const datetimeFormatsStates = [
+      {
+        type: datetimeFormatsType,
+        key: "datetimeFormats",
+        editable: false,
+        value: composer.datetimeFormats.value
+      }
+    ];
+    state[datetimeFormatsType] = datetimeFormatsStates;
+    const numberFormatsType = "Datetime formats info";
+    const numberFormatsStates = [
+      {
+        type: numberFormatsType,
+        key: "numberFormats",
+        editable: false,
+        value: composer.numberFormats.value
+      }
+    ];
+    state[numberFormatsType] = numberFormatsStates;
+    return state;
+  }
+  function addTimelineEvent(event, payload) {
+    if (devtoolsApi) {
+      let groupId;
+      if (payload && "groupId" in payload) {
+        groupId = payload.groupId;
+        delete payload.groupId;
+      }
+      devtoolsApi.addTimelineEvent({
+        layerId: "vue-i18n-timeline",
+        event: {
+          title: event,
+          groupId,
+          time: Date.now(),
+          meta: {},
+          data: payload || {},
+          logType: event === "compile-error" ? "error" : event === "fallback" || event === "missing" ? "warning" : "default"
+        }
+      });
+    }
+  }
+  function editScope(payload, i18n2) {
+    const composer = getComposer$1(payload.nodeId, i18n2);
+    if (composer) {
+      const [field] = payload.path;
+      if (field === "locale" && isString(payload.state.value)) {
+        composer.locale.value = payload.state.value;
+      } else if (field === "fallbackLocale" && (isString(payload.state.value) || isArray(payload.state.value) || isObject$1(payload.state.value))) {
+        composer.fallbackLocale.value = payload.state.value;
+      } else if (field === "inheritLocale" && isBoolean(payload.state.value)) {
+        composer.inheritLocale = payload.state.value;
+      }
+    }
+  }
+  function defineMixin(vuei18n, composer, i18n2) {
+    return {
+      beforeCreate() {
+        const instance = vue.getCurrentInstance();
+        if (!instance) {
+          throw createI18nError(
+            22
+            /* UNEXPECTED_ERROR */
+          );
+        }
+        const options = this.$options;
+        if (options.i18n) {
+          const optionsI18n = options.i18n;
+          if (options.__i18n) {
+            optionsI18n.__i18n = options.__i18n;
+          }
+          optionsI18n.__root = composer;
+          if (this === this.$root) {
+            this.$i18n = mergeToRoot(vuei18n, optionsI18n);
+          } else {
+            optionsI18n.__injectWithOption = true;
+            this.$i18n = createVueI18n(optionsI18n);
+          }
+        } else if (options.__i18n) {
+          if (this === this.$root) {
+            this.$i18n = mergeToRoot(vuei18n, options);
+          } else {
+            this.$i18n = createVueI18n({
+              __i18n: options.__i18n,
+              __injectWithOption: true,
+              __root: composer
+            });
+          }
+        } else {
+          this.$i18n = vuei18n;
+        }
+        vuei18n.__onComponentInstanceCreated(this.$i18n);
+        i18n2.__setInstance(instance, this.$i18n);
+        this.$t = (...args) => this.$i18n.t(...args);
+        this.$rt = (...args) => this.$i18n.rt(...args);
+        this.$tc = (...args) => this.$i18n.tc(...args);
+        this.$te = (key, locale) => this.$i18n.te(key, locale);
+        this.$d = (...args) => this.$i18n.d(...args);
+        this.$n = (...args) => this.$i18n.n(...args);
+        this.$tm = (key) => this.$i18n.tm(key);
+      },
+      mounted() {
+        {
+          this.$el.__VUE_I18N__ = this.$i18n.__composer;
+          const emitter = this.__v_emitter = createEmitter();
+          const _vueI18n = this.$i18n;
+          _vueI18n.__enableEmitter && _vueI18n.__enableEmitter(emitter);
+          emitter.on("*", addTimelineEvent);
+        }
+      },
+      beforeUnmount() {
+        const instance = vue.getCurrentInstance();
+        if (!instance) {
+          throw createI18nError(
+            22
+            /* UNEXPECTED_ERROR */
+          );
+        }
+        {
+          if (this.__v_emitter) {
+            this.__v_emitter.off("*", addTimelineEvent);
+            delete this.__v_emitter;
+          }
+          const _vueI18n = this.$i18n;
+          _vueI18n.__disableEmitter && _vueI18n.__disableEmitter();
+          delete this.$el.__VUE_I18N__;
+        }
+        delete this.$t;
+        delete this.$rt;
+        delete this.$tc;
+        delete this.$te;
+        delete this.$d;
+        delete this.$n;
+        delete this.$tm;
+        i18n2.__deleteInstance(instance);
+        delete this.$i18n;
+      }
+    };
+  }
+  function mergeToRoot(root, options) {
+    root.locale = options.locale || root.locale;
+    root.fallbackLocale = options.fallbackLocale || root.fallbackLocale;
+    root.missing = options.missing || root.missing;
+    root.silentTranslationWarn = options.silentTranslationWarn || root.silentFallbackWarn;
+    root.silentFallbackWarn = options.silentFallbackWarn || root.silentFallbackWarn;
+    root.formatFallbackMessages = options.formatFallbackMessages || root.formatFallbackMessages;
+    root.postTranslation = options.postTranslation || root.postTranslation;
+    root.warnHtmlInMessage = options.warnHtmlInMessage || root.warnHtmlInMessage;
+    root.escapeParameterHtml = options.escapeParameterHtml || root.escapeParameterHtml;
+    root.sync = options.sync || root.sync;
+    root.__composer[SetPluralRulesSymbol](options.pluralizationRules || root.pluralizationRules);
+    const messages = getLocaleMessages(root.locale, {
+      messages: options.messages,
+      __i18n: options.__i18n
+    });
+    Object.keys(messages).forEach((locale) => root.mergeLocaleMessage(locale, messages[locale]));
+    if (options.datetimeFormats) {
+      Object.keys(options.datetimeFormats).forEach((locale) => root.mergeDateTimeFormat(locale, options.datetimeFormats[locale]));
+    }
+    if (options.numberFormats) {
+      Object.keys(options.numberFormats).forEach((locale) => root.mergeNumberFormat(locale, options.numberFormats[locale]));
+    }
+    return root;
+  }
+  function createI18n(options = {}) {
+    const __legacyMode = isBoolean(options.legacy) ? options.legacy : true;
+    const __globalInjection = !!options.globalInjection;
+    const __instances = /* @__PURE__ */ new Map();
+    const __global = __legacyMode ? createVueI18n(options) : createComposer(options);
+    const symbol = makeSymbol("vue-i18n");
+    const i18n2 = {
+      // mode
+      get mode() {
+        return __legacyMode ? "legacy" : "composition";
+      },
+      // install plugin
+      async install(app, ...options2) {
+        {
+          app.__VUE_I18N__ = i18n2;
+        }
+        app.__VUE_I18N_SYMBOL__ = symbol;
+        app.provide(app.__VUE_I18N_SYMBOL__, i18n2);
+        if (!__legacyMode && __globalInjection) {
+          injectGlobalFields(app, i18n2.global);
+        }
+        {
+          apply(app, i18n2, ...options2);
+        }
+        if (__legacyMode) {
+          app.mixin(defineMixin(__global, __global.__composer, i18n2));
+        }
+        {
+          const ret = await enableDevTools(app, i18n2);
+          if (!ret) {
+            throw createI18nError(
+              21
+              /* CANNOT_SETUP_VUE_DEVTOOLS_PLUGIN */
+            );
+          }
+          const emitter = createEmitter();
+          if (__legacyMode) {
+            const _vueI18n = __global;
+            _vueI18n.__enableEmitter && _vueI18n.__enableEmitter(emitter);
+          } else {
+            const _composer = __global;
+            _composer[EnableEmitter] && _composer[EnableEmitter](emitter);
+          }
+          emitter.on("*", addTimelineEvent);
+        }
+      },
+      // global accessor
+      get global() {
+        return __global;
+      },
+      // @internal
+      __instances,
+      // @internal
+      __getInstance(component) {
+        return __instances.get(component) || null;
+      },
+      // @internal
+      __setInstance(component, instance) {
+        __instances.set(component, instance);
+      },
+      // @internal
+      __deleteInstance(component) {
+        __instances.delete(component);
+      }
+    };
+    return i18n2;
+  }
+  function useI18n(options = {}) {
+    const instance = vue.getCurrentInstance();
+    if (instance == null) {
+      throw createI18nError(
+        16
+        /* MUST_BE_CALL_SETUP_TOP */
+      );
+    }
+    if (!instance.appContext.app.__VUE_I18N_SYMBOL__) {
+      throw createI18nError(
+        17
+        /* NOT_INSLALLED */
+      );
+    }
+    const i18n2 = vue.inject(instance.appContext.app.__VUE_I18N_SYMBOL__);
+    if (!i18n2) {
+      throw createI18nError(
+        22
+        /* UNEXPECTED_ERROR */
+      );
+    }
+    const global2 = i18n2.mode === "composition" ? i18n2.global : i18n2.global.__composer;
+    const scope = isEmptyObject(options) ? "__i18n" in instance.type ? "local" : "global" : !options.useScope ? "local" : options.useScope;
+    if (scope === "global") {
+      let messages = isObject$1(options.messages) ? options.messages : {};
+      if ("__i18nGlobal" in instance.type) {
+        messages = getLocaleMessages(global2.locale.value, {
+          messages,
+          __i18n: instance.type.__i18nGlobal
+        });
+      }
+      const locales = Object.keys(messages);
+      if (locales.length) {
+        locales.forEach((locale) => {
+          global2.mergeLocaleMessage(locale, messages[locale]);
+        });
+      }
+      if (isObject$1(options.datetimeFormats)) {
+        const locales2 = Object.keys(options.datetimeFormats);
+        if (locales2.length) {
+          locales2.forEach((locale) => {
+            global2.mergeDateTimeFormat(locale, options.datetimeFormats[locale]);
+          });
+        }
+      }
+      if (isObject$1(options.numberFormats)) {
+        const locales2 = Object.keys(options.numberFormats);
+        if (locales2.length) {
+          locales2.forEach((locale) => {
+            global2.mergeNumberFormat(locale, options.numberFormats[locale]);
+          });
+        }
+      }
+      return global2;
+    }
+    if (scope === "parent") {
+      let composer2 = getComposer(i18n2, instance, options.__useComponent);
+      if (composer2 == null) {
+        {
+          warn(getWarnMessage(
+            12
+            /* NOT_FOUND_PARENT_SCOPE */
+          ));
+        }
+        composer2 = global2;
+      }
+      return composer2;
+    }
+    if (i18n2.mode === "legacy") {
+      throw createI18nError(
+        18
+        /* NOT_AVAILABLE_IN_LEGACY_MODE */
+      );
+    }
+    const i18nInternal = i18n2;
+    let composer = i18nInternal.__getInstance(instance);
+    if (composer == null) {
+      const type = instance.type;
+      const composerOptions = assign$2({}, options);
+      if (type.__i18n) {
+        composerOptions.__i18n = type.__i18n;
+      }
+      if (global2) {
+        composerOptions.__root = global2;
+      }
+      composer = createComposer(composerOptions);
+      setupLifeCycle(i18nInternal, instance, composer);
+      i18nInternal.__setInstance(instance, composer);
+    }
+    return composer;
+  }
+  function getComposer(i18n2, target, useComponent = false) {
+    let composer = null;
+    const root = target.root;
+    let current = target.parent;
+    while (current != null) {
+      const i18nInternal = i18n2;
+      if (i18n2.mode === "composition") {
+        composer = i18nInternal.__getInstance(current);
+      } else {
+        const vueI18n = i18nInternal.__getInstance(current);
+        if (vueI18n != null) {
+          composer = vueI18n.__composer;
+        }
+        if (useComponent && composer && !composer[InejctWithOption]) {
+          composer = null;
+        }
+      }
+      if (composer != null) {
+        break;
+      }
+      if (root === current) {
+        break;
+      }
+      current = current.parent;
+    }
+    return composer;
+  }
+  function setupLifeCycle(i18n2, target, composer) {
+    let emitter = null;
+    vue.onMounted(() => {
+      if (target.vnode.el) {
+        target.vnode.el.__VUE_I18N__ = composer;
+        emitter = createEmitter();
+        const _composer = composer;
+        _composer[EnableEmitter] && _composer[EnableEmitter](emitter);
+        emitter.on("*", addTimelineEvent);
+      }
+    }, target);
+    vue.onUnmounted(() => {
+      if (target.vnode.el && target.vnode.el.__VUE_I18N__) {
+        emitter && emitter.off("*", addTimelineEvent);
+        const _composer = composer;
+        _composer[DisableEmitter] && _composer[DisableEmitter]();
+        delete target.vnode.el.__VUE_I18N__;
+      }
+      i18n2.__deleteInstance(target);
+    }, target);
+  }
+  const globalExportProps = [
+    "locale",
+    "fallbackLocale",
+    "availableLocales"
+  ];
+  const globalExportMethods = ["t", "rt", "d", "n", "tm"];
+  function injectGlobalFields(app, composer) {
+    const i18n2 = /* @__PURE__ */ Object.create(null);
+    globalExportProps.forEach((prop) => {
+      const desc = Object.getOwnPropertyDescriptor(composer, prop);
+      if (!desc) {
+        throw createI18nError(
+          22
+          /* UNEXPECTED_ERROR */
+        );
+      }
+      const wrap = vue.isRef(desc.value) ? {
+        get() {
+          return desc.value.value;
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        set(val) {
+          desc.value.value = val;
+        }
+      } : {
+        get() {
+          return desc.get && desc.get();
+        }
+      };
+      Object.defineProperty(i18n2, prop, wrap);
+    });
+    app.config.globalProperties.$i18n = i18n2;
+    globalExportMethods.forEach((method) => {
+      const desc = Object.getOwnPropertyDescriptor(composer, method);
+      if (!desc || !desc.value) {
+        throw createI18nError(
+          22
+          /* UNEXPECTED_ERROR */
+        );
+      }
+      Object.defineProperty(app.config.globalProperties, `$${method}`, desc);
+    });
+  }
+  {
+    initFeatureFlags();
+  }
+  {
+    const target = getGlobalThis();
+    target.__INTLIFY__ = true;
+    setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
+  }
   const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -309,6 +3820,7 @@ if (uni.restoreGlobal) {
     emits: ["close", "select", "filter", "loadMore"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
+      const { t } = useI18n();
       const props = __props;
       const emit = __emit;
       const isFilterExpanded = vue.ref(false);
@@ -321,11 +3833,11 @@ if (uni.restoreGlobal) {
         endDate: ""
       });
       const onScrollToLower = () => {
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:109", "Cuộn xuống đáy -> Load more");
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:110", "Cuộn xuống đáy -> Load more");
         emit("loadMore");
       };
       const managerDisplayOptions = vue.computed(() => {
-        const defaultOption = "Thành viên quản lý";
+        const defaultOption = t("customer_modal.manager_default");
         const list = props.managers || [];
         const memberNames = list.map((m) => m.UserName || "Thành viên ẩn danh");
         return [defaultOption, ...memberNames];
@@ -353,7 +3865,7 @@ if (uni.restoreGlobal) {
         filter.startDate = "";
         filter.endDate = "";
         applyFilter();
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:146", "Đã đặt lại bộ lọc");
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:147", "Đã đặt lại bộ lọc");
       };
       const applyFilter = () => {
         emit("filter", {
@@ -378,7 +3890,7 @@ if (uni.restoreGlobal) {
         const date = new Date(timestamp);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       };
-      const __returned__ = { props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
+      const __returned__ = { t, props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -395,7 +3907,13 @@ if (uni.restoreGlobal) {
         }, ["stop"]))
       }, [
         vue.createElementVNode("view", { class: "modal-header" }, [
-          vue.createElementVNode("text", { class: "modal-title" }, "Chọn khách hàng"),
+          vue.createElementVNode(
+            "text",
+            { class: "modal-title" },
+            vue.toDisplayString(_ctx.$t("customer_modal.title")),
+            1
+            /* TEXT */
+          ),
           vue.createElementVNode("view", { class: "header-actions" }, [
             vue.createElementVNode(
               "view",
@@ -423,35 +3941,23 @@ if (uni.restoreGlobal) {
           class: "filter-section"
         }, [
           vue.createElementVNode("view", { class: "f-item" }, [
-            vue.withDirectives(vue.createElementVNode(
-              "input",
-              {
-                class: "f-input",
-                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.name = $event),
-                placeholder: "Nhập tên khách hàng",
-                "placeholder-class": "ph-style"
-              },
-              null,
-              512
-              /* NEED_PATCH */
-            ), [
+            vue.withDirectives(vue.createElementVNode("input", {
+              class: "f-input",
+              "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.filter.name = $event),
+              placeholder: _ctx.$t("customer_modal.placeholder_name"),
+              "placeholder-class": "ph-style"
+            }, null, 8, ["placeholder"]), [
               [vue.vModelText, $setup.filter.name]
             ])
           ]),
           vue.createElementVNode("view", { class: "f-item" }, [
-            vue.withDirectives(vue.createElementVNode(
-              "input",
-              {
-                class: "f-input",
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.phone = $event),
-                type: "number",
-                placeholder: "Nhập số điện thoại",
-                "placeholder-class": "ph-style"
-              },
-              null,
-              512
-              /* NEED_PATCH */
-            ), [
+            vue.withDirectives(vue.createElementVNode("input", {
+              class: "f-input",
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.filter.phone = $event),
+              type: "number",
+              placeholder: _ctx.$t("customer_modal.placeholder_phone"),
+              "placeholder-class": "ph-style"
+            }, null, 8, ["placeholder"]), [
               [vue.vModelText, $setup.filter.phone]
             ])
           ]),
@@ -485,20 +3991,38 @@ if (uni.restoreGlobal) {
             }, null, 8, ["startDate", "endDate"])
           ]),
           vue.createElementVNode("view", { class: "f-actions" }, [
-            vue.createElementVNode("button", {
-              class: "btn-reset",
-              onClick: $setup.resetFilter
-            }, "Đặt lại"),
-            vue.createElementVNode("button", {
-              class: "btn-submit",
-              onClick: $setup.applyFilter
-            }, "Lọc")
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-reset",
+                onClick: $setup.resetFilter
+              },
+              vue.toDisplayString(_ctx.$t("common.reset")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-submit",
+                onClick: $setup.applyFilter
+              },
+              vue.toDisplayString(_ctx.$t("common.filter")),
+              1
+              /* TEXT */
+            )
           ])
         ])) : vue.createCommentVNode("v-if", true),
-        $props.loading ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 1,
-          class: "loading-state"
-        }, "Đang tải dữ liệu...")) : (vue.openBlock(), vue.createElementBlock(
+        $props.loading ? (vue.openBlock(), vue.createElementBlock(
+          "view",
+          {
+            key: 1,
+            class: "loading-state"
+          },
+          vue.toDisplayString(_ctx.$t("common.loading")),
+          1
+          /* TEXT */
+        )) : (vue.openBlock(), vue.createElementBlock(
           "scroll-view",
           {
             key: 2,
@@ -526,14 +4050,14 @@ if (uni.restoreGlobal) {
                     vue.createElementVNode(
                       "text",
                       { class: "name-text" },
-                      vue.toDisplayString(item.name || "(Không tên)"),
+                      vue.toDisplayString(item.name || _ctx.$t("customer_modal.no_name")),
                       1
                       /* TEXT */
                     ),
                     vue.createElementVNode(
                       "text",
                       { class: "phone-text" },
-                      vue.toDisplayString(item.phone || "Không có SĐT"),
+                      vue.toDisplayString(item.phone || _ctx.$t("customer_modal.no_phone")),
                       1
                       /* TEXT */
                     )
@@ -556,12 +4080,24 @@ if (uni.restoreGlobal) {
               key: 0,
               class: "loading-more-container"
             }, [
-              vue.createElementVNode("text", { class: "loading-more-text" }, "Đang tải thêm...")
+              vue.createElementVNode(
+                "text",
+                { class: "loading-more-text" },
+                vue.toDisplayString(_ctx.$t("customer_modal.loading_more")),
+                1
+                /* TEXT */
+              )
             ])) : vue.createCommentVNode("v-if", true),
-            $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 1,
-              class: "empty-state"
-            }, "Không có dữ liệu")) : vue.createCommentVNode("v-if", true)
+            $props.customers.length === 0 ? (vue.openBlock(), vue.createElementBlock(
+              "view",
+              {
+                key: 1,
+                class: "empty-state"
+              },
+              vue.toDisplayString(_ctx.$t("common.no_data")),
+              1
+              /* TEXT */
+            )) : vue.createCommentVNode("v-if", true)
           ],
           32
           /* NEED_HYDRATION */
@@ -2035,8 +5571,8 @@ This will fail in production.`);
         if (currentInstance && currentInstance.proxy && // avoid adding stores that are just built for hot module replacement
         !hot) {
           const vm = currentInstance.proxy;
-          const cache = "_pStores" in vm ? vm._pStores : vm._pStores = {};
-          cache[id] = store;
+          const cache2 = "_pStores" in vm ? vm._pStores : vm._pStores = {};
+          cache2[id] = store;
         }
       }
       return store;
@@ -2860,6 +6396,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useListTodoController = () => {
+    const { t } = useI18n();
     const todos = vue.ref([]);
     const {
       pageNo,
@@ -2878,15 +6415,32 @@ This will fail in production if not fixed.`);
     const selectedCustomerName = vue.ref("");
     const isConfirmDeleteOpen = vue.ref(false);
     const itemToDelete = vue.ref(null);
-    const statusOptions = ["Tất cả", STATUS_LABELS[TODO_STATUS.NEW], STATUS_LABELS[TODO_STATUS.IN_PROGRESS], STATUS_LABELS[TODO_STATUS.DONE]];
+    const statusOptions = vue.computed(() => [
+      t("common.all"),
+      STATUS_LABELS[TODO_STATUS.NEW],
+      STATUS_LABELS[TODO_STATUS.IN_PROGRESS],
+      STATUS_LABELS[TODO_STATUS.DONE]
+    ]);
     const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
     const statusIndex = vue.ref(0);
     const rawMemberList = vue.ref([]);
-    const creatorOptions = vue.ref(["Tất cả"]);
+    const creatorOptions = vue.computed(() => {
+      const names = rawMemberList.value.map((m) => m.UserName || "Thành viên ẩn");
+      return [t("common.all"), ...names];
+    });
     const creatorIndex = vue.ref(0);
-    const assigneeOptions = vue.ref(["Tất cả"]);
+    const assigneeOptions = vue.computed(() => {
+      const names = rawMemberList.value.map((m) => m.UserName || "Thành viên ẩn");
+      return [t("common.all"), ...names];
+    });
     const assigneeIndex = vue.ref(0);
-    const sourceOptions = ["Tất cả", "Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
+    const sourceOptions = vue.computed(() => [
+      t("common.all"),
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation"),
+      t("source.message")
+    ]);
     const sourceValues = ["", TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
     const sourceIndex = vue.ref(0);
     const filter = vue.ref({
@@ -2910,7 +6464,7 @@ This will fail in production if not fixed.`);
         creatorOptions.value = ["Tất cả", ...names];
         assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:61", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:80", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const {
@@ -2958,7 +6512,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:115", error);
+        formatAppLog("error", "at controllers/list_todo.ts:134", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -3030,8 +6584,8 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:194", error);
-        showError("Lỗi tải dữ liệu");
+        formatAppLog("error", "at controllers/list_todo.ts:213", error);
+        showError(t("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
         }
@@ -3041,7 +6595,7 @@ This will fail in production if not fixed.`);
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/list_todo.ts:205", "Đang làm mới trang...");
+      formatAppLog("log", "at controllers/list_todo.ts:224", "Đang làm mới trang...");
       resetPage();
       getTodoList();
     });
@@ -3050,18 +6604,18 @@ This will fail in production if not fixed.`);
         return;
       try {
         await deleteTodo(itemToDelete.value.id);
-        showSuccess("Đã xóa thành công");
+        showSuccess(t("common.success_delete"));
         isConfirmDeleteOpen.value = false;
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:218", "Delete Error:", error);
-        showError("Xóa thất bại");
+        formatAppLog("error", "at controllers/list_todo.ts:237", "Delete Error:", error);
+        showError(t("common.fail_delete"));
       }
     };
     const showActionMenu = (item) => {
       uni.showActionSheet({
-        itemList: ["Xóa"],
+        itemList: [t("common.delete")],
         itemColor: "#ff3b30",
         success: (res) => {
           if (res.tapIndex === 0)
@@ -3641,7 +7195,13 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "header" }, [
         vue.createElementVNode("view", { class: "header-left" }),
-        vue.createElementVNode("text", { class: "header-title" }, "Công việc"),
+        vue.createElementVNode(
+          "text",
+          { class: "header-title" },
+          vue.toDisplayString(_ctx.$t("todo.page_title")),
+          1
+          /* TEXT */
+        ),
         vue.createElementVNode("view", {
           class: "header-right",
           onClick: _cache[0] || (_cache[0] = (...args) => $setup.openFilter && $setup.openFilter(...args))
@@ -3658,7 +7218,13 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-state"
           }, [
-            vue.createElementVNode("text", null, "Đang tải dữ liệu...")
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString(_ctx.$t("common.loading")),
+              1
+              /* TEXT */
+            )
           ])) : $setup.todos.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-state"
@@ -3668,7 +7234,13 @@ This will fail in production if not fixed.`);
               mode: "aspectFit",
               class: "empty-icon"
             }),
-            vue.createElementVNode("text", { class: "empty-text" }, "Chưa có dữ liệu")
+            vue.createElementVNode(
+              "text",
+              { class: "empty-text" },
+              vue.toDisplayString(_ctx.$t("common.no_data")),
+              1
+              /* TEXT */
+            )
           ])) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
             key: 2,
             "scroll-y": "true",
@@ -3716,7 +7288,7 @@ This will fail in production if not fixed.`);
                       vue.createElementVNode(
                         "text",
                         { class: "card-date" },
-                        "Tạo: " + vue.toDisplayString(item.createdAtFormatted),
+                        vue.toDisplayString(_ctx.$t("todo.created_at")) + ": " + vue.toDisplayString(item.createdAtFormatted),
                         1
                         /* TEXT */
                       )
@@ -3732,7 +7304,7 @@ This will fail in production if not fixed.`);
                       vue.createElementVNode(
                         "text",
                         { class: "card-date text-danger" },
-                        "Hết hạn: " + vue.toDisplayString(item.dueDateFormatted),
+                        vue.toDisplayString(_ctx.$t("todo.expired_at")) + ": " + vue.toDisplayString(item.dueDateFormatted),
                         1
                         /* TEXT */
                       )
@@ -3748,7 +7320,7 @@ This will fail in production if not fixed.`);
                       vue.createElementVNode(
                         "text",
                         { class: "card-date text-primary" },
-                        "Thông báo: " + vue.toDisplayString(item.notifyAtFormatted),
+                        vue.toDisplayString(_ctx.$t("todo.notify_at")) + ": " + vue.toDisplayString(item.notifyAtFormatted),
                         1
                         /* TEXT */
                       )
@@ -3788,7 +7360,13 @@ This will fail in production if not fixed.`);
               onClick: _cache[1] || (_cache[1] = (...args) => $setup.addNewTask && $setup.addNewTask(...args))
             }, [
               vue.createElementVNode("text", { class: "plus-icon" }, "+"),
-              vue.createElementVNode("text", { class: "add-text" }, "Thêm công việc")
+              vue.createElementVNode(
+                "text",
+                { class: "add-text" },
+                vue.toDisplayString(_ctx.$t("todo.add_task")),
+                1
+                /* TEXT */
+              )
             ])
           ]),
           _: 1
@@ -3806,7 +7384,13 @@ This will fail in production if not fixed.`);
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
-            vue.createElementVNode("text", { class: "filter-title" }, "Bộ lọc tìm kiếm"),
+            vue.createElementVNode(
+              "text",
+              { class: "filter-title" },
+              vue.toDisplayString(_ctx.$t("todo.filter_title")),
+              1
+              /* TEXT */
+            ),
             vue.createElementVNode("text", {
               class: "close-btn",
               onClick: _cache[2] || (_cache[2] = (...args) => $setup.closeFilter && $setup.closeFilter(...args))
@@ -3817,39 +7401,45 @@ This will fail in production if not fixed.`);
             class: "filter-body"
           }, [
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Tiêu đề / Từ khóa"),
-              vue.withDirectives(vue.createElementVNode(
-                "input",
-                {
-                  class: "f-input",
-                  "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.filter.title = $event),
-                  placeholder: "Nhập từ khóa..."
-                },
-                null,
-                512
-                /* NEED_PATCH */
-              ), [
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.search_label")),
+                1
+                /* TEXT */
+              ),
+              vue.withDirectives(vue.createElementVNode("input", {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.filter.title = $event),
+                placeholder: _ctx.$t("todo.search_placeholder")
+              }, null, 8, ["placeholder"]), [
                 [vue.vModelText, $setup.filter.title]
               ])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Mã công việc"),
-              vue.withDirectives(vue.createElementVNode(
-                "input",
-                {
-                  class: "f-input",
-                  "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.jobCode = $event),
-                  placeholder: "Ví dụ: TODO-08"
-                },
-                null,
-                512
-                /* NEED_PATCH */
-              ), [
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.code_prefix")),
+                1
+                /* TEXT */
+              ),
+              vue.withDirectives(vue.createElementVNode("input", {
+                class: "f-input",
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.jobCode = $event),
+                placeholder: _ctx.$t("todo.job_code_placeholder")
+              }, null, 8, ["placeholder"]), [
                 [vue.vModelText, $setup.filter.jobCode]
               ])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Trạng thái"),
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.status")),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("picker", {
                 mode: "selector",
                 range: $setup.statusOptions,
@@ -3867,7 +7457,13 @@ This will fail in production if not fixed.`);
               ], 40, ["range", "value"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Người tạo"),
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.creator")),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("picker", {
                 mode: "selector",
                 range: $setup.creatorOptions,
@@ -3885,7 +7481,13 @@ This will fail in production if not fixed.`);
               ], 40, ["range", "value"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Khách hàng"),
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.customer")),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("view", {
                 class: "f-input",
                 onClick: _cache[7] || (_cache[7] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
@@ -3896,7 +7498,7 @@ This will fail in production if not fixed.`);
                   {
                     style: vue.normalizeStyle({ color: $setup.selectedCustomerName ? "#333" : "#999" })
                   },
-                  vue.toDisplayString($setup.selectedCustomerName || "Chọn khách hàng"),
+                  vue.toDisplayString($setup.selectedCustomerName || _ctx.$t("todo.select_customer")),
                   5
                   /* TEXT, STYLE */
                 ),
@@ -3904,7 +7506,13 @@ This will fail in production if not fixed.`);
               ])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Người được giao"),
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.assignee")),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("picker", {
                 mode: "selector",
                 range: $setup.assigneeOptions,
@@ -3922,7 +7530,13 @@ This will fail in production if not fixed.`);
               ], 40, ["range", "value"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
-              vue.createElementVNode("text", { class: "f-label" }, "Nguồn"),
+              vue.createElementVNode(
+                "text",
+                { class: "f-label" },
+                vue.toDisplayString(_ctx.$t("todo.source")),
+                1
+                /* TEXT */
+              ),
               vue.createElementVNode("picker", {
                 mode: "selector",
                 range: $setup.sourceOptions,
@@ -3940,41 +7554,41 @@ This will fail in production if not fixed.`);
               ], 40, ["range", "value"])
             ]),
             vue.createVNode($setup["DateRangeFilter"], {
-              title: "Thời gian tạo",
+              title: _ctx.$t("todo.time_create"),
               startDate: $setup.filter.createdFrom,
               "onUpdate:startDate": _cache[10] || (_cache[10] = ($event) => $setup.filter.createdFrom = $event),
               endDate: $setup.filter.createdTo,
               "onUpdate:endDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.createdTo = $event)
-            }, null, 8, ["startDate", "endDate"]),
+            }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
-              title: "Thời gian hết hạn",
+              title: _ctx.$t("todo.time_expired"),
               startDate: $setup.filter.dueDateFrom,
               "onUpdate:startDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.dueDateFrom = $event),
               endDate: $setup.filter.dueDateTo,
               "onUpdate:endDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.dueDateTo = $event)
-            }, null, 8, ["startDate", "endDate"]),
+            }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
-              title: "Thời gian thông báo",
+              title: _ctx.$t("todo.time_notify"),
               startDate: $setup.filter.notifyFrom,
               "onUpdate:startDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.notifyFrom = $event),
               endDate: $setup.filter.notifyTo,
               "onUpdate:endDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.notifyTo = $event)
-            }, null, 8, ["startDate", "endDate"]),
+            }, null, 8, ["title", "startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
           vue.createElementVNode("view", { class: "filter-footer" }, [
             vue.createVNode($setup["AppButton"], {
               type: "secondary",
-              label: "Đặt lại",
+              label: _ctx.$t("common.reset"),
               class: "btn-filter-reset",
               onClick: $setup.resetFilter
-            }, null, 8, ["onClick"]),
+            }, null, 8, ["label", "onClick"]),
             vue.createVNode($setup["AppButton"], {
               type: "primary",
-              label: "Áp dụng",
+              label: _ctx.$t("common.apply"),
               class: "btn-filter-apply",
               onClick: $setup.applyFilter
-            }, null, 8, ["onClick"])
+            }, null, 8, ["label", "onClick"])
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
@@ -3992,12 +7606,12 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
         "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
-        title: "Thông báo",
-        message: `Bạn có chắc muốn xóa công việc "${(_a = $setup.itemToDelete) == null ? void 0 : _a.title}"?`,
+        title: _ctx.$t("common.notification"),
+        message: _ctx.$t("todo.confirm_delete_msg", { title: (_a = $setup.itemToDelete) == null ? void 0 : _a.title }),
         "confirm-type": "danger",
         onConfirm: $setup.confirmDelete,
         onCancel: $setup.cancelDelete
-      }, null, 8, ["visible", "message", "onConfirm", "onCancel"]),
+      }, null, 8, ["visible", "title", "message", "onConfirm", "onCancel"]),
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
@@ -4033,6 +7647,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useCreateTodoController = () => {
+    const { t } = useI18n();
     useAuthStore();
     const pad = (n) => n.toString().padStart(2, "0");
     const getTodayISO = () => {
@@ -4061,7 +7676,11 @@ This will fail in production if not fixed.`);
       notifyDate: getTodayISO(),
       notifyTime: getCurrentTime()
     });
-    const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại"];
+    const sourceOptions = vue.computed(() => [
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation")
+    ]);
     const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
     const sourceIndex = vue.ref(-1);
     const memberList = vue.ref([]);
@@ -4078,7 +7697,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:63", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:68", "Lỗi lấy thành viên:", error);
         showError("Không thể tải danh sách thành viên");
       }
     };
@@ -4124,7 +7743,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:115", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:120", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -4140,7 +7759,7 @@ This will fail in production if not fixed.`);
     };
     const submitForm = async () => {
       if (!form.value.name || !form.value.name.trim()) {
-        showInfo("Vui lòng nhập tên công việc");
+        showInfo(t("todo.validate_name"));
         return;
       }
       let selectedLink = "CALL";
@@ -4148,7 +7767,7 @@ This will fail in production if not fixed.`);
         selectedLink = sourceValues[sourceIndex.value];
       }
       loading.value = true;
-      showLoading("Đang xử lý dữ liệu...");
+      showLoading(t("todo.upload_processing"));
       try {
         const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
         form.value.desc = newContent;
@@ -4158,18 +7777,18 @@ This will fail in production if not fixed.`);
           link: selectedLink,
           uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
-        formatAppLog("log", "at controllers/create_todo.ts:158", "Payload Submit:", payload);
+        formatAppLog("log", "at controllers/create_todo.ts:163", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
-        showSuccess("Tạo thành công!");
+        showSuccess(t("todo.create_success"));
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:168", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:173", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
-        showError("Lỗi: " + errorMsg);
+        showError(t("common.error_load") + ": " + errorMsg);
       } finally {
         loading.value = false;
       }
@@ -4303,11 +7922,13 @@ This will fail in production if not fixed.`);
     __name: "TodoEditor",
     props: {
       modelValue: String,
-      placeholder: { type: String, default: "Nhập nội dung..." }
+      placeholder: { type: String, default: "" }
+      // Để rỗng, xử lý ở template hoặc computed
     },
     emits: ["update:modelValue"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
+      const { t } = useI18n();
       const props = __props;
       const emit = __emit;
       const tools = [
@@ -4464,13 +8085,13 @@ This will fail in production if not fixed.`);
           showColorModal.value = true;
           return;
         }
-        format(item.name, item.value);
+        format2(item.name, item.value);
       };
       const applyColor = (color) => {
         if (color) {
-          format(colorTab.value, color);
+          format2(colorTab.value, color);
         } else {
-          format(colorTab.value, null);
+          format2(colorTab.value, null);
         }
         showColorModal.value = false;
       };
@@ -4481,48 +8102,58 @@ This will fail in production if not fixed.`);
         return formats.value[colorTab.value] === color;
       };
       const handleAlignSetting = () => {
-        const options = ["Căn trái", "Căn giữa", "Căn phải", "Căn đều"];
+        const options = [
+          t("editor.align_left"),
+          t("editor.align_center"),
+          t("editor.align_right"),
+          t("editor.align_justify")
+        ];
         uni.showActionSheet({
           itemList: options,
           success: (res) => {
             const index = res.tapIndex;
             if (index === 0)
-              format("align", "left");
+              format2("align", "left");
             if (index === 1)
-              format("align", "center");
+              format2("align", "center");
             if (index === 2)
-              format("align", "right");
+              format2("align", "right");
             if (index === 3)
-              format("align", "justify");
+              format2("align", "justify");
           }
         });
       };
       const handleFontSizeSetting = () => {
-        const options = ["Nhỏ", "Bình thường", "Lớn", "Rất lớn"];
+        const options = [
+          t("editor.size_small"),
+          t("editor.size_normal"),
+          t("editor.size_large"),
+          t("editor.size_huge")
+        ];
         uni.showActionSheet({
           itemList: options,
           success: (res) => {
             const index = res.tapIndex;
             if (index === 0)
-              format("fontSize", "small");
+              format2("fontSize", "small");
             if (index === 1)
-              format("fontSize", null);
+              format2("fontSize", null);
             if (index === 2)
-              format("fontSize", "large");
+              format2("fontSize", "large");
             if (index === 3)
-              format("fontSize", "huge");
+              format2("fontSize", "huge");
           }
         });
       };
       const handleHeaderSetting = () => {
-        const options = ["Tiêu đề 1 (H1)", "Tiêu đề 2 (H2)", "Tiêu đề 3 (H3)", "Tiêu đề 4 (H4)", "Tiêu đề 5 (H5)", "Tiêu đề 6 (H6)", "Văn bản thường"];
+        const options = ["H1", "H2", "H3", "H4", "H5", "H6", t("editor.size_normal")];
         uni.showActionSheet({
           itemList: options,
           success: (res) => {
             if (res.tapIndex < 6) {
-              format("header", res.tapIndex + 1);
+              format2("header", res.tapIndex + 1);
             } else {
-              format("header", null);
+              format2("header", null);
             }
           }
         });
@@ -4566,24 +8197,24 @@ This will fail in production if not fixed.`);
         formats.value = e.detail;
         isLinkSelected.value = !!e.detail.link;
       };
-      const format = (name, value = null) => {
+      const format2 = (name, value = null) => {
         if (!editorCtx.value)
           return;
         editorCtx.value.format(name, value);
       };
       const insertImage = () => {
         uni.showActionSheet({
-          itemList: ["Chụp ảnh mới", "Chọn từ thư viện"],
+          itemList: [t("editor.img_camera"), t("editor.img_album")],
           success: (res) => {
             const index = res.tapIndex;
-            let source = "album";
+            let source2 = "album";
             if (index === 0)
-              source = "camera";
+              source2 = "camera";
             if (index === 1)
-              source = "album";
+              source2 = "album";
             uni.chooseImage({
               count: 1,
-              sourceType: [source],
+              sourceType: [source2],
               success: (imageRes) => {
                 const tempPath = imageRes.tempFilePaths[0];
                 if (editorCtx.value) {
@@ -4627,7 +8258,7 @@ This will fail in production if not fixed.`);
           }
         }
       });
-      const __returned__ = { props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, handleToolClick, applyColor, closeColorModal, isColorSelected, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format, insertImage, handleLink, confirmLink, clearFormat, LinkCard };
+      const __returned__ = { t, props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, handleToolClick, applyColor, closeColorModal, isColorSelected, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, isActive, onEditorReady, onInput, onStatusChange, format: format2, insertImage, handleLink, confirmLink, clearFormat, LinkCard };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -4637,7 +8268,7 @@ This will fail in production if not fixed.`);
       vue.createElementVNode("editor", {
         id: $setup.editorId,
         class: "ql-container",
-        placeholder: $props.placeholder,
+        placeholder: $props.placeholder || _ctx.$t("editor.placeholder"),
         "show-img-size": "",
         "show-img-toolbar": "",
         "show-img-resize": "",
@@ -4768,7 +8399,13 @@ This will fail in production if not fixed.`);
           onClick: _cache[2] || (_cache[2] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
-          vue.createElementVNode("text", { class: "modal-title" }, "Chèn Hyperlink (Text)"),
+          vue.createElementVNode(
+            "text",
+            { class: "modal-title" },
+            vue.toDisplayString(_ctx.$t("editor.link_modal_title")),
+            1
+            /* TEXT */
+          ),
           vue.withDirectives(vue.createElementVNode("input", {
             class: "modal-input",
             "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.linkUrl = $event),
@@ -4778,14 +8415,26 @@ This will fail in production if not fixed.`);
             [vue.vModelText, $setup.linkUrl]
           ]),
           vue.createElementVNode("view", { class: "modal-actions" }, [
-            vue.createElementVNode("button", {
-              class: "btn-cancel",
-              onClick: _cache[1] || (_cache[1] = ($event) => $setup.showLinkModal = false)
-            }, "Hủy"),
-            vue.createElementVNode("button", {
-              class: "btn-confirm",
-              onClick: $setup.confirmLink
-            }, "Xác nhận")
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-cancel",
+                onClick: _cache[1] || (_cache[1] = ($event) => $setup.showLinkModal = false)
+              },
+              vue.toDisplayString(_ctx.$t("common.cancel")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-confirm",
+                onClick: $setup.confirmLink
+              },
+              vue.toDisplayString(_ctx.$t("common.confirm")),
+              1
+              /* TEXT */
+            )
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
@@ -4799,8 +8448,20 @@ This will fail in production if not fixed.`);
           onClick: _cache[6] || (_cache[6] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
-          vue.createElementVNode("text", { class: "modal-title" }, "Chèn Thẻ Liên Kết (Web)"),
-          vue.createElementVNode("text", { class: "modal-desc" }, "Liên kết sẽ hiển thị dạng thẻ xem trước."),
+          vue.createElementVNode(
+            "text",
+            { class: "modal-title" },
+            vue.toDisplayString(_ctx.$t("editor.card_modal_title")),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode(
+            "text",
+            { class: "modal-desc" },
+            vue.toDisplayString(_ctx.$t("editor.card_modal_desc")),
+            1
+            /* TEXT */
+          ),
           vue.withDirectives(vue.createElementVNode("input", {
             class: "modal-input",
             "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.cardLinkUrl = $event),
@@ -4810,14 +8471,26 @@ This will fail in production if not fixed.`);
             [vue.vModelText, $setup.cardLinkUrl]
           ]),
           vue.createElementVNode("view", { class: "modal-actions" }, [
-            vue.createElementVNode("button", {
-              class: "btn-cancel",
-              onClick: _cache[5] || (_cache[5] = ($event) => $setup.showCardLinkModal = false)
-            }, "Hủy"),
-            vue.createElementVNode("button", {
-              class: "btn-confirm",
-              onClick: $setup.confirmCardLink
-            }, "Thêm thẻ")
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-cancel",
+                onClick: _cache[5] || (_cache[5] = ($event) => $setup.showCardLinkModal = false)
+              },
+              vue.toDisplayString(_ctx.$t("common.cancel")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "button",
+              {
+                class: "btn-confirm",
+                onClick: $setup.confirmCardLink
+              },
+              vue.toDisplayString(_ctx.$t("common.confirm")),
+              1
+              /* TEXT */
+            )
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
@@ -4838,9 +8511,9 @@ This will fail in production if not fixed.`);
                 class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "color" }]),
                 onClick: _cache[8] || (_cache[8] = ($event) => $setup.colorTab = "color")
               },
-              " Màu chữ ",
-              2
-              /* CLASS */
+              vue.toDisplayString(_ctx.$t("editor.color_text")),
+              3
+              /* TEXT, CLASS */
             ),
             vue.createElementVNode(
               "view",
@@ -4848,9 +8521,9 @@ This will fail in production if not fixed.`);
                 class: vue.normalizeClass(["color-tab", { active: $setup.colorTab === "backgroundColor" }]),
                 onClick: _cache[9] || (_cache[9] = ($event) => $setup.colorTab = "backgroundColor")
               },
-              " Màu nền ",
-              2
-              /* CLASS */
+              vue.toDisplayString(_ctx.$t("editor.color_bg")),
+              3
+              /* TEXT, CLASS */
             )
           ]),
           vue.createElementVNode("view", { class: "color-grid" }, [
@@ -4918,6 +8591,12 @@ This will fail in production if not fixed.`);
   });
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "flat-item date-compound-block" }, [
+      vue.createElementVNode("view", { class: "item-left icon-top-aligned" }, [
+        vue.createElementVNode("image", {
+          src: "https://img.icons8.com/ios/50/666666/clock--v1.png",
+          class: "item-icon"
+        })
+      ]),
       vue.createElementVNode("view", { class: "right-column" }, [
         vue.createElementVNode("view", { class: "date-row" }, [
           vue.createElementVNode("picker", {
@@ -4934,9 +8613,15 @@ This will fail in production if not fixed.`);
                 class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.dueDate }])
               },
               [
-                vue.createElementVNode("text", { class: "picker-label" }, "Hạn xử lý:"),
+                vue.createElementVNode(
+                  "text",
+                  { class: "picker-label" },
+                  vue.toDisplayString(_ctx.$t("todo.due_date_label")),
+                  1
+                  /* TEXT */
+                ),
                 vue.createTextVNode(
-                  " " + vue.toDisplayString($props.dueDate ? $setup.formatDateDisplay($props.dueDate) : "Chọn ngày"),
+                  " " + vue.toDisplayString($props.dueDate ? $setup.formatDateDisplay($props.dueDate) : _ctx.$t("todo.select_date")),
                   1
                   /* TEXT */
                 )
@@ -4960,9 +8645,15 @@ This will fail in production if not fixed.`);
                 class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.notifyDate }])
               },
               [
-                vue.createElementVNode("text", { class: "picker-label" }, "Ngày thông báo:"),
+                vue.createElementVNode(
+                  "text",
+                  { class: "picker-label" },
+                  vue.toDisplayString(_ctx.$t("todo.notify_date_label")),
+                  1
+                  /* TEXT */
+                ),
                 vue.createTextVNode(
-                  " " + vue.toDisplayString($props.notifyDate ? $setup.formatDateDisplay($props.notifyDate) : "Ngày"),
+                  " " + vue.toDisplayString($props.notifyDate ? $setup.formatDateDisplay($props.notifyDate) : _ctx.$t("todo.date_text")),
                   1
                   /* TEXT */
                 )
@@ -4983,7 +8674,7 @@ This will fail in production if not fixed.`);
               {
                 class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.notifyTime }])
               },
-              vue.toDisplayString($props.notifyTime ? $props.notifyTime : "Giờ"),
+              vue.toDisplayString($props.notifyTime ? $props.notifyTime : _ctx.$t("todo.time_text")),
               3
               /* TEXT, CLASS */
             )
@@ -5032,33 +8723,28 @@ This will fail in production if not fixed.`);
             class: "item-icon"
           })
         ]),
-        vue.withDirectives(vue.createElementVNode(
-          "textarea",
-          {
-            class: "item-input title-textarea",
-            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.name = $event),
-            placeholder: "Nhập tên công việc... *",
-            maxlength: "256",
-            "auto-height": ""
-          },
-          null,
-          512
-          /* NEED_PATCH */
-        ), [
+        vue.withDirectives(vue.createElementVNode("textarea", {
+          class: "item-input title-textarea",
+          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.name = $event),
+          placeholder: _ctx.$t("todo.enter_task_name"),
+          maxlength: "256",
+          "auto-height": ""
+        }, null, 8, ["placeholder"]), [
           [vue.vModelText, $setup.form.name]
         ]),
         vue.createElementVNode(
           "text",
           { class: "char-count" },
-          vue.toDisplayString($setup.form.name ? $setup.form.name.length : 0) + "/256 ",
+          vue.toDisplayString(_ctx.$t("todo.char_count", { current: $setup.form.name ? $setup.form.name.length : 0, max: 256 })),
           1
           /* TEXT */
         )
       ]),
       vue.createVNode($setup["TodoEditor"], {
         modelValue: $setup.form.desc,
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.desc = $event)
-      }, null, 8, ["modelValue"]),
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.desc = $event),
+        placeholder: _ctx.$t("editor.placeholder")
+      }, null, 8, ["modelValue", "placeholder"]),
       vue.createElementVNode("view", {
         class: "flat-item",
         onClick: _cache[2] || (_cache[2] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args))
@@ -5074,7 +8760,7 @@ This will fail in production if not fixed.`);
           {
             class: vue.normalizeClass(["input-trigger", { "placeholder": !$setup.form.customer }])
           },
-          vue.toDisplayString($setup.form.customer || "Chọn khách hàng"),
+          vue.toDisplayString($setup.form.customer || _ctx.$t("todo.select_customer")),
           3
           /* TEXT, CLASS */
         ),
@@ -5109,7 +8795,7 @@ This will fail in production if not fixed.`);
             {
               class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
             },
-            vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : "Chọn nguồn"),
+            vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
             3
             /* TEXT, CLASS */
           )
@@ -5134,7 +8820,7 @@ This will fail in production if not fixed.`);
             {
               class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
             },
-            vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : "Người được giao"),
+            vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
             3
             /* TEXT, CLASS */
           )
@@ -5151,13 +8837,13 @@ This will fail in production if not fixed.`);
       vue.createElementVNode("view", { class: "footer-action" }, [
         vue.createVNode($setup["AppButton"], {
           type: "secondary",
-          label: "Hủy bỏ",
+          label: _ctx.$t("common.cancel_action"),
           class: "btn-cancel",
           onClick: $setup.goBack
-        }, null, 8, ["onClick"]),
+        }, null, 8, ["label", "onClick"]),
         vue.createVNode($setup["AppButton"], {
           type: "primary",
-          label: $setup.loading ? "Đang lưu..." : "Lưu công việc",
+          label: $setup.loading ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
           loading: $setup.loading,
           class: "btn-submit",
           onClick: $setup.submitForm
@@ -5226,6 +8912,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useTodoDetailController = () => {
+    const { t } = useI18n();
     const authStore = useAuthStore();
     const currentUserId = authStore.uid;
     const isLoading = vue.ref(false);
@@ -5250,7 +8937,10 @@ This will fail in production if not fixed.`);
     const currentReactingComment = vue.ref(null);
     const emojiList = ["👍", "👎", "😍", "😆", "😱", "😭", "😤"];
     const commentFilterIndex = vue.ref(0);
-    const commentFilterOptions = ["Tất cả hoạt động", "Bình luận"];
+    const commentFilterOptions = vue.computed(() => [
+      t("todo.filter_activity_all"),
+      t("todo.filter_activity_comment")
+    ]);
     const commentFilterValues = ["", "COMMENT"];
     const isSavingDescription = vue.ref(false);
     const replyingMessagePreview = vue.ref("");
@@ -5294,10 +8984,10 @@ This will fail in production if not fixed.`);
             payload.notificationReceivedAt = convertToTimestamp(datePart, timePart);
           }
         }
-        formatAppLog("log", "at controllers/todo_detail.ts:122", `Payload Update ${event.field}:`, payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:123", `Payload Update ${event.field}:`, payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Cập nhật thành công");
+          showSuccess(t("todo.msg_update_success"));
           if (event.field === "dueDate") {
             form.value.raw.dueDate = payload.dueDate;
           } else {
@@ -5308,8 +8998,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:140", "Lỗi cập nhật ngày:", error);
-        showError("Lỗi cập nhật");
+        formatAppLog("error", "at controllers/todo_detail.ts:141", "Lỗi cập nhật ngày:", error);
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -5328,7 +9018,7 @@ This will fail in production if not fixed.`);
         cleanMessage = cleanMessage.replace(fullImgTag, "");
         if (!src.startsWith("http") && !src.startsWith("https")) {
           const p = uploadTodoFile(src).then((serverUrl) => serverUrl).catch((err) => {
-            formatAppLog("error", "at controllers/todo_detail.ts:167", "Upload ảnh bình luận lỗi:", err);
+            formatAppLog("error", "at controllers/todo_detail.ts:168", "Upload ảnh bình luận lỗi:", err);
             return "";
           });
           uploadPromises.push(p);
@@ -5361,7 +9051,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/todo_detail.ts:207", `Upload ảnh detail lỗi:`, err);
+            formatAppLog("error", "at controllers/todo_detail.ts:208", `Upload ảnh detail lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -5377,7 +9067,7 @@ This will fail in production if not fixed.`);
     };
     const onSaveDescription = async () => {
       if (!form.value.raw) {
-        showError("Không tìm thấy dữ liệu gốc");
+        showError(t("common.error_missing_data"));
         return;
       }
       isSavingDescription.value = true;
@@ -5393,10 +9083,10 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:251", "Payload Update Description:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:252", "Payload Update Description:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Đã cập nhật mô tả");
+          showSuccess(t("todo.msg_desc_saved"));
           form.value.raw.description = form.value.desc;
           if (filesString) {
             form.value.raw.files = filesString;
@@ -5404,8 +9094,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:266", "Lỗi cập nhật công việc:", error);
-        showError("Cập nhật thất bại");
+        formatAppLog("error", "at controllers/todo_detail.ts:267", "Lỗi cập nhật công việc:", error);
+        showError(t("common.error_update"));
       } finally {
         isSavingDescription.value = false;
       }
@@ -5416,7 +9106,7 @@ This will fail in production if not fixed.`);
       const newTitle = form.value.title ? form.value.title.trim() : "";
       const oldTitle = form.value.raw.title;
       if (!newTitle) {
-        showInfo("Tiêu đề không được để trống");
+        showInfo(t("todo.msg_title_empty"));
         form.value.title = oldTitle;
         return;
       }
@@ -5432,10 +9122,10 @@ This will fail in production if not fixed.`);
           files: form.value.raw.files || "",
           tagCodes: form.value.raw.tagCodes || ""
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:301", "Payload Update Title:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:302", "Payload Update Title:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Đã đổi tiêu đề");
+          showSuccess(t("todo.msg_title_changed"));
           form.value.raw.title = newTitle;
           if (form.value.customerCode) {
             await fetchHistoryLog(form.value.customerCode);
@@ -5443,8 +9133,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:316", "Lỗi cập nhật tiêu đề:", error);
-        showError("Lỗi cập nhật");
+        formatAppLog("error", "at controllers/todo_detail.ts:317", "Lỗi cập nhật tiêu đề:", error);
+        showError(t("todo.msg_update_error"));
         form.value.title = oldTitle;
       } finally {
         isLoading.value = false;
@@ -5464,7 +9154,7 @@ This will fail in production if not fixed.`);
       if (foundMember) {
         replyingMemberName.value = foundMember.UserName;
       } else {
-        replyingMemberName.value = "Người dùng ẩn";
+        replyingMemberName.value = t("todo.user_hidden");
       }
       await vue.nextTick();
     };
@@ -5484,7 +9174,7 @@ This will fail in production if not fixed.`);
     };
     const submitReply = async () => {
       if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
-        showInfo("Vui lòng nhập nội dung");
+        showInfo(t("todo.msg_empty_content"));
         return;
       }
       if (!replyingCommentData.value)
@@ -5507,7 +9197,7 @@ This will fail in production if not fixed.`);
         };
         const newReplyId = await createTodoMessage(payload);
         if (newReplyId) {
-          showSuccess("Đã trả lời");
+          showSuccess(t("todo.msg_reply_success"));
           const newReplyData = await getTodoMessageDetail(newReplyId, form.value.id);
           const processedReply = processCommentData(newReplyData);
           const rootParentId = replyingCommentData.value.rootParentId || replyingCommentData.value.id;
@@ -5521,8 +9211,8 @@ This will fail in production if not fixed.`);
           resetReplyState();
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:416", "Lỗi gửi trả lời:", error);
-        showError("Gửi thất bại");
+        formatAppLog("error", "at controllers/todo_detail.ts:417", "Lỗi gửi trả lời:", error);
+        showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -5582,7 +9272,7 @@ This will fail in production if not fixed.`);
             if (existingReactionIndex !== -1) {
               const currentEmoji = foundComment.reactions[existingReactionIndex].codeEmoji;
               if (currentEmoji === emoji) {
-                formatAppLog("log", "at controllers/todo_detail.ts:494", "User thả trùng emoji cũ");
+                formatAppLog("log", "at controllers/todo_detail.ts:495", "User thả trùng emoji cũ");
               } else {
                 foundComment.reactions[existingReactionIndex].codeEmoji = emoji;
               }
@@ -5596,20 +9286,20 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:512", "Lỗi thả cảm xúc:", error);
-        showError("Lỗi kết nối");
+        formatAppLog("error", "at controllers/todo_detail.ts:513", "Lỗi thả cảm xúc:", error);
+        showError(t("common.error_connection"));
       }
     };
     const editingCommentData = vue.ref(null);
     const historyFilterIndex = vue.ref(0);
-    const historyFilterOptions = [
-      "Tất cả",
-      "Công việc",
-      "Ticket",
-      "Lịch sử gọi",
-      "Khách hàng",
-      "Ghi chú"
-    ];
+    const historyFilterOptions = vue.computed(() => [
+      t("todo.history_all"),
+      t("todo.history_todo"),
+      t("todo.history_ticket"),
+      t("todo.history_call"),
+      t("todo.history_customer"),
+      t("todo.history_note")
+    ]);
     const historyFilterValues = [
       "ALL",
       "TODO",
@@ -5621,7 +9311,7 @@ This will fail in production if not fixed.`);
     const form = vue.ref({
       id: "",
       title: "",
-      code: "Loading...",
+      code: t("common.loading"),
       desc: "",
       statusIndex: 0,
       sourceIndex: 0,
@@ -5638,14 +9328,19 @@ This will fail in production if not fixed.`);
       customerManagerName: "",
       customerManagerLabel: ""
     });
-    const sourceOptions = ["Cuộc gọi", "Khách hàng", "Hội thoại", "Tin nhắn"];
+    const sourceOptions = vue.computed(() => [
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation"),
+      t("source.message")
+    ]);
     const memberList = vue.ref([]);
     const assigneeOptions = vue.ref([]);
     const dynamicStatusOptions = vue.computed(() => {
       const options = [
-        { label: "Chưa xử lý", value: "TO_DO" },
-        { label: "Đang xử lý", value: "IN_PROGRESS" },
-        { label: "Hoàn thành", value: "DONE" }
+        { label: t("todo.status_todo"), value: "TO_DO" },
+        { label: t("todo.status_progress"), value: "IN_PROGRESS" },
+        { label: t("todo.status_done"), value: "DONE" }
       ];
       if (form.value.raw && form.value.raw.status === "IN_PROGRESS") {
         return options.filter((opt) => opt.value !== "TO_DO");
@@ -5659,7 +9354,7 @@ This will fail in production if not fixed.`);
         return;
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:578", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:579", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -5672,17 +9367,17 @@ This will fail in production if not fixed.`);
           if (foundMember) {
             editingMemberName.value = foundMember.UserName;
           } else {
-            editingMemberName.value = "tôi";
+            editingMemberName.value = t("common.me");
           }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:604", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:605", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:615", "Lỗi lấy chi tiết bình luận:", error);
-        showError("Lỗi tải dữ liệu");
+        formatAppLog("error", "at controllers/todo_detail.ts:616", "Lỗi lấy chi tiết bình luận:", error);
+        showError(t("common.error_load"));
       } finally {
         isLoading.value = false;
       }
@@ -5691,7 +9386,7 @@ This will fail in production if not fixed.`);
       if (!editingCommentData.value)
         return;
       if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
-        showInfo("Nội dung không được để trống");
+        showInfo(t("todo.msg_empty_content"));
         return;
       }
       isSubmittingComment.value = true;
@@ -5706,7 +9401,7 @@ This will fail in production if not fixed.`);
         };
         const updatedData = await updateTodoMessage(payload);
         if (updatedData) {
-          showSuccess("Đã cập nhật");
+          showSuccess(t("todo.msg_update_success"));
           const parentIndex = comments.value.findIndex((c) => c.id === updatedData.id);
           if (parentIndex !== -1) {
             comments.value[parentIndex].message = updatedData.message;
@@ -5728,8 +9423,8 @@ This will fail in production if not fixed.`);
           resetEditState();
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:673", "Lỗi cập nhật:", error);
-        showError("Cập nhật thất bại");
+        formatAppLog("error", "at controllers/todo_detail.ts:674", "Lỗi cập nhật:", error);
+        showError(t("common.error_update"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -5764,7 +9459,7 @@ This will fail in production if not fixed.`);
       isConfirmDeleteCommentOpen.value = false;
       try {
         await deleteTodoMessage(idToDelete);
-        showSuccess("Đã xóa");
+        showSuccess(t("todo.msg_deleted"));
         const parentIndex = comments.value.findIndex((c) => c.id === idToDelete);
         if (parentIndex !== -1) {
           comments.value.splice(parentIndex, 1);
@@ -5780,8 +9475,8 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:743", "Lỗi xóa bình luận:", error);
-        showError("Xóa thất bại");
+        formatAppLog("error", "at controllers/todo_detail.ts:740", "Lỗi xóa bình luận:", error);
+        showError(t("common.fail_delete"));
       } finally {
         commentToDeleteId.value = null;
       }
@@ -5809,7 +9504,7 @@ This will fail in production if not fixed.`);
         };
         const newCommentId = await createTodoMessage(payload);
         if (newCommentId) {
-          showSuccess("Đã gửi bình luận");
+          showSuccess(t("todo.msg_comment_success"));
           newCommentText.value = "";
           const newCommentData = await getTodoMessageDetail(newCommentId, todoId);
           if (newCommentData) {
@@ -5818,8 +9513,8 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:793", "Lỗi gửi bình luận:", error);
-        showError("Gửi thất bại");
+        formatAppLog("error", "at controllers/todo_detail.ts:790", "Lỗi gửi bình luận:", error);
+        showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -5834,14 +9529,14 @@ This will fail in production if not fixed.`);
       try {
         const data = await getAllMembers();
         memberList.value = data;
-        assigneeOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
+        assigneeOptions.value = data.map((m) => m.UserName || t("common.unknown_member"));
         if (form.value.assigneeId) {
           const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
           if (index !== -1)
             form.value.assigneeIndex = index;
         }
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:818", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:815", "Lỗi lấy members", e);
       }
     };
     const reloadDetail = async () => {
@@ -5854,13 +9549,13 @@ This will fail in production if not fixed.`);
           fetchDetail(form.value.id)
         ]);
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:832", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:829", e);
       } finally {
         uni.stopPullDownRefresh();
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/todo_detail.ts:839", "Refreshing detail...");
+      formatAppLog("log", "at controllers/todo_detail.ts:836", "Refreshing detail...");
       reloadDetail();
     });
     const fetchDetail = async (id) => {
@@ -5892,8 +9587,8 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:879", "Lỗi lấy chi tiết:", error);
-        showError("Lỗi kết nối");
+        formatAppLog("error", "at controllers/todo_detail.ts:876", "Lỗi lấy chi tiết:", error);
+        showError(t("common.error_connection"));
       } finally {
         isLoading.value = false;
         uni.hideNavigationBarLoading();
@@ -5901,7 +9596,7 @@ This will fail in production if not fixed.`);
     };
     const processCommentData = (item) => {
       var _a;
-      let senderName = "Người dùng ẩn";
+      let senderName = t("todo.user_hidden");
       let avatarChar = "?";
       let avatarColor = "#e3f2fd";
       if (item.senderId) {
@@ -5916,11 +9611,11 @@ This will fail in production if not fixed.`);
       avatarChar = senderName.charAt(0).toUpperCase();
       let actionText = "";
       if (item.type === "COMMENT")
-        actionText = "đã thêm một bình luận";
+        actionText = t("todo.action_comment");
       else if (item.type === "LOG")
-        actionText = "đã cập nhật hoạt động";
+        actionText = t("todo.action_log");
       else if (item.type === "UPDATE_TODO")
-        actionText = "cập nhật thông tin công việc";
+        actionText = t("todo.action_update");
       const reactionList = ((_a = item.reactions) == null ? void 0 : _a.details) || [];
       return {
         id: item.id,
@@ -5959,7 +9654,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:951", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:948", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -5987,20 +9682,20 @@ This will fail in production if not fixed.`);
         const managerField = fields.find((f) => f.code === "member_no");
         if (nameField) {
           form.value.customerName = nameField.value;
-          form.value.customerNameLabel = nameField.name;
+          form.value.customerNameLabel = nameField.name || t("todo.customer_name_label");
         }
         if (phoneField) {
           form.value.customerPhone = phoneField.value;
           form.value.customerPhoneLabel = phoneField.name;
         }
         if (managerField) {
-          form.value.customerManagerLabel = managerField.name;
+          form.value.customerManagerLabel = managerField.name || t("todo.customer_manager_label");
           const managerUid = managerField.value;
           const manager = memberList.value.find((m) => m.memberUID === managerUid);
-          form.value.customerManagerName = manager ? manager.UserName : "(Chưa xác định)";
+          form.value.customerManagerName = manager ? manager.UserName : t("todo.unknown");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1008", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1006", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -6011,7 +9706,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:1020", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:1018", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -6022,14 +9717,14 @@ This will fail in production if not fixed.`);
             const month = (date.getMonth() + 1).toString().padStart(2, "0");
             const year = date.getFullYear();
             const timeStr = `${day}/${month}/${year}`;
-            let actorName = "Hệ thống";
+            let actorName = t("common.system");
             if (item.memberUid) {
               const foundMember = memberList.value.find((m) => m.memberUID === item.memberUid);
               if (foundMember) {
                 actorName = foundMember.UserName;
               }
             }
-            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || "Tương tác khác";
+            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t("todo.interaction_other");
             return {
               id: item.id,
               timeStr,
@@ -6040,7 +9735,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1058", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1056", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -6071,10 +9766,10 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1105", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1103", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Đã cập nhật trạng thái");
+          showSuccess(t("todo.msg_status_changed"));
           form.value.raw.status = newStatus;
           const newDisplayIndex = dynamicStatusOptions.value.findIndex((opt) => opt.value === newStatus);
           form.value.statusIndex = newDisplayIndex !== -1 ? newDisplayIndex : 0;
@@ -6083,8 +9778,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1121", "Lỗi cập nhật trạng thái:", error);
-        showError("Lỗi cập nhật");
+        formatAppLog("error", "at controllers/todo_detail.ts:1119", "Lỗi cập nhật trạng thái:", error);
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -6101,7 +9796,7 @@ This will fail in production if not fixed.`);
       form.value.assigneeIndex = idx;
       form.value.assigneeId = newAssigneeId;
       if (!form.value.raw) {
-        showError("Thiếu dữ liệu gốc");
+        showError(t("common.error_missing_data"));
         return;
       }
       isLoading.value = true;
@@ -6115,10 +9810,10 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1165", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1163", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Đã đổi người thực hiện");
+          showSuccess(t("todo.msg_assignee_changed"));
           form.value.raw.assigneeId = newAssigneeId;
           if (form.value.customerCode) {
             await fetchHistoryLog(form.value.customerCode);
@@ -6126,8 +9821,8 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1183", "Lỗi cập nhật người giao:", error);
-        showError("Lỗi cập nhật");
+        formatAppLog("error", "at controllers/todo_detail.ts:1181", "Lỗi cập nhật người giao:", error);
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -6136,8 +9831,8 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1192", "Lưu:", form.value);
-      showSuccess("Đã lưu");
+      formatAppLog("log", "at controllers/todo_detail.ts:1190", "Lưu:", form.value);
+      showSuccess(t("todo.msg_saved"));
     };
     return {
       isLoading,
@@ -6510,33 +10205,33 @@ This will fail in production if not fixed.`);
             /* TEXT */
           )
         ]),
-        vue.withDirectives(vue.createElementVNode(
-          "textarea",
-          {
-            class: "header-title-input",
-            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
-            placeholder: "Đang tải tên công việc...",
-            "auto-height": "",
-            maxlength: "256",
-            "confirm-type": "done",
-            onConfirm: _cache[1] || (_cache[1] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
-            onBlur: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args))
-          },
-          null,
-          544
-          /* NEED_HYDRATION, NEED_PATCH */
-        ), [
+        vue.withDirectives(vue.createElementVNode("textarea", {
+          class: "header-title-input",
+          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
+          placeholder: _ctx.$t("todo.header_loading"),
+          "auto-height": "",
+          maxlength: "256",
+          "confirm-type": "done",
+          onConfirm: _cache[1] || (_cache[1] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
+          onBlur: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args))
+        }, null, 40, ["placeholder"]), [
           [vue.vModelText, $setup.form.title]
         ])
       ]),
       vue.createElementVNode("view", { class: "detail-body" }, [
-        vue.createElementVNode("view", { class: "section-title" }, "Mô tả"),
+        vue.createElementVNode(
+          "view",
+          { class: "section-title" },
+          vue.toDisplayString(_ctx.$t("todo.desc_section")),
+          1
+          /* TEXT */
+        ),
         vue.createElementVNode("view", { class: "section-block" }, [
           vue.createVNode($setup["TodoEditor"], {
             modelValue: $setup.form.desc,
             "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.form.desc = $event),
-            placeholder: "Nhập mô tả công việc..."
-          }, null, 8, ["modelValue"]),
+            placeholder: _ctx.$t("todo.desc_placeholder")
+          }, null, 8, ["modelValue", "placeholder"]),
           vue.createElementVNode("view", {
             class: "input-actions",
             style: { "margin-top": "10px" }
@@ -6545,12 +10240,18 @@ This will fail in production if not fixed.`);
               type: "primary",
               size: "small",
               loading: $setup.isSavingDescription,
-              label: $setup.isSavingDescription ? "Đang lưu..." : "Lưu lại",
+              label: $setup.isSavingDescription ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
               onClick: $setup.onSaveDescription
             }, null, 8, ["loading", "label", "onClick"])
           ])
         ]),
-        vue.createElementVNode("view", { class: "section-title" }, "Thông tin công việc"),
+        vue.createElementVNode(
+          "view",
+          { class: "section-title" },
+          vue.toDisplayString(_ctx.$t("todo.info_section")),
+          1
+          /* TEXT */
+        ),
         vue.createElementVNode("view", { class: "info-group" }, [
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
@@ -6558,7 +10259,13 @@ This will fail in production if not fixed.`);
                 src: "https://img.icons8.com/ios/50/666666/checked-checkbox.png",
                 class: "item-icon"
               }),
-              vue.createElementVNode("text", { class: "item-label" }, "Trạng thái")
+              vue.createElementVNode(
+                "text",
+                { class: "item-label" },
+                vue.toDisplayString(_ctx.$t("todo.status")),
+                1
+                /* TEXT */
+              )
             ]),
             vue.createElementVNode("picker", {
               mode: "selector",
@@ -6575,7 +10282,7 @@ This will fail in production if not fixed.`);
                 },
                 [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || "Đang tải...") + " ",
+                    vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || _ctx.$t("common.loading")) + " ",
                     1
                     /* TEXT */
                   ),
@@ -6592,7 +10299,13 @@ This will fail in production if not fixed.`);
                 src: "https://img.icons8.com/ios/50/666666/internet.png",
                 class: "item-icon"
               }),
-              vue.createElementVNode("text", { class: "item-label" }, "Nguồn")
+              vue.createElementVNode(
+                "text",
+                { class: "item-label" },
+                vue.toDisplayString(_ctx.$t("todo.source")),
+                1
+                /* TEXT */
+              )
             ]),
             vue.createElementVNode("view", { class: "item-picker-box" }, [
               vue.createElementVNode(
@@ -6610,7 +10323,13 @@ This will fail in production if not fixed.`);
                 src: "https://img.icons8.com/ios/50/666666/user.png",
                 class: "item-icon"
               }),
-              vue.createElementVNode("text", { class: "item-label" }, "Người được giao")
+              vue.createElementVNode(
+                "text",
+                { class: "item-label" },
+                vue.toDisplayString(_ctx.$t("todo.assignee")),
+                1
+                /* TEXT */
+              )
             ]),
             vue.createElementVNode("picker", {
               mode: "selector",
@@ -6622,7 +10341,7 @@ This will fail in production if not fixed.`);
               vue.createElementVNode(
                 "view",
                 { class: "picker-text" },
-                vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : "Đang tải...") + " ▾ ",
+                vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : _ctx.$t("common.loading")) + " ▾ ",
                 1
                 /* TEXT */
               )
@@ -6638,18 +10357,36 @@ This will fail in production if not fixed.`);
             onChange: $setup.onDateUpdate
           }, null, 8, ["dueDate", "notifyDate", "notifyTime", "onChange"])
         ]),
-        vue.createElementVNode("view", { class: "section-title" }, "Thông tin khách hàng"),
+        vue.createElementVNode(
+          "view",
+          { class: "section-title" },
+          vue.toDisplayString(_ctx.$t("todo.customer_section")),
+          1
+          /* TEXT */
+        ),
         vue.createElementVNode("view", { class: "info-group customer-block" }, [
           $setup.isLoadingCustomer ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", { class: "loading-text" }, "⏳ Đang tải thông tin từ CRM...")
+            vue.createElementVNode(
+              "text",
+              { class: "loading-text" },
+              vue.toDisplayString(_ctx.$t("todo.loading_crm")),
+              1
+              /* TEXT */
+            )
           ])) : !$setup.form.customerCode ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
           }, [
-            vue.createElementVNode("text", null, "(Công việc này chưa gắn với khách hàng nào)")
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString(_ctx.$t("todo.no_customer_attached")),
+              1
+              /* TEXT */
+            )
           ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
             vue.createElementVNode("view", { class: "flat-item" }, [
               vue.createElementVNode("view", { class: "item-left" }, [
@@ -6660,7 +10397,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerNameLabel || "Khách hàng"),
+                  vue.toDisplayString($setup.form.customerNameLabel || _ctx.$t("todo.customer_name_label")),
                   1
                   /* TEXT */
                 )
@@ -6682,7 +10419,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerPhoneLabel || "SĐT"),
+                  vue.toDisplayString($setup.form.customerPhoneLabel || _ctx.$t("todo.customer_phone_label")),
                   1
                   /* TEXT */
                 )
@@ -6704,7 +10441,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerManagerLabel || "Phụ trách"),
+                  vue.toDisplayString($setup.form.customerManagerLabel || _ctx.$t("todo.customer_manager_label")),
                   1
                   /* TEXT */
                 )
@@ -6712,7 +10449,7 @@ This will fail in production if not fixed.`);
               vue.createElementVNode(
                 "view",
                 { class: "item-right-text highlight-text" },
-                vue.toDisplayString($setup.form.customerManagerName || "(Chưa có)"),
+                vue.toDisplayString($setup.form.customerManagerName || _ctx.$t("todo.manager_none")),
                 1
                 /* TEXT */
               )
@@ -6724,7 +10461,13 @@ This will fail in production if not fixed.`);
             class: "toggle-header",
             onClick: $setup.toggleComments
           }, [
-            vue.createElementVNode("text", { class: "section-title no-margin" }, "Bình luận và hoạt động"),
+            vue.createElementVNode(
+              "text",
+              { class: "section-title no-margin" },
+              vue.toDisplayString(_ctx.$t("todo.comments_activities")),
+              1
+              /* TEXT */
+            ),
             vue.createElementVNode(
               "image",
               {
@@ -6765,7 +10508,7 @@ This will fail in production if not fixed.`);
               vue.createVNode($setup["TodoEditor"], {
                 modelValue: $setup.newCommentText,
                 "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.newCommentText = $event),
-                placeholder: $setup.isEditingComment ? "Đang chỉnh sửa..." : $setup.isReplying ? "Viết câu trả lời..." : "Viết bình luận"
+                placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
             $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -6773,7 +10516,11 @@ This will fail in production if not fixed.`);
               class: "editing-alert"
             }, [
               vue.createElementVNode("text", { class: "editing-text" }, [
-                vue.createTextVNode("Đang chỉnh sửa bình luận của "),
+                vue.createTextVNode(
+                  vue.toDisplayString(_ctx.$t("todo.editing_alert")) + " ",
+                  1
+                  /* TEXT */
+                ),
                 vue.createElementVNode(
                   "text",
                   { class: "editing-name" },
@@ -6788,7 +10535,13 @@ This will fail in production if not fixed.`);
               class: "reply-alert"
             }, [
               vue.createElementVNode("view", { class: "reply-info" }, [
-                vue.createElementVNode("text", { class: "reply-label" }, "Đang trả lời bình luận của "),
+                vue.createElementVNode(
+                  "text",
+                  { class: "reply-label" },
+                  vue.toDisplayString(_ctx.$t("todo.replying_alert")),
+                  1
+                  /* TEXT */
+                ),
                 vue.createElementVNode(
                   "text",
                   { class: "reply-name" },
@@ -6812,7 +10565,7 @@ This will fail in production if not fixed.`);
                 type: "primary",
                 size: "small",
                 loading: $setup.isSubmittingComment,
-                label: $setup.isSubmittingComment ? "Đang lưu..." : "Lưu lại",
+                label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
                 onClick: $setup.submitComment
               }, null, 8, ["loading", "label", "onClick"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
                 key: 1,
@@ -6821,15 +10574,15 @@ This will fail in production if not fixed.`);
                 vue.createVNode($setup["AppButton"], {
                   type: "secondary",
                   size: "small",
-                  label: "Hủy",
+                  label: _ctx.$t("common.cancel"),
                   disabled: $setup.isSubmittingComment,
                   onClick: $setup.onCancelEditComment
-                }, null, 8, ["disabled", "onClick"]),
+                }, null, 8, ["label", "disabled", "onClick"]),
                 vue.createVNode($setup["AppButton"], {
                   type: "primary",
                   size: "small",
                   loading: $setup.isSubmittingComment,
-                  label: $setup.isSubmittingComment ? "Đang cập nhật..." : "Cập nhật",
+                  label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.update_btn"),
                   onClick: $setup.submitUpdateComment
                 }, null, 8, ["loading", "label", "onClick"])
               ])) : $setup.isReplying ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -6839,15 +10592,15 @@ This will fail in production if not fixed.`);
                 vue.createVNode($setup["AppButton"], {
                   type: "secondary",
                   size: "small",
-                  label: "Hủy",
+                  label: _ctx.$t("common.cancel"),
                   disabled: $setup.isSubmittingComment,
                   onClick: $setup.onCancelReply
-                }, null, 8, ["disabled", "onClick"]),
+                }, null, 8, ["label", "disabled", "onClick"]),
                 vue.createVNode($setup["AppButton"], {
                   type: "primary",
                   size: "small",
                   loading: $setup.isSubmittingComment,
-                  label: $setup.isSubmittingComment ? "Đang gửi..." : "Trả lời",
+                  label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.reply_btn"),
                   onClick: $setup.submitReply
                 }, null, 8, ["loading", "label", "onClick"])
               ])) : vue.createCommentVNode("v-if", true)
@@ -6858,12 +10611,24 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", null, "⏳ Đang tải bình luận...")
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString(_ctx.$t("todo.loading_comments")),
+              1
+              /* TEXT */
+            )
           ])) : $setup.comments.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
           }, [
-            vue.createElementVNode("text", null, "Chưa có bình luận nào.")
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString(_ctx.$t("todo.no_comments")),
+              1
+              /* TEXT */
+            )
           ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
             (vue.openBlock(true), vue.createElementBlock(
               vue.Fragment,
@@ -6888,7 +10653,13 @@ This will fail in production if not fixed.`);
             class: "toggle-header",
             onClick: _cache[15] || (_cache[15] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
           }, [
-            vue.createElementVNode("text", { class: "section-title no-margin" }, "Lịch sử tương tác khách hàng"),
+            vue.createElementVNode(
+              "text",
+              { class: "section-title no-margin" },
+              vue.toDisplayString(_ctx.$t("todo.history_section")),
+              1
+              /* TEXT */
+            ),
             vue.createElementVNode(
               "image",
               {
@@ -6925,12 +10696,24 @@ This will fail in production if not fixed.`);
             key: 0,
             class: "loading-row"
           }, [
-            vue.createElementVNode("text", { class: "loading-text" }, "⏳ Đang tải lịch sử...")
+            vue.createElementVNode(
+              "text",
+              { class: "loading-text" },
+              vue.toDisplayString(_ctx.$t("todo.loading_history")),
+              1
+              /* TEXT */
+            )
           ])) : $setup.historyList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
             key: 1,
             class: "empty-row"
           }, [
-            vue.createElementVNode("text", null, "(Không tìm thấy dữ liệu)")
+            vue.createElementVNode(
+              "text",
+              null,
+              vue.toDisplayString(_ctx.$t("todo.no_history")),
+              1
+              /* TEXT */
+            )
           ])) : (vue.openBlock(), vue.createElementBlock("view", {
             key: 2,
             class: "timeline-list"
@@ -6985,34 +10768,34 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelEditOpen,
         "onUpdate:visible": _cache[18] || (_cache[18] = ($event) => $setup.isConfirmCancelEditOpen = $event),
-        title: "Xác nhận hủy",
-        message: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
-        "cancel-label": "Tiếp tục sửa",
-        "confirm-label": "Hủy bỏ",
+        title: _ctx.$t("todo.cancel_edit_title"),
+        message: _ctx.$t("todo.cancel_edit_msg"),
+        "cancel-label": _ctx.$t("todo.continue_edit"),
+        "confirm-label": _ctx.$t("common.cancel_action"),
         "confirm-type": "danger",
         onCancel: $setup.continueEditing,
         onConfirm: $setup.confirmCancelEdit
-      }, null, 8, ["visible", "onCancel", "onConfirm"]),
+      }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelReplyOpen,
         "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
-        title: "Hủy trả lời",
-        message: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
-        "cancel-label": "Tiếp tục viết",
-        "confirm-label": "Hủy bỏ",
+        title: _ctx.$t("todo.cancel_reply_title"),
+        message: _ctx.$t("todo.cancel_reply_msg"),
+        "cancel-label": _ctx.$t("todo.continue_reply"),
+        "confirm-label": _ctx.$t("common.cancel_action"),
         "confirm-type": "danger",
         onCancel: $setup.continueReplying,
         onConfirm: $setup.confirmCancelReply
-      }, null, 8, ["visible", "onCancel", "onConfirm"]),
+      }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteCommentOpen,
         "onUpdate:visible": _cache[20] || (_cache[20] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
-        title: "Xác nhận xóa",
-        message: "Bạn có chắc muốn xóa bình luận này không?",
+        title: _ctx.$t("todo.delete_comment_title"),
+        message: _ctx.$t("todo.delete_comment_msg"),
         "confirm-type": "danger",
         onConfirm: $setup.confirmDeleteComment,
         onCancel: $setup.cancelDeleteComment
-      }, null, 8, ["visible", "onConfirm", "onCancel"]),
+      }, null, 8, ["visible", "title", "message", "onConfirm", "onCancel"]),
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
@@ -7076,9 +10859,342 @@ This will fail in production if not fixed.`);
     }
   });
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android-2/App.vue"]]);
+  const common$1 = {
+    loading: "Đang tải dữ liệu...",
+    no_data: "Chưa có dữ liệu",
+    all: "Tất cả",
+    reset: "Đặt lại",
+    apply: "Áp dụng",
+    "delete": "Xóa",
+    confirm: "Xác nhận",
+    cancel: "Hủy",
+    notification: "Thông báo",
+    success_delete: "Đã xóa thành công",
+    fail_delete: "Xóa thất bại",
+    error_load: "Lỗi tải dữ liệu",
+    save: "Lưu",
+    saving: "Đang lưu...",
+    cancel_action: "Hủy bỏ",
+    search: "Tìm kiếm",
+    filter: "Lọc",
+    me: "tôi",
+    system: "Hệ thống",
+    unknown_member: "Thành viên ẩn danh",
+    error_missing_data: "Thiếu dữ liệu gốc",
+    error_connection: "Lỗi kết nối",
+    error_update: "Cập nhật thất bại",
+    error_send: "Gửi thất bại"
+  };
+  const todo$1 = {
+    page_title: "Công việc",
+    create_page_title: "Tạo công việc",
+    add_task: "Thêm công việc",
+    created_at: "Tạo",
+    expired_at: "Hết hạn",
+    notify_at: "Thông báo",
+    code_prefix: "Mã công việc",
+    filter_title: "Bộ lọc tìm kiếm",
+    search_placeholder: "Nhập từ khóa...",
+    search_label: "Tiêu đề / Từ khóa",
+    job_code_placeholder: "Ví dụ: TODO-08",
+    status: "Trạng thái",
+    creator: "Người tạo",
+    customer: "Khách hàng",
+    select_customer: "Chọn khách hàng",
+    assignee: "Người được giao",
+    source: "Nguồn",
+    select_source: "Chọn nguồn",
+    time_create: "Thời gian tạo",
+    time_expired: "Thời gian hết hạn",
+    time_notify: "Thời gian thông báo",
+    confirm_delete_msg: 'Bạn có chắc muốn xóa công việc "{title}"?',
+    enter_task_name: "Nhập tên công việc... *",
+    char_count: "{current}/{max}",
+    due_date_label: "Hạn xử lý:",
+    notify_date_label: "Ngày thông báo:",
+    select_date: "Chọn ngày",
+    date_text: "Ngày",
+    time_text: "Giờ",
+    validate_name: "Vui lòng nhập tên công việc",
+    create_success: "Tạo thành công!",
+    upload_processing: "Đang xử lý dữ liệu...",
+    header_loading: "Đang tải tên công việc...",
+    desc_section: "Mô tả",
+    desc_placeholder: "Nhập mô tả công việc...",
+    info_section: "Thông tin công việc",
+    customer_section: "Thông tin khách hàng",
+    loading_crm: "⏳ Đang tải thông tin từ CRM...",
+    no_customer_attached: "(Công việc này chưa gắn với khách hàng nào)",
+    customer_name_label: "Khách hàng",
+    customer_phone_label: "SĐT",
+    customer_manager_label: "Phụ trách",
+    manager_none: "(Chưa có)",
+    comments_activities: "Bình luận và hoạt động",
+    comment_placeholder_edit: "Đang chỉnh sửa...",
+    comment_placeholder_reply: "Viết câu trả lời...",
+    comment_placeholder_write: "Viết bình luận",
+    editing_alert: "Đang chỉnh sửa bình luận của",
+    replying_alert: "Đang trả lời bình luận của",
+    loading_comments: "⏳ Đang tải bình luận...",
+    no_comments: "Chưa có bình luận nào.",
+    history_section: "Lịch sử tương tác khách hàng",
+    loading_history: "⏳ Đang tải lịch sử...",
+    no_history: "(Không tìm thấy dữ liệu)",
+    reply_btn: "Trả lời",
+    update_btn: "Cập nhật",
+    cancel_edit_title: "Xác nhận hủy",
+    cancel_edit_msg: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
+    continue_edit: "Tiếp tục sửa",
+    cancel_reply_title: "Hủy trả lời",
+    cancel_reply_msg: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
+    continue_reply: "Tiếp tục viết",
+    delete_comment_title: "Xác nhận xóa",
+    delete_comment_msg: "Bạn có chắc muốn xóa bình luận này không?",
+    status_todo: "Chưa xử lý",
+    status_progress: "Đang xử lý",
+    status_done: "Hoàn thành",
+    filter_activity_all: "Tất cả hoạt động",
+    filter_activity_comment: "Bình luận",
+    history_all: "Tất cả",
+    history_todo: "Công việc",
+    history_ticket: "Ticket",
+    history_call: "Lịch sử gọi",
+    history_customer: "Khách hàng",
+    history_note: "Ghi chú",
+    msg_update_success: "Cập nhật thành công",
+    msg_update_error: "Lỗi cập nhật",
+    msg_title_empty: "Tiêu đề không được để trống",
+    msg_title_changed: "Đã đổi tiêu đề",
+    msg_desc_saved: "Đã cập nhật mô tả",
+    msg_reply_success: "Đã trả lời",
+    msg_comment_success: "Đã gửi bình luận",
+    msg_empty_content: "Vui lòng nhập nội dung",
+    msg_assignee_changed: "Đã đổi người thực hiện",
+    msg_status_changed: "Đã cập nhật trạng thái",
+    action_comment: "đã thêm một bình luận",
+    action_log: "đã cập nhật hoạt động",
+    action_update: "cập nhật thông tin công việc",
+    user_hidden: "Người dùng ẩn",
+    unknown: "Chưa xác định",
+    msg_deleted: "Đã xóa",
+    msg_saved: "Đã lưu",
+    interaction_other: "Tương tác khác"
+  };
+  const customer_modal$1 = {
+    title: "Chọn khách hàng",
+    placeholder_name: "Nhập tên khách hàng",
+    placeholder_phone: "Nhập số điện thoại",
+    manager_default: "Thành viên quản lý",
+    loading_more: "Đang tải thêm...",
+    no_name: "(Không tên)",
+    no_phone: "Không có SĐT"
+  };
+  const editor$1 = {
+    placeholder: "Nhập nội dung mô tả...",
+    link_modal_title: "Chèn Hyperlink (Text)",
+    card_modal_title: "Chèn Thẻ Liên Kết (Web)",
+    card_modal_desc: "Liên kết sẽ hiển thị dạng thẻ xem trước.",
+    color_text: "Màu chữ",
+    color_bg: "Màu nền",
+    align_left: "Căn trái",
+    align_center: "Căn giữa",
+    align_right: "Căn phải",
+    align_justify: "Căn đều",
+    size_small: "Nhỏ",
+    size_normal: "Bình thường",
+    size_large: "Lớn",
+    size_huge: "Rất lớn",
+    img_camera: "Chụp ảnh mới",
+    img_album: "Chọn từ thư viện"
+  };
+  const source$1 = {
+    call: "Cuộc gọi",
+    customer: "Khách hàng",
+    conversation: "Hội thoại",
+    message: "Tin nhắn"
+  };
+  const vi = {
+    common: common$1,
+    todo: todo$1,
+    customer_modal: customer_modal$1,
+    editor: editor$1,
+    source: source$1
+  };
+  const common = {
+    loading: "Loading data...",
+    no_data: "No data available",
+    all: "All",
+    reset: "Reset",
+    apply: "Apply",
+    "delete": "Delete",
+    confirm: "Confirm",
+    cancel: "Cancel",
+    notification: "Notification",
+    success_delete: "Deleted successfully",
+    fail_delete: "Delete failed",
+    error_load: "Error loading data",
+    save: "Save",
+    saving: "Saving...",
+    cancel_action: "Cancel",
+    search: "Search",
+    filter: "Filter",
+    me: "me",
+    system: "System",
+    unknown_member: "Unknown Member",
+    error_missing_data: "Original data missing",
+    error_connection: "Connection error",
+    error_update: "Update failed",
+    error_send: "Send failed"
+  };
+  const todo = {
+    page_title: "Tasks",
+    create_page_title: "Create Task",
+    add_task: "Add Task",
+    created_at: "Created",
+    expired_at: "Due date",
+    notify_at: "Notify",
+    code_prefix: "Job Code",
+    filter_title: "Search Filter",
+    search_placeholder: "Enter keywords...",
+    search_label: "Title / Keywords",
+    job_code_placeholder: "Ex: TODO-08",
+    status: "Status",
+    creator: "Creator",
+    customer: "Customer",
+    select_customer: "Select Customer",
+    assignee: "Assignee",
+    source: "Source",
+    select_source: "Select Source",
+    time_create: "Created Time",
+    time_expired: "Due Date Time",
+    time_notify: "Notification Time",
+    confirm_delete_msg: 'Are you sure you want to delete "{title}"?',
+    enter_task_name: "Enter task name... *",
+    char_count: "{current}/{max}",
+    due_date_label: "Due Date:",
+    notify_date_label: "Notify Date:",
+    select_date: "Select Date",
+    date_text: "Date",
+    time_text: "Time",
+    validate_name: "Please enter task name",
+    create_success: "Created successfully!",
+    upload_processing: "Processing data...",
+    header_loading: "Loading task title...",
+    desc_section: "Description",
+    desc_placeholder: "Enter task description...",
+    info_section: "Task Information",
+    customer_section: "Customer Information",
+    loading_crm: "⏳ Loading CRM info...",
+    no_customer_attached: "(No customer attached)",
+    customer_name_label: "Customer",
+    customer_phone_label: "Phone",
+    customer_manager_label: "In charge",
+    manager_none: "(None)",
+    comments_activities: "Comments & Activities",
+    comment_placeholder_edit: "Editing...",
+    comment_placeholder_reply: "Write a reply...",
+    comment_placeholder_write: "Write a comment",
+    editing_alert: "Editing comment of",
+    replying_alert: "Replying to comment of",
+    loading_comments: "⏳ Loading comments...",
+    no_comments: "No comments yet.",
+    history_section: "Customer Interaction History",
+    loading_history: "⏳ Loading history...",
+    no_history: "(No data found)",
+    reply_btn: "Reply",
+    update_btn: "Update",
+    cancel_edit_title: "Cancel Editing",
+    cancel_edit_msg: "Are you sure you want to cancel? Changes will be lost.",
+    continue_edit: "Keep Editing",
+    cancel_reply_title: "Cancel Reply",
+    cancel_reply_msg: "Are you sure? Draft content will be lost.",
+    continue_reply: "Keep Writing",
+    delete_comment_title: "Confirm Delete",
+    delete_comment_msg: "Are you sure you want to delete this comment?",
+    status_todo: "To Do",
+    status_progress: "In Progress",
+    status_done: "Done",
+    filter_activity_all: "All Activities",
+    filter_activity_comment: "Comments",
+    history_all: "All",
+    history_todo: "Tasks",
+    history_ticket: "Tickets",
+    history_call: "Calls",
+    history_customer: "Customer",
+    history_note: "Notes",
+    msg_update_success: "Update successful",
+    msg_update_error: "Update failed",
+    msg_title_empty: "Title cannot be empty",
+    msg_title_changed: "Title changed",
+    msg_desc_saved: "Description updated",
+    msg_reply_success: "Replied successfully",
+    msg_comment_success: "Comment sent",
+    msg_empty_content: "Please enter content",
+    msg_assignee_changed: "Assignee changed",
+    msg_status_changed: "Status updated",
+    action_comment: "added a comment",
+    action_log: "updated activity",
+    action_update: "updated task info",
+    user_hidden: "Hidden User",
+    unknown: "Unknown",
+    msg_deleted: "Deleted",
+    msg_saved: "Saved",
+    interaction_other: "Other interaction"
+  };
+  const customer_modal = {
+    title: "Select Customer",
+    placeholder_name: "Enter customer name",
+    placeholder_phone: "Enter phone number",
+    manager_default: "Manager Member",
+    loading_more: "Loading more...",
+    no_name: "(No Name)",
+    no_phone: "No Phone"
+  };
+  const editor = {
+    placeholder: "Enter description...",
+    link_modal_title: "Insert Hyperlink (Text)",
+    card_modal_title: "Insert Link Card (Web)",
+    card_modal_desc: "Link will be displayed as a preview card.",
+    color_text: "Text Color",
+    color_bg: "Background Color",
+    align_left: "Align Left",
+    align_center: "Align Center",
+    align_right: "Align Right",
+    align_justify: "Justify",
+    size_small: "Small",
+    size_normal: "Normal",
+    size_large: "Large",
+    size_huge: "Huge",
+    img_camera: "Take Photo",
+    img_album: "Choose from Album"
+  };
+  const source = {
+    call: "Call",
+    customer: "Customer",
+    conversation: "Conversation",
+    message: "Message"
+  };
+  const en = {
+    common,
+    todo,
+    customer_modal,
+    editor,
+    source
+  };
+  const i18n = createI18n({
+    locale: "vi",
+    fallbackLocale: "en",
+    messages: {
+      vi,
+      en
+    },
+    legacy: false,
+    globalInjection: true
+  });
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());
+    app.use(i18n);
     return {
       app,
       Pinia

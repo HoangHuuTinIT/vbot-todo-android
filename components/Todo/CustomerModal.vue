@@ -4,7 +4,7 @@
 		<view class="modal-content" @click.stop>
 
 			<view class="modal-header">
-				<text class="modal-title">Chọn khách hàng</text>
+                <text class="modal-title">{{ $t('customer_modal.title') }}</text>
 
 				<view class="header-actions">
 					<view class="filter-toggle-btn" :class="{ 'active': isFilterExpanded }" @click="toggleFilter">
@@ -16,12 +16,12 @@
 
 			<view class="filter-section" v-if="isFilterExpanded">
 				<view class="f-item">
-					<input class="f-input" v-model="filter.name" placeholder="Nhập tên khách hàng"
+                    <input class="f-input" v-model="filter.name" :placeholder="$t('customer_modal.placeholder_name')"
 						placeholder-class="ph-style" />
 				</view>
 
 				<view class="f-item">
-					<input class="f-input" v-model="filter.phone" type="number" placeholder="Nhập số điện thoại"
+					<input class="f-input" v-model="filter.phone" type="number" :placeholder="$t('customer_modal.placeholder_phone')"
 						placeholder-class="ph-style" />
 				</view>
 
@@ -44,28 +44,28 @@
 				</view>
 
 				<view class="f-actions">
-					<button class="btn-reset" @click="resetFilter">Đặt lại</button>
-					<button class="btn-submit" @click="applyFilter">Lọc</button>
+					<button class="btn-reset" @click="resetFilter">{{ $t('common.reset') }}</button>
+					<button class="btn-submit" @click="applyFilter">{{ $t('common.filter') }}</button>
 				</view>
 			</view>
 
-			<view v-if="loading" class="loading-state">Đang tải dữ liệu...</view>
+			<view v-if="loading" class="loading-state">{{ $t('common.loading') }}</view>
 			<scroll-view scroll-y class="customer-list" v-else @scrolltolower="onScrollToLower" lower-threshold="50">
 				<view v-for="(item, index) in customers" :key="item.id" class="customer-item"
 					@click="selectCustomer(item)">
 					<UserAvatar :name="item.name" :size="40" class="mr-3" />
 					<view class="info-column">
-						<text class="name-text">{{ item.name || '(Không tên)' }}</text>
-						<text class="phone-text">{{ item.phone || 'Không có SĐT' }}</text>
+						<text class="name-text">{{ item.name || $t('customer_modal.no_name') }}</text>
+						<text class="phone-text">{{ item.phone || $t('customer_modal.no_phone') }}</text>
 					</view>
 					<view class="date-column">
 						<text class="date-text">{{ formatDate(item.createAt) }}</text>
 					</view>
 				</view>
 				<view v-if="loadingMore" class="loading-more-container">
-					<text class="loading-more-text">Đang tải thêm...</text>
+					<text class="loading-more-text">{{ $t('customer_modal.loading_more') }}</text>
 				</view>
-				<view v-if="customers.length === 0" class="empty-state">Không có dữ liệu</view>
+				<view v-if="customers.length === 0" class="empty-state">{{ $t('common.no_data') }}</view>
 			</scroll-view>
 		</view>
 	</view>
@@ -76,7 +76,8 @@
 	import UserAvatar from '@/components/UserAvatar.vue';
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
 	import type { ProjectMember } from '@/types/Project';
-
+	import { useI18n } from 'vue-i18n';
+	const { t } = useI18n();
 	interface CustomerDisplay {
 		id : number;
 		name : string;
@@ -110,11 +111,11 @@
 		emit('loadMore');
 	};
 	const managerDisplayOptions = computed(() => {
-		const defaultOption = 'Thành viên quản lý';
-		const list = props.managers || [];
-		const memberNames = list.map(m => m.UserName || 'Thành viên ẩn danh');
-		return [defaultOption, ...memberNames];
-	});
+			const defaultOption = t('customer_modal.manager_default');
+			const list = props.managers || [];
+			const memberNames = list.map(m => m.UserName || 'Thành viên ẩn danh');
+			return [defaultOption, ...memberNames];
+		});
 
 	const toggleFilter = () => {
 		isFilterExpanded.value = !isFilterExpanded.value;

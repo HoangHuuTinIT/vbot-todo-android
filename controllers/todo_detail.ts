@@ -12,10 +12,10 @@ import { formatRelativeTime } from '@/utils/dateUtils';
 import { TODO_STATUS } from '@/utils/constants';
 import { showSuccess, showError, showInfo } from '@/utils/toast';
 import { extractLinksAndCleanHtml } from '@/utils/linkHelper';
+import { useI18n } from 'vue-i18n';
 interface CommentItem {
 	id : number;
 	senderId : string | number;
-
 	senderName : string;
 	senderAvatarChar : string;
 	senderAvatarColor : string;
@@ -38,6 +38,7 @@ interface HistoryItem {
 	originalType : string;
 }
 export const useTodoDetailController = () => {
+	const { t } = useI18n();
 	const authStore = useAuthStore();
 
 	const currentUserId = authStore.uid;
@@ -69,7 +70,10 @@ export const useTodoDetailController = () => {
 	const emojiList = ['👍', '👎', '😍', '😆', '😱', '😭', '😤'];
 
 	const commentFilterIndex = ref(0);
-	const commentFilterOptions = ['Tất cả hoạt động', 'Bình luận'];
+	const commentFilterOptions = computed(() => [
+	        t('todo.filter_activity_all'), 
+	        t('todo.filter_activity_comment')
+	    ]);
 	const commentFilterValues = ['', 'COMMENT'];
 
 	const isSavingDescription = ref(false);
@@ -94,9 +98,6 @@ export const useTodoDetailController = () => {
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
-
-
-
 		isLoading.value = true;
 		try {
 			const payload = {
@@ -124,7 +125,7 @@ export const useTodoDetailController = () => {
 			const res = await updateTodo(payload);
 
 			if (res) {
-				showSuccess('Cập nhật thành công');
+				showSuccess(t('todo.msg_update_success'));
 
 				if (event.field === 'dueDate') {
 					form.value.raw.dueDate = payload.dueDate;
@@ -138,7 +139,7 @@ export const useTodoDetailController = () => {
 
 		} catch (error) {
 			console.error("Lỗi cập nhật ngày:", error);
-			showError('Lỗi cập nhật');
+			showError(t('todo.msg_update_error'));
 		} finally {
 			isLoading.value = false;
 		}
@@ -224,7 +225,7 @@ export const useTodoDetailController = () => {
 
 	const onSaveDescription = async () => {
 		if (!form.value.raw) {
-			showError('Không tìm thấy dữ liệu gốc');
+			showError(t('common.error_missing_data'));
 			return;
 		}
 
@@ -253,7 +254,7 @@ export const useTodoDetailController = () => {
 			const res = await updateTodo(payload);
 
 			if (res) {
-				showSuccess('Đã cập nhật mô tả');
+				showSuccess(t('todo.msg_desc_saved'));
 
 
 				form.value.raw.description = form.value.desc;
@@ -264,7 +265,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error("Lỗi cập nhật công việc:", error);
-			showError('Cập nhật thất bại');
+			showError(t('common.error_update'));
 		} finally {
 
 			isSavingDescription.value = false;
@@ -278,7 +279,7 @@ export const useTodoDetailController = () => {
 		const oldTitle = form.value.raw.title;
 
 		if (!newTitle) {
-			showInfo('Tiêu đề không được để trống');
+			showInfo(t('todo.msg_title_empty'));
 			form.value.title = oldTitle;
 			return;
 		}
@@ -303,7 +304,7 @@ export const useTodoDetailController = () => {
 			const res = await updateTodo(payload);
 
 			if (res) {
-				showSuccess('Đã đổi tiêu đề');
+				showSuccess(t('todo.msg_title_changed'));
 
 				form.value.raw.title = newTitle;
 
@@ -314,7 +315,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error("Lỗi cập nhật tiêu đề:", error);
-			showError('Lỗi cập nhật');
+			showError(t('todo.msg_update_error'));
 			form.value.title = oldTitle;
 		} finally {
 
@@ -342,7 +343,7 @@ export const useTodoDetailController = () => {
 		if (foundMember) {
 			replyingMemberName.value = foundMember.UserName;
 		} else {
-			replyingMemberName.value = 'Người dùng ẩn';
+			replyingMemberName.value = t('todo.user_hidden');
 		}
 
 		await nextTick();
@@ -368,7 +369,7 @@ export const useTodoDetailController = () => {
 
 	const submitReply = async () => {
 		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-			showInfo('Vui lòng nhập nội dung');
+			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
 		if (!replyingCommentData.value) return;
@@ -396,7 +397,7 @@ export const useTodoDetailController = () => {
 			const newReplyId = await createTodoMessage(payload);
 
 			if (newReplyId) {
-				showSuccess('Đã trả lời');
+				showSuccess(t('todo.msg_reply_success'));
 				const newReplyData = await getTodoMessageDetail(newReplyId, form.value.id);
 				const processedReply = processCommentData(newReplyData);
 
@@ -414,7 +415,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error("Lỗi gửi trả lời:", error);
-			showError('Gửi thất bại');
+			showError(t('common.error_send'));
 		} finally {
 			isSubmittingComment.value = false;
 		}
@@ -510,7 +511,7 @@ export const useTodoDetailController = () => {
 				}
 			} catch (error) {
 				console.error("Lỗi thả cảm xúc:", error);
-				showError('Lỗi kết nối');
+				showError(t('common.error_connection'));
 			}
 		};
 	const editingCommentData = ref<{
@@ -520,14 +521,14 @@ export const useTodoDetailController = () => {
 	} | null>(null);
 	const historyFilterIndex = ref(0);
 
-	const historyFilterOptions = [
-		'Tất cả',
-		'Công việc',
-		'Ticket',
-		'Lịch sử gọi',
-		'Khách hàng',
-		'Ghi chú'
-	];
+	const historyFilterOptions = computed(() => [
+	        t('todo.history_all'),
+	        t('todo.history_todo'),
+	        t('todo.history_ticket'),
+	        t('todo.history_call'),
+	        t('todo.history_customer'),
+	        t('todo.history_note')
+	    ]);
 	const historyFilterValues = [
 		'ALL',
 		'TODO',
@@ -537,7 +538,7 @@ export const useTodoDetailController = () => {
 		'NOTE'
 	];
 	const form = ref<TodoDetailForm>({
-		id: '', title: '', code: 'Loading...', desc: '',
+		id: '', title: '', code: t('common.loading'), desc: '',
 		statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
 		dueDate: '', notifyDate: '', notifyTime: '',
 		customerCode: '', customerName: '', customerNameLabel: '',
@@ -545,32 +546,32 @@ export const useTodoDetailController = () => {
 		customerManagerName: '', customerManagerLabel: ''
 	});
 
-	const statusOptions = ['Chưa xử lý', 'Đang xử lý', 'Hoàn thành'];
-	const sourceOptions = ['Cuộc gọi', 'Khách hàng', 'Hội thoại', 'Tin nhắn'];
+	// const statusOptions = ['Chưa xử lý', 'Đang xử lý', 'Hoàn thành'];
+	const sourceOptions = computed(() => [
+	        t('source.call'), 
+	        t('source.customer'), 
+	        t('source.conversation'), 
+	        t('source.message')
+	    ]);
 
 	const memberList = ref<any[]>([]);
 	const assigneeOptions = ref<string[]>([]);
 	const dynamicStatusOptions = computed(() => {
-		const options = [
-			{ label: 'Chưa xử lý', value: 'TO_DO' },
-			{ label: 'Đang xử lý', value: 'IN_PROGRESS' },
-			{ label: 'Hoàn thành', value: 'DONE' }
-		];
-
-
-		if (form.value.raw && form.value.raw.status === 'IN_PROGRESS') {
-
-			return options.filter(opt => opt.value !== 'TO_DO');
-		}
-
-		return options;
-	});
+			const options = [
+				{ label: t('todo.status_todo'), value: 'TO_DO' },
+				{ label: t('todo.status_progress'), value: 'IN_PROGRESS' },
+				{ label: t('todo.status_done'), value: 'DONE' }
+			];
+			if (form.value.raw && form.value.raw.status === 'IN_PROGRESS') {
+				return options.filter(opt => opt.value !== 'TO_DO');
+			}
+			return options;
+		});
 	const statusLabels = computed(() => dynamicStatusOptions.value.map(opt => opt.label));
 	const onRequestEditComment = async (commentId : number) => {
 		const todoId = form.value.id;
 		if (!todoId) return;
 
-		// isLoading.value = true;
 		try {
 
 			const res = await getTodoMessageDetail(commentId, todoId);
@@ -596,7 +597,7 @@ export const useTodoDetailController = () => {
 					editingMemberName.value = foundMember.UserName;
 				} else {
 
-					editingMemberName.value = 'tôi';
+					editingMemberName.value = t('common.me');
 				}
 
 				const content = dataDetail.message || '';
@@ -613,7 +614,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error("Lỗi lấy chi tiết bình luận:", error);
-			showError('Lỗi tải dữ liệu');
+			showError(t('common.error_load'));
 		} finally {
 
 			isLoading.value = false;
@@ -625,7 +626,7 @@ export const useTodoDetailController = () => {
 
 
 		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-			showInfo('Nội dung không được để trống');
+			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
 
@@ -644,7 +645,7 @@ export const useTodoDetailController = () => {
 			const updatedData = await updateTodoMessage(payload);
 
 			if (updatedData) {
-				showSuccess('Đã cập nhật');
+				showSuccess(t('todo.msg_update_success'));
 
 				const parentIndex = comments.value.findIndex(c => c.id === updatedData.id);
 				if (parentIndex !== -1) {
@@ -671,7 +672,7 @@ export const useTodoDetailController = () => {
 
 		} catch (error) {
 			console.error("Lỗi cập nhật:", error);
-			showError('Cập nhật thất bại');
+			showError(t('common.error_update'));
 		} finally {
 			isSubmittingComment.value = false;
 		}
@@ -717,11 +718,7 @@ export const useTodoDetailController = () => {
 
 		try {
 			await deleteTodoMessage(idToDelete);
-			showSuccess('Đã xóa');
-
-
-
-
+			showSuccess(t('todo.msg_deleted'));
 			const parentIndex = comments.value.findIndex(c => c.id === idToDelete);
 			if (parentIndex !== -1) {
 				comments.value.splice(parentIndex, 1);
@@ -741,7 +738,7 @@ export const useTodoDetailController = () => {
 
 		} catch (error) {
 			console.error("Lỗi xóa bình luận:", error);
-			showError('Xóa thất bại');
+			showError(t('common.fail_delete'));
 		} finally {
 			commentToDeleteId.value = null;
 		}
@@ -776,7 +773,7 @@ export const useTodoDetailController = () => {
 			const newCommentId = await createTodoMessage(payload);
 
 			if (newCommentId) {
-				showSuccess('Đã gửi bình luận');
+				showSuccess(t('todo.msg_comment_success'));
 				newCommentText.value = '';
 
 				const newCommentData = await getTodoMessageDetail(newCommentId, todoId);
@@ -791,7 +788,7 @@ export const useTodoDetailController = () => {
 
 		} catch (error) {
 			console.error("Lỗi gửi bình luận:", error);
-			showError('Gửi thất bại');
+			showError(t('common.error_send'));
 		} finally {
 			isSubmittingComment.value = false;
 		}
@@ -809,7 +806,7 @@ export const useTodoDetailController = () => {
 		try {
 			const data = await getAllMembers();
 			memberList.value = data;
-			assigneeOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
+			assigneeOptions.value = data.map(m => m.UserName || t('common.unknown_member'));
 			if (form.value.assigneeId) {
 				const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
 				if (index !== -1) form.value.assigneeIndex = index;
@@ -877,7 +874,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error('Lỗi lấy chi tiết:', error);
-			showError('Lỗi kết nối');
+			showError(t('common.error_connection'));
 		} finally {
 			isLoading.value = false;
 			uni.hideNavigationBarLoading();
@@ -885,7 +882,7 @@ export const useTodoDetailController = () => {
 	};
 	const processCommentData = (item : any) : CommentItem => {
 
-		let senderName = 'Người dùng ẩn';
+		let senderName = t('todo.user_hidden');
 		let avatarChar = '?';
 		let avatarColor = '#e3f2fd';
 		if (item.senderId) {
@@ -903,9 +900,9 @@ export const useTodoDetailController = () => {
 
 
 		let actionText = '';
-		if (item.type === 'COMMENT') actionText = 'đã thêm một bình luận';
-		else if (item.type === 'LOG') actionText = 'đã cập nhật hoạt động';
-		else if (item.type === 'UPDATE_TODO') actionText = 'cập nhật thông tin công việc';
+				if (item.type === 'COMMENT') actionText = t('todo.action_comment');
+				else if (item.type === 'LOG') actionText = t('todo.action_log');
+				else if (item.type === 'UPDATE_TODO') actionText = t('todo.action_update');
 
 		const reactionList = item.reactions?.details || [];
 
@@ -985,7 +982,8 @@ export const useTodoDetailController = () => {
 
 			if (nameField) {
 				form.value.customerName = nameField.value;
-				form.value.customerNameLabel = nameField.name;
+				form.value.customerNameLabel = nameField.name || t('todo.customer_name_label');
+				
 			}
 
 
@@ -997,11 +995,11 @@ export const useTodoDetailController = () => {
 
 			if (managerField) {
 
-				form.value.customerManagerLabel = managerField.name;
+				form.value.customerManagerLabel = managerField.name || t('todo.customer_manager_label');
 
 				const managerUid = managerField.value;
 				const manager = memberList.value.find(m => m.memberUID === managerUid);
-				form.value.customerManagerName = manager ? manager.UserName : '(Chưa xác định)';
+				form.value.customerManagerName = manager ? manager.UserName : t('todo.unknown');
 			}
 
 		} catch (error) {
@@ -1034,7 +1032,7 @@ export const useTodoDetailController = () => {
 
 					const timeStr = `${day}/${month}/${year}`;
 
-					let actorName = 'Hệ thống';
+					let actorName = t('common.system');
 					if (item.memberUid) {
 						const foundMember = memberList.value.find(m => m.memberUID === item.memberUid);
 						if (foundMember) {
@@ -1042,7 +1040,7 @@ export const useTodoDetailController = () => {
 						}
 					}
 
-					const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || 'Tương tác khác';
+					const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t('todo.interaction_other');
 
 					return {
 						id: item.id,
@@ -1108,7 +1106,7 @@ export const useTodoDetailController = () => {
 			const res = await updateTodo(payload);
 
 			if (res) {
-				showSuccess('Đã cập nhật trạng thái');
+				showSuccess(t('todo.msg_status_changed'));
 
 				form.value.raw.status = newStatus;
 				const newDisplayIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === newStatus);
@@ -1120,7 +1118,7 @@ export const useTodoDetailController = () => {
 		} catch (error) {
 			console.error("Lỗi cập nhật trạng thái:", error);
 
-			showError('Lỗi cập nhật');
+			showError(t('todo.msg_update_error'));
 		} finally {
 			isLoading.value = false;
 
@@ -1142,7 +1140,7 @@ export const useTodoDetailController = () => {
 		form.value.assigneeId = newAssigneeId;
 
 		if (!form.value.raw) {
-			showError('Thiếu dữ liệu gốc');
+			showError(t('common.error_missing_data'));
 			return;
 		}
 		isLoading.value = true;
@@ -1168,7 +1166,7 @@ export const useTodoDetailController = () => {
 			const res = await updateTodo(payload);
 
 			if (res) {
-				showSuccess('Đã đổi người thực hiện');
+				showSuccess(t('todo.msg_assignee_changed'));
 
 
 				form.value.raw.assigneeId = newAssigneeId;
@@ -1181,7 +1179,7 @@ export const useTodoDetailController = () => {
 			}
 		} catch (error) {
 			console.error("Lỗi cập nhật người giao:", error);
-			showError('Lỗi cập nhật');
+			showError(t('todo.msg_update_error'));
 		} finally {
 
 			isLoading.value = false;
@@ -1190,7 +1188,7 @@ export const useTodoDetailController = () => {
 	const goBack = () => { uni.navigateBack(); };
 	const saveTodo = () => {
 		console.log("Lưu:", form.value);
-		showSuccess('Đã lưu');
+		showSuccess(t('todo.msg_saved'));
 	};
 
 	return {
@@ -1200,11 +1198,9 @@ export const useTodoDetailController = () => {
 		statusOptions: statusLabels, sourceOptions, assigneeOptions,
 		onStatusChange, onSourceChange, onAssigneeChange,
 		goBack, saveTodo,
-
 		historyFilterOptions,
 		historyFilterIndex,
 		onHistoryFilterChange,
-
 		comments, isLoadingComments,
 		newCommentText, isSubmittingComment, submitComment,
 		isConfirmDeleteCommentOpen,

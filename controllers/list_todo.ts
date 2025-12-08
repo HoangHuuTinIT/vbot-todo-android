@@ -11,8 +11,9 @@ import { getAllMembers } from '@/api/project';
 import { showSuccess, showError } from '@/utils/toast';
 import { usePagination } from '@/composables/usePagination';
 import { useCustomerFilter } from '@/composables/useCustomerFilter';
-
+import { useI18n } from 'vue-i18n';
 export const useListTodoController = () => {
+	const { t } = useI18n();
 	const todos = ref<TodoItem[]>([]);
 	const {
 		pageNo, pageSize, totalCount, pageSizeOptions,
@@ -28,17 +29,35 @@ export const useListTodoController = () => {
 	const isConfirmDeleteOpen = ref<boolean>(false);
 	const itemToDelete = ref<TodoItem | null>(null);
 
-	const statusOptions = ['Tất cả', STATUS_LABELS[TODO_STATUS.NEW], STATUS_LABELS[TODO_STATUS.IN_PROGRESS], STATUS_LABELS[TODO_STATUS.DONE]];
+	const statusOptions = computed(() => [
+	        t('common.all'), 
+	        STATUS_LABELS[TODO_STATUS.NEW], 
+	        STATUS_LABELS[TODO_STATUS.IN_PROGRESS], 
+	        STATUS_LABELS[TODO_STATUS.DONE]
+	    ]);
 	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
 	const statusIndex = ref<number>(0);
 
 	const rawMemberList = ref<any[]>([]);
-	const creatorOptions = ref(['Tất cả']);
-	const creatorIndex = ref(0);
-	const assigneeOptions = ref(['Tất cả']);
-	const assigneeIndex = ref(0);
+	const creatorOptions = computed(() => {
+	        const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
+	        return [t('common.all'), ...names];
+	    });
+	    const creatorIndex = ref(0);
+	    
+	    const assigneeOptions = computed(() => {
+	        const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
+	        return [t('common.all'), ...names];
+	    });
+	    const assigneeIndex = ref(0);
 
-	const sourceOptions = ['Tất cả', 'Cuộc gọi', 'Khách hàng', 'Hội thoại', 'Tin nhắn'];
+	const sourceOptions = computed(() => [
+	        t('common.all'), 
+	        t('source.call'), 
+	        t('source.customer'), 
+	        t('source.conversation'), 
+	        t('source.message')
+	    ]);
 	const sourceValues = ['', TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
 	const sourceIndex = ref<number>(0);
 
@@ -192,7 +211,7 @@ export const useListTodoController = () => {
 	
 			} catch (error) {
 				console.error(error);
-				showError('Lỗi tải dữ liệu');
+				showError(t('common.error_load'));
 	            if (todos.value.length === 0) {
 	                todos.value = [];
 	            }
@@ -210,19 +229,19 @@ uni.stopPullDownRefresh();
 		if (!itemToDelete.value) return;
 		try {
 			await deleteTodo(itemToDelete.value.id);
-			showSuccess('Đã xóa thành công');
+			showSuccess(t('common.success_delete'));
 			isConfirmDeleteOpen.value = false;
 			itemToDelete.value = null;
 			getTodoList();
 		} catch (error) {
 			console.error("Delete Error:", error);
-			showError('Xóa thất bại');
+			showError(t('common.fail_delete'));
 		}
 	};
 
 	const showActionMenu = (item : TodoItem) => {
 		uni.showActionSheet({
-			itemList: ['Xóa'],
+			itemList: [t('common.delete')],
 			itemColor: '#ff3b30',
 			success: (res) => {
 				if (res.tapIndex === 0) onRequestDelete(item);

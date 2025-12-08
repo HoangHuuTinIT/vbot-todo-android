@@ -3,7 +3,7 @@
 	<view class="container">
 		<view class="header">
 			<view class="header-left"></view>
-			<text class="header-title">Công việc</text>
+			<text class="header-title">{{ $t('todo.page_title') }}</text>
 			<view class="header-right" @click="openFilter">
 				<image src="https://img.icons8.com/ios-filled/50/333333/filter--v1.png" class="filter-icon"></image>
 			</view>
@@ -12,13 +12,13 @@
 		<view class="content">
 			<view class="list-container">
 				<view v-if="isLoading" class="loading-state">
-					<text>Đang tải dữ liệu...</text>
+					<text>{{ $t('common.loading') }}</text>
 				</view>
 
 				<view v-else-if="todos.length === 0" class="empty-state">
 					<image src="https://img.icons8.com/ios/100/cccccc/empty-box.png" mode="aspectFit"
 						class="empty-icon"></image>
-					<text class="empty-text">Chưa có dữ liệu</text>
+					<text class="empty-text">{{ $t('common.no_data') }}</text>
 				</view>
 
 				<scroll-view v-else scroll-y="true" class="list-view">
@@ -34,18 +34,18 @@
 							</view>
 							<view class="card-info-row">
 								<image src="https://img.icons8.com/ios/50/666666/time.png" class="icon-small"></image>
-								<text class="card-date">Tạo: {{ item.createdAtFormatted }}</text>
+								<text class="card-date">{{ $t('todo.created_at') }}: {{ item.createdAtFormatted }}</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.dueDateFormatted">
 								<image src="https://img.icons8.com/ios/50/ff3b30/calendar--v1.png" class="icon-small">
 								</image>
-								<text class="card-date text-danger">Hết hạn: {{ item.dueDateFormatted }}</text>
+								<text class="card-date text-danger">{{ $t('todo.expired_at') }}: {{ item.dueDateFormatted }}</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.notifyAtFormatted">
 								<image src="https://img.icons8.com/ios/50/007aff/alarm.png" class="icon-small"></image>
-								<text class="card-date text-primary">Thông báo: {{ item.notifyAtFormatted }}</text>
+								<text class="card-date text-primary">{{ $t('todo.notify_at') }}: {{ item.notifyAtFormatted }}</text>
 							</view>
 							<view class="card-row bot-row">
 								<view class="code-tag">#{{ item.code }}</view>
@@ -62,7 +62,7 @@
 				<template #action>
 					<view class="add-task-simple" @click="addNewTask">
 						<text class="plus-icon">+</text>
-						<text class="add-text">Thêm công việc</text>
+						<text class="add-text">{{ $t('todo.add_task') }}</text>
 					</view>
 				</template>
 			</Pagination>
@@ -71,46 +71,46 @@
 		<view class="filter-overlay" v-if="isFilterOpen" @click.stop="closeFilter">
 			<view class="filter-panel" @click.stop>
 				<view class="filter-header">
-					<text class="filter-title">Bộ lọc tìm kiếm</text>
+					<text class="filter-title">{{ $t('todo.filter_title') }}</text>
 					<text class="close-btn" @click="closeFilter">✕</text>
 				</view>
 
 				<scroll-view scroll-y="true" class="filter-body">
 					<view class="f-group">
-						<text class="f-label">Tiêu đề / Từ khóa</text>
-						<input class="f-input" v-model="filter.title" placeholder="Nhập từ khóa..." />
+						<text class="f-label">{{ $t('todo.search_label') }}</text>
+						<input class="f-input" v-model="filter.title" :placeholder="$t('todo.search_placeholder')" />
 					</view>
 					<view class="f-group">
-						<text class="f-label">Mã công việc</text>
-						<input class="f-input" v-model="filter.jobCode" placeholder="Ví dụ: TODO-08" />
+						<text class="f-label">{{ $t('todo.code_prefix') }}</text>
+						<input class="f-input" v-model="filter.jobCode" :placeholder="$t('todo.job_code_placeholder')" />
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Trạng thái</text>
+						<text class="f-label">{{ $t('todo.status') }}</text>
 						<picker mode="selector" :range="statusOptions" :value="statusIndex" @change="onStatusChange">
 							<view class="f-picker">{{ statusOptions[statusIndex] }}<text class="arrow">▼</text></view>
 						</picker>
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Người tạo</text>
+						<text class="f-label">{{ $t('todo.creator') }}</text>
 						<picker mode="selector" :range="creatorOptions" :value="creatorIndex" @change="onCreatorChange">
 							<view class="f-picker">{{ creatorOptions[creatorIndex] }}<text class="arrow">▼</text></view>
 						</picker>
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Khách hàng</text>
+						<text class="f-label">{{ $t('todo.customer') }}</text>
 						<view class="f-input" @click="openCustomerPopup" style="justify-content: space-between;">
 							<text :style="{ color: selectedCustomerName ? '#333' : '#999' }">
-								{{ selectedCustomerName || 'Chọn khách hàng' }}
+								{{ selectedCustomerName || $t('todo.select_customer') }}
 							</text>
 							<text class="arrow">›</text>
 						</view>
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Người được giao</text>
+						<text class="f-label">{{ $t('todo.assignee') }}</text>
 						<picker mode="selector" :range="assigneeOptions" :value="assigneeIndex"
 							@change="onAssigneeChange">
 							<view class="f-picker">{{ assigneeOptions[assigneeIndex] }}<text class="arrow">▼</text>
@@ -119,33 +119,34 @@
 					</view>
 
 					<view class="f-group">
-						<text class="f-label">Nguồn</text>
+						<text class="f-label">{{ $t('todo.source') }}</text>
 						<picker mode="selector" :range="sourceOptions" :value="sourceIndex" @change="onSourceChange">
 							<view class="f-picker">{{ sourceOptions[sourceIndex] }}<text class="arrow">▼</text></view>
 						</picker>
 					</view>
 
-					<DateRangeFilter title="Thời gian tạo" v-model:startDate="filter.createdFrom"
+					<DateRangeFilter :title="$t('todo.time_create')" v-model:startDate="filter.createdFrom"
 						v-model:endDate="filter.createdTo" />
 
-					<DateRangeFilter title="Thời gian hết hạn" v-model:startDate="filter.dueDateFrom"
+					<DateRangeFilter :title="$t('todo.time_expired')" v-model:startDate="filter.dueDateFrom"
 						v-model:endDate="filter.dueDateTo" />
-					<DateRangeFilter title="Thời gian thông báo" v-model:startDate="filter.notifyFrom"
+					<DateRangeFilter :title="$t('todo.time_notify')" v-model:startDate="filter.notifyFrom"
 						v-model:endDate="filter.notifyTo" />
 					<view style="height: 20px;"></view>
 				</scroll-view>
 
 				<view class="filter-footer">
-					<AppButton type="secondary" label="Đặt lại" class="btn-filter-reset" @click="resetFilter" />
-					<AppButton type="primary" label="Áp dụng" class="btn-filter-apply" @click="applyFilter" />
+					<AppButton type="secondary" :label="$t('common.reset')" class="btn-filter-reset" @click="resetFilter" />
+					<AppButton type="primary" :label="$t('common.apply')" class="btn-filter-apply" @click="applyFilter" />
 				</view>
 			</view>
 		</view>
 		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
 			:customers="customerList" :managers="rawMemberList" @close="showCustomerModal = false"
 			@select="onCustomerSelect" @filter="onFilterCustomerInModal" @loadMore="loadMoreCustomers" />
-		<ConfirmModal v-model:visible="isConfirmDeleteOpen" title="Thông báo"
-			:message="`Bạn có chắc muốn xóa công việc &quot;${itemToDelete?.title}&quot;?`" confirm-type="danger"
+		
+		<ConfirmModal v-model:visible="isConfirmDeleteOpen" :title="$t('common.notification')"
+			:message="$t('todo.confirm_delete_msg', { title: itemToDelete?.title })" confirm-type="danger"
 			@confirm="confirmDelete" @cancel="cancelDelete" />
 		<GlobalMessage />
 	</view>

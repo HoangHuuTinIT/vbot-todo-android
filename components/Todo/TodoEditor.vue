@@ -3,7 +3,7 @@
 		<editor 
 			:id="editorId" 
 			class="ql-container" 
-			:placeholder="placeholder"
+			:placeholder="placeholder || $t('editor.placeholder')"
 			show-img-size 
 			show-img-toolbar 
 			show-img-resize
@@ -12,7 +12,6 @@
 			@statuschange="onStatusChange">
 		</editor>
 
-	
 		<view class="link-cards-area" v-if="insertedLinks.length > 0">
 			<LinkCard 
 				v-for="(link, index) in insertedLinks" 
@@ -22,8 +21,6 @@
 				@remove="removeLink(index)"
 			/>
 		</view>
-
-		<!-- 🔹 TOOLBAR -->
 		<view class="toolbar">
 			<view class="tool-list">
 				<view v-for="(item, index) in tools" :key="index"
@@ -65,11 +62,11 @@
 	
 		<view class="modal-overlay" v-if="showLinkModal" @tap="showLinkModal = false">
 			<view class="modal-box" @tap.stop>
-				<text class="modal-title">Chèn Hyperlink (Text)</text>
+				<text class="modal-title">{{ $t('editor.link_modal_title') }}</text>
 				<input class="modal-input" v-model="linkUrl" placeholder="https://example.com" :focus="showLinkModal" />
 				<view class="modal-actions">
-					<button class="btn-cancel" @tap="showLinkModal = false">Hủy</button>
-					<button class="btn-confirm" @tap="confirmLink">Xác nhận</button>
+					<button class="btn-cancel" @tap="showLinkModal = false">{{ $t('common.cancel') }}</button>
+					<button class="btn-confirm" @tap="confirmLink">{{ $t('common.confirm') }}</button>
 				</view>
 			</view>
 		</view>
@@ -77,12 +74,13 @@
 		
 		<view class="modal-overlay" v-if="showCardLinkModal" @tap="showCardLinkModal = false">
 			<view class="modal-box" @tap.stop>
-				<text class="modal-title">Chèn Thẻ Liên Kết (Web)</text>
-				<text class="modal-desc">Liên kết sẽ hiển thị dạng thẻ xem trước.</text>
+				<text class="modal-title">{{ $t('editor.card_modal_title') }}</text>
+				<text class="modal-desc">{{ $t('editor.card_modal_desc') }}</text>
+				
 				<input class="modal-input" v-model="cardLinkUrl" placeholder="https://youtube.com/..." :focus="showCardLinkModal" />
 				<view class="modal-actions">
-					<button class="btn-cancel" @tap="showCardLinkModal = false">Hủy</button>
-					<button class="btn-confirm" @tap="confirmCardLink">Thêm thẻ</button>
+					<button class="btn-cancel" @tap="showCardLinkModal = false">{{ $t('common.cancel') }}</button>
+					<button class="btn-confirm" @tap="confirmCardLink">{{ $t('common.confirm') }}</button>
 				</view>
 			</view>
 		</view>
@@ -92,10 +90,10 @@
 			<view class="modal-box color-box" @tap.stop>
 				<view class="color-tabs">
 					<view class="color-tab" :class="{ active: colorTab === 'color' }" @tap="colorTab = 'color'">
-						Màu chữ
+						{{ $t('editor.color_text') }}
 					</view>
 					<view class="color-tab" :class="{ active: colorTab === 'backgroundColor' }" @tap="colorTab = 'backgroundColor'">
-						Màu nền
+						{{ $t('editor.color_bg') }}
 					</view>
 				</view>
 
@@ -120,10 +118,12 @@
 <script setup lang="ts">
 import { ref, watch, getCurrentInstance, onMounted } from 'vue';
 import LinkCard from '@/components/Todo/LinkCard.vue';
-import { extractLinksAndCleanHtml, composeHtmlWithIframes } from '@/utils/linkHelper'; 
+import { extractLinksAndCleanHtml, composeHtmlWithIframes } from '@/utils/linkHelper';
+ import { useI18n } from 'vue-i18n';
+ const { t } = useI18n();
 const props = defineProps({
 	modelValue: String,
-	placeholder: { type: String, default: 'Nhập nội dung...' }
+	placeholder: { type: String, default: '' } // Để rỗng, xử lý ở template hoặc computed
 });
 const emit = defineEmits(['update:modelValue']);
 
@@ -320,7 +320,12 @@ const isColorSelected = (color: string) => {
 };
 
 const handleAlignSetting = () => {
-	const options = ['Căn trái', 'Căn giữa', 'Căn phải', 'Căn đều'];
+	const options = [
+	        t('editor.align_left'), 
+	        t('editor.align_center'), 
+	        t('editor.align_right'), 
+	        t('editor.align_justify')
+	    ];
 	uni.showActionSheet({
 		itemList: options,
 		success: (res) => {
@@ -334,7 +339,12 @@ const handleAlignSetting = () => {
 }
 
 const handleFontSizeSetting = () => {
-	const options = ['Nhỏ', 'Bình thường', 'Lớn', 'Rất lớn'];
+	const options = [
+	        t('editor.size_small'), 
+	        t('editor.size_normal'), 
+	        t('editor.size_large'), 
+	        t('editor.size_huge')
+	    ];
 	uni.showActionSheet({
 		itemList: options,
 		success: (res) => {
@@ -348,7 +358,7 @@ const handleFontSizeSetting = () => {
 }
 
 const handleHeaderSetting = () => {
-	const options = ['Tiêu đề 1 (H1)', 'Tiêu đề 2 (H2)', 'Tiêu đề 3 (H3)', 'Tiêu đề 4 (H4)', 'Tiêu đề 5 (H5)', 'Tiêu đề 6 (H6)', 'Văn bản thường'];
+	const options = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', t('editor.size_normal')];
 	uni.showActionSheet({
 		itemList: options,
 		success: (res) => {
@@ -407,7 +417,7 @@ const format = (name: string, value: any = null) => {
 
 const insertImage = () => {
 	uni.showActionSheet({
-		itemList: ['Chụp ảnh mới', 'Chọn từ thư viện'],
+		itemList: [t('editor.img_camera'), t('editor.img_album')],
 		success: (res) => {
 			const index = res.tapIndex;
 			let source: 'camera' | 'album' = 'album';

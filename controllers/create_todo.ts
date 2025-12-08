@@ -9,9 +9,10 @@ import { useAuthStore } from '@/stores/auth';
 import { TODO_SOURCE } from '@/utils/enums';
 import { showSuccess, showError, showInfo, showLoading, hideLoading } from '@/utils/toast';
 import { useCustomerFilter } from '@/composables/useCustomerFilter';
-
+import { useI18n } from 'vue-i18n';
 
 export const useCreateTodoController = () => {
+	const { t } = useI18n();
 	const authStore = useAuthStore();
 	const pad = (n : number) => n.toString().padStart(2, '0');
 	const getTodayISO = () => {
@@ -41,7 +42,11 @@ export const useCreateTodoController = () => {
 		notifyDate: getTodayISO(),
 		notifyTime: getCurrentTime()
 	});
-	const sourceOptions = ['Cuộc gọi', 'Khách hàng', 'Hội thoại'];
+	const sourceOptions = computed(() => [
+	        t('source.call'), 
+	        t('source.customer'), 
+	        t('source.conversation')
+	    ]);
 	const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
 	const sourceIndex = ref(-1);
 	const memberList = ref<any[]>([]);
@@ -131,7 +136,7 @@ export const useCreateTodoController = () => {
 		};
 	const submitForm = async () => {
 			if (!form.value.name || !form.value.name.trim()) {
-				showInfo('Vui lòng nhập tên công việc');
+				showInfo(t('todo.validate_name'));
 				return;
 			}
 	
@@ -141,7 +146,7 @@ export const useCreateTodoController = () => {
 			}
 	
 			loading.value = true;
-			showLoading('Đang xử lý dữ liệu...'); 
+			showLoading(t('todo.upload_processing'));
 	
 			try {
 				const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
@@ -160,14 +165,14 @@ export const useCreateTodoController = () => {
 				await createTodo(payload);
 	
 				hideLoading();
-				showSuccess('Tạo thành công!');
+				showSuccess(t('todo.create_success'));
 				setTimeout(() => { uni.navigateBack(); }, 1500);
 	
 			} catch (error: any) {
 				hideLoading();
 				console.error("Create Error:", error);
 				const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
-				showError('Lỗi: ' + errorMsg);
+				showError(t('common.error_load') + ': ' + errorMsg);
 			} finally {
 				loading.value = false;
 			}

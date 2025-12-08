@@ -1,6 +1,7 @@
 import App from './App'
 import * as Pinia from 'pinia'
 import PrimeVue from 'primevue/config';
+import i18n from './locale/index'
 // #ifndef VUE3
 import Vue from 'vue'
 import './uni.promisify.adaptor'
@@ -16,7 +17,8 @@ app.$mount()
 import { createSSRApp } from 'vue'
 export function createApp() {
   const app = createSSRApp(App)
-  app.use(Pinia.createPinia())
+  app.use(Pinia.createPinia()  )
+  app.use(i18n)
   return {
     app,
 	Pinia,
