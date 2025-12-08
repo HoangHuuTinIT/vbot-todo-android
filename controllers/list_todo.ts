@@ -243,20 +243,23 @@ uni.stopPullDownRefresh();
 	const onSourceChange = (e : any) => { sourceIndex.value = e.detail.value; };
 
 	const resetFilter = () => {
-		filter.value = {
-			title: '', jobCode: '',
-			createdFrom: '', createdTo: '',
-			dueDateFrom: '', dueDateTo: '',
-			customerCode: '',
-			notifyFrom: '', notifyTo: ''
+			filter.value = {
+				title: '', jobCode: '',
+				createdFrom: '', createdTo: '',
+				dueDateFrom: '', dueDateTo: '',
+				customerCode: '',
+				notifyFrom: '', notifyTo: ''
+			};
+			statusIndex.value = 0;
+			creatorIndex.value = 0;
+			assigneeIndex.value = 0;
+			sourceIndex.value = 0;
+			selectedCustomerName.value = '';
+			
+			resetPage();
+			getTodoList(); 
+			closeFilter();
 		};
-		statusIndex.value = 0;
-		creatorIndex.value = 0;
-		assigneeIndex.value = 0;
-		sourceIndex.value = 0;
-		selectedCustomerName.value = '';
-		resetPage();
-	};
 
 	const applyFilter = () => {
 		resetPage();

@@ -45,7 +45,7 @@ export const useTodoDetailController = () => {
 	const isLoadingCustomer = ref(false);
 	const isLoadingHistory = ref(false);
 	const historyList = ref<HistoryItem[]>([]);
-
+	const isHistoryOpen = ref(false);
 	const comments = ref<CommentItem[]>([]);
 	const isLoadingComments = ref(false);
 
@@ -75,6 +75,9 @@ export const useTodoDetailController = () => {
 	const isSavingDescription = ref(false);
 	const replyingMessagePreview = ref('');
 
+const toggleHistory = () => {
+        isHistoryOpen.value = !isHistoryOpen.value;
+    };
 	const convertToTimestamp = (dateStr : string, timeStr : string = '00:00') : number => {
 		if (!dateStr) return 0;
 		try {
@@ -91,7 +94,8 @@ export const useTodoDetailController = () => {
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
-
+	
+	
 	
 isLoading.value = true;
 		try {
@@ -1155,5 +1159,7 @@ isLoading.value = true;
 		dynamicStatusOptions,
 		onSaveTitle,
 		replyingMessagePreview,
+		isHistoryOpen,
+		toggleHistory,
 	};
 };

@@ -862,7 +862,6 @@ to {
 /* 透明度 */
 /* 文章场景相关 */
 .container[data-v-9f96c8fe] {
-  /* Bỏ height: 100vh để trang có thể dài ra và cuộn được */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -872,7 +871,6 @@ to {
   background-color: #fff;
   padding: 15px 15px 10px 15px;
   border-bottom: 1px solid #eee;
-  /* QUAN TRỌNG: Giữ header dính trên cùng khi cuộn */
   position: -webkit-sticky;
   position: sticky;
   top: 0;
@@ -910,8 +908,6 @@ to {
   flex: 1;
   padding: 15px;
   box-sizing: border-box;
-  /* Xóa overflow-y: auto vì giờ là cuộn trang window */
-  /* overflow-y: auto; <--- XÓA DÒNG NÀY */
 }
 .section-block[data-v-9f96c8fe] {
   margin-bottom: 20px;

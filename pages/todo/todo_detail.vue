@@ -167,36 +167,47 @@
 			</view>
 
 			<view class="section-header-row">
-				<text class="section-title no-margin">Lịch sử tương tác khách hàng</text>
-				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @change="onHistoryFilterChange">
-					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
-				</picker>
+			    <view class="toggle-header" @click="toggleHistory">
+			        <text class="section-title no-margin">Lịch sử tương tác khách hàng</text>
+			        <image 
+			            src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" 
+			            class="toggle-icon" 
+			            :class="{ 'open': isHistoryOpen }"
+			        ></image>
+			    </view>
+			    
+			    <picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop @change="onHistoryFilterChange">
+			        <view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
+			    </picker>
 			</view>
-
-			<view class="history-container">
-				<view v-if="isLoadingHistory" class="loading-row">
-					<text class="loading-text">⏳ Đang tải lịch sử...</text>
-				</view>
-				<view v-else-if="historyList.length === 0" class="empty-row">
-					<text>(Không tìm thấy dữ liệu)</text>
-				</view>
-				<view v-else class="timeline-list">
-					<view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
-						<view class="timeline-line" v-if="index !== historyList.length - 1"></view>
-						<view class="timeline-dot"></view>
-						<view class="timeline-content">
-							<view class="timeline-header">
-								<text class="t-actor">{{ item.actorName }}</text>
-								<text class="t-time">{{ item.timeStr }}</text>
+			
+			<view class="history-container" v-if="isHistoryOpen">
+			                <view v-if="isLoadingHistory" class="loading-row">
+								<text class="loading-text">⏳ Đang tải lịch sử...</text>
 							</view>
-							<text class="t-action">{{ item.content }}</text>
+			
+			                <view v-else-if="historyList.length === 0" class="empty-row">
+								<text>(Không tìm thấy dữ liệu)</text>
+							</view>
+			
+			                <view v-else class="timeline-list">
+								<view v-for="(item, index) in historyList" :key="item.id" class="timeline-item">
+									<view class="timeline-line" v-if="index !== historyList.length - 1"></view>
+									<view class="timeline-dot"></view>
+									<view class="timeline-content">
+										<view class="timeline-header">
+											<text class="t-actor">{{ item.actorName }}</text>
+											<text class="t-time">{{ item.timeStr }}</text>
+										</view>
+										<text class="t-action">{{ item.content }}</text>
+									</view>
+								</view>
+							</view>
 						</view>
-					</view>
-				</view>
-			</view>
 
 			<view style="height: 50px;"></view>
 		</view>
+
 		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" title="Xác nhận hủy" message="Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu." cancel-label="Tiếp tục sửa" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueEditing" @confirm="confirmCancelEdit" />
 		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" title="Hủy trả lời" message="Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất." cancel-label="Tiếp tục viết" confirm-label="Hủy bỏ" confirm-type="danger" @cancel="continueReplying" @confirm="confirmCancelReply" />
 		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" title="Xác nhận xóa" message="Bạn có chắc muốn xóa bình luận này không?" confirm-type="danger" @confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
@@ -268,6 +279,8 @@
 		isStatusDisabled,
 		onSaveTitle,
 		replyingMessagePreview,
+		isHistoryOpen,  // <-- Thêm vào đây
+		        toggleHistory,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
@@ -297,7 +310,7 @@
 
 <style lang="scss" scoped>
 	.container {
-	        /* Bỏ height: 100vh để trang có thể dài ra và cuộn được */
+	     
 			min-height: 100vh; 
 			display: flex;
 			flex-direction: column;
@@ -308,8 +321,6 @@
 			background-color: #fff;
 			padding: 15px 15px 10px 15px;
 			border-bottom: 1px solid #eee;
-	        
-	        /* QUAN TRỌNG: Giữ header dính trên cùng khi cuộn */
 	        position: sticky; 
 	        top: 0;
 	        z-index: 100;
@@ -351,8 +362,7 @@
 			flex: 1;
 			padding: 15px;
 			box-sizing: border-box;
-	        /* Xóa overflow-y: auto vì giờ là cuộn trang window */
-	        /* overflow-y: auto; <--- XÓA DÒNG NÀY */
+	    
 		}
 
 	.section-block {
