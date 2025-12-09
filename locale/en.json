@@ -170,5 +170,39 @@
 		"showActionSheet": {
 			"cancel": "Cancel"
 		}
-	}
+	},
+	"uni-datetime-picker": {
+	    "selectDate": "Select Date",
+	    "selectTime": "Select Time",
+	    "selectDateTime": "Select Date & Time",
+	    "startDate": "Start Date",
+	    "endDate": "End Date",
+	    "ok": "OK",
+	    "clear": "Clear",
+	    "cancel": "Cancel",
+	    "year": "Year",
+	    "month": "Month"
+	  },
+	  "uni-calender": {
+	    "confirm": "Confirm",
+	    "SUN": "Sun",
+	    "MON": "Mon",
+	    "TUE": "Tue",
+	    "WED": "Wed",
+	    "THU": "Thu",
+	    "FRI": "Fri",
+	    "SAT": "Sat",
+	    "jan": "Jan",
+	    "feb": "Feb",
+	    "mar": "Mar",
+	    "apr": "Apr",
+	    "may": "May",
+	    "jun": "Jun",
+	    "jul": "Jul",
+	    "aug": "Aug",
+	    "sep": "Sep",
+	    "oct": "Oct",
+	    "nov": "Nov",
+	    "dec": "Dec"
+	  }
 }

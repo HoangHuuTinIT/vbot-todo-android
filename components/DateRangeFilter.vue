@@ -6,11 +6,12 @@
     <view class="f-row">
       <view class="f-group half">
         <uni-datetime-picker 
-                  type="date" 
-                  :value="startDate" 
-                  @change="onStartChange"
-                  :border="false"
-                >
+           :key="`start-${locale}`" 
+           type="date" 
+           :value="startDate" 
+           @change="onStartChange"
+           :border="false"
+        >
           <view class="f-picker date" :class="{ 'placeholder': !startDate }">
             {{ startDate ? formatDateDisplay(startDate) : $t('common.from_date') }}
           </view>
@@ -19,11 +20,12 @@
 
       <view class="f-group half">
         <uni-datetime-picker 
-                  type="date" 
-                  :value="endDate" 
-                  @change="onEndChange"
-                  :border="false"
-                >
+           :key="`end-${locale}`"
+           type="date" 
+           :value="endDate" 
+           @change="onEndChange"
+           :border="false"
+        >
           <view class="f-picker date" :class="{ 'placeholder': !endDate }">
             {{ endDate ? formatDateDisplay(endDate) : $t('common.to_date') }}
           </view>
@@ -35,7 +37,8 @@
 
 <script setup lang="ts">
 import { formatDateDisplay } from '@/utils/dateUtils';
-
+import { useI18n } from 'vue-i18n';
+const { locale } = useI18n();
 const props = defineProps<{
   title?: string;
   startDate: string;

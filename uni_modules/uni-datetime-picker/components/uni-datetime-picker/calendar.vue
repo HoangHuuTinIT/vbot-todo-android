@@ -1,3 +1,4 @@
+//calendar.vue
 <template>
 	<view class="uni-calendar" @mouseleave="leaveCale">
 
@@ -12,10 +13,10 @@
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
 				</view>
 
-				<picker mode="date" :value="date" fields="month" @change="bindDateChange">
-					<text class="uni-calendar__header-text">
-					    {{ monthText + ' ' + (nowDate.month||'') + ' ' + yearText + ' ' + (nowDate.year||'') }}
-					</text>
+				<picker mode="multiSelector" :range="pickerRange" :value="pickerIndex" @change="bindMultiPickerChange">
+				    <text class="uni-calendar__header-text">
+				        {{ monthText + ' ' + (nowDate.month||'') + ' ' + yearText + ' ' + (nowDate.year||'') }}
+				    </text>
 				</picker>
 
 				<view class="uni-calendar__header-btn-box" @click.stop="changeMonth('next')">
@@ -106,9 +107,9 @@
 	import calendarItem from './calendar-item.vue'
 	import timePicker from './time-picker.vue'
 
-	import { initVueI18n } from '@dcloudio/uni-i18n'
-	import i18nMessages from './i18n/index.js'
-	const { t } = initVueI18n(i18nMessages)
+	// import { initVueI18n } from '@dcloudio/uni-i18n'
+	// import i18nMessages from './i18n/index.js'
+	// const { t } = initVueI18n(i18nMessages)
 
 	/**
 	 * Calendar 日历
@@ -220,6 +221,7 @@
 			return {
 				show: false,
 				weeks: [],
+				pickerYears: [],
 				calendar: {},
 				nowDate: {},
 				aniMaskShow: false,
@@ -342,47 +344,74 @@
 			 * for i18n
 			 */
 			selectDateText() {
-				return t("uni-datetime-picker.selectDate")
-			},
-			startDateText() {
-				return this.startPlaceholder || t("uni-datetime-picker.startDate")
-			},
-			endDateText() {
-				return this.endPlaceholder || t("uni-datetime-picker.endDate")
-			},
-			okText() {
-				return t("uni-datetime-picker.ok")
-			},
-			yearText() {
-				return t("uni-datetime-picker.year")
-			},
-			monthText() {
-				return t("uni-datetime-picker.month")
-			},
-			MONText() {
-				return t("uni-calender.MON")
-			},
-			TUEText() {
-				return t("uni-calender.TUE")
-			},
-			WEDText() {
-				return t("uni-calender.WED")
-			},
-			THUText() {
-				return t("uni-calender.THU")
-			},
-			FRIText() {
-				return t("uni-calender.FRI")
-			},
-			SATText() {
-				return t("uni-calender.SAT")
-			},
-			SUNText() {
-				return t("uni-calender.SUN")
-			},
-			confirmText() {
-				return t("uni-calender.confirm")
-			},
+			        return this.$t("uni-datetime-picker.selectDate")
+			    },
+			    startDateText() {
+			        return this.startPlaceholder || this.$t("uni-datetime-picker.startDate")
+			    },
+			    endDateText() {
+			        return this.endPlaceholder || this.$t("uni-datetime-picker.endDate")
+			    },
+			    okText() {
+			        return this.$t("uni-datetime-picker.ok")
+			    },
+			    yearText() {
+			        return this.$t("uni-datetime-picker.year")
+			    },
+			    monthText() {
+			        return this.$t("uni-datetime-picker.month")
+			    },
+			    MONText() {
+			        return this.$t("uni-calender.MON")
+			    },
+			    TUEText() {
+			        return this.$t("uni-calender.TUE")
+			    },
+			    WEDText() {
+			        return this.$t("uni-calender.WED")
+			    },
+			    THUText() {
+			        return this.$t("uni-calender.THU")
+			    },
+			    FRIText() {
+			        return this.$t("uni-calender.FRI")
+			    },
+			    SATText() {
+			        return this.$t("uni-calender.SAT")
+			    },
+			    SUNText() {
+			        return this.$t("uni-calender.SUN")
+			    },
+			    confirmText() {
+			        return this.$t("uni-calender.confirm")
+			    },
+			pickerMonths() {
+			        return [
+			            this.$t('uni-calender.jan'), this.$t('uni-calender.feb'),
+			            this.$t('uni-calender.mar'), this.$t('uni-calender.apr'),
+			            this.$t('uni-calender.may'), this.$t('uni-calender.jun'),
+			            this.$t('uni-calender.jul'), this.$t('uni-calender.aug'),
+			            this.$t('uni-calender.sep'), this.$t('uni-calender.oct'),
+			            this.$t('uni-calender.nov'), this.$t('uni-calender.dec')
+			        ]
+			    },
+			    // Gom năm và tháng vào mảng cho picker hiển thị (Cột 0: Năm, Cột 1: Tháng)
+			    pickerRange() {
+			        return [this.pickerYears, this.pickerMonths];
+			    },
+			    // Tính toán vị trí hiển thị hiện tại
+			    pickerIndex() {
+			        if (!this.nowDate || !this.nowDate.year) return [0, 0];
+			        
+			        const yearStr = String(this.nowDate.year);
+			        const yearIdx = this.pickerYears.indexOf(yearStr);
+			        const monthIdx = parseInt(this.nowDate.month) - 1;
+			        
+			        return [
+			            yearIdx >= 0 ? yearIdx : 0, 
+			            monthIdx >= 0 ? monthIdx : 0
+			        ];
+			    },
 		},
 		created() {
 			// 获取日历方法实例
@@ -392,10 +421,26 @@
 				endDate: this.endDate,
 				range: this.range,
 			})
+			const currentYear = new Date().getFullYear();
+			    for (let i = 1900; i <= currentYear + 100; i++) {
+			        this.pickerYears.push(String(i));
+			}
 			// 选中某一天
 			this.init(this.date)
 		},
 		methods: {
+			bindMultiPickerChange(e) {
+			        const [yearIndex, monthIndex] = e.detail.value;
+			        const year = this.pickerYears[yearIndex];
+			        const month = monthIndex + 1;
+			        
+			        // Tạo chuỗi ngày dạng YYYY-MM-DD để setDate xử lý
+			        // Luôn set về ngày mùng 1 để tránh lỗi ngày 31 của tháng này sang tháng kia không có
+			        const dateStr = `${year}-${month < 10 ? '0' + month : month}-01`;
+			        
+			        this.setDate(dateStr);
+			        this.monthSwitch(); // Kích hoạt sự kiện chuyển tháng
+			    },
 			leaveCale() {
 				this.firstEnter = true
 			},

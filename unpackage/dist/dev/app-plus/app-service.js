@@ -2216,7 +2216,7 @@ if (uni.restoreGlobal) {
     "zh-Hans": zhHans,
     "zh-Hant": zhHant
   };
-  const { t: t$1 } = initVueI18n(i18nMessages);
+  const { t } = initVueI18n(i18nMessages);
   const _sfc_main$h = {
     name: "UniDatetimePicker",
     data() {
@@ -2512,16 +2512,16 @@ if (uni.restoreGlobal) {
        * for i18n
        */
       selectTimeText() {
-        return t$1("uni-datetime-picker.selectTime");
+        return t("uni-datetime-picker.selectTime");
       },
       okText() {
-        return t$1("uni-datetime-picker.ok");
+        return t("uni-datetime-picker.ok");
       },
       clearText() {
-        return t$1("uni-datetime-picker.clear");
+        return t("uni-datetime-picker.clear");
       },
       cancelText() {
-        return t$1("uni-datetime-picker.cancel");
+        return t("uni-datetime-picker.cancel");
       }
     },
     mounted() {
@@ -3101,7 +3101,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
-  const { t } = initVueI18n(i18nMessages);
   const _sfc_main$g = {
     components: {
       calendarItem,
@@ -3192,6 +3191,7 @@ if (uni.restoreGlobal) {
       return {
         show: false,
         weeks: [],
+        pickerYears: [],
         calendar: {},
         nowDate: {},
         aniMaskShow: false,
@@ -3310,46 +3310,78 @@ if (uni.restoreGlobal) {
        * for i18n
        */
       selectDateText() {
-        return t("uni-datetime-picker.selectDate");
+        return this.$t("uni-datetime-picker.selectDate");
       },
       startDateText() {
-        return this.startPlaceholder || t("uni-datetime-picker.startDate");
+        return this.startPlaceholder || this.$t("uni-datetime-picker.startDate");
       },
       endDateText() {
-        return this.endPlaceholder || t("uni-datetime-picker.endDate");
+        return this.endPlaceholder || this.$t("uni-datetime-picker.endDate");
       },
       okText() {
-        return t("uni-datetime-picker.ok");
+        return this.$t("uni-datetime-picker.ok");
       },
       yearText() {
-        return t("uni-datetime-picker.year");
+        return this.$t("uni-datetime-picker.year");
       },
       monthText() {
-        return t("uni-datetime-picker.month");
+        return this.$t("uni-datetime-picker.month");
       },
       MONText() {
-        return t("uni-calender.MON");
+        return this.$t("uni-calender.MON");
       },
       TUEText() {
-        return t("uni-calender.TUE");
+        return this.$t("uni-calender.TUE");
       },
       WEDText() {
-        return t("uni-calender.WED");
+        return this.$t("uni-calender.WED");
       },
       THUText() {
-        return t("uni-calender.THU");
+        return this.$t("uni-calender.THU");
       },
       FRIText() {
-        return t("uni-calender.FRI");
+        return this.$t("uni-calender.FRI");
       },
       SATText() {
-        return t("uni-calender.SAT");
+        return this.$t("uni-calender.SAT");
       },
       SUNText() {
-        return t("uni-calender.SUN");
+        return this.$t("uni-calender.SUN");
       },
       confirmText() {
-        return t("uni-calender.confirm");
+        return this.$t("uni-calender.confirm");
+      },
+      pickerMonths() {
+        return [
+          this.$t("uni-calender.jan"),
+          this.$t("uni-calender.feb"),
+          this.$t("uni-calender.mar"),
+          this.$t("uni-calender.apr"),
+          this.$t("uni-calender.may"),
+          this.$t("uni-calender.jun"),
+          this.$t("uni-calender.jul"),
+          this.$t("uni-calender.aug"),
+          this.$t("uni-calender.sep"),
+          this.$t("uni-calender.oct"),
+          this.$t("uni-calender.nov"),
+          this.$t("uni-calender.dec")
+        ];
+      },
+      // Gom năm và tháng vào mảng cho picker hiển thị (Cột 0: Năm, Cột 1: Tháng)
+      pickerRange() {
+        return [this.pickerYears, this.pickerMonths];
+      },
+      // Tính toán vị trí hiển thị hiện tại
+      pickerIndex() {
+        if (!this.nowDate || !this.nowDate.year)
+          return [0, 0];
+        const yearStr = String(this.nowDate.year);
+        const yearIdx = this.pickerYears.indexOf(yearStr);
+        const monthIdx = parseInt(this.nowDate.month) - 1;
+        return [
+          yearIdx >= 0 ? yearIdx : 0,
+          monthIdx >= 0 ? monthIdx : 0
+        ];
       }
     },
     created() {
@@ -3359,9 +3391,21 @@ if (uni.restoreGlobal) {
         endDate: this.endDate,
         range: this.range
       });
+      const currentYear = (/* @__PURE__ */ new Date()).getFullYear();
+      for (let i = 1900; i <= currentYear + 100; i++) {
+        this.pickerYears.push(String(i));
+      }
       this.init(this.date);
     },
     methods: {
+      bindMultiPickerChange(e) {
+        const [yearIndex, monthIndex] = e.detail.value;
+        const year = this.pickerYears[yearIndex];
+        const month = monthIndex + 1;
+        const dateStr = `${year}-${month < 10 ? "0" + month : month}-01`;
+        this.setDate(dateStr);
+        this.monthSwitch();
+      },
       leaveCale() {
         this.firstEnter = true;
       },
@@ -3620,10 +3664,10 @@ if (uni.restoreGlobal) {
                   vue.createElementVNode("view", { class: "uni-calendar__header-btn uni-calendar--left" })
                 ]),
                 vue.createElementVNode("picker", {
-                  mode: "date",
-                  value: $props.date,
-                  fields: "month",
-                  onChange: _cache[2] || (_cache[2] = (...args) => $options.bindDateChange && $options.bindDateChange(...args))
+                  mode: "multiSelector",
+                  range: $options.pickerRange,
+                  value: $options.pickerIndex,
+                  onChange: _cache[2] || (_cache[2] = (...args) => $options.bindMultiPickerChange && $options.bindMultiPickerChange(...args))
                 }, [
                   vue.createElementVNode(
                     "text",
@@ -3632,7 +3676,7 @@ if (uni.restoreGlobal) {
                     1
                     /* TEXT */
                   )
-                ], 40, ["value"]),
+                ], 40, ["range", "value"]),
                 vue.createElementVNode("view", {
                   class: "uni-calendar__header-btn-box",
                   onClick: _cache[3] || (_cache[3] = vue.withModifiers(($event) => $options.changeMonth("next"), ["stop"]))
@@ -4902,7 +4946,8 @@ if (uni.restoreGlobal) {
   const parseSafeDate = (dateStr) => {
     if (!dateStr)
       return null;
-    const d = new Date(dateStr);
+    const safeStr = dateStr.replace(/-/g, "/");
+    const d = new Date(safeStr);
     return isNaN(d.getTime()) ? null : d;
   };
   const getStartOfDay = (dateStr) => {
@@ -4931,93 +4976,6 @@ if (uni.restoreGlobal) {
     const e = endTs === -1 ? "" : endTs;
     return `${s}|${e}`;
   };
-  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
-    __name: "DateRangeFilter",
-    props: {
-      title: { type: String, required: false },
-      startDate: { type: String, required: true },
-      endDate: { type: String, required: true }
-    },
-    emits: ["update:startDate", "update:endDate"],
-    setup(__props, { expose: __expose, emit: __emit }) {
-      __expose();
-      const props = __props;
-      const emit = __emit;
-      const onStartChange = (val) => {
-        emit("update:startDate", val);
-      };
-      const onEndChange = (val) => {
-        emit("update:endDate", val);
-      };
-      const __returned__ = { props, emit, onStartChange, onEndChange, get formatDateDisplay() {
-        return formatDateDisplay;
-      } };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
-    return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
-      $props.title ? (vue.openBlock(), vue.createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: "f-section-title"
-        },
-        vue.toDisplayString($props.title),
-        1
-        /* TEXT */
-      )) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode("view", { class: "f-row" }, [
-        vue.createElementVNode("view", { class: "f-group half" }, [
-          vue.createVNode(_component_uni_datetime_picker, {
-            type: "date",
-            value: $props.startDate,
-            onChange: $setup.onStartChange,
-            border: false
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                {
-                  class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
-                },
-                vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : _ctx.$t("common.from_date")),
-                3
-                /* TEXT, CLASS */
-              )
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["value"])
-        ]),
-        vue.createElementVNode("view", { class: "f-group half" }, [
-          vue.createVNode(_component_uni_datetime_picker, {
-            type: "date",
-            value: $props.endDate,
-            onChange: $setup.onEndChange,
-            border: false
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                {
-                  class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
-                },
-                vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : _ctx.$t("common.to_date")),
-                3
-                /* TEXT, CLASS */
-              )
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["value"])
-        ])
-      ])
-    ]);
-  }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
   /*!
     * @intlify/shared v9.1.9
     * (c) 2021 kazuya kawaguchi
@@ -8529,6 +8487,96 @@ ${codeFrame}` : message);
     target.__INTLIFY__ = true;
     setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
   }
+  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
+    __name: "DateRangeFilter",
+    props: {
+      title: { type: String, required: false },
+      startDate: { type: String, required: true },
+      endDate: { type: String, required: true }
+    },
+    emits: ["update:startDate", "update:endDate"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const { locale } = useI18n();
+      const props = __props;
+      const emit = __emit;
+      const onStartChange = (val) => {
+        emit("update:startDate", val);
+      };
+      const onEndChange = (val) => {
+        emit("update:endDate", val);
+      };
+      const __returned__ = { locale, props, emit, onStartChange, onEndChange, get formatDateDisplay() {
+        return formatDateDisplay;
+      } };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
+    return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
+      $props.title ? (vue.openBlock(), vue.createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "f-section-title"
+        },
+        vue.toDisplayString($props.title),
+        1
+        /* TEXT */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode("view", { class: "f-row" }, [
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          (vue.openBlock(), vue.createBlock(_component_uni_datetime_picker, {
+            key: `start-${$setup.locale}`,
+            type: "date",
+            value: $props.startDate,
+            onChange: $setup.onStartChange,
+            border: false
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
+                },
+                vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : _ctx.$t("common.from_date")),
+                3
+                /* TEXT, CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["value"]))
+        ]),
+        vue.createElementVNode("view", { class: "f-group half" }, [
+          (vue.openBlock(), vue.createBlock(_component_uni_datetime_picker, {
+            key: `end-${$setup.locale}`,
+            type: "date",
+            value: $props.endDate,
+            onChange: $setup.onEndChange,
+            border: false
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
+                },
+                vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : _ctx.$t("common.to_date")),
+                3
+                /* TEXT, CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["value"]))
+        ])
+      ])
+    ]);
+  }
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
   const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -10460,13 +10508,13 @@ This will fail in production if not fixed.`);
     CUSTOMER_CODE: "",
     PHONE_PLACEHOLDER: "072836272322"
   };
-  const SERVER_BASE_URL = "https://api-staging.vbot.vn/v1.0";
+  const SERVER_BASE_URL = "https://api-sandbox-h01.vbot.vn/v1.0";
   const AUTH_API_URL = SERVER_BASE_URL;
   const CRM_API_URL = `${SERVER_BASE_URL}/api/module-crm`;
   const PROJECT_API_URL = `${SERVER_BASE_URL}/api/project`;
   const TODO_API_URL = `${SERVER_BASE_URL}/api/module-todo/todo`;
-  const PROJECT_CODE = "PR202511170947436134";
-  const UID = "77b7675d29d74cafa23771e46881db7c";
+  const PROJECT_CODE = "PR202511211001129372";
+  const UID = "87d90802634146e29721476337bce64b";
   const systemLogin = (username, password) => {
     return new Promise((resolve, reject) => {
       uni.request({
@@ -10633,10 +10681,10 @@ This will fail in production if not fixed.`);
         }
       },
       async loginDevMode() {
-        const devUser = "647890427";
-        const devPass = "53496785941d8dc2f5aa3e98e753eb3d0780de9fda3d9ac1761c47eaae28ae39";
-        const devUid = "77b7675d29d74cafa23771e46881db7c";
-        const devProject = "PR202511170947436134";
+        const devUser = "hoangtinvpm";
+        const devPass = "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f";
+        const devUid = "87d90802634146e29721476337bce64b";
+        const devProject = "PR202511211001129372";
         try {
           formatAppLog("log", "at stores/auth.ts:97", "Store: Đang gọi API đăng nhập hệ thống...");
           const loginData = await systemLogin(devUser, devPass);
@@ -10780,16 +10828,19 @@ This will fail in production if not fixed.`);
     return `${d}/${m}/${y} ${h}:${min}`;
   };
   const buildTodoParams = (filter, statusValue, sourceValue, creatorId, assigneeId) => {
+    const validCreatedTo = filter.createdTo || filter.createdFrom;
+    const validDueDateTo = filter.dueDateTo || filter.dueDateFrom;
+    const validNotifyTo = filter.notifyTo || filter.notifyFrom;
     return {
       keySearch: filter.title || "",
       code: filter.jobCode || "",
       status: statusValue || "",
       startDate: getStartOfDay(filter.createdFrom),
-      endDate: getStartOfNextDay(filter.createdTo),
+      endDate: getStartOfDay(validCreatedTo),
       dueDateFrom: getStartOfDay(filter.dueDateFrom),
-      dueDateTo: getStartOfNextDay(filter.dueDateTo),
+      dueDateTo: getStartOfDay(validDueDateTo),
       notificationReceivedAtFrom: getStartOfDay(filter.notifyFrom),
-      notificationReceivedAtTo: getStartOfNextDay(filter.notifyTo),
+      notificationReceivedAtTo: getStartOfDay(validNotifyTo),
       createdBy: creatorId || "",
       assigneeId: assigneeId || "",
       customerCode: filter.customerCode || "",
@@ -11205,12 +11256,12 @@ This will fail in production if not fixed.`);
         let selectedCreatorId = "";
         if (creatorIndex.value > 0) {
           const member = rawMemberList.value[creatorIndex.value - 1];
-          selectedCreatorId = member.UID || "";
+          selectedCreatorId = member.memberUID || "";
         }
         let selectedAssigneeId = "";
         if (assigneeIndex.value > 0) {
           const member = rawMemberList.value[assigneeIndex.value - 1];
-          selectedAssigneeId = member.UID || "";
+          selectedAssigneeId = member.memberUID || "";
         }
         const filterParams = buildTodoParams(
           filter.value,
@@ -15853,7 +15904,41 @@ This will fail in production if not fixed.`);
     customer_modal: customer_modal$1,
     editor: editor$1,
     source: source$1,
-    uni: uni$2
+    uni: uni$2,
+    "uni-datetime-picker": {
+      selectDate: "Chọn ngày",
+      selectTime: "Chọn giờ",
+      selectDateTime: "Chọn ngày giờ",
+      startDate: "Ngày bắt đầu",
+      endDate: "Ngày kết thúc",
+      ok: "OK",
+      clear: "Xóa",
+      cancel: "Hủy",
+      year: "Năm",
+      month: "Tháng"
+    },
+    "uni-calender": {
+      confirm: "Xác nhận",
+      SUN: "CN",
+      MON: "T2",
+      TUE: "T3",
+      WED: "T4",
+      THU: "T5",
+      FRI: "T6",
+      SAT: "T7",
+      jan: "Tháng 1",
+      feb: "Tháng 2",
+      mar: "Tháng 3",
+      apr: "Tháng 4",
+      may: "Tháng 5",
+      jun: "Tháng 6",
+      jul: "Tháng 7",
+      aug: "Tháng 8",
+      sep: "Tháng 9",
+      oct: "Tháng 10",
+      nov: "Tháng 11",
+      dec: "Tháng 12"
+    }
   };
   const common = {
     loading: "Loading data...",
@@ -16026,11 +16111,46 @@ This will fail in production if not fixed.`);
     customer_modal,
     editor,
     source,
-    uni: uni$1
+    uni: uni$1,
+    "uni-datetime-picker": {
+      selectDate: "Select Date",
+      selectTime: "Select Time",
+      selectDateTime: "Select Date & Time",
+      startDate: "Start Date",
+      endDate: "End Date",
+      ok: "OK",
+      clear: "Clear",
+      cancel: "Cancel",
+      year: "Year",
+      month: "Month"
+    },
+    "uni-calender": {
+      confirm: "Confirm",
+      SUN: "Sun",
+      MON: "Mon",
+      TUE: "Tue",
+      WED: "Wed",
+      THU: "Thu",
+      FRI: "Fri",
+      SAT: "Sat",
+      jan: "Jan",
+      feb: "Feb",
+      mar: "Mar",
+      apr: "Apr",
+      may: "May",
+      jun: "Jun",
+      jul: "Jul",
+      aug: "Aug",
+      sep: "Sep",
+      oct: "Oct",
+      nov: "Nov",
+      dec: "Dec"
+    }
   };
+  const curLocale = "vi";
   const i18n = createI18n({
-    locale: "vi",
-    fallbackLocale: "en",
+    locale: curLocale,
+    fallbackLocale: "vi",
     messages: {
       vi,
       en
@@ -16042,7 +16162,8 @@ This will fail in production if not fixed.`);
     const app = vue.createVueApp(App);
     app.use(createPinia());
     app.use(i18n);
-    uni.setLocale("vi");
+    const currentLocale = i18n.global.locale.value || i18n.global.locale;
+    uni.setLocale(currentLocale);
     return {
       app,
       Pinia

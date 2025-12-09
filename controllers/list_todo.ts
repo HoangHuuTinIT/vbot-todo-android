@@ -94,17 +94,17 @@ export const useListTodoController = () => {
 				pageNo: pageNo.value,
 				pageSize: pageSize.value
 			};
-
+			
 			let selectedCreatorId = '';
 			if (creatorIndex.value > 0) {
 				const member = rawMemberList.value[creatorIndex.value - 1];
-				selectedCreatorId = member.UID || '';
+				selectedCreatorId = member.memberUID || '';
 			}
 
 			let selectedAssigneeId = '';
 			if (assigneeIndex.value > 0) {
 				const member = rawMemberList.value[assigneeIndex.value - 1];
-				selectedAssigneeId = member.UID || '';
+				selectedAssigneeId = member.memberUID || '';
 			}
 
 			const filterParams = buildTodoParams(
@@ -114,7 +114,7 @@ export const useListTodoController = () => {
 				selectedCreatorId,
 				selectedAssigneeId
 			);
-
+			
 			const [listData, countData] = await Promise.all([
 				getTodos({
 					...filterParams,

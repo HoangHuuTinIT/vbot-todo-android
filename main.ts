@@ -1,31 +1,19 @@
-import App from './App'
-import * as Pinia from 'pinia'
-import PrimeVue from 'primevue/config';
-import i18n from './locale/index'
-// #ifndef VUE3
-import Vue from 'vue'
-import './uni.promisify.adaptor'
-import { initVueI18n } from '@dcloudio/uni-i18n'
-import messages from './locale/index'
-Vue.config.productionTip = false
-App.mpType = 'app'
-const app = new Vue({
-  ...App
-})
-app.$mount()
-// #endif
-
-// #ifdef VUE3
+// main.ts
 import { createSSRApp } from 'vue'
+import App from './App.vue'
+import * as Pinia from 'pinia'
+import i18n from './locale/index'
+
 export function createApp() {
   const app = createSSRApp(App)
-  app.use(Pinia.createPinia()  )
+  app.use(Pinia.createPinia())
   app.use(i18n)
-  uni.setLocale('vi');
+
+  const currentLocale = i18n.global.locale.value || i18n.global.locale;
+  uni.setLocale(currentLocale);
+
   return {
     app,
-	Pinia,
+    Pinia,
   }
 }
-
-// #endif
