@@ -7,7 +7,7 @@
       <view class="f-group half">
         <picker mode="date" :value="startDate" @change="onStartChange">
           <view class="f-picker date" :class="{ 'placeholder': !startDate }">
-            {{ startDate ? formatDateDisplay(startDate) : 'Từ ngày' }}
+            {{ startDate ? formatDateDisplay(startDate) : $t('common.from_date') }}
           </view>
         </picker>
       </view>
@@ -15,7 +15,7 @@
       <view class="f-group half">
         <picker mode="date" :value="endDate" @change="onEndChange">
           <view class="f-picker date" :class="{ 'placeholder': !endDate }">
-            {{ endDate ? formatDateDisplay(endDate) : 'Đến ngày' }}
+            {{ endDate ? formatDateDisplay(endDate) : $t('common.to_date') }}
           </view>
         </picker>
       </view>

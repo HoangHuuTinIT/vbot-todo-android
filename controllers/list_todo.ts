@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { onShow ,onPullDownRefresh} from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
 import { useAuthStore } from '@/stores/auth';
-import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
+import { TODO_STATUS } from '@/utils/constants';
 import { buildTodoParams } from '@/models/todo';
 import { TODO_SOURCE } from '@/utils/enums';
 import type { TodoItem } from '@/types/todo';
@@ -30,17 +30,17 @@ export const useListTodoController = () => {
 	const itemToDelete = ref<TodoItem | null>(null);
 
 	const statusOptions = computed(() => [
-	        t('common.all'), 
-	        STATUS_LABELS[TODO_STATUS.NEW], 
-	        STATUS_LABELS[TODO_STATUS.IN_PROGRESS], 
-	        STATUS_LABELS[TODO_STATUS.DONE]
+	        t('common.all'),
+	        t('todo.status_todo'),
+	        t('todo.status_progress'),
+	        t('todo.status_done')
 	    ]);
 	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
 	const statusIndex = ref<number>(0);
 
 	const rawMemberList = ref<any[]>([]);
 	const creatorOptions = computed(() => {
-	        const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
+	        const names = rawMemberList.value.map(m => m.UserName || t('common.hidden_member'));
 	        return [t('common.all'), ...names];
 	    });
 	    const creatorIndex = ref(0);
@@ -69,17 +69,14 @@ export const useListTodoController = () => {
 		notifyFrom: '', notifyTo: '',
 	});
 	const fetchFilterMembers = async () => {
-		if (rawMemberList.value.length > 0) return;
-		try {
-			const data = await getAllMembers();
-			rawMemberList.value = data;
-			const names = data.map(m => m.UserName || 'Thành viên ẩn');
-			creatorOptions.value = ['Tất cả', ...names];
-			assigneeOptions.value = ['Tất cả', ...names];
-		} catch (error) {
-			console.error('Lỗi lấy danh sách thành viên filter:', error);
-		}
-	};
+			if (rawMemberList.value.length > 0) return;
+			try {
+				const data = await getAllMembers();
+				rawMemberList.value = data;
+			} catch (error) {
+				console.error('Lỗi lấy danh sách thành viên filter:', error);
+			}
+		};
 	const {
 		customerList,
 		loadingCustomer,

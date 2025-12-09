@@ -270,7 +270,7 @@ if (uni.restoreGlobal) {
               {
                 class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.startDate }])
               },
-              vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : "Từ ngày"),
+              vue.toDisplayString($props.startDate ? $setup.formatDateDisplay($props.startDate) : _ctx.$t("common.from_date")),
               3
               /* TEXT, CLASS */
             )
@@ -287,7 +287,7 @@ if (uni.restoreGlobal) {
               {
                 class: vue.normalizeClass(["f-picker date", { "placeholder": !$props.endDate }])
               },
-              vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : "Đến ngày"),
+              vue.toDisplayString($props.endDate ? $setup.formatDateDisplay($props.endDate) : _ctx.$t("common.to_date")),
               3
               /* TEXT, CLASS */
             )
@@ -6417,15 +6417,15 @@ This will fail in production if not fixed.`);
     const itemToDelete = vue.ref(null);
     const statusOptions = vue.computed(() => [
       t("common.all"),
-      STATUS_LABELS[TODO_STATUS.NEW],
-      STATUS_LABELS[TODO_STATUS.IN_PROGRESS],
-      STATUS_LABELS[TODO_STATUS.DONE]
+      t("todo.status_todo"),
+      t("todo.status_progress"),
+      t("todo.status_done")
     ]);
     const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
     const statusIndex = vue.ref(0);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.computed(() => {
-      const names = rawMemberList.value.map((m) => m.UserName || "Thành viên ẩn");
+      const names = rawMemberList.value.map((m) => m.UserName || t("common.hidden_member"));
       return [t("common.all"), ...names];
     });
     const creatorIndex = vue.ref(0);
@@ -6460,11 +6460,8 @@ This will fail in production if not fixed.`);
       try {
         const data = await getAllMembers();
         rawMemberList.value = data;
-        const names = data.map((m) => m.UserName || "Thành viên ẩn");
-        creatorOptions.value = ["Tất cả", ...names];
-        assigneeOptions.value = ["Tất cả", ...names];
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:80", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:77", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const {
@@ -6512,7 +6509,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:134", error);
+        formatAppLog("error", "at controllers/list_todo.ts:131", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -6584,7 +6581,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:213", error);
+        formatAppLog("error", "at controllers/list_todo.ts:210", error);
         showError(t("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
@@ -6595,7 +6592,7 @@ This will fail in production if not fixed.`);
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/list_todo.ts:224", "Đang làm mới trang...");
+      formatAppLog("log", "at controllers/list_todo.ts:221", "Đang làm mới trang...");
       resetPage();
       getTodoList();
     });
@@ -6609,7 +6606,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:237", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:234", "Delete Error:", error);
         showError(t("common.fail_delete"));
       }
     };
@@ -6733,9 +6730,19 @@ This will fail in production if not fixed.`);
     },
     setup(__props, { expose: __expose }) {
       __expose();
+      const { t } = useI18n();
       const props = __props;
       const badgeLabel = vue.computed(() => {
-        return STATUS_LABELS[props.status] || props.status || "Không xác định";
+        switch (props.status) {
+          case TODO_STATUS.NEW:
+            return t("todo.status_todo");
+          case TODO_STATUS.IN_PROGRESS:
+            return t("todo.status_progress");
+          case TODO_STATUS.DONE:
+            return t("todo.status_done");
+          default:
+            return props.status || "Unknown";
+        }
       });
       const badgeColorClass = vue.computed(() => {
         switch (props.status) {
@@ -6761,7 +6768,7 @@ This will fail in production if not fixed.`);
             return { backgroundColor: "#f4f4f5", color: "#a1a1aa" };
         }
       });
-      const __returned__ = { props, badgeLabel, badgeColorClass, customStyle };
+      const __returned__ = { t, props, badgeLabel, badgeColorClass, customStyle };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -7073,7 +7080,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode(
             "text",
             { class: "size-text" },
-            vue.toDisplayString($props.pageSize) + " / trang",
+            vue.toDisplayString($props.pageSize) + " / " + vue.toDisplayString(_ctx.$t("common.page_unit")),
             1
             /* TEXT */
           ),
@@ -7086,7 +7093,7 @@ This will fail in production if not fixed.`);
           key: 0,
           class: "total-text"
         },
-        "Tổng: " + vue.toDisplayString($props.total),
+        vue.toDisplayString(_ctx.$t("common.total")) + ": " + vue.toDisplayString($props.total),
         1
         /* TEXT */
       )) : vue.createCommentVNode("v-if", true),
@@ -7191,7 +7198,6 @@ This will fail in production if not fixed.`);
     }
   });
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a;
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "header" }, [
         vue.createElementVNode("view", { class: "header-left" }),
@@ -7607,11 +7613,13 @@ This will fail in production if not fixed.`);
         visible: $setup.isConfirmDeleteOpen,
         "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
         title: _ctx.$t("common.notification"),
-        message: _ctx.$t("todo.confirm_delete_msg", { title: (_a = $setup.itemToDelete) == null ? void 0 : _a.title }),
+        message: $setup.itemToDelete ? _ctx.$t("todo.confirm_delete_msg").replace("{title}", $setup.itemToDelete.title) : "",
         "confirm-type": "danger",
+        "cancel-label": _ctx.$t("common.cancel"),
+        "confirm-label": _ctx.$t("common.delete"),
         onConfirm: $setup.confirmDelete,
         onCancel: $setup.cancelDelete
-      }, null, 8, ["visible", "title", "message", "onConfirm", "onCancel"]),
+      }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onConfirm", "onCancel"]),
       vue.createVNode($setup["GlobalMessage"])
     ]);
   }
@@ -10883,7 +10891,13 @@ This will fail in production if not fixed.`);
     error_missing_data: "Thiếu dữ liệu gốc",
     error_connection: "Lỗi kết nối",
     error_update: "Cập nhật thất bại",
-    error_send: "Gửi thất bại"
+    error_send: "Gửi thất bại",
+    page_unit: "trang",
+    total: "Tổng",
+    from_date: "Từ ngày",
+    to_date: "Đến ngày",
+    hidden_member: "Thành viên ẩn",
+    hidden_user: "Người dùng ẩn"
   };
   const todo$1 = {
     page_title: "Công việc",
@@ -11013,12 +11027,18 @@ This will fail in production if not fixed.`);
     conversation: "Hội thoại",
     message: "Tin nhắn"
   };
+  const uni$2 = {
+    showActionSheet: {
+      cancel: "Hủy"
+    }
+  };
   const vi = {
     common: common$1,
     todo: todo$1,
     customer_modal: customer_modal$1,
     editor: editor$1,
-    source: source$1
+    source: source$1,
+    uni: uni$2
   };
   const common = {
     loading: "Loading data...",
@@ -11044,7 +11064,13 @@ This will fail in production if not fixed.`);
     error_missing_data: "Original data missing",
     error_connection: "Connection error",
     error_update: "Update failed",
-    error_send: "Send failed"
+    error_send: "Send failed",
+    page_unit: "page",
+    total: "Total",
+    from_date: "From Date",
+    to_date: "To Date",
+    hidden_member: "Hidden Member",
+    hidden_user: "Hidden User"
   };
   const todo = {
     page_title: "Tasks",
@@ -11174,15 +11200,21 @@ This will fail in production if not fixed.`);
     conversation: "Conversation",
     message: "Message"
   };
+  const uni$1 = {
+    showActionSheet: {
+      cancel: "Cancel"
+    }
+  };
   const en = {
     common,
     todo,
     customer_modal,
     editor,
-    source
+    source,
+    uni: uni$1
   };
   const i18n = createI18n({
-    locale: "vi",
+    locale: "en",
     fallbackLocale: "en",
     messages: {
       vi,

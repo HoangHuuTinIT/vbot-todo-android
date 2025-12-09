@@ -145,9 +145,16 @@
 			:customers="customerList" :managers="rawMemberList" @close="showCustomerModal = false"
 			@select="onCustomerSelect" @filter="onFilterCustomerInModal" @loadMore="loadMoreCustomers" />
 		
-		<ConfirmModal v-model:visible="isConfirmDeleteOpen" :title="$t('common.notification')"
-			:message="$t('todo.confirm_delete_msg', { title: itemToDelete?.title })" confirm-type="danger"
-			@confirm="confirmDelete" @cancel="cancelDelete" />
+		<ConfirmModal 
+		    v-model:visible="isConfirmDeleteOpen" 
+		    :title="$t('common.notification')"
+		    :message="itemToDelete ? $t('todo.confirm_delete_msg').replace('{title}', itemToDelete.title) : ''" 
+		    confirm-type="danger"
+		    :cancel-label="$t('common.cancel')"
+		    :confirm-label="$t('common.delete')"
+		    @confirm="confirmDelete" 
+		    @cancel="cancelDelete" 
+		/>
 		<GlobalMessage />
 	</view>
 </template>

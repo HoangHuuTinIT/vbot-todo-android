@@ -24,7 +24,13 @@
 		"error_missing_data": "Thiếu dữ liệu gốc",
 		"error_connection": "Lỗi kết nối",
 		"error_update": "Cập nhật thất bại",
-		"error_send": "Gửi thất bại"
+		"error_send": "Gửi thất bại",
+		"page_unit": "trang",
+		"total": "Tổng",
+		"from_date": "Từ ngày",
+		"to_date": "Đến ngày",
+		"hidden_member": "Thành viên ẩn",
+		"hidden_user": "Người dùng ẩn"
 	},
 	"todo": {
 		"page_title": "Công việc",
@@ -121,7 +127,11 @@
 		"msg_saved": "Đã lưu",
 		"interaction_other": "Tương tác khác",
 		"msg_assignee_changed": "Đã đổi người thực hiện",
-		"msg_status_changed": "Đã cập nhật trạng thái"
+		"msg_status_changed": "Đã cập nhật trạng thái",
+		"confirm_delete_msg": "Bạn có chắc muốn xóa công việc \"{title}\"?",
+		"status_todo": "Chưa xử lý",
+		"status_progress": "Đang xử lý",
+		"status_done": "Hoàn thành"
 	},
 	"customer_modal": {
 		"title": "Chọn khách hàng",
@@ -155,5 +165,10 @@
 		"customer": "Khách hàng",
 		"conversation": "Hội thoại",
 		"message": "Tin nhắn"
+	},
+	"uni": {
+		"showActionSheet": {
+			"cancel": "Hủy"
+		}
 	}
 }

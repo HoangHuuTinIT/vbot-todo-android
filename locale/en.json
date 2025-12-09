@@ -24,7 +24,13 @@
 		"error_missing_data": "Original data missing",
 		"error_connection": "Connection error",
 		"error_update": "Update failed",
-		"error_send": "Send failed"
+		"error_send": "Send failed",
+		"page_unit": "page",
+		"total": "Total",
+		"from_date": "From Date",
+		"to_date": "To Date",
+		"hidden_member": "Hidden Member",
+		"hidden_user": "Hidden User"
 	},
 	"todo": {
 		"page_title": "Tasks",
@@ -121,7 +127,11 @@
 		"msg_saved": "Saved",
 		"interaction_other": "Other interaction",
 		"msg_assignee_changed": "Assignee changed",
-		"msg_status_changed": "Status updated"
+		"msg_status_changed": "Status updated",
+		"confirm_delete_msg": "Are you sure you want to delete \"{title}\"?",
+		"status_todo": "To Do",
+		"status_progress": "In Progress",
+		"status_done": "Done"
 	},
 	"customer_modal": {
 		"title": "Select Customer",
@@ -155,5 +165,10 @@
 		"customer": "Customer",
 		"conversation": "Conversation",
 		"message": "Message"
+	},
+	"uni": {
+		"showActionSheet": {
+			"cancel": "Cancel"
+		}
 	}
 }

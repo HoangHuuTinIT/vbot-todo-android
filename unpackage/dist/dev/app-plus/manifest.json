@@ -42,6 +42,14 @@
     "nvueStyleCompiler": "uni-app",
     "compilerVersion": 3,
     "distribute": {
+      "locales": {
+        "en": {
+          "res": "locale/en.json"
+        },
+        "vi": {
+          "res": "locale/vi.json"
+        }
+      },
       "google": {
         "permissions": [
           "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",

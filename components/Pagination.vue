@@ -2,18 +2,16 @@
 	<view class="pagination-footer">
 		<picker mode="selector" :range="pageSizeOptions" :value="pageSizeIndex" @change="onPageSizeChange">
 			<view class="page-size-selector">
-				<text class="size-text">{{ pageSize }} / trang</text>
+				<text class="size-text">{{ pageSize }} / {{ $t('common.page_unit') }}</text>
 				<text class="dropdown-arrow">▼</text>
 			</view>
 		</picker>
 
-		<text class="total-text" v-if="showTotal">Tổng: {{ total }}</text>
+		<text class="total-text" v-if="showTotal">{{ $t('common.total') }}: {{ total }}</text>
 
 		<view class="pagination-controls">
 			<view class="page-arrow" :class="{ 'disabled': pageNo <= 1 }" @click="onPrev">‹</view>
-
 			<view class="page-box active">{{ pageNo }}</view>
-
 			<view class="page-arrow" :class="{ 'disabled': pageNo >= totalPages }" @click="onNext">›</view>
 		</view>
 

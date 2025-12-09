@@ -13,12 +13,24 @@
 import { computed } from 'vue';
 import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
 import type { TodoStatusType } from '@/types/common';
+import { useI18n } from 'vue-i18n'; 
+
+const { t } = useI18n(); 
 const props = defineProps<{
   status: string 
 }>();
 
 const badgeLabel = computed(() => {
-  return STATUS_LABELS[props.status as TodoStatusType] || props.status || 'Không xác định';
+  switch (props.status) {
+    case TODO_STATUS.NEW:
+      return t('todo.status_todo');
+    case TODO_STATUS.IN_PROGRESS:
+      return t('todo.status_progress');
+    case TODO_STATUS.DONE:
+      return t('todo.status_done');
+    default:
+      return props.status || 'Unknown';
+  }
 });
 
 const badgeColorClass = computed(() => {
