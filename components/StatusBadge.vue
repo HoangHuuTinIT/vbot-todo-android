@@ -1,72 +1,100 @@
 //components/StatusBadge.vue
 <template>
-  <view 
-    class="px-2 py-1 rounded-full text-xs font-bold inline-block text-center min-w-[80px]"
-    :class="badgeColorClass"
-    :style="customStyle"
-  >
-    {{ badgeLabel }}
-  </view>
+	<view class="px-2 py-1 rounded-full text-xs font-bold inline-block text-center min-w-[80px]"
+		:class="badgeColorClass" :style="customStyle">
+		{{ badgeLabel }}
+	</view>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
-import type { TodoStatusType } from '@/types/common';
-import { useI18n } from 'vue-i18n'; 
+	import { computed } from 'vue';
+	import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
+	import type { TodoStatusType } from '@/types/common';
+	import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n(); 
-const props = defineProps<{
-  status: string 
-}>();
+	const { t } = useI18n();
+	const props = defineProps<{
+		status : string
+	}>();
 
-const badgeLabel = computed(() => {
-  switch (props.status) {
-    case TODO_STATUS.NEW:
-      return t('todo.status_todo');
-    case TODO_STATUS.IN_PROGRESS:
-      return t('todo.status_progress');
-    case TODO_STATUS.DONE:
-      return t('todo.status_done');
-    default:
-      return props.status || 'Unknown';
-  }
-});
+	const badgeLabel = computed(() => {
+		switch (props.status) {
+			case TODO_STATUS.NEW:
+				return t('todo.status_todo');
+			case TODO_STATUS.IN_PROGRESS:
+				return t('todo.status_progress');
+			case TODO_STATUS.DONE:
+				return t('todo.status_done');
+			case TODO_STATUS.OVERDUE:
+				return t('todo.status_overdue');
+			default:
+				return props.status || 'Unknown';
+		}
+	});
 
-const badgeColorClass = computed(() => {
-  switch (props.status) {
-    case TODO_STATUS.NEW:
-      return 'bg-gray-200 text-gray-600'; 
-    case TODO_STATUS.IN_PROGRESS:
-      return 'bg-orange-100 text-orange-600'; 
-    case TODO_STATUS.DONE:
-      return 'bg-green-100 text-green-600'; 
-    default:
-      return 'bg-gray-100 text-gray-400';
-  }
-});
+	const badgeColorClass = computed(() => {
+		switch (props.status) {
+			case TODO_STATUS.NEW:
+				return 'bg-gray-200 text-gray-600';
+			case TODO_STATUS.IN_PROGRESS:
+				return 'bg-orange-100 text-orange-600';
+			case TODO_STATUS.DONE:
+				return 'bg-green-100 text-green-600';
+			case TODO_STATUS.OVERDUE:
+			      return 'bg-red-100 text-red-600';
+			default:
+				return 'bg-gray-100 text-gray-400';
+		}
+	});
 
-const customStyle = computed(() => {
-  switch (props.status) {
-    case TODO_STATUS.NEW:
-      return { backgroundColor: '#e4e4e7', color: '#52525b' };
-    case TODO_STATUS.IN_PROGRESS:
-      return { backgroundColor: '#ffedd5', color: '#c2410c' };
-    case TODO_STATUS.DONE:
-      return { backgroundColor: '#dcfce7', color: '#15803d' };
-    default:
-      return { backgroundColor: '#f4f4f5', color: '#a1a1aa' };
-  }
-});
+	const customStyle = computed(() => {
+		switch (props.status) {
+			case TODO_STATUS.NEW:
+				return { backgroundColor: '#e4e4e7', color: '#52525b' };
+			case TODO_STATUS.IN_PROGRESS:
+				return { backgroundColor: '#ffedd5', color: '#c2410c' };
+			case TODO_STATUS.DONE:
+				return { backgroundColor: '#dcfce7', color: '#15803d' };
+			case TODO_STATUS.OVERDUE:
+			      return { backgroundColor: '#fee2e2', color: '#dc2626' };
+			default:
+				return { backgroundColor: '#f4f4f5', color: '#a1a1aa' };
+		}
+	});
 </script>
 
 <style scoped>
-.px-2 { padding-left: 8px; padding-right: 8px; }
-.py-1 { padding-top: 4px; padding-bottom: 4px; }
-.rounded-full { border-radius: 9999px; }
-.text-xs { font-size: 12px; }
-.font-bold { font-weight: 700; }
-.inline-block { display: inline-block; }
-.text-center { text-align: center; }
-.min-w-\[80px\] { min-width: 80px; }
+	.px-2 {
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+
+	.py-1 {
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+
+	.rounded-full {
+		border-radius: 9999px;
+	}
+
+	.text-xs {
+		font-size: 12px;
+	}
+
+	.font-bold {
+		font-weight: 700;
+	}
+
+	.inline-block {
+		display: inline-block;
+	}
+
+	.text-center {
+		text-align: center;
+	}
+
+	.min-w-\[80px\] {
+		min-width: 80px;
+	}
 </style>

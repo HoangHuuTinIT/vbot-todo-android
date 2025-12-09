@@ -33,9 +33,10 @@ export const useListTodoController = () => {
 	        t('common.all'),
 	        t('todo.status_todo'),
 	        t('todo.status_progress'),
-	        t('todo.status_done')
+	        t('todo.status_done'),
+			t('todo.status_overdue')
 	    ]);
-	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
+	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE,TODO_STATUS.OVERDUE];
 	const statusIndex = ref<number>(0);
 
 	const rawMemberList = ref<any[]>([]);

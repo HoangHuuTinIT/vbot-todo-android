@@ -100,6 +100,7 @@
 		"status_todo": "To Do",
 		"status_progress": "In Progress",
 		"status_done": "Done",
+		"status_overdue": "Overdue",
 		"filter_activity_all": "All Activities",
 		"filter_activity_comment": "Comments",
 		"history_all": "All",

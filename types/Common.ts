@@ -10,6 +10,6 @@ export interface ApiResponse<T> {
 
 export type TodoLinkType = 'CALL' | 'CUSTOMER' | 'CONVERSATION' | 'CHAT_MESSAGE';
 
-export type TodoStatusType = 'TO_DO' | 'IN_PROGRESS' | 'DONE';
+export type TodoStatusType = 'TO_DO' | 'IN_PROGRESS' | 'DONE' | 'OVERDUE';
 
 export type TodoMessageType = 'COMMENT' | 'UPDATE_TODO' | 'LOG';

@@ -100,6 +100,7 @@
 		"status_todo": "Chưa xử lý",
 		"status_progress": "Đang xử lý",
 		"status_done": "Hoàn thành",
+		"status_overdue": "Quá hạn",
 		"filter_activity_all": "Tất cả hoạt động",
 		"filter_activity_comment": "Bình luận",
 		"history_all": "Tất cả",

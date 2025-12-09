@@ -724,4 +724,7 @@
 	    height: 8px;
 	    background-color: #f1f1f1;
 	}
+	// .bg-red {
+	//     background-color: #ff3b30 !important; /* Màu đỏ */
+	// }
 </style>

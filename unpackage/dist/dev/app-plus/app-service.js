@@ -10785,17 +10785,20 @@ This will fail in production if not fixed.`);
   const TODO_STATUS = {
     NEW: "TO_DO",
     IN_PROGRESS: "IN_PROGRESS",
-    DONE: "DONE"
+    DONE: "DONE",
+    OVERDUE: "OVERDUE"
   };
   const STATUS_LABELS = {
     "TO_DO": "Chưa xử lý",
     "IN_PROGRESS": "Đang xử lý",
-    "DONE": "Hoàn thành"
+    "DONE": "Hoàn thành",
+    "OVERDUE": "Quá hạn"
   };
   const STATUS_COLORS = {
     "TO_DO": "bg-gray",
     "IN_PROGRESS": "bg-orange",
-    "DONE": "bg-green"
+    "DONE": "bg-green",
+    "OVERDUE": "bg-red"
   };
   const TIMELINE_TYPE_MAP = {
     "HISTORY_CALL_IN": "Cuộc gọi đến",
@@ -11191,9 +11194,10 @@ This will fail in production if not fixed.`);
       t2("common.all"),
       t2("todo.status_todo"),
       t2("todo.status_progress"),
-      t2("todo.status_done")
+      t2("todo.status_done"),
+      t2("todo.status_overdue")
     ]);
-    const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE];
+    const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE, TODO_STATUS.OVERDUE];
     const statusIndex = vue.ref(0);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.computed(() => {
@@ -11233,7 +11237,7 @@ This will fail in production if not fixed.`);
         const data = await getAllMembers();
         rawMemberList.value = data;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:77", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:78", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const {
@@ -11281,7 +11285,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:131", error);
+        formatAppLog("error", "at controllers/list_todo.ts:132", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -11353,7 +11357,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:210", error);
+        formatAppLog("error", "at controllers/list_todo.ts:211", error);
         showError(t2("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
@@ -11364,7 +11368,7 @@ This will fail in production if not fixed.`);
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/list_todo.ts:221", "Đang làm mới trang...");
+      formatAppLog("log", "at controllers/list_todo.ts:222", "Đang làm mới trang...");
       resetPage();
       getTodoList();
     });
@@ -11378,7 +11382,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:234", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:235", "Delete Error:", error);
         showError(t2("common.fail_delete"));
       }
     };
@@ -11512,6 +11516,8 @@ This will fail in production if not fixed.`);
             return t2("todo.status_progress");
           case TODO_STATUS.DONE:
             return t2("todo.status_done");
+          case TODO_STATUS.OVERDUE:
+            return t2("todo.status_overdue");
           default:
             return props.status || "Unknown";
         }
@@ -11524,6 +11530,8 @@ This will fail in production if not fixed.`);
             return "bg-orange-100 text-orange-600";
           case TODO_STATUS.DONE:
             return "bg-green-100 text-green-600";
+          case TODO_STATUS.OVERDUE:
+            return "bg-red-100 text-red-600";
           default:
             return "bg-gray-100 text-gray-400";
         }
@@ -11536,6 +11544,8 @@ This will fail in production if not fixed.`);
             return { backgroundColor: "#ffedd5", color: "#c2410c" };
           case TODO_STATUS.DONE:
             return { backgroundColor: "#dcfce7", color: "#15803d" };
+          case TODO_STATUS.OVERDUE:
+            return { backgroundColor: "#fee2e2", color: "#dc2626" };
           default:
             return { backgroundColor: "#f4f4f5", color: "#a1a1aa" };
         }
@@ -15833,6 +15843,7 @@ This will fail in production if not fixed.`);
     status_todo: "Chưa xử lý",
     status_progress: "Đang xử lý",
     status_done: "Hoàn thành",
+    status_overdue: "Quá hạn",
     filter_activity_all: "Tất cả hoạt động",
     filter_activity_comment: "Bình luận",
     history_all: "Tất cả",
@@ -16040,6 +16051,7 @@ This will fail in production if not fixed.`);
     status_todo: "To Do",
     status_progress: "In Progress",
     status_done: "Done",
+    status_overdue: "Overdue",
     filter_activity_all: "All Activities",
     filter_activity_comment: "Comments",
     history_all: "All",

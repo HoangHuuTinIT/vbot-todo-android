@@ -1523,21 +1523,31 @@ to {
   color: #999;
 }
 
-.px-2[data-v-7f144565] { padding-left: 8px; padding-right: 8px;
+.px-2[data-v-7f144565] {
+		padding-left: 8px;
+		padding-right: 8px;
 }
-.py-1[data-v-7f144565] { padding-top: 4px; padding-bottom: 4px;
+.py-1[data-v-7f144565] {
+		padding-top: 4px;
+		padding-bottom: 4px;
 }
-.rounded-full[data-v-7f144565] { border-radius: 9999px;
+.rounded-full[data-v-7f144565] {
+		border-radius: 9999px;
 }
-.text-xs[data-v-7f144565] { font-size: 12px;
+.text-xs[data-v-7f144565] {
+		font-size: 12px;
 }
-.font-bold[data-v-7f144565] { font-weight: 700;
+.font-bold[data-v-7f144565] {
+		font-weight: 700;
 }
-.inline-block[data-v-7f144565] { display: inline-block;
+.inline-block[data-v-7f144565] {
+		display: inline-block;
 }
-.text-center[data-v-7f144565] { text-align: center;
+.text-center[data-v-7f144565] {
+		text-align: center;
 }
-.min-w-\[80px\][data-v-7f144565] { min-width: 80px;
+.min-w-\[80px\][data-v-7f144565] {
+		min-width: 80px;
 }
 
 /**

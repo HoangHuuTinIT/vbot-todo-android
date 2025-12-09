@@ -4,19 +4,22 @@ import type { TodoStatusType } from '@/types/common';
 export const TODO_STATUS = {
     NEW: 'TO_DO',
     IN_PROGRESS: 'IN_PROGRESS',
-    DONE: 'DONE'
+    DONE: 'DONE',
+	OVERDUE: 'OVERDUE'
 } as const;
 
 export const STATUS_LABELS: Record<TodoStatusType, string> = {
     'TO_DO': 'Chưa xử lý',
     'IN_PROGRESS': 'Đang xử lý',
-    'DONE': 'Hoàn thành'
+    'DONE': 'Hoàn thành',
+	'OVERDUE': 'Quá hạn'
 };
 
 export const STATUS_COLORS: Record<TodoStatusType, string> = {
     'TO_DO': 'bg-gray',    
     'IN_PROGRESS': 'bg-orange',
-    'DONE': 'bg-green'
+    'DONE': 'bg-green',
+	'OVERDUE': 'bg-red'
 };
 
 export const TIMELINE_TYPE_MAP: Record<string, string> = {
