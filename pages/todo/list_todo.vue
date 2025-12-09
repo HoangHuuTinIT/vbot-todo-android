@@ -5,7 +5,7 @@
 			<view class="header-left"></view>
 			<text class="header-title">{{ $t('todo.page_title') }}</text>
 			<view class="header-right" @click="openFilter">
-				<image src="https://img.icons8.com/ios-filled/50/333333/filter--v1.png" class="filter-icon"></image>
+				<image src="/static/filter.png" class="filter-icon"></image>
 			</view>
 		</view>
 
@@ -28,8 +28,8 @@
 						<view class="card-body">
 							<view class="card-row top-row">
 								<text class="card-title">{{ item.title }}</text>
-								<view class="action-btn" @click.stop="showActionMenu(item)">
-									<text class="dots">•••</text>
+								<view class="action-btn" @click.stop="openCustomMenu(item)">
+								    <text class="dots">•••</text>
 								</view>
 							</view>
 							<view class="card-info-row">
@@ -155,11 +155,25 @@
 		    @confirm="confirmDelete" 
 		    @cancel="cancelDelete" 
 		/>
+		<view class="custom-sheet-mask" :class="{ 'show': showCustomActionSheet }" @click="showCustomActionSheet = false">
+		    <view class="custom-sheet-panel" @click.stop>
+		        <view class="sheet-item delete" @click="handleCustomAction('delete')">
+		            <text>{{ $t('common.delete') }}</text>
+		        </view>
+		        
+		        <view class="sheet-gap"></view>
+		        
+		        <view class="sheet-item cancel" @click="showCustomActionSheet = false">
+		            <text>{{ $t('common.cancel') }}</text>
+		        </view>
+		    </view>
+		</view>
 		<GlobalMessage />
 	</view>
 </template>
 
 <script setup lang="ts">
+	import { ref } from 'vue';
 	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import { useListTodoController } from '@/controllers/list_todo';
 	import StatusBadge from '@/components/StatusBadge.vue';
@@ -189,6 +203,26 @@
 		loadingMore,
 		loadMoreCustomers,
 	} = useListTodoController();
+	const showCustomActionSheet = ref(false);
+	const selectedItemForAction = ref<any>(null);
+	
+	// Hàm mở menu (thay thế hàm cũ)
+	const openCustomMenu = (item: any) => {
+	    selectedItemForAction.value = item;
+	    showCustomActionSheet.value = true;
+	};
+	
+	// Hàm xử lý khi bấm nút trong menu
+	const handleCustomAction = (action: string) => {
+	    showCustomActionSheet.value = false; // Đóng menu trước
+	    
+	    if (action === 'delete') {
+	        // Gán item cần xóa vào biến của controller và mở modal xóa
+	        itemToDelete.value = selectedItemForAction.value; 
+	        isConfirmDeleteOpen.value = true;
+	    }
+	    // Sau này muốn làm thêm sửa/xem chi tiết thì thêm if vào đây
+	};
 </script>
 
 <style lang="scss" scoped>
@@ -632,5 +666,62 @@
 		color: #007aff;
 		padding: 5px 0;
 		margin-left: 10px;
+	}
+	/* CSS cho Menu tự làm */
+	.custom-sheet-mask {
+	    position: fixed;
+	    top: 0; left: 0; right: 0; bottom: 0;
+	    background: rgba(0,0,0,0.4); /* Màu nền tối mờ */
+	    z-index: 9999;
+	    visibility: hidden;
+	    opacity: 0;
+	    transition: all 0.2s;
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: flex-end;
+	}
+	
+	.custom-sheet-mask.show {
+	    visibility: visible;
+	    opacity: 1;
+	}
+	
+	.custom-sheet-panel {
+	    background-color: #f1f1f1;
+	    border-top-left-radius: 12px;
+	    border-top-right-radius: 12px;
+	    transform: translateY(100%);
+	    transition: transform 0.2s;
+	    overflow: hidden;
+	    padding-bottom: env(safe-area-inset-bottom); /* Tránh tai thỏ/bottom bar iphone */
+	}
+	
+	.custom-sheet-mask.show .custom-sheet-panel {
+	    transform: translateY(0);
+	}
+	
+	.sheet-item {
+	    background-color: #fff;
+	    padding: 16px;
+	    text-align: center;
+	    font-size: 17px;
+	    border-bottom: 1px solid #eee;
+	}
+	
+	.sheet-item:active {
+	    background-color: #ddd;
+	}
+	
+	.sheet-item.delete text {
+	    color: #ff3b30; /* Màu đỏ cho chữ Xóa */
+	}
+	
+	.sheet-item.cancel {
+	    font-weight: 600;
+	}
+	
+	.sheet-gap {
+	    height: 8px;
+	    background-color: #f1f1f1;
 	}
 </style>

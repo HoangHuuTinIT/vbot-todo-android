@@ -353,6 +353,54 @@
   color: #999;
   font-weight: bold;
 }
+.custom-sheet-mask[data-v-7d79903f] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.custom-sheet-mask.show[data-v-7d79903f] {
+  visibility: visible;
+  opacity: 1;
+}
+.custom-sheet-panel[data-v-7d79903f] {
+  background-color: #f1f1f1;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  transform: translateY(100%);
+  transition: transform 0.2s;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.custom-sheet-mask.show .custom-sheet-panel[data-v-7d79903f] {
+  transform: translateY(0);
+}
+.sheet-item[data-v-7d79903f] {
+  background-color: #fff;
+  padding: 16px;
+  text-align: center;
+  font-size: 17px;
+  border-bottom: 1px solid #eee;
+}
+.sheet-item[data-v-7d79903f]:active {
+  background-color: #ddd;
+}
+.sheet-item.cancel[data-v-7d79903f] {
+  font-weight: 600;
+}
+.sheet-gap[data-v-7d79903f] {
+  height: 8px;
+  background-color: #f1f1f1;
+}
 @keyframes fadeIn-7d79903f {
 from {
     opacity: 0;

@@ -1,38 +1,39 @@
 <template>
 	<view class="editor-container">
-		<editor 
-			:id="editorId" 
-			class="ql-container" 
+		<editor
+			:id="editorId"
+			class="ql-container"
 			:placeholder="placeholder || $t('editor.placeholder')"
-			show-img-size 
-			show-img-toolbar 
+			show-img-size
+			show-img-toolbar
 			show-img-resize
-			@ready="onEditorReady" 
+			@ready="onEditorReady"
 			@input="onInput"
 			@statuschange="onStatusChange">
 		</editor>
 
 		<view class="link-cards-area" v-if="insertedLinks.length > 0">
-			<LinkCard 
-				v-for="(link, index) in insertedLinks" 
-				:key="index" 
+			<LinkCard
+				v-for="(link, index) in insertedLinks"
+				:key="index"
 				:url="link"
 				:removable="true"
 				@remove="removeLink(index)"
 			/>
 		</view>
+
 		<view class="toolbar">
 			<view class="tool-list">
 				<view v-for="(item, index) in tools" :key="index"
-					class="tool-item" 
-					:class="{ 'active': isActive(item) }" 
+					class="tool-item"
+					:class="{ 'active': isActive(item) }"
 					@touchend.prevent="handleToolClick(item)">
 					
-					<text v-if="item.iconText" 
-						  :style="item.style" 
-						  class="txt-icon"
-						  :class="{'txt-dynamic': item.action}"> 
-						{{ getDisplayText(item) }} 
+					<text v-if="item.iconText"
+						:style="item.style"
+						class="txt-icon"
+						:class="{'txt-dynamic': item.action}">
+						{{ getDisplayText(item) }}
 					</text>
 					
 					<image v-else :src="getDisplayImage(item)" class="img-icon"></image>
@@ -48,7 +49,6 @@
 					<image src="https://img.icons8.com/ios/50/666666/link--v1.png" class="img-icon"></image>
 				</view>
 
-				
 				<view class="tool-item" @touchend.prevent="openCardLinkModal">
 					<image src="https://img.icons8.com/ios/50/666666/add-link.png" class="img-icon"></image>
 				</view>
@@ -59,7 +59,6 @@
 			</view>
 		</view>
 
-	
 		<view class="modal-overlay" v-if="showLinkModal" @tap="showLinkModal = false">
 			<view class="modal-box" @tap.stop>
 				<text class="modal-title">{{ $t('editor.link_modal_title') }}</text>
@@ -71,7 +70,6 @@
 			</view>
 		</view>
 
-		
 		<view class="modal-overlay" v-if="showCardLinkModal" @tap="showCardLinkModal = false">
 			<view class="modal-box" @tap.stop>
 				<text class="modal-title">{{ $t('editor.card_modal_title') }}</text>
@@ -85,7 +83,6 @@
 			</view>
 		</view>
 
-		
 		<view class="modal-overlay" v-if="showColorModal" @tap="closeColorModal">
 			<view class="modal-box color-box" @tap.stop>
 				<view class="color-tabs">
@@ -101,8 +98,8 @@
 					<view class="color-circle no-color" @tap="applyColor('')">
 						<text class="x-mark">✕</text>
 					</view>
-					<view v-for="(c, idx) in colorList" :key="idx" 
-						class="color-circle" 
+					<view v-for="(c, idx) in colorList" :key="idx"
+						class="color-circle"
 						:style="{ backgroundColor: c }"
 						:class="{ selected: isColorSelected(c) }"
 						@tap="applyColor(c)">
@@ -111,25 +108,41 @@
 			</view>
 		</view>
 
+		<view class="custom-sheet-mask" :class="{ 'show': showActionSheet }" @tap="closeActionSheet">
+			<view class="custom-sheet-panel" @tap.stop>
+				<view v-for="(item, index) in currentActionSheetItems" :key="index" 
+					class="sheet-item" 
+					@tap="handleActionSheetItemClick(item)">
+					<text>{{ item.text }}</text>
+				</view>
+				
+				<view class="sheet-gap"></view>
+				
+				<view class="sheet-item cancel" @tap="closeActionSheet">
+					<text>{{ $t('common.cancel') }}</text>
+				</view>
+			</view>
+		</view>
+
 	</view>
 </template>
 
-
 <script setup lang="ts">
-import { ref, watch, getCurrentInstance, onMounted } from 'vue';
+import { ref, watch, getCurrentInstance } from 'vue';
 import LinkCard from '@/components/Todo/LinkCard.vue';
 import { extractLinksAndCleanHtml, composeHtmlWithIframes } from '@/utils/linkHelper';
- import { useI18n } from 'vue-i18n';
- const { t } = useI18n();
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 const props = defineProps({
 	modelValue: String,
-	placeholder: { type: String, default: '' } // Để rỗng, xử lý ở template hoặc computed
+	placeholder: { type: String, default: '' }
 });
 const emit = defineEmits(['update:modelValue']);
 
 const tools = [
 	{ name: 'header', iconText: 'H', style: 'font-weight:bold', action: 'header-menu' },
-	{ name: 'fontSize', iconText: 'A', style: 'font-weight:bold; font-size:16px', action: 'fontsize-menu' }, 
+	{ name: 'fontSize', iconText: 'A', style: 'font-weight:bold; font-size:16px', action: 'fontsize-menu' },
 	{ name: 'bold', iconText: 'B', style: 'font-weight:900' },
 	{ name: 'italic', iconText: 'I', style: 'font-style:italic' },
 	{ name: 'underline', iconText: 'U', style: 'text-decoration:underline' },
@@ -146,8 +159,8 @@ const tools = [
 const colorList = [
 	'#000000', '#333333', '#888888', '#aaaaaa',
 	'#e60000', '#ff9900', '#ffff00', '#008a00',
-	'#0066cc', '#880088', '#ffffff', '#facccc', 
-	'#ffebcc', '#ffffcc', '#cce8cc', '#cce0f5' 
+	'#0066cc', '#880088', '#ffffff', '#facccc',
+	'#ffebcc', '#ffffcc', '#cce8cc', '#cce0f5'
 ];
 
 const editorId = ref(`editor-${Math.random().toString(36).substr(2, 5)}`);
@@ -155,19 +168,25 @@ const editorCtx = ref<any>(null);
 const formats = ref<any>({});
 const instance = getCurrentInstance();
 const isLinkSelected = ref(false);
-const lastVal = ref(''); 
+const lastVal = ref('');
 
 
 const showLinkModal = ref(false);
 const linkUrl = ref('');
-
 const showCardLinkModal = ref(false);
 const cardLinkUrl = ref('');
-
 const showColorModal = ref(false);
 const colorTab = ref<'color' | 'backgroundColor'>('color');
 
+
 const insertedLinks = ref<string[]>([]);
+
+interface ActionSheetItem {
+	text: string;
+	handler: () => void;
+}
+const showActionSheet = ref(false);
+const currentActionSheetItems = ref<ActionSheetItem[]>([]);
 
 
 const getDomain = (url: string) => {
@@ -179,46 +198,34 @@ const getDomain = (url: string) => {
 	}
 };
 
-
 const openLink = (url: string) => {
-    // #ifdef APP-PLUS
-    plus.runtime.openURL(url);
-    // #endif
-    // #ifdef H5
-    window.open(url, '_blank');
-    // #endif
+	// #ifdef APP-PLUS
+	plus.runtime.openURL(url);
+	// #endif
+	// #ifdef H5
+	window.open(url, '_blank');
+	// #endif
 }
-
 
 const parseContent = (html: string) => {
 	if (!html) return { cleanHtml: '', links: [] };
-	
 	const links: string[] = [];
-	
 	const iframeRegex = /<iframe[^>]+src="([^">]+)"[^>]*><\/iframe>/g;
-	
-
 	const cleanHtml = html.replace(iframeRegex, (match, src) => {
 		if (src) links.push(src);
 		return '';
 	});
-
 	return { cleanHtml, links };
 };
 
-
 const composeContent = (cleanHtml: string, links: string[]) => {
 	let fullContent = cleanHtml;
-
 	links.forEach(link => {
-	
 		const iframeStr = `<iframe class="ql-video" frameborder="0" allowfullscreen="true" src="${link}"></iframe>`;
 		fullContent += iframeStr;
 	});
 	return fullContent;
 };
-
-
 
 const openCardLinkModal = () => {
 	cardLinkUrl.value = '';
@@ -232,10 +239,11 @@ const confirmCardLink = () => {
 			url = 'https://' + url;
 		}
 		insertedLinks.value.push(url);
-		triggerUpdate(); 
+		triggerUpdate();
 	}
 	showCardLinkModal.value = false;
 };
+
 const removeLink = (index: number) => {
 	insertedLinks.value.splice(index, 1);
 	triggerUpdate();
@@ -246,16 +254,13 @@ const triggerUpdate = () => {
 		editorCtx.value.getContents({
 			success: (res: any) => {
 				const html = res.html;
-				lastVal.value = html; 
-				
+				lastVal.value = html;
 				const finalContent = composeHtmlWithIframes(html, insertedLinks.value);
 				emit('update:modelValue', finalContent);
 			}
 		});
 	}
 };
-
-
 
 const getDisplayText = (item: any) => {
 	const formatVal = formats.value[item.name];
@@ -269,7 +274,6 @@ const getDisplayText = (item: any) => {
 	return item.iconText;
 };
 
-
 const getDisplayImage = (item: any) => {
 	if (item.action === 'align-menu') {
 		const alignVal = formats.value.align || 'left';
@@ -282,6 +286,27 @@ const getDisplayImage = (item: any) => {
 	}
 	return item.iconImg;
 };
+
+const isActive = (item: any) => {
+	const currentFormat = formats.value[item.name];
+	if (item.action === 'header-menu') return !!currentFormat;
+	if (item.action === 'fontsize-menu') return !!currentFormat;
+	if (item.action === 'align-menu') return !!currentFormat && currentFormat !== 'left';
+	if (item.name === 'color') return !!formats.value.color;
+	if (item.name === 'backgroundColor') return !!formats.value.backgroundColor;
+	if (item.value) return currentFormat === item.value;
+	return !!currentFormat;
+};
+
+const closeActionSheet = () => {
+	showActionSheet.value = false;
+};
+
+const handleActionSheetItemClick = (item: ActionSheetItem) => {
+	item.handler();
+	closeActionSheet();
+};
+
 
 const handleToolClick = (item: any) => {
 	if (item.action === 'header-menu') return handleHeaderSetting();
@@ -300,89 +325,76 @@ const handleToolClick = (item: any) => {
 	}
 
 	format(item.name, item.value);
-}
-
-const applyColor = (color: string) => {
-	if (color) {
-		format(colorTab.value, color);
-	} else {
-		format(colorTab.value, null); 
-	}
-	showColorModal.value = false;
-};
-
-const closeColorModal = () => {
-	showColorModal.value = false;
-};
-
-const isColorSelected = (color: string) => {
-	return formats.value[colorTab.value] === color;
 };
 
 const handleAlignSetting = () => {
-	const options = [
-	        t('editor.align_left'), 
-	        t('editor.align_center'), 
-	        t('editor.align_right'), 
-	        t('editor.align_justify')
-	    ];
-	uni.showActionSheet({
-		itemList: options,
-		success: (res) => {
-			const index = res.tapIndex;
-			if (index === 0) format('align', 'left');
-			if (index === 1) format('align', 'center');
-			if (index === 2) format('align', 'right');
-			if (index === 3) format('align', 'justify');
-		}
-	});
-}
+	currentActionSheetItems.value = [
+		{ text: t('editor.align_left'), handler: () => format('align', 'left') },
+		{ text: t('editor.align_center'), handler: () => format('align', 'center') },
+		{ text: t('editor.align_right'), handler: () => format('align', 'right') },
+		{ text: t('editor.align_justify'), handler: () => format('align', 'justify') }
+	];
+	showActionSheet.value = true;
+};
 
 const handleFontSizeSetting = () => {
-	const options = [
-	        t('editor.size_small'), 
-	        t('editor.size_normal'), 
-	        t('editor.size_large'), 
-	        t('editor.size_huge')
-	    ];
-	uni.showActionSheet({
-		itemList: options,
-		success: (res) => {
-			const index = res.tapIndex;
-			if (index === 0) format('fontSize', 'small');
-			if (index === 1) format('fontSize', null);
-			if (index === 2) format('fontSize', 'large');
-			if (index === 3) format('fontSize', 'huge');
-		}
-	});
-}
+	currentActionSheetItems.value = [
+		{ text: t('editor.size_small'), handler: () => format('fontSize', 'small') },
+		{ text: t('editor.size_normal'), handler: () => format('fontSize', null) },
+		{ text: t('editor.size_large'), handler: () => format('fontSize', 'large') },
+		{ text: t('editor.size_huge'), handler: () => format('fontSize', 'huge') }
+	];
+	showActionSheet.value = true;
+};
 
 const handleHeaderSetting = () => {
-	const options = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', t('editor.size_normal')];
-	uni.showActionSheet({
-		itemList: options,
-		success: (res) => {
-			if (res.tapIndex < 6) {
-				format('header', res.tapIndex + 1);
-			} else {
-				format('header', null);
-			}
-		}
-	});
-}
-
-const isActive = (item: any) => {
-	const currentFormat = formats.value[item.name];
-	if (item.action === 'header-menu') return !!currentFormat;
-	if (item.action === 'fontsize-menu') return !!currentFormat;
-	if (item.action === 'align-menu') return !!currentFormat && currentFormat !== 'left';
-	
-	if (item.name === 'color') return !!formats.value.color;
-	if (item.name === 'backgroundColor') return !!formats.value.backgroundColor;
-
-	if (item.value) return currentFormat === item.value;
-	return !!currentFormat;
+	currentActionSheetItems.value = [
+		{ text: 'Heading 1', handler: () => format('header', 1) },
+		{ text: 'Heading 2', handler: () => format('header', 2) },
+		{ text: 'Heading 3', handler: () => format('header', 3) },
+		{ text: 'Heading 4', handler: () => format('header', 4) },
+		{ text: t('editor.size_normal'), handler: () => format('header', null) }
+	];
+	showActionSheet.value = true;
 };
+
+const insertImage = () => {
+	currentActionSheetItems.value = [
+		{ 
+			text: t('editor.img_camera'), 
+			handler: () => {
+				uni.chooseImage({
+					count: 1,
+					sourceType: ['camera'],
+					success: (imageRes) => processImageSelection(imageRes)
+				});
+			} 
+		},
+		{ 
+			text: t('editor.img_album'), 
+			handler: () => {
+				uni.chooseImage({
+					count: 1,
+					sourceType: ['album'],
+					success: (imageRes) => processImageSelection(imageRes)
+				});
+			} 
+		}
+	];
+	showActionSheet.value = true;
+};
+
+const processImageSelection = (imageRes: any) => {
+	const tempPath = imageRes.tempFilePaths[0];
+	if (editorCtx.value) {
+		editorCtx.value.insertImage({
+			src: tempPath,
+			width: '80%',
+			alt: 'image'
+		});
+	}
+};
+
 
 const onEditorReady = () => {
 	uni.createSelectorQuery().in(instance).select(`#${editorId.value}`).context((res) => {
@@ -400,7 +412,7 @@ const onEditorReady = () => {
 
 const onInput = (e: any) => {
 	const val = e.detail.html;
-	lastVal.value = val; 
+	lastVal.value = val;
 	const finalContent = composeHtmlWithIframes(val, insertedLinks.value);
 	emit('update:modelValue', finalContent);
 };
@@ -415,36 +427,26 @@ const format = (name: string, value: any = null) => {
 	editorCtx.value.format(name, value);
 };
 
-const insertImage = () => {
-	uni.showActionSheet({
-		itemList: [t('editor.img_camera'), t('editor.img_album')],
-		success: (res) => {
-			const index = res.tapIndex;
-			let source: 'camera' | 'album' = 'album';
-			if (index === 0) source = 'camera';
-			if (index === 1) source = 'album';
+const applyColor = (color: string) => {
+	if (color) {
+		format(colorTab.value, color);
+	} else {
+		format(colorTab.value, null);
+	}
+	showColorModal.value = false;
+};
 
-			uni.chooseImage({
-				count: 1,
-				sourceType: [source],
-				success: (imageRes) => {
-					const tempPath = imageRes.tempFilePaths[0];
-					if (editorCtx.value) {
-						editorCtx.value.insertImage({
-							src: tempPath, 
-							width: '80%',
-							alt: 'image'
-						});
-					}
-				}
-			});
-		}
-	});
+const closeColorModal = () => {
+	showColorModal.value = false;
+};
+
+const isColorSelected = (color: string) => {
+	return formats.value[colorTab.value] === color;
 };
 
 const handleLink = () => {
 	if(isLinkSelected.value) {
-		editorCtx.value.format('link', null); 
+		editorCtx.value.format('link', null);
 	} else {
 		linkUrl.value = '';
 		showLinkModal.value = true;
@@ -462,18 +464,13 @@ const clearFormat = () => {
 	editorCtx.value.removeFormat();
 };
 
-
 watch(() => props.modelValue, (newVal) => {
 	if (editorCtx.value) {
 		const { cleanHtml, links } = extractLinksAndCleanHtml(newVal || '');
-		
-	
 		if (cleanHtml !== lastVal.value) {
 			editorCtx.value.setContents({ html: cleanHtml });
 			lastVal.value = cleanHtml;
 		}
-		
-		
 		if (JSON.stringify(links) !== JSON.stringify(insertedLinks.value)) {
 			insertedLinks.value = links;
 		}
@@ -489,7 +486,7 @@ watch(() => props.modelValue, (newVal) => {
 	border: 1px solid #e0e0e0;
 	border-radius: 8px;
 	overflow: hidden;
-	min-height: 250px; 
+	min-height: 250px;
 }
 .ql-container {
 	flex: 1;
@@ -564,16 +561,16 @@ watch(() => props.modelValue, (newVal) => {
 	background-color: #f5f7fa;
 	border-top: 1px solid #eee;
 	width: 100%;
-	height: auto; 
-	padding: 8px 5px; 
-	box-sizing: border-box; 
+	height: auto;
+	padding: 8px 5px;
+	box-sizing: border-box;
 }
 .tool-list {
 	display: flex;
 	align-items: center;
 	width: 100%;
-	flex-wrap: wrap; 
-	gap: 8px; 
+	flex-wrap: wrap;
+	gap: 8px;
 }
 .tool-item {
 	width: 32px;
@@ -584,7 +581,7 @@ watch(() => props.modelValue, (newVal) => {
 	border-radius: 4px;
 	background-color: #fff;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-	flex-shrink: 0; 
+	flex-shrink: 0;
 }
 .tool-item.active {
 	background-color: #d0e4ff;
@@ -592,7 +589,7 @@ watch(() => props.modelValue, (newVal) => {
 	border: 1px solid #007aff;
 }
 .txt-icon { font-size: 16px; color: #555; font-weight: 600; }
-.txt-dynamic { font-size: 14px; } 
+.txt-dynamic { font-size: 14px; }
 .img-icon { width: 18px; height: 18px; opacity: 0.7; }
 .tool-divider { width: 1px; height: 20px; background-color: #ddd; display: none; }
 
@@ -652,7 +649,7 @@ watch(() => props.modelValue, (newVal) => {
 .btn-confirm { background-color: #007aff; color: #fff; }
 
 .color-box {
-	padding: 0; 
+	padding: 0;
 	overflow: hidden;
 	width: 85%;
 }
@@ -705,6 +702,52 @@ watch(() => props.modelValue, (newVal) => {
 	font-size: 20px;
 	color: #999;
 	font-weight: bold;
+}
+
+.custom-sheet-mask {
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(0,0,0,0.4);
+	z-index: 9999;
+	visibility: hidden;
+	opacity: 0;
+	transition: all 0.2s;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+.custom-sheet-mask.show {
+	visibility: visible;
+	opacity: 1;
+}
+.custom-sheet-panel {
+	background-color: #f1f1f1;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	transform: translateY(100%);
+	transition: transform 0.2s;
+	overflow: hidden;
+	padding-bottom: env(safe-area-inset-bottom);
+}
+.custom-sheet-mask.show .custom-sheet-panel {
+	transform: translateY(0);
+}
+.sheet-item {
+	background-color: #fff;
+	padding: 16px;
+	text-align: center;
+	font-size: 17px;
+	border-bottom: 1px solid #eee;
+}
+.sheet-item:active {
+	background-color: #ddd;
+}
+.sheet-item.cancel {
+	font-weight: 600;
+}
+.sheet-gap {
+	height: 8px;
+	background-color: #f1f1f1;
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

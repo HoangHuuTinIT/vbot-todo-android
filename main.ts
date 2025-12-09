@@ -5,6 +5,8 @@ import i18n from './locale/index'
 // #ifndef VUE3
 import Vue from 'vue'
 import './uni.promisify.adaptor'
+import { initVueI18n } from '@dcloudio/uni-i18n'
+import messages from './locale/index'
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue({
@@ -19,6 +21,7 @@ export function createApp() {
   const app = createSSRApp(App)
   app.use(Pinia.createPinia()  )
   app.use(i18n)
+  uni.setLocale('vi');
   return {
     app,
 	Pinia,

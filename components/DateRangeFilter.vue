@@ -5,19 +5,29 @@
     
     <view class="f-row">
       <view class="f-group half">
-        <picker mode="date" :value="startDate" @change="onStartChange">
+        <uni-datetime-picker 
+                  type="date" 
+                  :value="startDate" 
+                  @change="onStartChange"
+                  :border="false"
+                >
           <view class="f-picker date" :class="{ 'placeholder': !startDate }">
             {{ startDate ? formatDateDisplay(startDate) : $t('common.from_date') }}
           </view>
-        </picker>
+        </uni-datetime-picker>
       </view>
 
       <view class="f-group half">
-        <picker mode="date" :value="endDate" @change="onEndChange">
+        <uni-datetime-picker 
+                  type="date" 
+                  :value="endDate" 
+                  @change="onEndChange"
+                  :border="false"
+                >
           <view class="f-picker date" :class="{ 'placeholder': !endDate }">
             {{ endDate ? formatDateDisplay(endDate) : $t('common.to_date') }}
           </view>
-        </picker>
+        </uni-datetime-picker>
       </view>
     </view>
   </view>
@@ -34,12 +44,12 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:startDate', 'update:endDate']);
 
-const onStartChange = (e: any) => {
-  emit('update:startDate', e.detail.value);
+const onStartChange = (val: string) => {
+  emit('update:startDate', val);
 };
 
-const onEndChange = (e: any) => {
-  emit('update:endDate', e.detail.value);
+const onEndChange = (val: string) => {
+  emit('update:endDate', val);
 };
 </script>
 

@@ -33,7 +33,7 @@
 		"hidden_user": "Hidden User"
 	},
 	"todo": {
-		"page_title": "Tasks",
+		"page_title": "Todo",
 		"create_page_title": "Create Task",
 		"add_task": "Add Task",
 		"created_at": "Created",

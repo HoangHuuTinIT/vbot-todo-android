@@ -4,7 +4,7 @@ import vi from './vi.json';
 import en from './en.json';
 
 const i18n = createI18n({
-  locale: 'en',
+  locale: 'vi',
   fallbackLocale: 'en',
   messages: {
     vi,

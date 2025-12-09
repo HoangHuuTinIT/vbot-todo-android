@@ -13,8 +13,9 @@
 				</view>
 
 				<picker mode="date" :value="date" fields="month" @change="bindDateChange">
-					<text
-						class="uni-calendar__header-text">{{ (nowDate.year||'') + yearText + ( nowDate.month||'') + monthText}}</text>
+					<text class="uni-calendar__header-text">
+					    {{ monthText + ' ' + (nowDate.month||'') + ' ' + yearText + ' ' + (nowDate.year||'') }}
+					</text>
 				</picker>
 
 				<view class="uni-calendar__header-btn-box" @click.stop="changeMonth('next')">
