@@ -133,8 +133,8 @@
 	 **/
 	import Calendar from './calendar.vue'
 	import TimePicker from './time-picker.vue'
-	import { initVueI18n } from '@dcloudio/uni-i18n'
-	import i18nMessages from './i18n/index.js'
+	// import { initVueI18n } from '@dcloudio/uni-i18n'
+	// import i18nMessages from './i18n/index.js'
   import { getDateTime, getDate, getTime, getDefaultSecond, dateCompare, checkDate, fixIosDateFormat } from './util'
 
 	export default {
@@ -188,7 +188,7 @@
 				isEmitValue: false,
 				isPhone: false,
 				isFirstShow: true,
-        i18nT: () => {}
+        // i18nT: () => {}
 			}
 		},
 		props: {
@@ -261,16 +261,15 @@
 					this.isRange = newVal.indexOf('range') !== -1
 				}
 			},
-			// #ifndef VUE3
 			value: {
-				immediate: true,
-				handler(newVal) {
-					if (this.isEmitValue) {
-						this.isEmitValue = false
-						return
-					}
-					this.initPicker(newVal)
-				}
+			    handler(newVal) {
+			        if (this.isEmitValue) {
+			            this.isEmitValue = false
+			            return
+			        }
+			        this.initPicker(newVal)
+			    },
+			    immediate: true
 			},
 			// #endif
 			// #ifdef VUE3
@@ -346,45 +345,45 @@
 				return this.endPlaceholder || this.endDateText
 			},
 			selectDateText() {
-				return this.i18nT("uni-datetime-picker.selectDate")
+			    return this.$t("uni-datetime-picker.selectDate")
 			},
-      selectDateTimeText() {
-        return this.i18nT("uni-datetime-picker.selectDateTime")
-      },
+			selectDateTimeText() {
+			    return this.$t("uni-datetime-picker.selectDateTime")
+			},
 			selectTimeText() {
-				return this.i18nT("uni-datetime-picker.selectTime")
+			    return this.$t("uni-datetime-picker.selectTime")
 			},
 			startDateText() {
-				return this.startPlaceholder || this.i18nT("uni-datetime-picker.startDate")
+			    return this.startPlaceholder || this.$t("uni-datetime-picker.startDate")
 			},
 			startTimeText() {
-				return this.i18nT("uni-datetime-picker.startTime")
+			    return this.$t("uni-datetime-picker.startTime")
 			},
 			endDateText() {
-				return this.endPlaceholder || this.i18nT("uni-datetime-picker.endDate")
+			    return this.endPlaceholder || this.$t("uni-datetime-picker.endDate")
 			},
 			endTimeText() {
-				return this.i18nT("uni-datetime-picker.endTime")
+			    return this.$t("uni-datetime-picker.endTime")
 			},
 			okText() {
-				return this.i18nT("uni-datetime-picker.ok")
+			    return this.$t("uni-datetime-picker.ok")
 			},
 			clearText() {
-				return this.i18nT("uni-datetime-picker.clear")
+			    return this.$t("uni-datetime-picker.clear")
 			},
 			showClearIcon() {
 				return this.clearIcon && !this.disabled && (this.displayValue || (this.displayRangeValue.startDate && this.displayRangeValue.endDate))
 			}
 		},
 		created() {
-			this.initI18nT()
+			// this.initI18nT()
       this.platform()
 		},
 		methods: {
-      initI18nT() {
-        const vueI18n = initVueI18n(i18nMessages)
-        this.i18nT = vueI18n.t
-      },
+      // initI18nT() {
+      //   const vueI18n = initVueI18n(i18nMessages)
+      //   this.i18nT = vueI18n.t
+      // },
 			initPicker(newVal) {
 				if ((!newVal && !this.defaultValue) || Array.isArray(newVal) && !newVal.length) {
 					this.$nextTick(() => {
@@ -459,46 +458,56 @@
 				this.windowWidth = windowWidth
 			},
 			show() {
-				if (this.disabled) {
-					return
-				}
-				this.platform()
-				if (this.isPhone) {
-					setTimeout(() => {
-            this.$refs.mobile.open()
-          }, 0);
-					return
-				}
-				this.pickerPositionStyle = {
-					top: '10px'
-				}
-				const dateEditor = uni.createSelectorQuery().in(this).select(".uni-date-editor")
-				dateEditor.boundingClientRect(rect => {
-					if (this.windowWidth - rect.left < this.datePopupWidth) {
-						this.pickerPositionStyle.right = 0
-					}
-				}).exec()
-				setTimeout(() => {
-					this.pickerVisible = !this.pickerVisible
-					if (!this.isPhone && this.isRange && this.isFirstShow) {
-						this.isFirstShow = false
-						const {
-							startDate,
-							endDate
-						} = this.calendarRange
-						if (startDate && endDate) {
-							if (this.diffDate(startDate, endDate) < 30) {
-								this.$refs.right.changeMonth('pre')
-							}
-						} else {
-							this.$refs.right.changeMonth('next')
-							if(this.isPhone){
-								this.$refs.right.cale.lastHover = false;
-							}
-						}
-					}
-
-				}, 50)
+			    if (this.disabled) {
+			        return
+			    }
+			    this.platform()
+			    if (this.isPhone) {
+			        setTimeout(() => {
+			            this.$refs.mobile.open()
+			        }, 0);
+			        return
+			    }
+			
+			    this.pickerPositionStyle = {
+			        top: '10px'
+			    }
+			    const dateEditor = uni.createSelectorQuery().in(this).select(".uni-date-editor")
+			    dateEditor.boundingClientRect(rect => {
+			        if (this.windowWidth - rect.left < this.datePopupWidth) {
+			            this.pickerPositionStyle.right = 0
+			        }
+			    }).exec()
+			
+			    setTimeout(() => {
+			        this.pickerVisible = !this.pickerVisible
+			        
+			  
+			        if (this.pickerVisible) {
+			            if (!this.isRange && this.$refs.pcSingle) {
+			                this.$refs.pcSingle.init(this.calendarDate)
+			            } else if (this.isRange && this.$refs.left && this.$refs.right) {
+			                this.$refs.left.init(this.calendarRange.startDate)
+			                this.$refs.right.init(this.calendarRange.endDate)
+			            }
+			        }
+			
+			        if (!this.isPhone && this.isRange && this.isFirstShow) {
+			            this.isFirstShow = false
+			            const { startDate, endDate } = this.calendarRange
+			            if (startDate && endDate) {
+			                if (this.diffDate(startDate, endDate) < 30) {
+			                    this.$refs.right.changeMonth('pre')
+			                }
+			            } else {
+			                this.$refs.right.changeMonth('next')
+			                if(this.isPhone){
+			                    this.$refs.right.cale.lastHover = false;
+			                }
+			            }
+			        }
+			
+			    }, 50)
 			},
 			close() {
 				setTimeout(() => {
@@ -625,32 +634,42 @@
 				this.endMultipleStatus = Object.assign({}, this.endMultipleStatus, obj)
 			},
 			mobileChange(e) {
-				if (this.isRange) {
-					const {before, after} = e.range
-
-          if(!before || !after){
-            return
-          }
-
-					this.handleStartAndEnd(before, after, true)
-					if (this.hasTime) {
-						const {
-							startTime,
-							endTime
-						} = e.timeRange
-						this.tempRange.startTime = startTime
-						this.tempRange.endTime = endTime
-					}
-					this.confirmRangeChange()
-				} else {
-					if (this.hasTime) {
-						this.displayValue = e.fulldate + ' ' + e.time
-					} else {
-						this.displayValue = e.fulldate
-					}
-					this.setEmit(this.displayValue)
-				}
-				this.$refs.mobile.close()
+			    if (this.isRange) {
+			        const {
+			            before,
+			            after
+			        } = e.range
+			
+			        if (!before || !after) {
+			            return
+			        }
+			
+			        this.handleStartAndEnd(before, after, true)
+			        if (this.hasTime) {
+			            const {
+			                startTime,
+			                endTime
+			            } = e.timeRange
+			            this.tempRange.startTime = startTime
+			            this.tempRange.endTime = endTime
+			        }
+			        this.confirmRangeChange()
+			    } else {
+			        // --- SỬA TỪ ĐÂY ---
+			        // Cập nhật lại ngày hiện tại cho lịch
+			        this.calendarDate = e.fulldate 
+			        
+			        if (this.hasTime) {
+			            // QUAN TRỌNG: Cập nhật biến pickerTime thành giờ mới chọn
+			            this.pickerTime = e.time 
+			            this.displayValue = e.fulldate + ' ' + e.time
+			        } else {
+			            this.displayValue = e.fulldate
+			        }
+			        this.setEmit(this.displayValue)
+			        // --- ĐẾN ĐÂY ---
+			    }
+			    this.$refs.mobile.close()
 			},
 			rangeChange(before, after) {
 				if (!(before && after)) return

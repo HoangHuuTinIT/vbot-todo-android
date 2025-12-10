@@ -18,7 +18,7 @@ const getSavedLocale = () => {
 };
 
 // const curLocale = getSavedLocale();
-const curLocale = 'en';
+const curLocale = 'vi';
 const i18n = createI18n({
   locale: curLocale,      
   fallbackLocale: 'vi',    

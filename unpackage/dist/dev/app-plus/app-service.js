@@ -1826,397 +1826,6 @@ if (uni.restoreGlobal) {
     );
   }
   const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
-  const isObject$2 = (val) => val !== null && typeof val === "object";
-  const defaultDelimiters = ["{", "}"];
-  class BaseFormatter {
-    constructor() {
-      this._caches = /* @__PURE__ */ Object.create(null);
-    }
-    interpolate(message, values, delimiters = defaultDelimiters) {
-      if (!values) {
-        return [message];
-      }
-      let tokens = this._caches[message];
-      if (!tokens) {
-        tokens = parse$1(message, delimiters);
-        this._caches[message] = tokens;
-      }
-      return compile(tokens, values);
-    }
-  }
-  const RE_TOKEN_LIST_VALUE = /^(?:\d)+/;
-  const RE_TOKEN_NAMED_VALUE = /^(?:\w)+/;
-  function parse$1(format2, [startDelimiter, endDelimiter]) {
-    const tokens = [];
-    let position = 0;
-    let text = "";
-    while (position < format2.length) {
-      let char = format2[position++];
-      if (char === startDelimiter) {
-        if (text) {
-          tokens.push({ type: "text", value: text });
-        }
-        text = "";
-        let sub = "";
-        char = format2[position++];
-        while (char !== void 0 && char !== endDelimiter) {
-          sub += char;
-          char = format2[position++];
-        }
-        const isClosed = char === endDelimiter;
-        const type = RE_TOKEN_LIST_VALUE.test(sub) ? "list" : isClosed && RE_TOKEN_NAMED_VALUE.test(sub) ? "named" : "unknown";
-        tokens.push({ value: sub, type });
-      } else {
-        text += char;
-      }
-    }
-    text && tokens.push({ type: "text", value: text });
-    return tokens;
-  }
-  function compile(tokens, values) {
-    const compiled = [];
-    let index = 0;
-    const mode = Array.isArray(values) ? "list" : isObject$2(values) ? "named" : "unknown";
-    if (mode === "unknown") {
-      return compiled;
-    }
-    while (index < tokens.length) {
-      const token = tokens[index];
-      switch (token.type) {
-        case "text":
-          compiled.push(token.value);
-          break;
-        case "list":
-          compiled.push(values[parseInt(token.value, 10)]);
-          break;
-        case "named":
-          if (mode === "named") {
-            compiled.push(values[token.value]);
-          } else {
-            {
-              console.warn(`Type of token '${token.type}' and format of value '${mode}' don't match!`);
-            }
-          }
-          break;
-        case "unknown":
-          {
-            console.warn(`Detect 'unknown' type of token!`);
-          }
-          break;
-      }
-      index++;
-    }
-    return compiled;
-  }
-  const LOCALE_ZH_HANS = "zh-Hans";
-  const LOCALE_ZH_HANT = "zh-Hant";
-  const LOCALE_EN = "en";
-  const LOCALE_FR = "fr";
-  const LOCALE_ES = "es";
-  const hasOwnProperty$2 = Object.prototype.hasOwnProperty;
-  const hasOwn$2 = (val, key) => hasOwnProperty$2.call(val, key);
-  const defaultFormatter = new BaseFormatter();
-  function include(str, parts) {
-    return !!parts.find((part) => str.indexOf(part) !== -1);
-  }
-  function startsWith(str, parts) {
-    return parts.find((part) => str.indexOf(part) === 0);
-  }
-  function normalizeLocale(locale, messages) {
-    if (!locale) {
-      return;
-    }
-    locale = locale.trim().replace(/_/g, "-");
-    if (messages && messages[locale]) {
-      return locale;
-    }
-    locale = locale.toLowerCase();
-    if (locale === "chinese") {
-      return LOCALE_ZH_HANS;
-    }
-    if (locale.indexOf("zh") === 0) {
-      if (locale.indexOf("-hans") > -1) {
-        return LOCALE_ZH_HANS;
-      }
-      if (locale.indexOf("-hant") > -1) {
-        return LOCALE_ZH_HANT;
-      }
-      if (include(locale, ["-tw", "-hk", "-mo", "-cht"])) {
-        return LOCALE_ZH_HANT;
-      }
-      return LOCALE_ZH_HANS;
-    }
-    let locales = [LOCALE_EN, LOCALE_FR, LOCALE_ES];
-    if (messages && Object.keys(messages).length > 0) {
-      locales = Object.keys(messages);
-    }
-    const lang = startsWith(locale, locales);
-    if (lang) {
-      return lang;
-    }
-  }
-  class I18n {
-    constructor({ locale, fallbackLocale, messages, watcher, formater: formater2 }) {
-      this.locale = LOCALE_EN;
-      this.fallbackLocale = LOCALE_EN;
-      this.message = {};
-      this.messages = {};
-      this.watchers = [];
-      if (fallbackLocale) {
-        this.fallbackLocale = fallbackLocale;
-      }
-      this.formater = formater2 || defaultFormatter;
-      this.messages = messages || {};
-      this.setLocale(locale || LOCALE_EN);
-      if (watcher) {
-        this.watchLocale(watcher);
-      }
-    }
-    setLocale(locale) {
-      const oldLocale = this.locale;
-      this.locale = normalizeLocale(locale, this.messages) || this.fallbackLocale;
-      if (!this.messages[this.locale]) {
-        this.messages[this.locale] = {};
-      }
-      this.message = this.messages[this.locale];
-      if (oldLocale !== this.locale) {
-        this.watchers.forEach((watcher) => {
-          watcher(this.locale, oldLocale);
-        });
-      }
-    }
-    getLocale() {
-      return this.locale;
-    }
-    watchLocale(fn) {
-      const index = this.watchers.push(fn) - 1;
-      return () => {
-        this.watchers.splice(index, 1);
-      };
-    }
-    add(locale, message, override = true) {
-      const curMessages = this.messages[locale];
-      if (curMessages) {
-        if (override) {
-          Object.assign(curMessages, message);
-        } else {
-          Object.keys(message).forEach((key) => {
-            if (!hasOwn$2(curMessages, key)) {
-              curMessages[key] = message[key];
-            }
-          });
-        }
-      } else {
-        this.messages[locale] = message;
-      }
-    }
-    f(message, values, delimiters) {
-      return this.formater.interpolate(message, values, delimiters).join("");
-    }
-    t(key, locale, values) {
-      let message = this.message;
-      if (typeof locale === "string") {
-        locale = normalizeLocale(locale, this.messages);
-        locale && (message = this.messages[locale]);
-      } else {
-        values = locale;
-      }
-      if (!hasOwn$2(message, key)) {
-        console.warn(`Cannot translate the value of keypath ${key}. Use the value of keypath as default.`);
-        return key;
-      }
-      return this.formater.interpolate(message[key], values).join("");
-    }
-  }
-  function watchAppLocale(appVm, i18n2) {
-    if (appVm.$watchLocale) {
-      appVm.$watchLocale((newLocale) => {
-        i18n2.setLocale(newLocale);
-      });
-    } else {
-      appVm.$watch(() => appVm.$locale, (newLocale) => {
-        i18n2.setLocale(newLocale);
-      });
-    }
-  }
-  function getDefaultLocale() {
-    if (typeof uni !== "undefined" && uni.getLocale) {
-      return uni.getLocale();
-    }
-    if (typeof global !== "undefined" && global.getLocale) {
-      return global.getLocale();
-    }
-    return LOCALE_EN;
-  }
-  function initVueI18n(locale, messages = {}, fallbackLocale, watcher) {
-    if (typeof locale !== "string") {
-      const options = [
-        messages,
-        locale
-      ];
-      locale = options[0];
-      messages = options[1];
-    }
-    if (typeof locale !== "string") {
-      locale = getDefaultLocale();
-    }
-    if (typeof fallbackLocale !== "string") {
-      fallbackLocale = typeof __uniConfig !== "undefined" && __uniConfig.fallbackLocale || LOCALE_EN;
-    }
-    const i18n2 = new I18n({
-      locale,
-      fallbackLocale,
-      messages,
-      watcher
-    });
-    let t2 = (key, values) => {
-      if (typeof getApp !== "function") {
-        t2 = function(key2, values2) {
-          return i18n2.t(key2, values2);
-        };
-      } else {
-        let isWatchedAppLocale = false;
-        t2 = function(key2, values2) {
-          const appVm = getApp().$vm;
-          if (appVm) {
-            appVm.$locale;
-            if (!isWatchedAppLocale) {
-              isWatchedAppLocale = true;
-              watchAppLocale(appVm, i18n2);
-            }
-          }
-          return i18n2.t(key2, values2);
-        };
-      }
-      return t2(key, values);
-    };
-    return {
-      i18n: i18n2,
-      f(message, values, delimiters) {
-        return i18n2.f(message, values, delimiters);
-      },
-      t(key, values) {
-        return t2(key, values);
-      },
-      add(locale2, message, override = true) {
-        return i18n2.add(locale2, message, override);
-      },
-      watch(fn) {
-        return i18n2.watchLocale(fn);
-      },
-      getLocale() {
-        return i18n2.getLocale();
-      },
-      setLocale(newLocale) {
-        return i18n2.setLocale(newLocale);
-      }
-    };
-  }
-  const en$1 = {
-    "uni-datetime-picker.selectDate": "select date",
-    "uni-datetime-picker.selectTime": "select time",
-    "uni-datetime-picker.selectDateTime": "select date and time",
-    "uni-datetime-picker.startDate": "start date",
-    "uni-datetime-picker.endDate": "end date",
-    "uni-datetime-picker.startTime": "start time",
-    "uni-datetime-picker.endTime": "end time",
-    "uni-datetime-picker.ok": "ok",
-    "uni-datetime-picker.clear": "clear",
-    "uni-datetime-picker.cancel": "cancel",
-    "uni-datetime-picker.year": "-",
-    "uni-datetime-picker.month": "",
-    "uni-calender.MON": "MON",
-    "uni-calender.TUE": "TUE",
-    "uni-calender.WED": "WED",
-    "uni-calender.THU": "THU",
-    "uni-calender.FRI": "FRI",
-    "uni-calender.SAT": "SAT",
-    "uni-calender.SUN": "SUN",
-    "uni-calender.confirm": "confirm"
-  };
-  const zhHans = {
-    "uni-datetime-picker.selectDate": "选择日期",
-    "uni-datetime-picker.selectTime": "选择时间",
-    "uni-datetime-picker.selectDateTime": "选择日期时间",
-    "uni-datetime-picker.startDate": "开始日期",
-    "uni-datetime-picker.endDate": "结束日期",
-    "uni-datetime-picker.startTime": "开始时间",
-    "uni-datetime-picker.endTime": "结束时间",
-    "uni-datetime-picker.ok": "确定",
-    "uni-datetime-picker.clear": "清除",
-    "uni-datetime-picker.cancel": "取消",
-    "uni-datetime-picker.year": "年",
-    "uni-datetime-picker.month": "月",
-    "uni-calender.SUN": "日",
-    "uni-calender.MON": "一",
-    "uni-calender.TUE": "二",
-    "uni-calender.WED": "三",
-    "uni-calender.THU": "四",
-    "uni-calender.FRI": "五",
-    "uni-calender.SAT": "六",
-    "uni-calender.confirm": "确认"
-  };
-  const zhHant = {
-    "uni-datetime-picker.selectDate": "選擇日期",
-    "uni-datetime-picker.selectTime": "選擇時間",
-    "uni-datetime-picker.selectDateTime": "選擇日期時間",
-    "uni-datetime-picker.startDate": "開始日期",
-    "uni-datetime-picker.endDate": "結束日期",
-    "uni-datetime-picker.startTime": "開始时间",
-    "uni-datetime-picker.endTime": "結束时间",
-    "uni-datetime-picker.ok": "確定",
-    "uni-datetime-picker.clear": "清除",
-    "uni-datetime-picker.cancel": "取消",
-    "uni-datetime-picker.year": "年",
-    "uni-datetime-picker.month": "月",
-    "uni-calender.SUN": "日",
-    "uni-calender.MON": "一",
-    "uni-calender.TUE": "二",
-    "uni-calender.WED": "三",
-    "uni-calender.THU": "四",
-    "uni-calender.FRI": "五",
-    "uni-calender.SAT": "六",
-    "uni-calender.confirm": "確認"
-  };
-  const vi$1 = {
-    "uni-datetime-picker.selectDate": "Chọn ngày",
-    "uni-datetime-picker.selectTime": "Chọn giờ",
-    "uni-datetime-picker.selectDateTime": "Chọn ngày giờ",
-    "uni-datetime-picker.startDate": "Ngày bắt đầu",
-    "uni-datetime-picker.endDate": "Ngày kết thúc",
-    "uni-datetime-picker.ok": "OK",
-    "uni-datetime-picker.clear": "Xóa",
-    "uni-datetime-picker.cancel": "Hủy",
-    "uni-datetime-picker.year": "năm",
-    "uni-datetime-picker.month": "tháng",
-    "uni-calender.confirm": "Xác nhận",
-    "uni-calender.SUN": "CN",
-    "uni-calender.MON": "T2",
-    "uni-calender.TUE": "T3",
-    "uni-calender.WED": "T4",
-    "uni-calender.THU": "T5",
-    "uni-calender.FRI": "T6",
-    "uni-calender.SAT": "T7",
-    "uni-calender.jan": "Tháng 1",
-    "uni-calender.feb": "Tháng 2",
-    "uni-calender.mar": "Tháng 3",
-    "uni-calender.apr": "Tháng 4",
-    "uni-calender.may": "Tháng 5",
-    "uni-calender.jun": "Tháng 6",
-    "uni-calender.jul": "Tháng 7",
-    "uni-calender.aug": "Tháng 8",
-    "uni-calender.sep": "Tháng 9",
-    "uni-calender.oct": "Tháng 10",
-    "uni-calender.nov": "Tháng 11",
-    "uni-calender.dec": "Tháng 12"
-  };
-  const i18nMessages = {
-    "vi": vi$1,
-    en: en$1,
-    "zh-Hans": zhHans,
-    "zh-Hant": zhHant
-  };
-  const { t } = initVueI18n(i18nMessages);
   const _sfc_main$h = {
     name: "UniDatetimePicker",
     data() {
@@ -2512,16 +2121,16 @@ if (uni.restoreGlobal) {
        * for i18n
        */
       selectTimeText() {
-        return t("uni-datetime-picker.selectTime");
+        return this.$t("uni-datetime-picker.selectTime");
       },
       okText() {
-        return t("uni-datetime-picker.ok");
+        return this.$t("uni-datetime-picker.ok");
       },
       clearText() {
-        return t("uni-datetime-picker.clear");
+        return this.$t("uni-datetime-picker.clear");
       },
       cancelText() {
-        return t("uni-datetime-picker.cancel");
+        return this.$t("uni-datetime-picker.cancel");
       }
     },
     mounted() {
@@ -3497,7 +3106,20 @@ if (uni.restoreGlobal) {
       open() {
         if (this.clearDate && !this.insert) {
           this.cale.cleanMultipleStatus();
-          this.init(this.date);
+        }
+        this.init(this.date);
+        if (!this.range && this.date) {
+          this.tempSingleDate = this.date;
+        }
+        if (!this.range) {
+          if (this.defTime) {
+            this.time = this.defTime;
+          }
+        } else {
+          if (this.defTime && this.defTime.start) {
+            this.timeRange.startTime = this.defTime.start;
+            this.timeRange.endTime = this.defTime.end;
+          }
         }
         this.show = true;
         this.$nextTick(() => {
@@ -3966,9 +3588,8 @@ if (uni.restoreGlobal) {
         pickerPositionStyle: null,
         isEmitValue: false,
         isPhone: false,
-        isFirstShow: true,
-        i18nT: () => {
-        }
+        isFirstShow: true
+        // i18nT: () => {}
       };
     },
     props: {
@@ -4041,6 +3662,18 @@ if (uni.restoreGlobal) {
           this.isRange = newVal.indexOf("range") !== -1;
         }
       },
+      value: {
+        handler(newVal) {
+          if (this.isEmitValue) {
+            this.isEmitValue = false;
+            return;
+          }
+          this.initPicker(newVal);
+        },
+        immediate: true
+      },
+      // #endif
+      // #ifdef VUE3
       modelValue: {
         immediate: true,
         handler(newVal) {
@@ -4051,6 +3684,7 @@ if (uni.restoreGlobal) {
           this.initPicker(newVal);
         }
       },
+      // #endif
       start: {
         immediate: true,
         handler(newVal) {
@@ -4112,45 +3746,44 @@ if (uni.restoreGlobal) {
         return this.endPlaceholder || this.endDateText;
       },
       selectDateText() {
-        return this.i18nT("uni-datetime-picker.selectDate");
+        return this.$t("uni-datetime-picker.selectDate");
       },
       selectDateTimeText() {
-        return this.i18nT("uni-datetime-picker.selectDateTime");
+        return this.$t("uni-datetime-picker.selectDateTime");
       },
       selectTimeText() {
-        return this.i18nT("uni-datetime-picker.selectTime");
+        return this.$t("uni-datetime-picker.selectTime");
       },
       startDateText() {
-        return this.startPlaceholder || this.i18nT("uni-datetime-picker.startDate");
+        return this.startPlaceholder || this.$t("uni-datetime-picker.startDate");
       },
       startTimeText() {
-        return this.i18nT("uni-datetime-picker.startTime");
+        return this.$t("uni-datetime-picker.startTime");
       },
       endDateText() {
-        return this.endPlaceholder || this.i18nT("uni-datetime-picker.endDate");
+        return this.endPlaceholder || this.$t("uni-datetime-picker.endDate");
       },
       endTimeText() {
-        return this.i18nT("uni-datetime-picker.endTime");
+        return this.$t("uni-datetime-picker.endTime");
       },
       okText() {
-        return this.i18nT("uni-datetime-picker.ok");
+        return this.$t("uni-datetime-picker.ok");
       },
       clearText() {
-        return this.i18nT("uni-datetime-picker.clear");
+        return this.$t("uni-datetime-picker.clear");
       },
       showClearIcon() {
         return this.clearIcon && !this.disabled && (this.displayValue || this.displayRangeValue.startDate && this.displayRangeValue.endDate);
       }
     },
     created() {
-      this.initI18nT();
       this.platform();
     },
     methods: {
-      initI18nT() {
-        const vueI18n = initVueI18n(i18nMessages);
-        this.i18nT = vueI18n.t;
-      },
+      // initI18nT() {
+      //   const vueI18n = initVueI18n(i18nMessages)
+      //   this.i18nT = vueI18n.t
+      // },
       initPicker(newVal) {
         if (!newVal && !this.defaultValue || Array.isArray(newVal) && !newVal.length) {
           this.$nextTick(() => {
@@ -4242,12 +3875,17 @@ if (uni.restoreGlobal) {
         }).exec();
         setTimeout(() => {
           this.pickerVisible = !this.pickerVisible;
+          if (this.pickerVisible) {
+            if (!this.isRange && this.$refs.pcSingle) {
+              this.$refs.pcSingle.init(this.calendarDate);
+            } else if (this.isRange && this.$refs.left && this.$refs.right) {
+              this.$refs.left.init(this.calendarRange.startDate);
+              this.$refs.right.init(this.calendarRange.endDate);
+            }
+          }
           if (!this.isPhone && this.isRange && this.isFirstShow) {
             this.isFirstShow = false;
-            const {
-              startDate,
-              endDate
-            } = this.calendarRange;
+            const { startDate, endDate } = this.calendarRange;
             if (startDate && endDate) {
               if (this.diffDate(startDate, endDate) < 30) {
                 this.$refs.right.changeMonth("pre");
@@ -4385,7 +4023,10 @@ if (uni.restoreGlobal) {
       },
       mobileChange(e) {
         if (this.isRange) {
-          const { before, after } = e.range;
+          const {
+            before,
+            after
+          } = e.range;
           if (!before || !after) {
             return;
           }
@@ -4400,7 +4041,9 @@ if (uni.restoreGlobal) {
           }
           this.confirmRangeChange();
         } else {
+          this.calendarDate = e.fulldate;
           if (this.hasTime) {
+            this.pickerTime = e.time;
             this.displayValue = e.fulldate + " " + e.time;
           } else {
             this.displayValue = e.fulldate;
@@ -6964,7 +6607,7 @@ ${codeFrame}` : message);
         );
       }
     }
-    function t2(...args) {
+    function t(...args) {
       return wrapWithDeps((context) => translate(context, ...args), () => parseTranslateArgs(...args), "translate", (root) => root.t(...args), (key) => key, (val) => isString(val));
     }
     function rt(...args) {
@@ -6975,7 +6618,7 @@ ${codeFrame}` : message);
           /* INVALID_ARGUMENT */
         );
       }
-      return t2(...[arg1, arg2, assign$2({ resolvedMessage: true }, arg3 || {})]);
+      return t(...[arg1, arg2, assign$2({ resolvedMessage: true }, arg3 || {})]);
     }
     function d(...args) {
       return wrapWithDeps((context) => datetime(context, ...args), () => parseDateTimeArgs(...args), "datetime format", (root) => root.d(...args), () => MISSING_RESOLVE_VALUE, (val) => isString(val));
@@ -7187,7 +6830,7 @@ ${codeFrame}` : message);
         _escapeParameter = val;
         _context.escapeParameter = val;
       },
-      t: t2,
+      t,
       rt,
       d,
       n,
@@ -8589,7 +8232,7 @@ ${codeFrame}` : message);
     emits: ["close", "select", "filter", "loadMore"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
-      const { t: t2 } = useI18n();
+      const { t } = useI18n();
       const props = __props;
       const emit = __emit;
       const isFilterExpanded = vue.ref(false);
@@ -8606,7 +8249,7 @@ ${codeFrame}` : message);
         emit("loadMore");
       };
       const managerDisplayOptions = vue.computed(() => {
-        const defaultOption = t2("customer_modal.manager_default");
+        const defaultOption = t("customer_modal.manager_default");
         const list = props.managers || [];
         const memberNames = list.map((m) => m.UserName || "Thành viên ẩn danh");
         return [defaultOption, ...memberNames];
@@ -8659,7 +8302,7 @@ ${codeFrame}` : message);
         const date = new Date(timestamp);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       };
-      const __returned__ = { t: t2, props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
+      const __returned__ = { t, props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -11171,7 +10814,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useListTodoController = () => {
-    const { t: t2 } = useI18n();
+    const { t } = useI18n();
     const todos = vue.ref([]);
     const {
       pageNo,
@@ -11191,31 +10834,31 @@ This will fail in production if not fixed.`);
     const isConfirmDeleteOpen = vue.ref(false);
     const itemToDelete = vue.ref(null);
     const statusOptions = vue.computed(() => [
-      t2("common.all"),
-      t2("todo.status_todo"),
-      t2("todo.status_progress"),
-      t2("todo.status_done"),
-      t2("todo.status_overdue")
+      t("common.all"),
+      t("todo.status_todo"),
+      t("todo.status_progress"),
+      t("todo.status_done"),
+      t("todo.status_overdue")
     ]);
     const statusValues = ["", TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE, TODO_STATUS.OVERDUE];
     const statusIndex = vue.ref(0);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.computed(() => {
-      const names = rawMemberList.value.map((m) => m.UserName || t2("common.hidden_member"));
-      return [t2("common.all"), ...names];
+      const names = rawMemberList.value.map((m) => m.UserName || t("common.hidden_member"));
+      return [t("common.all"), ...names];
     });
     const creatorIndex = vue.ref(0);
     const assigneeOptions = vue.computed(() => {
       const names = rawMemberList.value.map((m) => m.UserName || "Thành viên ẩn");
-      return [t2("common.all"), ...names];
+      return [t("common.all"), ...names];
     });
     const assigneeIndex = vue.ref(0);
     const sourceOptions = vue.computed(() => [
-      t2("common.all"),
-      t2("source.call"),
-      t2("source.customer"),
-      t2("source.conversation"),
-      t2("source.message")
+      t("common.all"),
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation"),
+      t("source.message")
     ]);
     const sourceValues = ["", TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
     const sourceIndex = vue.ref(0);
@@ -11358,7 +11001,7 @@ This will fail in production if not fixed.`);
         setTotal(countData || 0);
       } catch (error) {
         formatAppLog("error", "at controllers/list_todo.ts:211", error);
-        showError(t2("common.error_load"));
+        showError(t("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
         }
@@ -11377,18 +11020,18 @@ This will fail in production if not fixed.`);
         return;
       try {
         await deleteTodo(itemToDelete.value.id);
-        showSuccess(t2("common.success_delete"));
+        showSuccess(t("common.success_delete"));
         isConfirmDeleteOpen.value = false;
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
         formatAppLog("error", "at controllers/list_todo.ts:235", "Delete Error:", error);
-        showError(t2("common.fail_delete"));
+        showError(t("common.fail_delete"));
       }
     };
     const showActionMenu = (item) => {
       uni.showActionSheet({
-        itemList: [t2("common.delete")],
+        itemList: [t("common.delete")],
         itemColor: "#ff3b30",
         success: (res) => {
           if (res.tapIndex === 0)
@@ -11506,18 +11149,18 @@ This will fail in production if not fixed.`);
     },
     setup(__props, { expose: __expose }) {
       __expose();
-      const { t: t2 } = useI18n();
+      const { t } = useI18n();
       const props = __props;
       const badgeLabel = vue.computed(() => {
         switch (props.status) {
           case TODO_STATUS.NEW:
-            return t2("todo.status_todo");
+            return t("todo.status_todo");
           case TODO_STATUS.IN_PROGRESS:
-            return t2("todo.status_progress");
+            return t("todo.status_progress");
           case TODO_STATUS.DONE:
-            return t2("todo.status_done");
+            return t("todo.status_done");
           case TODO_STATUS.OVERDUE:
-            return t2("todo.status_overdue");
+            return t("todo.status_overdue");
           default:
             return props.status || "Unknown";
         }
@@ -11550,7 +11193,7 @@ This will fail in production if not fixed.`);
             return { backgroundColor: "#f4f4f5", color: "#a1a1aa" };
         }
       });
-      const __returned__ = { t: t2, props, badgeLabel, badgeColorClass, customStyle };
+      const __returned__ = { t, props, badgeLabel, badgeColorClass, customStyle };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12495,7 +12138,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useCreateTodoController = () => {
-    const { t: t2 } = useI18n();
+    const { t } = useI18n();
     useAuthStore();
     const pad = (n) => n.toString().padStart(2, "0");
     const getCurrentDateTimeISO = () => {
@@ -12525,9 +12168,9 @@ This will fail in production if not fixed.`);
       notifyAt: getCurrentDateTimeISO()
     });
     const sourceOptions = vue.computed(() => [
-      t2("source.call"),
-      t2("source.customer"),
-      t2("source.conversation")
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation")
     ]);
     const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
     const sourceIndex = vue.ref(-1);
@@ -12607,7 +12250,7 @@ This will fail in production if not fixed.`);
     };
     const submitForm = async () => {
       if (!form.value.name || !form.value.name.trim()) {
-        showInfo(t2("todo.validate_name"));
+        showInfo(t("todo.validate_name"));
         return;
       }
       let selectedLink = "CALL";
@@ -12615,7 +12258,7 @@ This will fail in production if not fixed.`);
         selectedLink = sourceValues[sourceIndex.value];
       }
       loading.value = true;
-      showLoading(t2("todo.upload_processing"));
+      showLoading(t("todo.upload_processing"));
       try {
         const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
         form.value.desc = newContent;
@@ -12628,7 +12271,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/create_todo.ts:163", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
-        showSuccess(t2("todo.create_success"));
+        showSuccess(t("todo.create_success"));
         setTimeout(() => {
           uni.navigateBack();
         }, 1500);
@@ -12636,7 +12279,7 @@ This will fail in production if not fixed.`);
         hideLoading();
         formatAppLog("error", "at controllers/create_todo.ts:172", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
-        showError(t2("common.error_load") + ": " + errorMsg);
+        showError(t("common.error_load") + ": " + errorMsg);
       } finally {
         loading.value = false;
       }
@@ -12775,7 +12418,7 @@ This will fail in production if not fixed.`);
     emits: ["update:modelValue"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
-      const { t: t2 } = useI18n();
+      const { t } = useI18n();
       const props = __props;
       const emit = __emit;
       const tools = [
@@ -12961,19 +12604,19 @@ This will fail in production if not fixed.`);
       };
       const handleAlignSetting = () => {
         currentActionSheetItems.value = [
-          { text: t2("editor.align_left"), handler: () => format2("align", "left") },
-          { text: t2("editor.align_center"), handler: () => format2("align", "center") },
-          { text: t2("editor.align_right"), handler: () => format2("align", "right") },
-          { text: t2("editor.align_justify"), handler: () => format2("align", "justify") }
+          { text: t("editor.align_left"), handler: () => format2("align", "left") },
+          { text: t("editor.align_center"), handler: () => format2("align", "center") },
+          { text: t("editor.align_right"), handler: () => format2("align", "right") },
+          { text: t("editor.align_justify"), handler: () => format2("align", "justify") }
         ];
         showActionSheet.value = true;
       };
       const handleFontSizeSetting = () => {
         currentActionSheetItems.value = [
-          { text: t2("editor.size_small"), handler: () => format2("fontSize", "small") },
-          { text: t2("editor.size_normal"), handler: () => format2("fontSize", null) },
-          { text: t2("editor.size_large"), handler: () => format2("fontSize", "large") },
-          { text: t2("editor.size_huge"), handler: () => format2("fontSize", "huge") }
+          { text: t("editor.size_small"), handler: () => format2("fontSize", "small") },
+          { text: t("editor.size_normal"), handler: () => format2("fontSize", null) },
+          { text: t("editor.size_large"), handler: () => format2("fontSize", "large") },
+          { text: t("editor.size_huge"), handler: () => format2("fontSize", "huge") }
         ];
         showActionSheet.value = true;
       };
@@ -12983,14 +12626,14 @@ This will fail in production if not fixed.`);
           { text: "Heading 2", handler: () => format2("header", 2) },
           { text: "Heading 3", handler: () => format2("header", 3) },
           { text: "Heading 4", handler: () => format2("header", 4) },
-          { text: t2("editor.size_normal"), handler: () => format2("header", null) }
+          { text: t("editor.size_normal"), handler: () => format2("header", null) }
         ];
         showActionSheet.value = true;
       };
       const insertImage = () => {
         currentActionSheetItems.value = [
           {
-            text: t2("editor.img_camera"),
+            text: t("editor.img_camera"),
             handler: () => {
               uni.chooseImage({
                 count: 1,
@@ -13000,7 +12643,7 @@ This will fail in production if not fixed.`);
             }
           },
           {
-            text: t2("editor.img_album"),
+            text: t("editor.img_album"),
             handler: () => {
               uni.chooseImage({
                 count: 1,
@@ -13093,7 +12736,7 @@ This will fail in production if not fixed.`);
           }
         }
       });
-      const __returned__ = { t: t2, props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, showActionSheet, currentActionSheetItems, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, isActive, closeActionSheet, handleActionSheetItemClick, handleToolClick, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, insertImage, processImageSelection, onEditorReady, onInput, onStatusChange, format: format2, applyColor, closeColorModal, isColorSelected, handleLink, confirmLink, clearFormat, LinkCard };
+      const __returned__ = { t, props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, showActionSheet, currentActionSheetItems, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, isActive, closeActionSheet, handleActionSheetItemClick, handleToolClick, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, insertImage, processImageSelection, onEditorReady, onInput, onStatusChange, format: format2, applyColor, closeColorModal, isColorSelected, handleLink, confirmLink, clearFormat, LinkCard };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -13450,7 +13093,7 @@ This will fail in production if not fixed.`);
       __expose();
       const props = __props;
       const emit = __emit;
-      const { t: t2 } = useI18n();
+      const { t } = useI18n();
       const onDueDateChange = (val) => {
         emit("update:dueDate", val);
         emit("change", { field: "dueDate", value: val });
@@ -13476,7 +13119,7 @@ This will fail in production if not fixed.`);
           return isoStr;
         }
       };
-      const __returned__ = { props, emit, t: t2, onDueDateChange, onNotifyDateChange, formatDateTimeDisplay };
+      const __returned__ = { props, emit, t, onDueDateChange, onNotifyDateChange, formatDateTimeDisplay };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -13786,7 +13429,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useTodoDetailController = () => {
-    const { t: t2 } = useI18n();
+    const { t } = useI18n();
     const authStore = useAuthStore();
     const currentUserId = authStore.uid;
     const isLoading = vue.ref(false);
@@ -13812,8 +13455,8 @@ This will fail in production if not fixed.`);
     const emojiList = ["👍", "👎", "😍", "😆", "😱", "😭", "😤"];
     const commentFilterIndex = vue.ref(0);
     const commentFilterOptions = vue.computed(() => [
-      t2("todo.filter_activity_all"),
-      t2("todo.filter_activity_comment")
+      t("todo.filter_activity_all"),
+      t("todo.filter_activity_comment")
     ]);
     const commentFilterValues = ["", "COMMENT"];
     const isSavingDescription = vue.ref(false);
@@ -13858,7 +13501,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/todo_detail.ts:122", `Payload Update ${event.field}:`, payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess(t2("todo.msg_update_success"));
+          showSuccess(t("todo.msg_update_success"));
           if (event.field === "dueDate") {
             form.value.raw.dueDate = payload.dueDate;
             form.value.dueDate = event.value;
@@ -13872,7 +13515,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:141", "Lỗi cập nhật ngày:", error);
-        showError(t2("todo.msg_update_error"));
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -13940,7 +13583,7 @@ This will fail in production if not fixed.`);
     };
     const onSaveDescription = async () => {
       if (!form.value.raw) {
-        showError(t2("common.error_missing_data"));
+        showError(t("common.error_missing_data"));
         return;
       }
       isSavingDescription.value = true;
@@ -13959,7 +13602,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/todo_detail.ts:252", "Payload Update Description:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess(t2("todo.msg_desc_saved"));
+          showSuccess(t("todo.msg_desc_saved"));
           form.value.raw.description = form.value.desc;
           if (filesString) {
             form.value.raw.files = filesString;
@@ -13968,7 +13611,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:267", "Lỗi cập nhật công việc:", error);
-        showError(t2("common.error_update"));
+        showError(t("common.error_update"));
       } finally {
         isSavingDescription.value = false;
       }
@@ -13979,7 +13622,7 @@ This will fail in production if not fixed.`);
       const newTitle = form.value.title ? form.value.title.trim() : "";
       const oldTitle = form.value.raw.title;
       if (!newTitle) {
-        showInfo(t2("todo.msg_title_empty"));
+        showInfo(t("todo.msg_title_empty"));
         form.value.title = oldTitle;
         return;
       }
@@ -13998,7 +13641,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/todo_detail.ts:302", "Payload Update Title:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess(t2("todo.msg_title_changed"));
+          showSuccess(t("todo.msg_title_changed"));
           form.value.raw.title = newTitle;
           if (form.value.customerCode) {
             await fetchHistoryLog(form.value.customerCode);
@@ -14007,7 +13650,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:317", "Lỗi cập nhật tiêu đề:", error);
-        showError(t2("todo.msg_update_error"));
+        showError(t("todo.msg_update_error"));
         form.value.title = oldTitle;
       } finally {
         isLoading.value = false;
@@ -14027,7 +13670,7 @@ This will fail in production if not fixed.`);
       if (foundMember) {
         replyingMemberName.value = foundMember.UserName;
       } else {
-        replyingMemberName.value = t2("todo.user_hidden");
+        replyingMemberName.value = t("todo.user_hidden");
       }
       await vue.nextTick();
     };
@@ -14047,7 +13690,7 @@ This will fail in production if not fixed.`);
     };
     const submitReply = async () => {
       if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
-        showInfo(t2("todo.msg_empty_content"));
+        showInfo(t("todo.msg_empty_content"));
         return;
       }
       if (!replyingCommentData.value)
@@ -14070,7 +13713,7 @@ This will fail in production if not fixed.`);
         };
         const newReplyId = await createTodoMessage(payload);
         if (newReplyId) {
-          showSuccess(t2("todo.msg_reply_success"));
+          showSuccess(t("todo.msg_reply_success"));
           const newReplyData = await getTodoMessageDetail(newReplyId, form.value.id);
           const processedReply = processCommentData(newReplyData);
           const rootParentId = replyingCommentData.value.rootParentId || replyingCommentData.value.id;
@@ -14085,7 +13728,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:417", "Lỗi gửi trả lời:", error);
-        showError(t2("common.error_send"));
+        showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -14160,18 +13803,18 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:513", "Lỗi thả cảm xúc:", error);
-        showError(t2("common.error_connection"));
+        showError(t("common.error_connection"));
       }
     };
     const editingCommentData = vue.ref(null);
     const historyFilterIndex = vue.ref(0);
     const historyFilterOptions = vue.computed(() => [
-      t2("todo.history_all"),
-      t2("todo.history_todo"),
-      t2("todo.history_ticket"),
-      t2("todo.history_call"),
-      t2("todo.history_customer"),
-      t2("todo.history_note")
+      t("todo.history_all"),
+      t("todo.history_todo"),
+      t("todo.history_ticket"),
+      t("todo.history_call"),
+      t("todo.history_customer"),
+      t("todo.history_note")
     ]);
     const historyFilterValues = [
       "ALL",
@@ -14184,7 +13827,7 @@ This will fail in production if not fixed.`);
     const form = vue.ref({
       id: "",
       title: "",
-      code: t2("common.loading"),
+      code: t("common.loading"),
       desc: "",
       statusIndex: 0,
       sourceIndex: 0,
@@ -14202,18 +13845,18 @@ This will fail in production if not fixed.`);
       raw: void 0
     });
     const sourceOptions = vue.computed(() => [
-      t2("source.call"),
-      t2("source.customer"),
-      t2("source.conversation"),
-      t2("source.message")
+      t("source.call"),
+      t("source.customer"),
+      t("source.conversation"),
+      t("source.message")
     ]);
     const memberList = vue.ref([]);
     const assigneeOptions = vue.ref([]);
     const dynamicStatusOptions = vue.computed(() => {
       const options = [
-        { label: t2("todo.status_todo"), value: "TO_DO" },
-        { label: t2("todo.status_progress"), value: "IN_PROGRESS" },
-        { label: t2("todo.status_done"), value: "DONE" }
+        { label: t("todo.status_todo"), value: "TO_DO" },
+        { label: t("todo.status_progress"), value: "IN_PROGRESS" },
+        { label: t("todo.status_done"), value: "DONE" }
       ];
       if (form.value.raw && form.value.raw.status === "IN_PROGRESS") {
         return options.filter((opt) => opt.value !== "TO_DO");
@@ -14240,7 +13883,7 @@ This will fail in production if not fixed.`);
           if (foundMember) {
             editingMemberName.value = foundMember.UserName;
           } else {
-            editingMemberName.value = t2("common.me");
+            editingMemberName.value = t("common.me");
           }
           const content = dataDetail.message || "";
           formatAppLog("log", "at controllers/todo_detail.ts:607", "Nội dung edit:", content);
@@ -14250,7 +13893,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:618", "Lỗi lấy chi tiết bình luận:", error);
-        showError(t2("common.error_load"));
+        showError(t("common.error_load"));
       } finally {
         isLoading.value = false;
       }
@@ -14259,7 +13902,7 @@ This will fail in production if not fixed.`);
       if (!editingCommentData.value)
         return;
       if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
-        showInfo(t2("todo.msg_empty_content"));
+        showInfo(t("todo.msg_empty_content"));
         return;
       }
       isSubmittingComment.value = true;
@@ -14274,7 +13917,7 @@ This will fail in production if not fixed.`);
         };
         const updatedData = await updateTodoMessage(payload);
         if (updatedData) {
-          showSuccess(t2("todo.msg_update_success"));
+          showSuccess(t("todo.msg_update_success"));
           const parentIndex = comments.value.findIndex((c) => c.id === updatedData.id);
           if (parentIndex !== -1) {
             comments.value[parentIndex].message = updatedData.message;
@@ -14297,7 +13940,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:676", "Lỗi cập nhật:", error);
-        showError(t2("common.error_update"));
+        showError(t("common.error_update"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -14332,7 +13975,7 @@ This will fail in production if not fixed.`);
       isConfirmDeleteCommentOpen.value = false;
       try {
         await deleteTodoMessage(idToDelete);
-        showSuccess(t2("todo.msg_deleted"));
+        showSuccess(t("todo.msg_deleted"));
         const parentIndex = comments.value.findIndex((c) => c.id === idToDelete);
         if (parentIndex !== -1) {
           comments.value.splice(parentIndex, 1);
@@ -14349,7 +13992,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:742", "Lỗi xóa bình luận:", error);
-        showError(t2("common.fail_delete"));
+        showError(t("common.fail_delete"));
       } finally {
         commentToDeleteId.value = null;
       }
@@ -14377,7 +14020,7 @@ This will fail in production if not fixed.`);
         };
         const newCommentId = await createTodoMessage(payload);
         if (newCommentId) {
-          showSuccess(t2("todo.msg_comment_success"));
+          showSuccess(t("todo.msg_comment_success"));
           newCommentText.value = "";
           const newCommentData = await getTodoMessageDetail(newCommentId, todoId);
           if (newCommentData) {
@@ -14387,7 +14030,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:792", "Lỗi gửi bình luận:", error);
-        showError(t2("common.error_send"));
+        showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
       }
@@ -14402,7 +14045,7 @@ This will fail in production if not fixed.`);
       try {
         const data = await getAllMembers();
         memberList.value = data;
-        assigneeOptions.value = data.map((m) => m.UserName || t2("common.unknown_member"));
+        assigneeOptions.value = data.map((m) => m.UserName || t("common.unknown_member"));
         if (form.value.assigneeId) {
           const index = memberList.value.findIndex((m) => m.memberUID === form.value.assigneeId);
           if (index !== -1)
@@ -14461,7 +14104,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:878", "Lỗi lấy chi tiết:", error);
-        showError(t2("common.error_connection"));
+        showError(t("common.error_connection"));
       } finally {
         isLoading.value = false;
         uni.hideNavigationBarLoading();
@@ -14469,7 +14112,7 @@ This will fail in production if not fixed.`);
     };
     const processCommentData = (item) => {
       var _a;
-      let senderName = t2("todo.user_hidden");
+      let senderName = t("todo.user_hidden");
       let avatarChar = "?";
       let avatarColor = "#e3f2fd";
       if (item.senderId) {
@@ -14484,11 +14127,11 @@ This will fail in production if not fixed.`);
       avatarChar = senderName.charAt(0).toUpperCase();
       let actionText = "";
       if (item.type === "COMMENT")
-        actionText = t2("todo.action_comment");
+        actionText = t("todo.action_comment");
       else if (item.type === "LOG")
-        actionText = t2("todo.action_log");
+        actionText = t("todo.action_log");
       else if (item.type === "UPDATE_TODO")
-        actionText = t2("todo.action_update");
+        actionText = t("todo.action_update");
       const reactionList = ((_a = item.reactions) == null ? void 0 : _a.details) || [];
       return {
         id: item.id,
@@ -14555,17 +14198,17 @@ This will fail in production if not fixed.`);
         const managerField = fields.find((f) => f.code === "member_no");
         if (nameField) {
           form.value.customerName = nameField.value;
-          form.value.customerNameLabel = nameField.name || t2("todo.customer_name_label");
+          form.value.customerNameLabel = nameField.name || t("todo.customer_name_label");
         }
         if (phoneField) {
           form.value.customerPhone = phoneField.value;
           form.value.customerPhoneLabel = phoneField.name;
         }
         if (managerField) {
-          form.value.customerManagerLabel = managerField.name || t2("todo.customer_manager_label");
+          form.value.customerManagerLabel = managerField.name || t("todo.customer_manager_label");
           const managerUid = managerField.value;
           const manager = memberList.value.find((m) => m.memberUID === managerUid);
-          form.value.customerManagerName = manager ? manager.UserName : t2("todo.unknown");
+          form.value.customerManagerName = manager ? manager.UserName : t("todo.unknown");
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:1008", "Lỗi CRM:", error);
@@ -14590,14 +14233,14 @@ This will fail in production if not fixed.`);
             const month = (date.getMonth() + 1).toString().padStart(2, "0");
             const year = date.getFullYear();
             const timeStr = `${day}/${month}/${year}`;
-            let actorName = t2("common.system");
+            let actorName = t("common.system");
             if (item.memberUid) {
               const foundMember = memberList.value.find((m) => m.memberUID === item.memberUid);
               if (foundMember) {
                 actorName = foundMember.UserName;
               }
             }
-            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t2("todo.interaction_other");
+            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t("todo.interaction_other");
             return {
               id: item.id,
               timeStr,
@@ -14642,7 +14285,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/todo_detail.ts:1105", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess(t2("todo.msg_status_changed"));
+          showSuccess(t("todo.msg_status_changed"));
           form.value.raw.status = newStatus;
           const newDisplayIndex = dynamicStatusOptions.value.findIndex((opt) => opt.value === newStatus);
           form.value.statusIndex = newDisplayIndex !== -1 ? newDisplayIndex : 0;
@@ -14652,7 +14295,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:1121", "Lỗi cập nhật trạng thái:", error);
-        showError(t2("todo.msg_update_error"));
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -14669,7 +14312,7 @@ This will fail in production if not fixed.`);
       form.value.assigneeIndex = idx;
       form.value.assigneeId = newAssigneeId;
       if (!form.value.raw) {
-        showError(t2("common.error_missing_data"));
+        showError(t("common.error_missing_data"));
         return;
       }
       isLoading.value = true;
@@ -14686,7 +14329,7 @@ This will fail in production if not fixed.`);
         formatAppLog("log", "at controllers/todo_detail.ts:1165", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess(t2("todo.msg_assignee_changed"));
+          showSuccess(t("todo.msg_assignee_changed"));
           form.value.raw.assigneeId = newAssigneeId;
           if (form.value.customerCode) {
             await fetchHistoryLog(form.value.customerCode);
@@ -14695,7 +14338,7 @@ This will fail in production if not fixed.`);
         }
       } catch (error) {
         formatAppLog("error", "at controllers/todo_detail.ts:1183", "Lỗi cập nhật người giao:", error);
-        showError(t2("todo.msg_update_error"));
+        showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
       }
@@ -14705,7 +14348,7 @@ This will fail in production if not fixed.`);
     };
     const saveTodo = () => {
       formatAppLog("log", "at controllers/todo_detail.ts:1192", "Lưu:", form.value);
-      showSuccess(t2("todo.msg_saved"));
+      showSuccess(t("todo.msg_saved"));
     };
     return {
       isLoading,
@@ -16146,7 +15789,7 @@ This will fail in production if not fixed.`);
       dec: "Dec"
     }
   };
-  const curLocale = "en";
+  const curLocale = "vi";
   const i18n = createI18n({
     locale: curLocale,
     fallbackLocale: "vi",

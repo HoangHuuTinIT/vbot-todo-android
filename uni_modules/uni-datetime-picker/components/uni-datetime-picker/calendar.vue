@@ -535,17 +535,39 @@
 			 * 打开日历弹窗
 			 */
 			open() {
-				// 弹窗模式并且清理数据
-				if (this.clearDate && !this.insert) {
-					this.cale.cleanMultipleStatus()
-					this.init(this.date)
-				}
-				this.show = true
-				this.$nextTick(() => {
-					setTimeout(() => {
-						this.aniMaskShow = true
-					}, 50)
-				})
+			    // Nếu là chế độ popup và cần clear dữ liệu cũ
+			    if (this.clearDate && !this.insert) {
+			        this.cale.cleanMultipleStatus()
+			    }
+			
+			    // 1. Khởi tạo lại lịch để nhảy đúng đến tháng/năm của ngày đã chọn
+			    this.init(this.date)
+			
+			    // 2. Cập nhật ngày hiển thị trên tiêu đề popup
+			    if (!this.range && this.date) {
+			        this.tempSingleDate = this.date
+			    }
+			
+			    // 3. Cập nhật giờ hiển thị (QUAN TRỌNG: Ưu tiên lấy từ this.time nếu đã có, nếu không thì lấy defTime)
+			    // Sửa lỗi: Khi mở lại, nó phải hiện giờ hiện tại của item đó chứ không phải giờ mặc định ban đầu
+			    if (!this.range) {
+			        if (this.defTime) {
+			             this.time = this.defTime
+			        }
+			    } else {
+			        // Xử lý cho range (nếu cần)
+			        if (this.defTime && this.defTime.start) {
+			             this.timeRange.startTime = this.defTime.start
+			             this.timeRange.endTime = this.defTime.end
+			        }
+			    }
+			
+			    this.show = true
+			    this.$nextTick(() => {
+			        setTimeout(() => {
+			            this.aniMaskShow = true
+			        }, 50)
+			    })
 			},
 			/**
 			 * 关闭日历弹窗

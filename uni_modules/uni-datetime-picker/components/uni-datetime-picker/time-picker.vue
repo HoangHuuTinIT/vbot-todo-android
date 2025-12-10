@@ -81,9 +81,9 @@
 </template>
 
 <script>
-	import { initVueI18n } from '@dcloudio/uni-i18n'
-	import i18nMessages from './i18n/index.js'
-	const {	t	} = initVueI18n(i18nMessages)
+	// import { initVueI18n } from '@dcloudio/uni-i18n'
+	// import i18nMessages from './i18n/index.js'
+	// const {	t	} = initVueI18n(i18nMessages)
   import { fixIosDateFormat } from './util'
 
 	/**
@@ -421,17 +421,17 @@
 			 * for i18n
 			 */
 			selectTimeText() {
-				return t("uni-datetime-picker.selectTime")
-			},
-			okText() {
-				return t("uni-datetime-picker.ok")
-			},
-			clearText() {
-				return t("uni-datetime-picker.clear")
-			},
-			cancelText() {
-				return t("uni-datetime-picker.cancel")
-			}
+			        return this.$t("uni-datetime-picker.selectTime") // Thêm this.
+			    },
+			    okText() {
+			        return this.$t("uni-datetime-picker.ok") // Thêm this.
+			    },
+			    clearText() {
+			        return this.$t("uni-datetime-picker.clear") // Thêm this.
+			    },
+			    cancelText() {
+			        return this.$t("uni-datetime-picker.cancel") // Thêm this.
+			    }
 		},
 
 		mounted() {
