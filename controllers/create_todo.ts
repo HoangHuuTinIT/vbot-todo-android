@@ -15,14 +15,16 @@ export const useCreateTodoController = () => {
 	const { t } = useI18n();
 	const authStore = useAuthStore();
 	const pad = (n : number) => n.toString().padStart(2, '0');
-	const getTodayISO = () => {
-		const d = new Date();
-		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-	};
-	const getCurrentTime = () => {
-		const d = new Date();
-		return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-	};
+	const getCurrentDateTimeISO = () => {
+	        const d = new Date();
+	        const y = d.getFullYear();
+	        const m = pad(d.getMonth() + 1);
+	        const day = pad(d.getDate());
+	        const h = pad(d.getHours());
+	        const min = pad(d.getMinutes());
+	        return `${y}-${m}-${day} ${h}:${min}:00`;
+	    };
+	
 	const {
 		customerList,
 		loadingCustomer,
@@ -33,15 +35,14 @@ export const useCreateTodoController = () => {
 	const loading = ref<boolean>(false);
 
 	const form = ref<TodoForm>({
-		name: '',
-		desc: '',
-		customer: '',
-		customerUid: '',
-		assignee: '',
-		dueDate: getTodayISO(),
-		notifyDate: getTodayISO(),
-		notifyTime: getCurrentTime()
-	});
+	        name: '',
+	        desc: '',
+	        customer: '',
+	        customerUid: '',
+	        assignee: '',
+	        dueDate: getCurrentDateTimeISO(),
+	        notifyAt: getCurrentDateTimeISO()
+	    });
 	const sourceOptions = computed(() => [
 	        t('source.call'), 
 	        t('source.customer'), 
@@ -135,48 +136,46 @@ export const useCreateTodoController = () => {
 			return { newContent: newHtml, fileUrls: uploadedUrls };
 		};
 	const submitForm = async () => {
-			if (!form.value.name || !form.value.name.trim()) {
-				showInfo(t('todo.validate_name'));
-				return;
-			}
+	        if (!form.value.name || !form.value.name.trim()) {
+	            showInfo(t('todo.validate_name'));
+	            return;
+	        }
 	
-			let selectedLink = 'CALL';
-			if (sourceIndex.value >= 0) {
-				selectedLink = sourceValues[sourceIndex.value];
-			}
+	        let selectedLink = 'CALL';
+	        if (sourceIndex.value >= 0) {
+	            selectedLink = sourceValues[sourceIndex.value];
+	        }
 	
-			loading.value = true;
-			showLoading(t('todo.upload_processing'));
+	        loading.value = true;
+	        showLoading(t('todo.upload_processing'));
 	
-			try {
-				const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
-	
-				form.value.desc = newContent;
+	        try {
+	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+	            form.value.desc = newContent;
 
-				const payload = buildCreateTodoPayload(form.value, {
-					projectCode: PROJECT_CODE,
-					uid: UID,
-					link: selectedLink,
-					uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : '' 
-				});
+	            const payload = buildCreateTodoPayload(form.value, {
+	                projectCode: PROJECT_CODE,
+	                uid: UID,
+	                link: selectedLink,
+	                uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : '' 
+	            });
 	
-				console.log("Payload Submit:", payload);
+	            console.log("Payload Submit:", payload);
+	            await createTodo(payload);
 	
-				await createTodo(payload);
+	            hideLoading();
+	            showSuccess(t('todo.create_success'));
+	            setTimeout(() => { uni.navigateBack(); }, 1500);
 	
-				hideLoading();
-				showSuccess(t('todo.create_success'));
-				setTimeout(() => { uni.navigateBack(); }, 1500);
-	
-			} catch (error: any) {
-				hideLoading();
-				console.error("Create Error:", error);
-				const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
-				showError(t('common.error_load') + ': ' + errorMsg);
-			} finally {
-				loading.value = false;
-			}
-		};
+	        } catch (error: any) {
+	            hideLoading();
+	            console.error("Create Error:", error);
+	            const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
+	            showError(t('common.error_load') + ': ' + errorMsg);
+	        } finally {
+	            loading.value = false;
+	        }
+	    };
 
 	onMounted(() => {
 		fetchMembers();

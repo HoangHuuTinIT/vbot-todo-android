@@ -22,31 +22,26 @@ export interface TodoDetailForm {
     customerPhoneLabel: string;
     customerManagerName: string;
     customerManagerLabel: string;
-    
+    notifyAt: string;
     raw: TodoItem; 
 }
-
-
-const timestampToDateStr = (ts: number): string => {
+const timestampToDateTimeStr = (ts: number): string => {
     if (!ts || ts <= 0) return '';
     try {
         const date = new Date(ts);
         const y = date.getFullYear();
         const m = (date.getMonth() + 1).toString().padStart(2, '0');
         const d = date.getDate().toString().padStart(2, '0');
-        return `${y}-${m}-${d}`;
+        const h = date.getHours().toString().padStart(2, '0');
+        const min = date.getMinutes().toString().padStart(2, '0');
+        const sec = '00'; // Mặc định giây
+        return `${y}-${m}-${d} ${h}:${min}:${sec}`;
     } catch { return ''; }
 };
 
-const timestampToTimeStr = (ts: number): string => {
-    if (!ts || ts <= 0) return '';
-    try {
-        const date = new Date(ts);
-        const h = date.getHours().toString().padStart(2, '0');
-        const min = date.getMinutes().toString().padStart(2, '0');
-        return `${h}:${min}`;
-    } catch { return ''; }
-};
+
+
+
 
 
 export const mapTodoDetailToForm = (apiData: TodoItem): TodoDetailForm | null => {
@@ -72,9 +67,8 @@ export const mapTodoDetailToForm = (apiData: TodoItem): TodoDetailForm | null =>
         sourceIndex: srcIndex,
         assigneeIndex: 0,
 		assigneeId: apiData.assigneeId || '',
-        dueDate: timestampToDateStr(apiData.dueDate),
-        notifyDate: timestampToDateStr(notiTimestamp),
-        notifyTime: timestampToTimeStr(notiTimestamp),
+		dueDate: timestampToDateTimeStr(apiData.dueDate),
+		notifyAt: timestampToDateTimeStr(apiData.notificationReceivedAt),
 		customerCode: apiData.customerCode || '', 
 		customerName: '', 
 		customerNameLabel: 'Tên khách hàng',

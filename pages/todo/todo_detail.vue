@@ -68,7 +68,11 @@
 					</picker>
 				</view>
 
-				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate" v-model:notifyTime="form.notifyTime" @change="onDateUpdate" />
+				<TodoDatePicker 
+				    v-model:dueDate="form.dueDate" 
+				    v-model:notifyAt="form.notifyAt" 
+				    @change="onDateUpdate" 
+				/>
 			</view>
 
 			<view class="section-title">{{ $t('todo.customer_section') }}</view>

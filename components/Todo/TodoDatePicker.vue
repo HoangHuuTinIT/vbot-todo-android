@@ -1,4 +1,3 @@
-//components/Todo/TodoDatePicker.vue
 <template>
     <view class="flat-item date-compound-block">
         <view class="item-left icon-top-aligned">
@@ -7,31 +6,37 @@
         <view class="right-column">
             
             <view class="date-row">
-                <picker mode="date" :value="dueDate" @change="onDateChange($event, 'dueDate')" @cancel="() => {}" class="full-width-picker">
+                <uni-datetime-picker 
+                    type="datetime" 
+                    :value="dueDate" 
+                    :hide-second="true"
+                    :border="false"
+                    @change="onDueDateChange"
+                    class="full-width-picker"
+                >
                     <view class="item-picker" :class="{ 'placeholder-color': !dueDate }">
                         <text class="picker-label">{{ $t('todo.due_date_label') }}</text> 
-                        {{ dueDate ? formatDateDisplay(dueDate) : $t('todo.select_date') }}
+                        {{ dueDate ? formatDateTimeDisplay(dueDate) : $t('todo.select_date') }}
                     </view>
-                </picker>
+                </uni-datetime-picker>
             </view>
 
             <view class="inner-divider"></view>
 
-            <view class="date-row split-row">
-                <picker mode="date" :value="notifyDate" @change="onDateChange($event, 'notifyDate')" class="half-picker">
-                    <view class="item-picker" :class="{ 'placeholder-color': !notifyDate }">
+            <view class="date-row">
+                <uni-datetime-picker 
+                    type="datetime" 
+                    :value="notifyAt" 
+                    :hide-second="true"
+                    :border="false"
+                    @change="onNotifyDateChange"
+                    class="full-width-picker"
+                >
+                    <view class="item-picker" :class="{ 'placeholder-color': !notifyAt }">
                         <text class="picker-label">{{ $t('todo.notify_date_label') }}</text> 
-                        {{ notifyDate ? formatDateDisplay(notifyDate) : $t('todo.date_text') }}
+                        {{ notifyAt ? formatDateTimeDisplay(notifyAt) : $t('todo.select_date') }}
                     </view>
-                </picker>
-
-                <view class="vertical-divider"></view>
-
-                <picker mode="time" :value="notifyTime" @change="onDateChange($event, 'notifyTime')" class="half-picker">
-                    <view class="item-picker" :class="{ 'placeholder-color': !notifyTime }">
-                        {{ notifyTime ? notifyTime : $t('todo.time_text') }}
-                    </view>
-                </picker>
+                </uni-datetime-picker>
             </view>
 
         </view>
@@ -39,29 +44,42 @@
 </template>
 
 <script setup lang="ts">
-interface DatePickerProps {
-    dueDate: string;
-    notifyDate: string;
-    notifyTime: string;
-}
-const props = defineProps<DatePickerProps>();
-const emit = defineEmits(['update:dueDate', 'update:notifyDate', 'update:notifyTime', 'change']);
+import { defineProps, defineEmits } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-const onDateChange = (e: any, field: keyof DatePickerProps) => {
-    emit(`update:${field}`, e.detail.value);
-    setTimeout(() => {
-        emit('change', { field: field, value: e.detail.value });
-    }, 50);
+interface DatePickerProps {
+    dueDate: string; 
+    notifyAt: string; 
+}
+
+const props = defineProps<DatePickerProps>();
+const emit = defineEmits(['update:dueDate', 'update:notifyAt', 'change']);
+const { t } = useI18n();
+
+const onDueDateChange = (val: string) => {
+    emit('update:dueDate', val);
+    emit('change', { field: 'dueDate', value: val });
 };
 
-const formatDateDisplay = (isoStr) => {
+const onNotifyDateChange = (val: string) => {
+    emit('update:notifyAt', val);
+    emit('change', { field: 'notifyAt', value: val });
+};
+
+
+const formatDateTimeDisplay = (isoStr: string) => {
     if (!isoStr) return '';
     try {
-        if (isoStr.includes('-')) {
-            const [y, m, d] = isoStr.split('-');
-            return `${d}/${m}/${y}`;
-        }
-        return isoStr;
+        const dateObj = new Date(isoStr.replace(/-/g, '/')); 
+        if (isNaN(dateObj.getTime())) return isoStr;
+
+        const d = dateObj.getDate().toString().padStart(2, '0');
+        const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        const y = dateObj.getFullYear();
+        const h = dateObj.getHours().toString().padStart(2, '0');
+        const min = dateObj.getMinutes().toString().padStart(2, '0');
+
+        return `${d}/${m}/${y} ${h}:${min}`;
     } catch (e) { return isoStr; }
 };
 </script>
@@ -70,18 +88,26 @@ const formatDateDisplay = (isoStr) => {
     .flat-item { background-color: #fff; margin-bottom: 12px; padding: 15px; display: flex; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .item-left { display: flex; align-items: center; margin-right: 15px; }
     .item-icon { width: 22px; height: 22px; opacity: 0.6; }
-    .icon-top-aligned { align-self: flex-start; margin-top: 2px; }
+    .icon-top-aligned { align-self: flex-start; margin-top: 6px; } 
     
     .date-compound-block { align-items: flex-start; } 
     .right-column { flex: 1; display: flex; flex-direction: column; }
-    .date-row { width: 100%; height: 30px; display: flex; align-items: center; } 
-    .full-width-picker { width: 100%; }
-    .item-picker { text-align: left; font-size: 15px; color: #333; width: 100%; display: flex; align-items: center; } 
-    .placeholder-color { color: #808080; }
-    .picker-label { font-weight: bold; color: #666; margin-right: 6px; font-size: 14px;white-space: nowrap; }
-    .inner-divider { height: 1px; background-color: #f0f0f0; margin: 10px 0; width: 100%; }
     
-    .split-row { justify-content: space-between; }
-    .half-picker { flex: 1; }
-    .vertical-divider { width: 1px; height: 18px; background-color: #ccc; margin: 0 10px; }
+    .date-row { width: 100%; min-height: 30px; display: flex; align-items: center; } 
+    .full-width-picker { width: 100%; }
+    
+  
+    .item-picker { 
+        text-align: left; 
+        font-size: 15px; 
+        color: #333; 
+        width: 100%; 
+        display: flex; 
+        align-items: center; 
+        padding: 5px 0;
+    } 
+    .placeholder-color { color: #808080; }
+    .picker-label { font-weight: bold; color: #666; margin-right: 10px; font-size: 14px; white-space: nowrap; }
+    
+    .inner-divider { height: 1px; background-color: #f0f0f0; margin: 10px 0; width: 100%; }
 </style>

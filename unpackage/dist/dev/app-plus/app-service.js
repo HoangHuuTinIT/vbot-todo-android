@@ -12464,14 +12464,16 @@ This will fail in production if not fixed.`);
   const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
-      return -1;
-    const safeDateStr = dateStr.replace(/\//g, "-");
+      return 0;
+    const safeDateStr = dateStr.replace(/-/g, "/");
     const dateObj = new Date(safeDateStr);
-    return isNaN(dateObj.getTime()) ? -1 : dateObj.getTime();
+    return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
   };
   const buildCreateTodoPayload = (form, config) => {
-    const fullNotifyDateTime = `${form.notifyDate} ${form.notifyTime || "00:00"}`;
-    const fullDueDate = form.dueDate;
+    formatAppLog("log", "at models/create_todo.ts:16", "Check date values:", {
+      dueDate: form.dueDate,
+      notifyAt: form.notifyAt
+    });
     return {
       title: form.name,
       description: form.desc || DEFAULT_VALUES.STRING,
@@ -12488,21 +12490,22 @@ This will fail in production if not fixed.`);
       groupMemberUid: "test1",
       files: config.uploadedFiles || DEFAULT_VALUES.STRING,
       phone: DEFAULT_VALUES.PHONE_PLACEHOLDER,
-      dueDate: dateToTimestamp(fullDueDate),
-      notificationReceivedAt: dateToTimestamp(fullNotifyDateTime)
+      dueDate: dateToTimestamp(form.dueDate),
+      notificationReceivedAt: dateToTimestamp(form.notifyAt)
     };
   };
   const useCreateTodoController = () => {
     const { t: t2 } = useI18n();
     useAuthStore();
     const pad = (n) => n.toString().padStart(2, "0");
-    const getTodayISO = () => {
+    const getCurrentDateTimeISO = () => {
       const d = /* @__PURE__ */ new Date();
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-    };
-    const getCurrentTime = () => {
-      const d = /* @__PURE__ */ new Date();
-      return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      const y = d.getFullYear();
+      const m = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const h = pad(d.getHours());
+      const min = pad(d.getMinutes());
+      return `${y}-${m}-${day} ${h}:${min}:00`;
     };
     const {
       customerList,
@@ -12518,9 +12521,8 @@ This will fail in production if not fixed.`);
       customer: "",
       customerUid: "",
       assignee: "",
-      dueDate: getTodayISO(),
-      notifyDate: getTodayISO(),
-      notifyTime: getCurrentTime()
+      dueDate: getCurrentDateTimeISO(),
+      notifyAt: getCurrentDateTimeISO()
     });
     const sourceOptions = vue.computed(() => [
       t2("source.call"),
@@ -12543,7 +12545,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:68", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:69", "Lỗi lấy thành viên:", error);
         showError("Không thể tải danh sách thành viên");
       }
     };
@@ -12589,7 +12591,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:120", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:121", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -12632,7 +12634,7 @@ This will fail in production if not fixed.`);
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:173", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:172", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError(t2("common.error_load") + ": " + errorMsg);
       } finally {
@@ -13441,39 +13443,46 @@ This will fail in production if not fixed.`);
     __name: "TodoDatePicker",
     props: {
       dueDate: { type: String, required: true },
-      notifyDate: { type: String, required: true },
-      notifyTime: { type: String, required: true }
+      notifyAt: { type: String, required: true }
     },
-    emits: ["update:dueDate", "update:notifyDate", "update:notifyTime", "change"],
+    emits: ["update:dueDate", "update:notifyAt", "change"],
     setup(__props, { expose: __expose, emit: __emit }) {
       __expose();
       const props = __props;
       const emit = __emit;
-      const onDateChange = (e, field) => {
-        emit(`update:${field}`, e.detail.value);
-        setTimeout(() => {
-          emit("change", { field, value: e.detail.value });
-        }, 50);
+      const { t: t2 } = useI18n();
+      const onDueDateChange = (val) => {
+        emit("update:dueDate", val);
+        emit("change", { field: "dueDate", value: val });
       };
-      const formatDateDisplay2 = (isoStr) => {
+      const onNotifyDateChange = (val) => {
+        emit("update:notifyAt", val);
+        emit("change", { field: "notifyAt", value: val });
+      };
+      const formatDateTimeDisplay = (isoStr) => {
         if (!isoStr)
           return "";
         try {
-          if (isoStr.includes("-")) {
-            const [y, m, d] = isoStr.split("-");
-            return `${d}/${m}/${y}`;
-          }
-          return isoStr;
+          const dateObj = new Date(isoStr.replace(/-/g, "/"));
+          if (isNaN(dateObj.getTime()))
+            return isoStr;
+          const d = dateObj.getDate().toString().padStart(2, "0");
+          const m = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+          const y = dateObj.getFullYear();
+          const h = dateObj.getHours().toString().padStart(2, "0");
+          const min = dateObj.getMinutes().toString().padStart(2, "0");
+          return `${d}/${m}/${y} ${h}:${min}`;
         } catch (e) {
           return isoStr;
         }
       };
-      const __returned__ = { props, emit, onDateChange, formatDateDisplay: formatDateDisplay2 };
+      const __returned__ = { props, emit, t: t2, onDueDateChange, onNotifyDateChange, formatDateTimeDisplay };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
     return vue.openBlock(), vue.createElementBlock("view", { class: "flat-item date-compound-block" }, [
       vue.createElementVNode("view", { class: "item-left icon-top-aligned" }, [
         vue.createElementVNode("image", {
@@ -13483,86 +13492,79 @@ This will fail in production if not fixed.`);
       ]),
       vue.createElementVNode("view", { class: "right-column" }, [
         vue.createElementVNode("view", { class: "date-row" }, [
-          vue.createElementVNode("picker", {
-            mode: "date",
+          vue.createVNode(_component_uni_datetime_picker, {
+            type: "datetime",
             value: $props.dueDate,
-            onChange: _cache[0] || (_cache[0] = ($event) => $setup.onDateChange($event, "dueDate")),
-            onCancel: () => {
-            },
+            "hide-second": true,
+            border: false,
+            onChange: $setup.onDueDateChange,
             class: "full-width-picker"
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.dueDate }])
-              },
-              [
-                vue.createElementVNode(
-                  "text",
-                  { class: "picker-label" },
-                  vue.toDisplayString(_ctx.$t("todo.due_date_label")),
-                  1
-                  /* TEXT */
-                ),
-                vue.createTextVNode(
-                  " " + vue.toDisplayString($props.dueDate ? $setup.formatDateDisplay($props.dueDate) : _ctx.$t("todo.select_date")),
-                  1
-                  /* TEXT */
-                )
-              ],
-              2
-              /* CLASS */
-            )
-          ], 40, ["value"])
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.dueDate }])
+                },
+                [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "picker-label" },
+                    vue.toDisplayString(_ctx.$t("todo.due_date_label")),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createTextVNode(
+                    " " + vue.toDisplayString($props.dueDate ? $setup.formatDateTimeDisplay($props.dueDate) : _ctx.$t("todo.select_date")),
+                    1
+                    /* TEXT */
+                  )
+                ],
+                2
+                /* CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["value"])
         ]),
         vue.createElementVNode("view", { class: "inner-divider" }),
-        vue.createElementVNode("view", { class: "date-row split-row" }, [
-          vue.createElementVNode("picker", {
-            mode: "date",
-            value: $props.notifyDate,
-            onChange: _cache[1] || (_cache[1] = ($event) => $setup.onDateChange($event, "notifyDate")),
-            class: "half-picker"
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.notifyDate }])
-              },
-              [
-                vue.createElementVNode(
-                  "text",
-                  { class: "picker-label" },
-                  vue.toDisplayString(_ctx.$t("todo.notify_date_label")),
-                  1
-                  /* TEXT */
-                ),
-                vue.createTextVNode(
-                  " " + vue.toDisplayString($props.notifyDate ? $setup.formatDateDisplay($props.notifyDate) : _ctx.$t("todo.date_text")),
-                  1
-                  /* TEXT */
-                )
-              ],
-              2
-              /* CLASS */
-            )
-          ], 40, ["value"]),
-          vue.createElementVNode("view", { class: "vertical-divider" }),
-          vue.createElementVNode("picker", {
-            mode: "time",
-            value: $props.notifyTime,
-            onChange: _cache[2] || (_cache[2] = ($event) => $setup.onDateChange($event, "notifyTime")),
-            class: "half-picker"
-          }, [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.notifyTime }])
-              },
-              vue.toDisplayString($props.notifyTime ? $props.notifyTime : _ctx.$t("todo.time_text")),
-              3
-              /* TEXT, CLASS */
-            )
-          ], 40, ["value"])
+        vue.createElementVNode("view", { class: "date-row" }, [
+          vue.createVNode(_component_uni_datetime_picker, {
+            type: "datetime",
+            value: $props.notifyAt,
+            "hide-second": true,
+            border: false,
+            onChange: $setup.onNotifyDateChange,
+            class: "full-width-picker"
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["item-picker", { "placeholder-color": !$props.notifyAt }])
+                },
+                [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "picker-label" },
+                    vue.toDisplayString(_ctx.$t("todo.notify_date_label")),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createTextVNode(
+                    " " + vue.toDisplayString($props.notifyAt ? $setup.formatDateTimeDisplay($props.notifyAt) : _ctx.$t("todo.select_date")),
+                    1
+                    /* TEXT */
+                  )
+                ],
+                2
+                /* CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["value"])
         ])
       ])
     ]);
@@ -13713,11 +13715,9 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["TodoDatePicker"], {
         dueDate: $setup.form.dueDate,
         "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
-        notifyDate: $setup.form.notifyDate,
-        "onUpdate:notifyDate": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyDate = $event),
-        notifyTime: $setup.form.notifyTime,
-        "onUpdate:notifyTime": _cache[8] || (_cache[8] = ($event) => $setup.form.notifyTime = $event)
-      }, null, 8, ["dueDate", "notifyDate", "notifyTime"]),
+        notifyAt: $setup.form.notifyAt,
+        "onUpdate:notifyAt": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyAt = $event)
+      }, null, 8, ["dueDate", "notifyAt"]),
       vue.createElementVNode("view", { class: "footer-action" }, [
         vue.createVNode($setup["AppButton"], {
           type: "secondary",
@@ -13737,7 +13737,7 @@ This will fail in production if not fixed.`);
     ]);
   }
   const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/create_todo.vue"]]);
-  const timestampToDateStr = (ts) => {
+  const timestampToDateTimeStr = (ts) => {
     if (!ts || ts <= 0)
       return "";
     try {
@@ -13745,19 +13745,10 @@ This will fail in production if not fixed.`);
       const y = date.getFullYear();
       const m = (date.getMonth() + 1).toString().padStart(2, "0");
       const d = date.getDate().toString().padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    } catch {
-      return "";
-    }
-  };
-  const timestampToTimeStr = (ts) => {
-    if (!ts || ts <= 0)
-      return "";
-    try {
-      const date = new Date(ts);
       const h = date.getHours().toString().padStart(2, "0");
       const min = date.getMinutes().toString().padStart(2, "0");
-      return `${h}:${min}`;
+      const sec = "00";
+      return `${y}-${m}-${d} ${h}:${min}:${sec}`;
     } catch {
       return "";
     }
@@ -13773,7 +13764,7 @@ This will fail in production if not fixed.`);
     let srcIndex = sourceMap.indexOf(apiData.links);
     if (srcIndex === -1)
       srcIndex = 0;
-    const notiTimestamp = apiData.notificationReceivedAt || 0;
+    apiData.notificationReceivedAt || 0;
     return {
       id: apiData.id,
       title: apiData.title || "",
@@ -13783,9 +13774,8 @@ This will fail in production if not fixed.`);
       sourceIndex: srcIndex,
       assigneeIndex: 0,
       assigneeId: apiData.assigneeId || "",
-      dueDate: timestampToDateStr(apiData.dueDate),
-      notifyDate: timestampToDateStr(notiTimestamp),
-      notifyTime: timestampToTimeStr(notiTimestamp),
+      dueDate: timestampToDateTimeStr(apiData.dueDate),
+      notifyAt: timestampToDateTimeStr(apiData.notificationReceivedAt),
       customerCode: apiData.customerCode || "",
       customerName: "",
       customerNameLabel: "Tên khách hàng",
@@ -13831,12 +13821,12 @@ This will fail in production if not fixed.`);
     const toggleHistory = () => {
       isHistoryOpen.value = !isHistoryOpen.value;
     };
-    const convertToTimestamp = (dateStr, timeStr = "00:00") => {
-      if (!dateStr)
+    const convertDateTimeToTimestamp = (dateTimeStr) => {
+      if (!dateTimeStr)
         return 0;
       try {
-        const dateTimeStr = `${dateStr}T${timeStr}:00`;
-        return new Date(dateTimeStr).getTime();
+        const safeStr = dateTimeStr.replace(/-/g, "/");
+        return new Date(safeStr).getTime();
       } catch {
         return 0;
       }
@@ -13859,23 +13849,22 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
+        const ts = convertDateTimeToTimestamp(event.value);
         if (event.field === "dueDate") {
-          payload.dueDate = convertToTimestamp(event.value, "23:59");
-        } else if (event.field === "notifyDate" || event.field === "notifyTime") {
-          const datePart = event.field === "notifyDate" ? event.value : form.value.notifyDate;
-          const timePart = event.field === "notifyTime" ? event.value : form.value.notifyTime;
-          if (datePart && timePart) {
-            payload.notificationReceivedAt = convertToTimestamp(datePart, timePart);
-          }
+          payload.dueDate = ts;
+        } else if (event.field === "notifyAt") {
+          payload.notificationReceivedAt = ts;
         }
-        formatAppLog("log", "at controllers/todo_detail.ts:123", `Payload Update ${event.field}:`, payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:122", `Payload Update ${event.field}:`, payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t2("todo.msg_update_success"));
           if (event.field === "dueDate") {
             form.value.raw.dueDate = payload.dueDate;
+            form.value.dueDate = event.value;
           } else {
             form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
+            form.value.notifyAt = event.value;
           }
           if (form.value.customerCode)
             await fetchHistoryLog(form.value.customerCode);
@@ -14202,15 +14191,15 @@ This will fail in production if not fixed.`);
       assigneeIndex: 0,
       assigneeId: "",
       dueDate: "",
-      notifyDate: "",
-      notifyTime: "",
+      notifyAt: "",
       customerCode: "",
       customerName: "",
       customerNameLabel: "",
       customerPhone: "",
       customerPhoneLabel: "",
       customerManagerName: "",
-      customerManagerLabel: ""
+      customerManagerLabel: "",
+      raw: void 0
     });
     const sourceOptions = vue.computed(() => [
       t2("source.call"),
@@ -14238,7 +14227,7 @@ This will fail in production if not fixed.`);
         return;
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:579", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:581", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -14254,13 +14243,13 @@ This will fail in production if not fixed.`);
             editingMemberName.value = t2("common.me");
           }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:605", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:607", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:616", "Lỗi lấy chi tiết bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:618", "Lỗi lấy chi tiết bình luận:", error);
         showError(t2("common.error_load"));
       } finally {
         isLoading.value = false;
@@ -14307,7 +14296,7 @@ This will fail in production if not fixed.`);
           resetEditState();
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:674", "Lỗi cập nhật:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:676", "Lỗi cập nhật:", error);
         showError(t2("common.error_update"));
       } finally {
         isSubmittingComment.value = false;
@@ -14359,7 +14348,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:740", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:742", "Lỗi xóa bình luận:", error);
         showError(t2("common.fail_delete"));
       } finally {
         commentToDeleteId.value = null;
@@ -14397,7 +14386,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:790", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:792", "Lỗi gửi bình luận:", error);
         showError(t2("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
@@ -14420,7 +14409,7 @@ This will fail in production if not fixed.`);
             form.value.assigneeIndex = index;
         }
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:815", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:817", "Lỗi lấy members", e);
       }
     };
     const reloadDetail = async () => {
@@ -14433,13 +14422,13 @@ This will fail in production if not fixed.`);
           fetchDetail(form.value.id)
         ]);
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:829", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:831", e);
       } finally {
         uni.stopPullDownRefresh();
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/todo_detail.ts:836", "Refreshing detail...");
+      formatAppLog("log", "at controllers/todo_detail.ts:838", "Refreshing detail...");
       reloadDetail();
     });
     const fetchDetail = async (id) => {
@@ -14471,7 +14460,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:876", "Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:878", "Lỗi lấy chi tiết:", error);
         showError(t2("common.error_connection"));
       } finally {
         isLoading.value = false;
@@ -14538,7 +14527,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:948", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:950", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -14579,7 +14568,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : t2("todo.unknown");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1006", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1008", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -14590,7 +14579,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:1018", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:1020", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -14619,7 +14608,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1056", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1058", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -14650,7 +14639,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1103", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1105", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t2("todo.msg_status_changed"));
@@ -14662,7 +14651,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1119", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1121", "Lỗi cập nhật trạng thái:", error);
         showError(t2("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -14694,7 +14683,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1163", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1165", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t2("todo.msg_assignee_changed"));
@@ -14705,7 +14694,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1181", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1183", "Lỗi cập nhật người giao:", error);
         showError(t2("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -14715,7 +14704,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1190", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1192", "Lưu:", form.value);
       showSuccess(t2("todo.msg_saved"));
     };
     return {
@@ -15234,12 +15223,10 @@ This will fail in production if not fixed.`);
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
             "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
-            notifyDate: $setup.form.notifyDate,
-            "onUpdate:notifyDate": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyDate = $event),
-            notifyTime: $setup.form.notifyTime,
-            "onUpdate:notifyTime": _cache[8] || (_cache[8] = ($event) => $setup.form.notifyTime = $event),
+            notifyAt: $setup.form.notifyAt,
+            "onUpdate:notifyAt": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyAt = $event),
             onChange: $setup.onDateUpdate
-          }, null, 8, ["dueDate", "notifyDate", "notifyTime", "onChange"])
+          }, null, 8, ["dueDate", "notifyAt", "onChange"])
         ]),
         vue.createElementVNode(
           "view",
@@ -15367,9 +15354,9 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.commentFilterOptions,
             value: $setup.commentFilterIndex,
-            onClick: _cache[9] || (_cache[9] = vue.withModifiers(() => {
+            onClick: _cache[8] || (_cache[8] = vue.withModifiers(() => {
             }, ["stop"])),
-            onChange: _cache[10] || (_cache[10] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
+            onChange: _cache[9] || (_cache[9] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -15391,7 +15378,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "editor-container" }, [
               vue.createVNode($setup["TodoEditor"], {
                 modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => $setup.newCommentText = $event),
+                "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.newCommentText = $event),
                 placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
@@ -15522,9 +15509,9 @@ This will fail in production if not fixed.`);
                   key: item.id,
                   data: item,
                   onReact: $setup.onToggleEmojiPicker,
-                  onReply: _cache[12] || (_cache[12] = (data) => $setup.handleReply(data)),
-                  onEdit: _cache[13] || (_cache[13] = (data) => $setup.handleEdit(data)),
-                  onDelete: _cache[14] || (_cache[14] = (id) => $setup.onRequestDeleteComment(id))
+                  onReply: _cache[11] || (_cache[11] = (data) => $setup.handleReply(data)),
+                  onEdit: _cache[12] || (_cache[12] = (data) => $setup.handleEdit(data)),
+                  onDelete: _cache[13] || (_cache[13] = (id) => $setup.onRequestDeleteComment(id))
                 }, null, 8, ["data", "onReact"]);
               }),
               128
@@ -15535,7 +15522,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("view", { class: "section-header-row" }, [
           vue.createElementVNode("view", {
             class: "toggle-header",
-            onClick: _cache[15] || (_cache[15] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
+            onClick: _cache[14] || (_cache[14] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
           }, [
             vue.createElementVNode(
               "text",
@@ -15559,9 +15546,9 @@ This will fail in production if not fixed.`);
             mode: "selector",
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
+            onClick: _cache[15] || (_cache[15] = vue.withModifiers(() => {
             }, ["stop"])),
-            onChange: _cache[17] || (_cache[17] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
+            onChange: _cache[16] || (_cache[16] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
           }, [
             vue.createElementVNode(
               "view",
@@ -15651,7 +15638,7 @@ This will fail in production if not fixed.`);
       ]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelEditOpen,
-        "onUpdate:visible": _cache[18] || (_cache[18] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+        "onUpdate:visible": _cache[17] || (_cache[17] = ($event) => $setup.isConfirmCancelEditOpen = $event),
         title: _ctx.$t("todo.cancel_edit_title"),
         message: _ctx.$t("todo.cancel_edit_msg"),
         "cancel-label": _ctx.$t("todo.continue_edit"),
@@ -15662,7 +15649,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelReplyOpen,
-        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
+        "onUpdate:visible": _cache[18] || (_cache[18] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
         title: _ctx.$t("todo.cancel_reply_title"),
         message: _ctx.$t("todo.cancel_reply_msg"),
         "cancel-label": _ctx.$t("todo.continue_reply"),
@@ -15673,7 +15660,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteCommentOpen,
-        "onUpdate:visible": _cache[20] || (_cache[20] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
+        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
         title: _ctx.$t("todo.delete_comment_title"),
         message: _ctx.$t("todo.delete_comment_msg"),
         "confirm-type": "danger",
@@ -15683,11 +15670,11 @@ This will fail in production if not fixed.`);
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[22] || (_cache[22] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
+        onClick: _cache[21] || (_cache[21] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
       }, [
         vue.createElementVNode("view", {
           class: "emoji-picker-container",
-          onClick: _cache[21] || (_cache[21] = vue.withModifiers(() => {
+          onClick: _cache[20] || (_cache[20] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "emoji-grid" }, [
@@ -16159,7 +16146,7 @@ This will fail in production if not fixed.`);
       dec: "Dec"
     }
   };
-  const curLocale = "vi";
+  const curLocale = "en";
   const i18n = createI18n({
     locale: curLocale,
     fallbackLocale: "vi",

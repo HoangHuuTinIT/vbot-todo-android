@@ -2,10 +2,10 @@ import { TODO_STATUS } from '@/utils/constants';
 import { TODO_SOURCE, DEFAULT_VALUES } from '@/utils/enums';
 import type { TodoForm, CreateTodoPayload, AppConfig } from '@/types/todo';
 const dateToTimestamp = (dateStr: string): number => {
-    if (!dateStr) return -1;
-    const safeDateStr = dateStr.replace(/\//g, '-');
+    if (!dateStr) return 0; 
+    const safeDateStr = dateStr.replace(/-/g, '/'); 
     const dateObj = new Date(safeDateStr);
-    return isNaN(dateObj.getTime()) ? -1 : dateObj.getTime();
+    return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
 };
 
 export interface CreateTodoConfig extends AppConfig {
@@ -13,9 +13,11 @@ export interface CreateTodoConfig extends AppConfig {
 	uploadedFiles?: string;
 }
 export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): CreateTodoPayload => {
-    
-    const fullNotifyDateTime = `${form.notifyDate} ${form.notifyTime || '00:00'}`;
-    const fullDueDate = form.dueDate; 
+    console.log("Check date values:", {
+            dueDate: form.dueDate,
+            notifyAt: form.notifyAt
+        });
+
 
     return {
         title: form.name,
@@ -39,7 +41,9 @@ export const buildCreateTodoPayload = (form: TodoForm, config: AppConfig): Creat
         files: config.uploadedFiles || DEFAULT_VALUES.STRING,
         phone: DEFAULT_VALUES.PHONE_PLACEHOLDER,
         
-        dueDate: dateToTimestamp(fullDueDate),
-        notificationReceivedAt: dateToTimestamp(fullNotifyDateTime)
+   
+		dueDate: dateToTimestamp(form.dueDate),
+		notificationReceivedAt: dateToTimestamp(form.notifyAt)
+		
     };
 };

@@ -11,8 +11,7 @@ export interface TodoForm {
     customerUid?: string; 
     assignee: string;   
     dueDate: string;    
-    notifyDate: string;  
-    notifyTime: string; 
+	notifyAt: string;
 }
 export interface TodoItem {
     id: number;

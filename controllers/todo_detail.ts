@@ -82,68 +82,68 @@ export const useTodoDetailController = () => {
 	const toggleHistory = () => {
 		isHistoryOpen.value = !isHistoryOpen.value;
 	};
-	const convertToTimestamp = (dateStr : string, timeStr : string = '00:00') : number => {
-		if (!dateStr) return 0;
-		try {
-			const dateTimeStr = `${dateStr}T${timeStr}:00`;
-			return new Date(dateTimeStr).getTime();
-		} catch {
-			return 0;
-		}
-	};
+	const convertDateTimeToTimestamp = (dateTimeStr: string): number => {
+	        if (!dateTimeStr) return 0;
+	        try {
+	            const safeStr = dateTimeStr.replace(/-/g, '/');
+	            return new Date(safeStr).getTime();
+	        } catch {
+	            return 0;
+	        }
+	    };
+
 
 	const isStatusDisabled = computed(() => {
 		if (!form.value.raw) return true;
 		return form.value.raw.status === 'DONE';
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
-		if (!form.value.raw) return;
-		isLoading.value = true;
-		try {
-			const payload = {
-				...form.value.raw,
-				preFixCode: "TODO",
-				description: form.value.desc,
-				files: "",
-				tagCodes: "",
-				title: form.value.title || form.value.raw.title
-			};
-			if (event.field === 'dueDate') {
-				payload.dueDate = convertToTimestamp(event.value, '23:59');
-			}
-			else if (event.field === 'notifyDate' || event.field === 'notifyTime') {
-				const datePart = event.field === 'notifyDate' ? event.value : form.value.notifyDate;
-				const timePart = event.field === 'notifyTime' ? event.value : form.value.notifyTime;
-
-				if (datePart && timePart) {
-					payload.notificationReceivedAt = convertToTimestamp(datePart, timePart);
-				}
-			}
-
-			console.log(`Payload Update ${event.field}:`, payload);
-
-			const res = await updateTodo(payload);
-
-			if (res) {
-				showSuccess(t('todo.msg_update_success'));
-
-				if (event.field === 'dueDate') {
-					form.value.raw.dueDate = payload.dueDate;
-				} else {
-					form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
-				}
-
-				if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
-				await fetchComments(form.value.id);
-			}
-
-		} catch (error) {
-			console.error("Lỗi cập nhật ngày:", error);
-			showError(t('todo.msg_update_error'));
-		} finally {
-			isLoading.value = false;
-		}
-	};
+	        if (!form.value.raw) return;
+	        isLoading.value = true;
+	        try {
+	            const payload = {
+	                ...form.value.raw,
+	                preFixCode: "TODO",
+	                description: form.value.desc,
+	                files: "",
+	                tagCodes: "",
+	                title: form.value.title || form.value.raw.title
+	            };
+	
+	            const ts = convertDateTimeToTimestamp(event.value);
+	
+	            if (event.field === 'dueDate') {
+	                payload.dueDate = ts;
+	            }
+	            else if (event.field === 'notifyAt') { 
+	                payload.notificationReceivedAt = ts;
+	            }
+	
+	            console.log(`Payload Update ${event.field}:`, payload);
+	
+	            const res = await updateTodo(payload);
+	
+	            if (res) {
+	                showSuccess(t('todo.msg_update_success'));
+	              
+	                if (event.field === 'dueDate') {
+	                    form.value.raw.dueDate = payload.dueDate;
+	                    form.value.dueDate = event.value;
+	                } else {
+	                    form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
+	                    form.value.notifyAt = event.value;
+	                }
+	
+	                if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
+	                await fetchComments(form.value.id);
+	            }
+	        } catch (error) {
+	            console.error("Lỗi cập nhật ngày:", error);
+	            showError(t('todo.msg_update_error'));
+	        } finally {
+	            isLoading.value = false;
+	        }
+	    };
 
 	const processCommentInput = async (htmlContent : string) : Promise<{ cleanMessage : string, fileUrl : string }> => {
 		if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
@@ -538,15 +538,17 @@ export const useTodoDetailController = () => {
 		'NOTE'
 	];
 	const form = ref<TodoDetailForm>({
-		id: '', title: '', code: t('common.loading'), desc: '',
-		statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
-		dueDate: '', notifyDate: '', notifyTime: '',
-		customerCode: '', customerName: '', customerNameLabel: '',
-		customerPhone: '', customerPhoneLabel: '',
-		customerManagerName: '', customerManagerLabel: ''
-	});
+	        id: '', title: '', code: t('common.loading'), desc: '',
+	        statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
+	        dueDate: '', 
+	        notifyAt: '', 
+	        customerCode: '', customerName: '', customerNameLabel: '',
+	        customerPhone: '', customerPhoneLabel: '',
+	        customerManagerName: '', customerManagerLabel: '',
+	        raw: undefined
+	    });
 
-	// const statusOptions = ['Chưa xử lý', 'Đang xử lý', 'Hoàn thành'];
+
 	const sourceOptions = computed(() => [
 	        t('source.call'), 
 	        t('source.customer'), 

@@ -57,8 +57,10 @@
 			</picker>
 		</view>
 
-		<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyDate="form.notifyDate"
-			v-model:notifyTime="form.notifyTime" />
+		<TodoDatePicker 
+		    v-model:dueDate="form.dueDate" 
+		    v-model:notifyAt="form.notifyAt" 
+		/>
 
 		<view class="footer-action">
 			<AppButton type="secondary" :label="$t('common.cancel_action')" class="btn-cancel" @click="goBack" />
