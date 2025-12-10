@@ -1,0 +1,58 @@
+/* --- 1. LIGHT MODE (Mặc định) --- */
+:root {
+  /* Nền */
+  --bg-body: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-modal: #ffffff;
+  --bg-input: #f8f9fa;
+  --bg-hover: #f9f9f9;
+  --bg-filter-panel: #ffffff;
+  
+  /* Text */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-placeholder: #999999;
+  --text-disabled: #cccccc;
+  
+  /* Border & Separator */
+  --border-color: #e0e0e0;
+  --border-light: #eeeeee;
+  
+  /* Brand/Status Colors (Giữ nguyên hoặc chỉnh nhẹ) */
+  --color-primary: #009688;
+  --color-danger: #ff3b30;
+  --color-blue: #007aff;
+  
+  /* Status Badge Colors (Light) */
+  --badge-new-bg: #e4e4e7; --badge-new-text: #52525b;
+  --badge-prog-bg: #ffedd5; --badge-prog-text: #c2410c;
+  --badge-done-bg: #dcfce7; --badge-done-text: #15803d;
+  --badge-over-bg: #fee2e2; --badge-over-text: #dc2626;
+}
+
+/* --- 2. DARK MODE --- */
+[data-theme="dark"] {
+  /* Nền */
+  --bg-body: #121212;      /* Đen sâu */
+  --bg-card: #1e1e1e;      /* Xám đen */
+  --bg-modal: #1e1e1e;
+  --bg-input: #2c2c2c;     /* Input sáng hơn nền card chút */
+  --bg-hover: #2a2a2a;
+  --bg-filter-panel: #1e1e1e;
+
+  /* Text */
+  --text-primary: #e0e0e0; /* Trắng xám */
+  --text-secondary: #a0a0a0;
+  --text-placeholder: #666666;
+  --text-disabled: #444444;
+
+  /* Border */
+  --border-color: #333333;
+  --border-light: #2a2a2a;
+
+  /* Status Badge Colors (Dark - làm tối màu nền, sáng màu chữ) */
+  --badge-new-bg: #3f3f46; --badge-new-text: #d4d4d8;
+  --badge-prog-bg: #7c2d12; --badge-prog-text: #ffedd5;
+  --badge-done-bg: #14532d; --badge-done-text: #dcfce7;
+  --badge-over-bg: #7f1d1d; --badge-over-text: #fee2e2;
+}
