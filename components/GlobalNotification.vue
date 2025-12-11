@@ -7,7 +7,6 @@
         <text v-else-if="notificationStore.type === 'error'" class="icon">⛔</text>
         <text v-else class="icon">🔔</text>
       </view>
-      
       <view class="content-box">
         <rich-text :nodes="formattedMessage"></rich-text>
       </view>

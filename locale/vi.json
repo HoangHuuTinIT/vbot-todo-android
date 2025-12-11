@@ -208,9 +208,10 @@
 	},
 	"socket": {
 		"received_at": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> sẽ hết hạn vào {date}. Vui lòng kiểm tra!",
-		"reassigned": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã đổi người phụ trách: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-		"status_changed": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã cập nhật trạng thái: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
+		"reassigned": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã đổi người phụ trách: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+		"status_changed": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã cập nhật trạng thái: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
 		"task_assigned": "Bạn có công việc mới: <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b>",
 		"due_date_passed": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã hết hạn vào {date}. Xử lý ngay!"
 	}
+
 }

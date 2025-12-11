@@ -10314,24 +10314,490 @@ This will fail in production if not fixed.`);
       visible: false,
       message: "",
       type: "info",
-      timeoutId: null
+      queue: [],
+      timeoutId: null,
+      isAnimating: false
     }),
     actions: {
-      show(message, type = "info", duration = 1e4) {
+      show(message, type = "info", duration = 7e3) {
+        this.queue.push({ message, type, duration });
+        if (!this.visible && !this.isAnimating) {
+          this.processQueue();
+        }
+      },
+      processQueue() {
+        if (this.queue.length === 0)
+          return;
+        const nextItem = this.queue.shift();
+        if (!nextItem)
+          return;
+        this.message = nextItem.message;
+        this.type = nextItem.type;
+        this.visible = true;
         if (this.timeoutId)
           clearTimeout(this.timeoutId);
-        this.message = message;
-        this.type = type;
-        this.visible = true;
         this.timeoutId = setTimeout(() => {
           this.hide();
-        }, duration);
+        }, nextItem.duration);
       },
       hide() {
+        if (!this.visible)
+          return;
         this.visible = false;
-        this.timeoutId = null;
+        this.isAnimating = true;
+        if (this.timeoutId) {
+          clearTimeout(this.timeoutId);
+          this.timeoutId = null;
+        }
+        setTimeout(() => {
+          this.isAnimating = false;
+          this.processQueue();
+        }, 450);
       }
     }
+  });
+  const common$1 = {
+    loading: "Đang tải dữ liệu...",
+    no_data: "Chưa có dữ liệu",
+    all: "Tất cả",
+    reset: "Đặt lại",
+    apply: "Áp dụng",
+    "delete": "Xóa",
+    confirm: "Xác nhận",
+    cancel: "Hủy",
+    notification: "Thông báo",
+    success_delete: "Đã xóa thành công",
+    fail_delete: "Xóa thất bại",
+    error_load: "Lỗi tải dữ liệu",
+    save: "Lưu",
+    saving: "Đang lưu...",
+    cancel_action: "Hủy bỏ",
+    search: "Tìm kiếm",
+    filter: "Lọc",
+    me: "tôi",
+    system: "Hệ thống",
+    unknown_member: "Thành viên ẩn danh",
+    error_missing_data: "Thiếu dữ liệu gốc",
+    error_connection: "Lỗi kết nối",
+    error_update: "Cập nhật thất bại",
+    error_send: "Gửi thất bại",
+    page_unit: "trang",
+    total: "Tổng",
+    from_date: "Từ ngày",
+    to_date: "Đến ngày",
+    hidden_member: "Thành viên ẩn",
+    hidden_user: "Người dùng ẩn"
+  };
+  const todo$1 = {
+    page_title: "Công việc",
+    create_page_title: "Tạo công việc",
+    add_task: "Thêm công việc",
+    created_at: "Tạo",
+    expired_at: "Hết hạn",
+    notify_at: "Thông báo",
+    code_prefix: "Mã công việc",
+    filter_title: "Bộ lọc tìm kiếm",
+    search_placeholder: "Nhập từ khóa...",
+    search_label: "Tiêu đề / Từ khóa",
+    job_code_placeholder: "Ví dụ: TODO-08",
+    status: "Trạng thái",
+    creator: "Người tạo",
+    customer: "Khách hàng",
+    select_customer: "Chọn khách hàng",
+    assignee: "Người được giao",
+    source: "Nguồn",
+    select_source: "Chọn nguồn",
+    time_create: "Thời gian tạo",
+    time_expired: "Thời gian hết hạn",
+    time_notify: "Thời gian thông báo",
+    confirm_delete_msg: 'Bạn có chắc muốn xóa công việc "{title}"?',
+    enter_task_name: "Nhập tên công việc... *",
+    char_count: "{current}/{max}",
+    due_date_label: "Hạn xử lý:",
+    notify_date_label: "Ngày thông báo:",
+    select_date: "Chọn ngày",
+    date_text: "Ngày",
+    time_text: "Giờ",
+    validate_name: "Vui lòng nhập tên công việc",
+    create_success: "Tạo thành công!",
+    upload_processing: "Đang xử lý dữ liệu...",
+    header_loading: "Đang tải tên công việc...",
+    desc_section: "Mô tả",
+    desc_placeholder: "Nhập mô tả công việc...",
+    info_section: "Thông tin công việc",
+    customer_section: "Thông tin khách hàng",
+    loading_crm: "⏳ Đang tải thông tin từ CRM...",
+    no_customer_attached: "(Công việc này chưa gắn với khách hàng nào)",
+    customer_name_label: "Khách hàng",
+    customer_phone_label: "SĐT",
+    customer_manager_label: "Phụ trách",
+    manager_none: "(Chưa có)",
+    comments_activities: "Bình luận và hoạt động",
+    comment_placeholder_edit: "Đang chỉnh sửa...",
+    comment_placeholder_reply: "Viết câu trả lời...",
+    comment_placeholder_write: "Viết bình luận",
+    editing_alert: "Đang chỉnh sửa bình luận của",
+    replying_alert: "Đang trả lời bình luận của",
+    loading_comments: "⏳ Đang tải bình luận...",
+    no_comments: "Chưa có bình luận nào.",
+    history_section: "Lịch sử tương tác khách hàng",
+    loading_history: "⏳ Đang tải lịch sử...",
+    no_history: "(Không tìm thấy dữ liệu)",
+    reply_btn: "Trả lời",
+    update_btn: "Cập nhật",
+    cancel_edit_title: "Xác nhận hủy",
+    cancel_edit_msg: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
+    continue_edit: "Tiếp tục sửa",
+    cancel_reply_title: "Hủy trả lời",
+    cancel_reply_msg: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
+    continue_reply: "Tiếp tục viết",
+    delete_comment_title: "Xác nhận xóa",
+    delete_comment_msg: "Bạn có chắc muốn xóa bình luận này không?",
+    status_todo: "Chưa xử lý",
+    status_progress: "Đang xử lý",
+    status_done: "Hoàn thành",
+    status_overdue: "Quá hạn",
+    filter_activity_all: "Tất cả hoạt động",
+    filter_activity_comment: "Bình luận",
+    history_all: "Tất cả",
+    history_todo: "Công việc",
+    history_ticket: "Ticket",
+    history_call: "Lịch sử gọi",
+    history_customer: "Khách hàng",
+    history_note: "Ghi chú",
+    msg_update_success: "Cập nhật thành công",
+    msg_update_error: "Lỗi cập nhật",
+    msg_title_empty: "Tiêu đề không được để trống",
+    msg_title_changed: "Đã đổi tiêu đề",
+    msg_desc_saved: "Đã cập nhật mô tả",
+    msg_reply_success: "Đã trả lời",
+    msg_comment_success: "Đã gửi bình luận",
+    msg_empty_content: "Vui lòng nhập nội dung",
+    msg_assignee_changed: "Đã đổi người thực hiện",
+    msg_status_changed: "Đã cập nhật trạng thái",
+    action_comment: "đã thêm một bình luận",
+    action_log: "đã cập nhật hoạt động",
+    action_update: "cập nhật thông tin công việc",
+    user_hidden: "Người dùng ẩn",
+    unknown: "Chưa xác định",
+    msg_deleted: "Đã xóa",
+    msg_saved: "Đã lưu",
+    interaction_other: "Tương tác khác"
+  };
+  const customer_modal$1 = {
+    title: "Chọn khách hàng",
+    placeholder_name: "Nhập tên khách hàng",
+    placeholder_phone: "Nhập số điện thoại",
+    manager_default: "Thành viên quản lý",
+    loading_more: "Đang tải thêm...",
+    no_name: "(Không tên)",
+    no_phone: "Không có SĐT"
+  };
+  const editor$1 = {
+    placeholder: "Nhập nội dung mô tả...",
+    link_modal_title: "Chèn Hyperlink (Text)",
+    card_modal_title: "Chèn Thẻ Liên Kết (Web)",
+    card_modal_desc: "Liên kết sẽ hiển thị dạng thẻ xem trước.",
+    color_text: "Màu chữ",
+    color_bg: "Màu nền",
+    align_left: "Căn trái",
+    align_center: "Căn giữa",
+    align_right: "Căn phải",
+    align_justify: "Căn đều",
+    size_small: "Nhỏ",
+    size_normal: "Bình thường",
+    size_large: "Lớn",
+    size_huge: "Rất lớn",
+    img_camera: "Chụp ảnh mới",
+    img_album: "Chọn từ thư viện"
+  };
+  const source$1 = {
+    call: "Cuộc gọi",
+    customer: "Khách hàng",
+    conversation: "Hội thoại",
+    message: "Tin nhắn"
+  };
+  const uni$2 = {
+    showActionSheet: {
+      cancel: "Hủy"
+    }
+  };
+  const socket$1 = {
+    received_at: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> sẽ hết hạn vào {date}. Vui lòng kiểm tra!",
+    reassigned: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã đổi người phụ trách: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+    status_changed: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã cập nhật trạng thái: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+    task_assigned: "Bạn có công việc mới: <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b>",
+    due_date_passed: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã hết hạn vào {date}. Xử lý ngay!"
+  };
+  const vi = {
+    common: common$1,
+    todo: todo$1,
+    customer_modal: customer_modal$1,
+    editor: editor$1,
+    source: source$1,
+    uni: uni$2,
+    "uni-datetime-picker": {
+      selectDate: "Chọn ngày",
+      selectTime: "Chọn giờ",
+      selectDateTime: "Chọn ngày giờ",
+      startDate: "Ngày bắt đầu",
+      endDate: "Ngày kết thúc",
+      ok: "OK",
+      clear: "Xóa",
+      cancel: "Hủy",
+      year: "Năm",
+      month: "Tháng"
+    },
+    "uni-calender": {
+      confirm: "Xác nhận",
+      SUN: "CN",
+      MON: "T2",
+      TUE: "T3",
+      WED: "T4",
+      THU: "T5",
+      FRI: "T6",
+      SAT: "T7",
+      jan: "Tháng 1",
+      feb: "Tháng 2",
+      mar: "Tháng 3",
+      apr: "Tháng 4",
+      may: "Tháng 5",
+      jun: "Tháng 6",
+      jul: "Tháng 7",
+      aug: "Tháng 8",
+      sep: "Tháng 9",
+      oct: "Tháng 10",
+      nov: "Tháng 11",
+      dec: "Tháng 12"
+    },
+    socket: socket$1
+  };
+  const common = {
+    loading: "Loading data...",
+    no_data: "No data available",
+    all: "All",
+    reset: "Reset",
+    apply: "Apply",
+    "delete": "Delete",
+    confirm: "Confirm",
+    cancel: "Cancel",
+    notification: "Notification",
+    success_delete: "Deleted successfully",
+    fail_delete: "Delete failed",
+    error_load: "Error loading data",
+    save: "Save",
+    saving: "Saving...",
+    cancel_action: "Cancel",
+    search: "Search",
+    filter: "Filter",
+    me: "me",
+    system: "System",
+    unknown_member: "Unknown Member",
+    error_missing_data: "Original data missing",
+    error_connection: "Connection error",
+    error_update: "Update failed",
+    error_send: "Send failed",
+    page_unit: "page",
+    total: "Total",
+    from_date: "From Date",
+    to_date: "To Date",
+    hidden_member: "Hidden Member",
+    hidden_user: "Hidden User"
+  };
+  const todo = {
+    page_title: "Todo",
+    create_page_title: "Create Task",
+    add_task: "Add Task",
+    created_at: "Created",
+    expired_at: "Due date",
+    notify_at: "Notify",
+    code_prefix: "Job Code",
+    filter_title: "Search Filter",
+    search_placeholder: "Enter keywords...",
+    search_label: "Title / Keywords",
+    job_code_placeholder: "Ex: TODO-08",
+    status: "Status",
+    creator: "Creator",
+    customer: "Customer",
+    select_customer: "Select Customer",
+    assignee: "Assignee",
+    source: "Source",
+    select_source: "Select Source",
+    time_create: "Created Time",
+    time_expired: "Due Date Time",
+    time_notify: "Notification Time",
+    confirm_delete_msg: 'Are you sure you want to delete "{title}"?',
+    enter_task_name: "Enter task name... *",
+    char_count: "{current}/{max}",
+    due_date_label: "Due Date:",
+    notify_date_label: "Notify Date:",
+    select_date: "Select Date",
+    date_text: "Date",
+    time_text: "Time",
+    validate_name: "Please enter task name",
+    create_success: "Created successfully!",
+    upload_processing: "Processing data...",
+    header_loading: "Loading task title...",
+    desc_section: "Description",
+    desc_placeholder: "Enter task description...",
+    info_section: "Task Information",
+    customer_section: "Customer Information",
+    loading_crm: "⏳ Loading CRM info...",
+    no_customer_attached: "(No customer attached)",
+    customer_name_label: "Customer",
+    customer_phone_label: "Phone",
+    customer_manager_label: "In charge",
+    manager_none: "(None)",
+    comments_activities: "Comments & Activities",
+    comment_placeholder_edit: "Editing...",
+    comment_placeholder_reply: "Write a reply...",
+    comment_placeholder_write: "Write a comment",
+    editing_alert: "Editing comment of",
+    replying_alert: "Replying to comment of",
+    loading_comments: "⏳ Loading comments...",
+    no_comments: "No comments yet.",
+    history_section: "Customer Interaction History",
+    loading_history: "⏳ Loading history...",
+    no_history: "(No data found)",
+    reply_btn: "Reply",
+    update_btn: "Update",
+    cancel_edit_title: "Cancel Editing",
+    cancel_edit_msg: "Are you sure you want to cancel? Changes will be lost.",
+    continue_edit: "Keep Editing",
+    cancel_reply_title: "Cancel Reply",
+    cancel_reply_msg: "Are you sure? Draft content will be lost.",
+    continue_reply: "Keep Writing",
+    delete_comment_title: "Confirm Delete",
+    delete_comment_msg: "Are you sure you want to delete this comment?",
+    status_todo: "To Do",
+    status_progress: "In Progress",
+    status_done: "Done",
+    status_overdue: "Overdue",
+    filter_activity_all: "All Activities",
+    filter_activity_comment: "Comments",
+    history_all: "All",
+    history_todo: "Tasks",
+    history_ticket: "Tickets",
+    history_call: "Calls",
+    history_customer: "Customer",
+    history_note: "Notes",
+    msg_update_success: "Update successful",
+    msg_update_error: "Update failed",
+    msg_title_empty: "Title cannot be empty",
+    msg_title_changed: "Title changed",
+    msg_desc_saved: "Description updated",
+    msg_reply_success: "Replied successfully",
+    msg_comment_success: "Comment sent",
+    msg_empty_content: "Please enter content",
+    msg_assignee_changed: "Assignee changed",
+    msg_status_changed: "Status updated",
+    action_comment: "added a comment",
+    action_log: "updated activity",
+    action_update: "updated task info",
+    user_hidden: "Hidden User",
+    unknown: "Unknown",
+    msg_deleted: "Deleted",
+    msg_saved: "Saved",
+    interaction_other: "Other interaction"
+  };
+  const customer_modal = {
+    title: "Select Customer",
+    placeholder_name: "Enter customer name",
+    placeholder_phone: "Enter phone number",
+    manager_default: "Manager Member",
+    loading_more: "Loading more...",
+    no_name: "(No Name)",
+    no_phone: "No Phone"
+  };
+  const editor = {
+    placeholder: "Enter description...",
+    link_modal_title: "Insert Hyperlink (Text)",
+    card_modal_title: "Insert Link Card (Web)",
+    card_modal_desc: "Link will be displayed as a preview card.",
+    color_text: "Text Color",
+    color_bg: "Background Color",
+    align_left: "Align Left",
+    align_center: "Align Center",
+    align_right: "Align Right",
+    align_justify: "Justify",
+    size_small: "Small",
+    size_normal: "Normal",
+    size_large: "Large",
+    size_huge: "Huge",
+    img_camera: "Take Photo",
+    img_album: "Choose from Album"
+  };
+  const source = {
+    call: "Call",
+    customer: "Customer",
+    conversation: "Conversation",
+    message: "Message"
+  };
+  const uni$1 = {
+    showActionSheet: {
+      cancel: "Cancel"
+    }
+  };
+  const socket = {
+    received_at: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> is due on {date}. Please check!",
+    reassigned: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> assignee changed: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+    status_changed: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> status updated: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+    task_assigned: "New task assigned: <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b>",
+    due_date_passed: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> expired on {date}. Action required!"
+  };
+  const en = {
+    common,
+    todo,
+    customer_modal,
+    editor,
+    source,
+    uni: uni$1,
+    "uni-datetime-picker": {
+      selectDate: "Select Date",
+      selectTime: "Select Time",
+      selectDateTime: "Select Date & Time",
+      startDate: "Start Date",
+      endDate: "End Date",
+      ok: "OK",
+      clear: "Clear",
+      cancel: "Cancel",
+      year: "Year",
+      month: "Month"
+    },
+    "uni-calender": {
+      confirm: "Confirm",
+      SUN: "Sun",
+      MON: "Mon",
+      TUE: "Tue",
+      WED: "Wed",
+      THU: "Thu",
+      FRI: "Fri",
+      SAT: "Sat",
+      jan: "Jan",
+      feb: "Feb",
+      mar: "Mar",
+      apr: "Apr",
+      may: "May",
+      jun: "Jun",
+      jul: "Jul",
+      aug: "Aug",
+      sep: "Sep",
+      oct: "Oct",
+      nov: "Nov",
+      dec: "Dec"
+    },
+    socket
+  };
+  const curLocale = "vi";
+  const i18n = createI18n({
+    locale: curLocale,
+    fallbackLocale: "vi",
+    messages: {
+      vi,
+      en
+    },
+    legacy: false,
+    globalInjection: true
   });
   const useSocketStore = defineStore("socket", {
     state: () => ({
@@ -10347,7 +10813,7 @@ This will fail in production if not fixed.`);
         const authStore = useAuthStore();
         vue.watch(() => authStore.sessionId, (newVal) => {
           if (newVal && !this.isConnected) {
-            formatAppLog("log", "at stores/socket.ts:32", "Socket: Phát hiện Session ID mới, đang kết nối...");
+            formatAppLog("log", "at stores/socket.ts:34", "Socket: Phát hiện Session ID mới, đang kết nối...");
             this.connect();
           }
         });
@@ -10363,17 +10829,17 @@ This will fail in production if not fixed.`);
         this.isManualClose = false;
         this.isConnecting = true;
         const url = `${WS_BASE_URL}?session_id=${sessionId}`;
-        formatAppLog("log", "at stores/socket.ts:49", "Socket: Connecting to...", url);
+        formatAppLog("log", "at stores/socket.ts:51", "Socket: Connecting to...", url);
         this.socketTask = uni.connectSocket({
           url,
-          success: () => formatAppLog("log", "at stores/socket.ts:53", "Socket: Init success"),
+          success: () => formatAppLog("log", "at stores/socket.ts:55", "Socket: Init success"),
           fail: (err) => {
-            formatAppLog("error", "at stores/socket.ts:55", "Socket: Init failed", err);
+            formatAppLog("error", "at stores/socket.ts:57", "Socket: Init failed", err);
             this.isConnecting = false;
           }
         });
         this.socketTask.onOpen(() => {
-          formatAppLog("log", "at stores/socket.ts:61", "Socket: Connected!");
+          formatAppLog("log", "at stores/socket.ts:63", "Socket: Connected!");
           this.isConnected = true;
           this.isConnecting = false;
           if (this.reconnectInterval) {
@@ -10385,29 +10851,29 @@ This will fail in production if not fixed.`);
           this.handleMessage(res.data);
         });
         this.socketTask.onError((err) => {
-          formatAppLog("error", "at stores/socket.ts:76", "Socket Error:", err);
+          formatAppLog("error", "at stores/socket.ts:78", "Socket Error:", err);
           this.isConnected = false;
           this.isConnecting = false;
         });
         this.socketTask.onClose(() => {
-          formatAppLog("log", "at stores/socket.ts:82", "Socket: Closed");
+          formatAppLog("log", "at stores/socket.ts:84", "Socket: Closed");
           this.isConnected = false;
           this.isConnecting = false;
           this.socketTask = null;
           if (!this.isManualClose) {
             if (!this.reconnectInterval) {
               this.reconnectInterval = setInterval(() => {
-                formatAppLog("log", "at stores/socket.ts:89", "Socket: Reconnecting (Auto)...");
+                formatAppLog("log", "at stores/socket.ts:91", "Socket: Reconnecting (Auto)...");
                 this.connect();
               }, 5e3);
             }
           } else {
-            formatAppLog("log", "at stores/socket.ts:94", "Socket: Chủ động ngắt kết nối, không reconnect.");
+            formatAppLog("log", "at stores/socket.ts:96", "Socket: Chủ động ngắt kết nối, không reconnect.");
           }
         });
       },
       disconnect() {
-        formatAppLog("log", "at stores/socket.ts:99", "Socket: Đang thực hiện Cleanup...");
+        formatAppLog("log", "at stores/socket.ts:101", "Socket: Đang thực hiện Cleanup...");
         this.isManualClose = true;
         if (this.reconnectInterval) {
           clearInterval(this.reconnectInterval);
@@ -10425,7 +10891,7 @@ This will fail in production if not fixed.`);
           const msg = JSON.parse(msgStr);
           if (msg.module !== "TODO")
             return;
-          formatAppLog("log", "at stores/socket.ts:122", "Socket Received Event:", msg.eventName, msg);
+          formatAppLog("log", "at stores/socket.ts:124", "Socket Received Event:", msg.eventName, msg);
           switch (msg.eventName) {
             case "TODO_NOTIFICATION_RECEIVED_AT":
               await this.handleNotificationReceived(msg.data);
@@ -10446,8 +10912,16 @@ This will fail in production if not fixed.`);
               break;
           }
         } catch (e) {
-          formatAppLog("error", "at stores/socket.ts:145", "Socket: Parse message error", e);
+          formatAppLog("error", "at stores/socket.ts:147", "Socket: Parse message error", e);
         }
+      },
+      getNotificationContent(key, params) {
+        let text = i18n.global.t(key);
+        for (const [paramKey, paramValue] of Object.entries(params)) {
+          const regex = new RegExp(`{${paramKey}}`, "g");
+          text = text.replace(regex, String(paramValue));
+        }
+        return text;
       },
       async getGroupName(projectCode) {
         var _a;
@@ -10462,36 +10936,63 @@ This will fail in production if not fixed.`);
           this.projectNamesCache[projectCode] = name;
           return name;
         } catch (error) {
-          formatAppLog("error", "at stores/socket.ts:165", "Lỗi lấy tên nhóm:", error);
+          formatAppLog("error", "at stores/socket.ts:175", "Lỗi lấy tên nhóm:", error);
           return projectCode;
         }
       },
       async handleNotificationReceived(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra!`;
+        const content = this.getNotificationContent("socket.received_at", {
+          code: data.code || "N/A",
+          title: data.title || "",
+          group: groupName,
+          date: data.dueDate || ""
+        });
         this.showNotificationAlert(content, "warning");
       },
       async handleReassigned(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã đổi người phụ trách: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+        const content = this.getNotificationContent("socket.reassigned", {
+          code: data.code || "N/A",
+          title: data.title || "",
+          group: groupName,
+          oldData: data.oldData || "Unknown",
+          newData: data.newData || "Unknown"
+        });
         this.showNotificationAlert(content, "info");
       },
       async handleStatusChanged(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> trạng thái mới: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+        const content = this.getNotificationContent("socket.status_changed", {
+          code: data.code || "N/A",
+          title: data.title || "",
+          group: groupName,
+          oldData: data.oldData || "Unknown",
+          newData: data.newData || "Unknown"
+        });
         this.showNotificationAlert(content, "success");
       },
       async handleTaskAssigned(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Bạn có công việc mới: <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b>`;
+        const content = this.getNotificationContent("socket.task_assigned", {
+          code: data.code || "N/A",
+          title: data.title || "",
+          group: groupName
+        });
         this.showNotificationAlert(content, "info");
       },
       async handleDueDatePassed(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã hết hạn vào ${data.dueDate}. Xử lý ngay!`;
+        const content = this.getNotificationContent("socket.due_date_passed", {
+          code: data.code || "N/A",
+          title: data.title || "",
+          group: groupName,
+          date: data.dueDate || ""
+        });
         this.showNotificationAlert(content, "error");
       },
       showNotificationAlert(content, type = "info") {
+        uni.vibrateShort({});
         const notificationStore = useNotificationStore();
         notificationStore.show(content, type);
       }
@@ -10575,7 +11076,7 @@ This will fail in production if not fixed.`);
         const devUid = "87d90802634146e29721476337bce64b";
         const devProject = "PR202511211001129372";
         try {
-          formatAppLog("log", "at stores/auth.ts:102", "Store: Đang gọi API đăng nhập hệ thống...");
+          formatAppLog("log", "at stores/auth.ts:103", "Store: Đang gọi API đăng nhập hệ thống...");
           const loginData = await systemLogin(devUser, devPass);
           this.setAuthData({
             rootToken: loginData.access_token,
@@ -10584,21 +11085,21 @@ This will fail in production if not fixed.`);
             sessionId: loginData.session_id
           });
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:114", "Store: Đăng nhập Dev thất bại", error);
+          formatAppLog("error", "at stores/auth.ts:115", "Store: Đăng nhập Dev thất bại", error);
           throw error;
         }
       },
       async initialize(options) {
-        formatAppLog("log", "at stores/auth.ts:120", "🚀 Store: Khởi tạo Auth...");
+        formatAppLog("log", "at stores/auth.ts:121", "🚀 Store: Khởi tạo Auth...");
         if (this.todoToken && this.crmToken && this.sessionId) {
-          formatAppLog("log", "at stores/auth.ts:123", ">> Đã có đủ Token cũ. Ready!");
+          formatAppLog("log", "at stores/auth.ts:124", ">> Đã có đủ Token cũ. Ready!");
           return;
         }
         await this.exchangeForTodoToken();
       },
       async exchangeForTodoToken() {
         if (this.refreshPromise) {
-          formatAppLog("log", "at stores/auth.ts:131", "🔄 Đang có tiến trình refresh token, vui lòng chờ...");
+          formatAppLog("log", "at stores/auth.ts:132", "🔄 Đang có tiến trình refresh token, vui lòng chờ...");
           return this.refreshPromise;
         }
         this.refreshPromise = this.fetchModuleTokens().finally(() => {
@@ -10607,7 +11108,7 @@ This will fail in production if not fixed.`);
         return this.refreshPromise;
       },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:142", "Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:143", "Store: Đăng xuất...");
         const socketStore = useSocketStore();
         socketStore.disconnect();
         this.rootToken = "";
@@ -11797,7 +12298,7 @@ This will fail in production if not fixed.`);
         notificationStore.hide();
       };
       const handleTap = () => {
-        formatAppLog("log", "at components/GlobalNotification.vue:42", "Click vào thông báo");
+        formatAppLog("log", "at components/GlobalNotification.vue:41", "Click vào thông báo");
         close();
       };
       const __returned__ = { notificationStore, statusBarHeight, formattedMessage, close, handleTap };
@@ -15684,449 +16185,6 @@ This will fail in production if not fixed.`);
     }
   });
   const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android-2/App.vue"]]);
-  const common$1 = {
-    loading: "Đang tải dữ liệu...",
-    no_data: "Chưa có dữ liệu",
-    all: "Tất cả",
-    reset: "Đặt lại",
-    apply: "Áp dụng",
-    "delete": "Xóa",
-    confirm: "Xác nhận",
-    cancel: "Hủy",
-    notification: "Thông báo",
-    success_delete: "Đã xóa thành công",
-    fail_delete: "Xóa thất bại",
-    error_load: "Lỗi tải dữ liệu",
-    save: "Lưu",
-    saving: "Đang lưu...",
-    cancel_action: "Hủy bỏ",
-    search: "Tìm kiếm",
-    filter: "Lọc",
-    me: "tôi",
-    system: "Hệ thống",
-    unknown_member: "Thành viên ẩn danh",
-    error_missing_data: "Thiếu dữ liệu gốc",
-    error_connection: "Lỗi kết nối",
-    error_update: "Cập nhật thất bại",
-    error_send: "Gửi thất bại",
-    page_unit: "trang",
-    total: "Tổng",
-    from_date: "Từ ngày",
-    to_date: "Đến ngày",
-    hidden_member: "Thành viên ẩn",
-    hidden_user: "Người dùng ẩn"
-  };
-  const todo$1 = {
-    page_title: "Công việc",
-    create_page_title: "Tạo công việc",
-    add_task: "Thêm công việc",
-    created_at: "Tạo",
-    expired_at: "Hết hạn",
-    notify_at: "Thông báo",
-    code_prefix: "Mã công việc",
-    filter_title: "Bộ lọc tìm kiếm",
-    search_placeholder: "Nhập từ khóa...",
-    search_label: "Tiêu đề / Từ khóa",
-    job_code_placeholder: "Ví dụ: TODO-08",
-    status: "Trạng thái",
-    creator: "Người tạo",
-    customer: "Khách hàng",
-    select_customer: "Chọn khách hàng",
-    assignee: "Người được giao",
-    source: "Nguồn",
-    select_source: "Chọn nguồn",
-    time_create: "Thời gian tạo",
-    time_expired: "Thời gian hết hạn",
-    time_notify: "Thời gian thông báo",
-    confirm_delete_msg: 'Bạn có chắc muốn xóa công việc "{title}"?',
-    enter_task_name: "Nhập tên công việc... *",
-    char_count: "{current}/{max}",
-    due_date_label: "Hạn xử lý:",
-    notify_date_label: "Ngày thông báo:",
-    select_date: "Chọn ngày",
-    date_text: "Ngày",
-    time_text: "Giờ",
-    validate_name: "Vui lòng nhập tên công việc",
-    create_success: "Tạo thành công!",
-    upload_processing: "Đang xử lý dữ liệu...",
-    header_loading: "Đang tải tên công việc...",
-    desc_section: "Mô tả",
-    desc_placeholder: "Nhập mô tả công việc...",
-    info_section: "Thông tin công việc",
-    customer_section: "Thông tin khách hàng",
-    loading_crm: "⏳ Đang tải thông tin từ CRM...",
-    no_customer_attached: "(Công việc này chưa gắn với khách hàng nào)",
-    customer_name_label: "Khách hàng",
-    customer_phone_label: "SĐT",
-    customer_manager_label: "Phụ trách",
-    manager_none: "(Chưa có)",
-    comments_activities: "Bình luận và hoạt động",
-    comment_placeholder_edit: "Đang chỉnh sửa...",
-    comment_placeholder_reply: "Viết câu trả lời...",
-    comment_placeholder_write: "Viết bình luận",
-    editing_alert: "Đang chỉnh sửa bình luận của",
-    replying_alert: "Đang trả lời bình luận của",
-    loading_comments: "⏳ Đang tải bình luận...",
-    no_comments: "Chưa có bình luận nào.",
-    history_section: "Lịch sử tương tác khách hàng",
-    loading_history: "⏳ Đang tải lịch sử...",
-    no_history: "(Không tìm thấy dữ liệu)",
-    reply_btn: "Trả lời",
-    update_btn: "Cập nhật",
-    cancel_edit_title: "Xác nhận hủy",
-    cancel_edit_msg: "Bạn có chắc muốn hủy chỉnh sửa? Các thay đổi sẽ không được lưu.",
-    continue_edit: "Tiếp tục sửa",
-    cancel_reply_title: "Hủy trả lời",
-    cancel_reply_msg: "Bạn có chắc muốn hủy trả lời? Nội dung đã nhập sẽ bị mất.",
-    continue_reply: "Tiếp tục viết",
-    delete_comment_title: "Xác nhận xóa",
-    delete_comment_msg: "Bạn có chắc muốn xóa bình luận này không?",
-    status_todo: "Chưa xử lý",
-    status_progress: "Đang xử lý",
-    status_done: "Hoàn thành",
-    status_overdue: "Quá hạn",
-    filter_activity_all: "Tất cả hoạt động",
-    filter_activity_comment: "Bình luận",
-    history_all: "Tất cả",
-    history_todo: "Công việc",
-    history_ticket: "Ticket",
-    history_call: "Lịch sử gọi",
-    history_customer: "Khách hàng",
-    history_note: "Ghi chú",
-    msg_update_success: "Cập nhật thành công",
-    msg_update_error: "Lỗi cập nhật",
-    msg_title_empty: "Tiêu đề không được để trống",
-    msg_title_changed: "Đã đổi tiêu đề",
-    msg_desc_saved: "Đã cập nhật mô tả",
-    msg_reply_success: "Đã trả lời",
-    msg_comment_success: "Đã gửi bình luận",
-    msg_empty_content: "Vui lòng nhập nội dung",
-    msg_assignee_changed: "Đã đổi người thực hiện",
-    msg_status_changed: "Đã cập nhật trạng thái",
-    action_comment: "đã thêm một bình luận",
-    action_log: "đã cập nhật hoạt động",
-    action_update: "cập nhật thông tin công việc",
-    user_hidden: "Người dùng ẩn",
-    unknown: "Chưa xác định",
-    msg_deleted: "Đã xóa",
-    msg_saved: "Đã lưu",
-    interaction_other: "Tương tác khác"
-  };
-  const customer_modal$1 = {
-    title: "Chọn khách hàng",
-    placeholder_name: "Nhập tên khách hàng",
-    placeholder_phone: "Nhập số điện thoại",
-    manager_default: "Thành viên quản lý",
-    loading_more: "Đang tải thêm...",
-    no_name: "(Không tên)",
-    no_phone: "Không có SĐT"
-  };
-  const editor$1 = {
-    placeholder: "Nhập nội dung mô tả...",
-    link_modal_title: "Chèn Hyperlink (Text)",
-    card_modal_title: "Chèn Thẻ Liên Kết (Web)",
-    card_modal_desc: "Liên kết sẽ hiển thị dạng thẻ xem trước.",
-    color_text: "Màu chữ",
-    color_bg: "Màu nền",
-    align_left: "Căn trái",
-    align_center: "Căn giữa",
-    align_right: "Căn phải",
-    align_justify: "Căn đều",
-    size_small: "Nhỏ",
-    size_normal: "Bình thường",
-    size_large: "Lớn",
-    size_huge: "Rất lớn",
-    img_camera: "Chụp ảnh mới",
-    img_album: "Chọn từ thư viện"
-  };
-  const source$1 = {
-    call: "Cuộc gọi",
-    customer: "Khách hàng",
-    conversation: "Hội thoại",
-    message: "Tin nhắn"
-  };
-  const uni$2 = {
-    showActionSheet: {
-      cancel: "Hủy"
-    }
-  };
-  const socket$1 = {
-    received_at: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> sẽ hết hạn vào {date}. Vui lòng kiểm tra!",
-    reassigned: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã đổi người phụ trách: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-    status_changed: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã cập nhật trạng thái: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-    task_assigned: "Bạn có công việc mới: <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b>",
-    due_date_passed: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã hết hạn vào {date}. Xử lý ngay!"
-  };
-  const vi = {
-    common: common$1,
-    todo: todo$1,
-    customer_modal: customer_modal$1,
-    editor: editor$1,
-    source: source$1,
-    uni: uni$2,
-    "uni-datetime-picker": {
-      selectDate: "Chọn ngày",
-      selectTime: "Chọn giờ",
-      selectDateTime: "Chọn ngày giờ",
-      startDate: "Ngày bắt đầu",
-      endDate: "Ngày kết thúc",
-      ok: "OK",
-      clear: "Xóa",
-      cancel: "Hủy",
-      year: "Năm",
-      month: "Tháng"
-    },
-    "uni-calender": {
-      confirm: "Xác nhận",
-      SUN: "CN",
-      MON: "T2",
-      TUE: "T3",
-      WED: "T4",
-      THU: "T5",
-      FRI: "T6",
-      SAT: "T7",
-      jan: "Tháng 1",
-      feb: "Tháng 2",
-      mar: "Tháng 3",
-      apr: "Tháng 4",
-      may: "Tháng 5",
-      jun: "Tháng 6",
-      jul: "Tháng 7",
-      aug: "Tháng 8",
-      sep: "Tháng 9",
-      oct: "Tháng 10",
-      nov: "Tháng 11",
-      dec: "Tháng 12"
-    },
-    socket: socket$1
-  };
-  const common = {
-    loading: "Loading data...",
-    no_data: "No data available",
-    all: "All",
-    reset: "Reset",
-    apply: "Apply",
-    "delete": "Delete",
-    confirm: "Confirm",
-    cancel: "Cancel",
-    notification: "Notification",
-    success_delete: "Deleted successfully",
-    fail_delete: "Delete failed",
-    error_load: "Error loading data",
-    save: "Save",
-    saving: "Saving...",
-    cancel_action: "Cancel",
-    search: "Search",
-    filter: "Filter",
-    me: "me",
-    system: "System",
-    unknown_member: "Unknown Member",
-    error_missing_data: "Original data missing",
-    error_connection: "Connection error",
-    error_update: "Update failed",
-    error_send: "Send failed",
-    page_unit: "page",
-    total: "Total",
-    from_date: "From Date",
-    to_date: "To Date",
-    hidden_member: "Hidden Member",
-    hidden_user: "Hidden User"
-  };
-  const todo = {
-    page_title: "Todo",
-    create_page_title: "Create Task",
-    add_task: "Add Task",
-    created_at: "Created",
-    expired_at: "Due date",
-    notify_at: "Notify",
-    code_prefix: "Job Code",
-    filter_title: "Search Filter",
-    search_placeholder: "Enter keywords...",
-    search_label: "Title / Keywords",
-    job_code_placeholder: "Ex: TODO-08",
-    status: "Status",
-    creator: "Creator",
-    customer: "Customer",
-    select_customer: "Select Customer",
-    assignee: "Assignee",
-    source: "Source",
-    select_source: "Select Source",
-    time_create: "Created Time",
-    time_expired: "Due Date Time",
-    time_notify: "Notification Time",
-    confirm_delete_msg: 'Are you sure you want to delete "{title}"?',
-    enter_task_name: "Enter task name... *",
-    char_count: "{current}/{max}",
-    due_date_label: "Due Date:",
-    notify_date_label: "Notify Date:",
-    select_date: "Select Date",
-    date_text: "Date",
-    time_text: "Time",
-    validate_name: "Please enter task name",
-    create_success: "Created successfully!",
-    upload_processing: "Processing data...",
-    header_loading: "Loading task title...",
-    desc_section: "Description",
-    desc_placeholder: "Enter task description...",
-    info_section: "Task Information",
-    customer_section: "Customer Information",
-    loading_crm: "⏳ Loading CRM info...",
-    no_customer_attached: "(No customer attached)",
-    customer_name_label: "Customer",
-    customer_phone_label: "Phone",
-    customer_manager_label: "In charge",
-    manager_none: "(None)",
-    comments_activities: "Comments & Activities",
-    comment_placeholder_edit: "Editing...",
-    comment_placeholder_reply: "Write a reply...",
-    comment_placeholder_write: "Write a comment",
-    editing_alert: "Editing comment of",
-    replying_alert: "Replying to comment of",
-    loading_comments: "⏳ Loading comments...",
-    no_comments: "No comments yet.",
-    history_section: "Customer Interaction History",
-    loading_history: "⏳ Loading history...",
-    no_history: "(No data found)",
-    reply_btn: "Reply",
-    update_btn: "Update",
-    cancel_edit_title: "Cancel Editing",
-    cancel_edit_msg: "Are you sure you want to cancel? Changes will be lost.",
-    continue_edit: "Keep Editing",
-    cancel_reply_title: "Cancel Reply",
-    cancel_reply_msg: "Are you sure? Draft content will be lost.",
-    continue_reply: "Keep Writing",
-    delete_comment_title: "Confirm Delete",
-    delete_comment_msg: "Are you sure you want to delete this comment?",
-    status_todo: "To Do",
-    status_progress: "In Progress",
-    status_done: "Done",
-    status_overdue: "Overdue",
-    filter_activity_all: "All Activities",
-    filter_activity_comment: "Comments",
-    history_all: "All",
-    history_todo: "Tasks",
-    history_ticket: "Tickets",
-    history_call: "Calls",
-    history_customer: "Customer",
-    history_note: "Notes",
-    msg_update_success: "Update successful",
-    msg_update_error: "Update failed",
-    msg_title_empty: "Title cannot be empty",
-    msg_title_changed: "Title changed",
-    msg_desc_saved: "Description updated",
-    msg_reply_success: "Replied successfully",
-    msg_comment_success: "Comment sent",
-    msg_empty_content: "Please enter content",
-    msg_assignee_changed: "Assignee changed",
-    msg_status_changed: "Status updated",
-    action_comment: "added a comment",
-    action_log: "updated activity",
-    action_update: "updated task info",
-    user_hidden: "Hidden User",
-    unknown: "Unknown",
-    msg_deleted: "Deleted",
-    msg_saved: "Saved",
-    interaction_other: "Other interaction"
-  };
-  const customer_modal = {
-    title: "Select Customer",
-    placeholder_name: "Enter customer name",
-    placeholder_phone: "Enter phone number",
-    manager_default: "Manager Member",
-    loading_more: "Loading more...",
-    no_name: "(No Name)",
-    no_phone: "No Phone"
-  };
-  const editor = {
-    placeholder: "Enter description...",
-    link_modal_title: "Insert Hyperlink (Text)",
-    card_modal_title: "Insert Link Card (Web)",
-    card_modal_desc: "Link will be displayed as a preview card.",
-    color_text: "Text Color",
-    color_bg: "Background Color",
-    align_left: "Align Left",
-    align_center: "Align Center",
-    align_right: "Align Right",
-    align_justify: "Justify",
-    size_small: "Small",
-    size_normal: "Normal",
-    size_large: "Large",
-    size_huge: "Huge",
-    img_camera: "Take Photo",
-    img_album: "Choose from Album"
-  };
-  const source = {
-    call: "Call",
-    customer: "Customer",
-    conversation: "Conversation",
-    message: "Message"
-  };
-  const uni$1 = {
-    showActionSheet: {
-      cancel: "Cancel"
-    }
-  };
-  const socket = {
-    received_at: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> is due on {date}. Please check!",
-    reassigned: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> assignee changed: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-    status_changed: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> status updated: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-    task_assigned: "New task assigned: <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b>",
-    due_date_passed: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> expired on {date}. Action required!"
-  };
-  const en = {
-    common,
-    todo,
-    customer_modal,
-    editor,
-    source,
-    uni: uni$1,
-    "uni-datetime-picker": {
-      selectDate: "Select Date",
-      selectTime: "Select Time",
-      selectDateTime: "Select Date & Time",
-      startDate: "Start Date",
-      endDate: "End Date",
-      ok: "OK",
-      clear: "Clear",
-      cancel: "Cancel",
-      year: "Year",
-      month: "Month"
-    },
-    "uni-calender": {
-      confirm: "Confirm",
-      SUN: "Sun",
-      MON: "Mon",
-      TUE: "Tue",
-      WED: "Wed",
-      THU: "Thu",
-      FRI: "Fri",
-      SAT: "Sat",
-      jan: "Jan",
-      feb: "Feb",
-      mar: "Mar",
-      apr: "Apr",
-      may: "May",
-      jun: "Jun",
-      jul: "Jul",
-      aug: "Aug",
-      sep: "Sep",
-      oct: "Oct",
-      nov: "Nov",
-      dec: "Dec"
-    },
-    socket
-  };
-  const curLocale = "vi";
-  const i18n = createI18n({
-    locale: curLocale,
-    fallbackLocale: "vi",
-    messages: {
-      vi,
-      en
-    },
-    legacy: false,
-    globalInjection: true
-  });
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());

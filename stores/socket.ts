@@ -5,6 +5,8 @@ import { getProjectByCode } from '@/api/project';
 import { useAuthStore } from '@/stores/auth';
 import { watch } from 'vue';
 import { useNotificationStore } from '@/stores/notification';
+import i18n from '@/locale/index';
+
 interface SocketState {
 	socketTask : UniApp.SocketTask | null;
 	isConnected : boolean;
@@ -145,7 +147,15 @@ export const useSocketStore = defineStore('socket', {
 				console.error('Socket: Parse message error', e);
 			}
 		},
+		getNotificationContent(key : string, params : Record<string, any>) {
+			let text = i18n.global.t(key);
+			for (const [paramKey, paramValue] of Object.entries(params)) {
+				const regex = new RegExp(`{${paramKey}}`, 'g');
+				text = text.replace(regex, String(paramValue));
+			}
 
+			return text;
+		},
 		async getGroupName(projectCode : string) : Promise<string> {
 			if (!projectCode) return 'Nhóm không xác định';
 
@@ -170,46 +180,73 @@ export const useSocketStore = defineStore('socket', {
 
 		async handleNotificationReceived(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra!`;
+			const content = this.getNotificationContent('socket.received_at', {
+				code: data.code || 'N/A',
+				title: data.title || '',
+				group: groupName,
+				date: data.dueDate || ''
+			});
 
 			this.showNotificationAlert(content, 'warning');
 		},
 
-
 		async handleReassigned(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã đổi người phụ trách: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+
+			const content = this.getNotificationContent('socket.reassigned', {
+				code: data.code || 'N/A',
+				title: data.title || '',
+				group: groupName,
+				oldData: data.oldData || 'Unknown',
+				newData: data.newData || 'Unknown'
+			});
 
 			this.showNotificationAlert(content, 'info');
 		},
 
-
 		async handleStatusChanged(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> trạng thái mới: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+
+			const content = this.getNotificationContent('socket.status_changed', {
+				code: data.code || 'N/A',
+				title: data.title || '',
+				group: groupName,
+				oldData: data.oldData || 'Unknown',
+				newData: data.newData || 'Unknown'
+			});
 
 			this.showNotificationAlert(content, 'success');
 		},
 
-
 		async handleTaskAssigned(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Bạn có công việc mới: <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b>`;
+
+			const content = this.getNotificationContent('socket.task_assigned', {
+				code: data.code || 'N/A',
+				title: data.title || '',
+				group: groupName
+			});
 
 			this.showNotificationAlert(content, 'info');
 		},
 
 		async handleDueDatePassed(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã hết hạn vào ${data.dueDate}. Xử lý ngay!`;
+
+			const content = this.getNotificationContent('socket.due_date_passed', {
+				code: data.code || 'N/A',
+				title: data.title || '',
+				group: groupName,
+				date: data.dueDate || ''
+			});
 
 			this.showNotificationAlert(content, 'error');
 		},
+
 		showNotificationAlert(content : string, type : 'info' | 'success' | 'warning' | 'error' = 'info') {
-			// // Rung nhẹ điện thoại
-			// // #ifdef APP-PLUS
-			// uni.vibrateShort({});
-			// // #endif
+			// #ifdef APP-PLUS
+			uni.vibrateShort({});
+			// #endif
 			const notificationStore = useNotificationStore();
 			notificationStore.show(content, type);
 		}

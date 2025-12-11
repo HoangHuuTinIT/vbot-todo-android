@@ -92,7 +92,8 @@ export const useAuthStore = defineStore('auth', {
             const devPass = import.meta.env.VITE_TEST_PASSWORD;
             const devUid = import.meta.env.VITE_UID;
             const devProject = import.meta.env.VITE_PROJECT_CODE;
-
+			
+			
             if (!devUser || !devPass) {
                 console.warn('Chưa cấu hình tài khoản Dev trong .env');
                 return;

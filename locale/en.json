@@ -208,8 +208,8 @@
 	},
 	"socket": {
 		"received_at": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> is due on {date}. Please check!",
-		"reassigned": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> assignee changed: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
-		"status_changed": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> status updated: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
+		"reassigned": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> assignee changed: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
+		"status_changed": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> status updated: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
 		"task_assigned": "New task assigned: <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b>",
 		"due_date_passed": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> expired on {date}. Action required!"
 	}
