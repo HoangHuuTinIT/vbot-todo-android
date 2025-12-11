@@ -205,5 +205,12 @@
 		"oct": "Tháng 10",
 		"nov": "Tháng 11",
 		"dec": "Tháng 12"
+	},
+	"socket": {
+		"received_at": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> sẽ hết hạn vào {date}. Vui lòng kiểm tra!",
+		"reassigned": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã đổi người phụ trách: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
+		"status_changed": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã cập nhật trạng thái: <b>{old}</b> ➝ <span class='highlight'>{new}</span>",
+		"task_assigned": "Bạn có công việc mới: <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b>",
+		"due_date_passed": "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã hết hạn vào {date}. Xử lý ngay!"
 	}
 }

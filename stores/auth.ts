@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { systemLogin, getTodoToken } from '@/api/auth';
 import { getCrmToken } from '@/api/crm';
 import { PROJECT_CODE, UID } from '@/utils/config';
-
+import { useSocketStore } from '@/stores/socket';
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const useAuthStore = defineStore('auth', {
@@ -61,17 +61,15 @@ export const useAuthStore = defineStore('auth', {
 
         async fetchModuleTokens() {
                     try {
-                        // Nếu root token hết hạn, gọi login dev mode
+                        
                         if (!this.isRootTokenValid) {
                             console.log('Root Token hết hạn, login lại...');
                             await this.loginDevMode(); 
-                            // loginDevMode sẽ tự gọi lại setAuthData để cập nhật rootToken mới
-                            // Sau đó code sẽ chạy tiếp xuống dưới
+                    
                         }
         
                         console.log('Store: Đang lấy Token cho Todo và CRM...');
                         
-                        // Quan trọng: Phải đảm bảo rootToken đã được cập nhật trước khi gọi dòng này
                         const [newTodoToken, newCrmToken] = await Promise.all([
                             getTodoToken(this.rootToken, this.projectCode, this.uid),
                             getCrmToken(this.projectCode, this.uid)
@@ -82,9 +80,9 @@ export const useAuthStore = defineStore('auth', {
                             crmToken: newCrmToken
                         });
                         
-                        console.log('✅ Store: Đã lấy đủ Token (Todo & CRM).');
+                        console.log('Store: Đã lấy đủ Token (Todo & CRM).');
                     } catch (error) {
-                        console.error('❌ Store: Lỗi lấy module tokens:', error);
+                        console.error('Store: Lỗi lấy module tokens:', error);
                         this.logout();
                         throw error;
                     }
@@ -121,15 +119,11 @@ export const useAuthStore = defineStore('auth', {
         async initialize(options: any) {
                     console.log('🚀 Store: Khởi tạo Auth...');
                     
-                    // 1. Nếu đã đủ token thì thôi
                     if (this.todoToken && this.crmToken && this.sessionId) {
                         console.log('>> Đã có đủ Token cũ. Ready!');
                         return; 
                     }
-        
-                    // 2. Nếu thiếu token nhưng root còn hạn -> Refresh token con
-                    // Hoặc root hết hạn -> Login lại từ đầu
-                    // Gọi hàm exchangeForTodoToken đã có cơ chế khóa (locking)
+
                     await this.exchangeForTodoToken();
                 },
 async exchangeForTodoToken() {
@@ -146,11 +140,14 @@ async exchangeForTodoToken() {
         },
         logout() {
             console.log('Store: Đăng xuất...');
+			const socketStore = useSocketStore();
+			socketStore.disconnect();
             this.rootToken = '';
             this.rootLoginTime = 0;
             this.todoToken = '';
             this.crmToken = '';
 			this.refreshPromise = null;
+			this.sessionId = '';
             uni.removeStorageSync('crm_access_token');
             uni.removeStorageSync('todo_access_token');
             uni.removeStorageSync('vbot_root_token');
