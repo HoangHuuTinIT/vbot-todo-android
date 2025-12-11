@@ -4,13 +4,14 @@ import { WS_BASE_URL } from '@/utils/config';
 import { getProjectByCode } from '@/api/project';
 import { useAuthStore } from '@/stores/auth';
 import { watch } from 'vue';
+import { useNotificationStore } from '@/stores/notification';
 interface SocketState {
 	socketTask : UniApp.SocketTask | null;
 	isConnected : boolean;
 	reconnectInterval : any;
 	isConnecting : boolean;
 	projectNamesCache : Record<string, string>;
-	isManualClose: boolean;
+	isManualClose : boolean;
 }
 
 export const useSocketStore = defineStore('socket', {
@@ -95,25 +96,24 @@ export const useSocketStore = defineStore('socket', {
 			});
 		},
 		disconnect() {
-		            console.log('Socket: Đang thực hiện Cleanup...');
-		            this.isManualClose = true;
+			console.log('Socket: Đang thực hiện Cleanup...');
+			this.isManualClose = true;
 
-		            if (this.reconnectInterval) {
-		                clearInterval(this.reconnectInterval);
-		                this.reconnectInterval = null;
-		            }
+			if (this.reconnectInterval) {
+				clearInterval(this.reconnectInterval);
+				this.reconnectInterval = null;
+			}
 
-		            if (this.socketTask) {
-		                this.socketTask.close({});
-		                this.socketTask = null;
-		            }
-		
-		            this.isConnected = false;
-		            this.isConnecting = false;
-		            
-		            // 5. (Tùy chọn) Xóa cache tên nhóm nếu muốn sạch sẽ hoàn toàn
-		            // this.projectNamesCache = {}; 
-		        },
+			if (this.socketTask) {
+				this.socketTask.close({});
+				this.socketTask = null;
+			}
+
+
+			this.isConnected = false;
+			this.isConnecting = false;
+
+		},
 		async handleMessage(msgStr : string) {
 			try {
 				const msg = JSON.parse(msgStr);
@@ -170,56 +170,48 @@ export const useSocketStore = defineStore('socket', {
 
 		async handleNotificationReceived(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra và xử lý trước thời hạn.`;
+			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra!`;
 
-			this.showNotificationAlert(content);
+			this.showNotificationAlert(content, 'warning');
 		},
 
 
 		async handleReassigned(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã được thay đổi người phụ trách: ${data.oldData} -> ${data.newData}`;
+			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã đổi người phụ trách: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
 
-			this.showNotificationAlert(content);
+			this.showNotificationAlert(content, 'info');
 		},
 
 
 		async handleStatusChanged(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã được cập nhật trạng thái : ${data.oldData} -> ${data.newData}`;
+			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> trạng thái mới: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
 
-			this.showNotificationAlert(content);
+			this.showNotificationAlert(content, 'success');
 		},
 
 
 		async handleTaskAssigned(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Bạn có công việc mới: ${data.code} | ${data.title} ở nhóm ${groupName}`;
+			const content = `Bạn có công việc mới: <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b>`;
 
-			this.showNotificationAlert(content);
+			this.showNotificationAlert(content, 'info');
 		},
 
 		async handleDueDatePassed(data : any) {
 			const groupName = await this.getGroupName(data.projectCode);
-			const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã hết hạn vào ${data.dueDate}. Vui lòng kiểm tra và xử lý ngay.`;
+			const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã hết hạn vào ${data.dueDate}. Xử lý ngay!`;
 
-			this.showNotificationAlert(content);
+			this.showNotificationAlert(content, 'error');
 		},
-
-		showNotificationAlert(content : string) {
-			// // Rung nhẹ điện thoại (nếu trên app)
+		showNotificationAlert(content : string, type : 'info' | 'success' | 'warning' | 'error' = 'info') {
+			// // Rung nhẹ điện thoại
 			// // #ifdef APP-PLUS
-			// uni.vibrateLong({});
+			// uni.vibrateShort({});
 			// // #endif
-
-			uni.showModal({
-				title: 'Thông báo',
-				content: content,
-				showCancel: false,
-				confirmText: 'Đã hiểu',
-				success: () => {
-				}
-			});
+			const notificationStore = useNotificationStore();
+			notificationStore.show(content, type);
 		}
 	}
 });

@@ -234,6 +234,7 @@
 			</view>
 		</view>
 		<GlobalMessage />
+		<GlobalNotification />
 	</view>
 </template>
 
@@ -247,6 +248,7 @@
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import ConfirmModal from '@/components/ConfirmModal.vue';
+	import GlobalNotification from '@/components/GlobalNotification.vue';
 	const {
 		isLoading, isLoadingCustomer,
 		isLoadingHistory, historyList,
@@ -921,10 +923,8 @@
 	}
 
 	.loading-overlay {
-		/* Gộp chung hoặc sửa riêng */
-		/* ... */
 		z-index: 9999 !important;
-		/* Đảm bảo nó nằm trên cùng */
+		
 	}
 
 	.modal-overlay {
@@ -934,9 +934,7 @@
 		right: 0;
 		bottom: 0;
 		background: rgba(0, 0, 0, 0.5);
-		/* Thêm màu nền tối mờ để dễ nhìn */
 		z-index: 9999;
-		/* Tăng lên cao hơn Header (100) */
 		display: flex;
 		justify-content: center;
 		align-items: center;

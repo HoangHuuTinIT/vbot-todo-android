@@ -169,6 +169,7 @@
 		    </view>
 		</view>
 		<GlobalMessage />
+		<GlobalNotification />
 	</view>
 </template>
 
@@ -182,6 +183,7 @@
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import ConfirmModal from '@/components/ConfirmModal.vue';
 	import Pagination from '@/components/Pagination.vue';
+	import GlobalNotification from '@/components/GlobalNotification.vue';
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
@@ -206,22 +208,20 @@
 	const showCustomActionSheet = ref(false);
 	const selectedItemForAction = ref<any>(null);
 	
-	// Hàm mở menu (thay thế hàm cũ)
+	
 	const openCustomMenu = (item: any) => {
 	    selectedItemForAction.value = item;
 	    showCustomActionSheet.value = true;
 	};
 	
-	// Hàm xử lý khi bấm nút trong menu
 	const handleCustomAction = (action: string) => {
-	    showCustomActionSheet.value = false; // Đóng menu trước
+	    showCustomActionSheet.value = false;
 	    
 	    if (action === 'delete') {
-	        // Gán item cần xóa vào biến của controller và mở modal xóa
+	       
 	        itemToDelete.value = selectedItemForAction.value; 
 	        isConfirmDeleteOpen.value = true;
 	    }
-	    // Sau này muốn làm thêm sửa/xem chi tiết thì thêm if vào đây
 	};
 </script>
 

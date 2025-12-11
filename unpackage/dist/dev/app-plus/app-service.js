@@ -81,7 +81,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$k = {
+  const _sfc_main$l = {
     __name: "UserAvatar",
     props: {
       name: {
@@ -114,7 +114,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   };
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -152,7 +152,7 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
   const icons = {
     "id": "2852637",
     "name": "uniui图标库",
@@ -1328,7 +1328,7 @@ if (uni.restoreGlobal) {
     const reg = /^[0-9]*$/g;
     return typeof val === "number" || reg.test(val) ? val + "px" : val;
   };
-  const _sfc_main$j = {
+  const _sfc_main$k = {
     name: "UniIcons",
     emits: ["click"],
     props: {
@@ -1372,7 +1372,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "text",
       {
@@ -1385,7 +1385,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
   let Calendar$1 = class Calendar {
     constructor({
       selected,
@@ -1735,7 +1735,7 @@ if (uni.restoreGlobal) {
     }
     return value;
   }
-  const _sfc_main$i = {
+  const _sfc_main$j = {
     props: {
       weeks: {
         type: Object,
@@ -1769,7 +1769,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1825,8 +1825,8 @@ if (uni.restoreGlobal) {
       /* CLASS, NEED_HYDRATION */
     );
   }
-  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
-  const _sfc_main$h = {
+  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
+  const _sfc_main$i = {
     name: "UniDatetimePicker",
     data() {
       return {
@@ -2434,7 +2434,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-datetime-picker" }, [
       vue.createElementVNode("view", {
         onClick: _cache[0] || (_cache[0] = (...args) => $options.initTimePicker && $options.initTimePicker(...args))
@@ -2709,8 +2709,8 @@ if (uni.restoreGlobal) {
       )) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
-  const _sfc_main$g = {
+  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
+  const _sfc_main$h = {
     components: {
       calendarItem,
       timePicker: TimePicker
@@ -3244,7 +3244,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_calendar_item = vue.resolveComponent("calendar-item");
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
@@ -3537,8 +3537,8 @@ if (uni.restoreGlobal) {
       /* NEED_HYDRATION */
     );
   }
-  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
-  const _sfc_main$f = {
+  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
+  const _sfc_main$g = {
     name: "UniDatetimePicker",
     options: {
       virtualHost: true
@@ -4203,7 +4203,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_Calendar = vue.resolveComponent("Calendar");
@@ -4546,7 +4546,7 @@ if (uni.restoreGlobal) {
       }, null, 8, ["date", "defTime", "start-date", "end-date", "selectableTimes", "startPlaceholder", "endPlaceholder", "default-value", "pleStatus", "range", "hasTime", "hideSecond", "onConfirm", "onMaskClose"])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
   const formatRelativeTime = (timestamp) => {
     if (!timestamp)
       return "";
@@ -8130,7 +8130,7 @@ ${codeFrame}` : message);
     target.__INTLIFY__ = true;
     setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
   }
-  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$f = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -8156,7 +8156,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
-  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$e(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
@@ -8219,8 +8219,8 @@ ${codeFrame}` : message);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
-  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
+  const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
       visible: { type: Boolean, required: true },
@@ -8307,7 +8307,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
-  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "modal-overlay",
@@ -8517,7 +8517,7 @@ ${codeFrame}` : message);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CustomerModal.vue"]]);
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CustomerModal.vue"]]);
   var isVue2 = false;
   function set(target, key, val) {
     if (Array.isArray(target)) {
@@ -10309,6 +10309,30 @@ This will fail in production if not fixed.`);
       });
     });
   };
+  const useNotificationStore = defineStore("notification", {
+    state: () => ({
+      visible: false,
+      message: "",
+      type: "info",
+      timeoutId: null
+    }),
+    actions: {
+      show(message, type = "info", duration = 1e4) {
+        if (this.timeoutId)
+          clearTimeout(this.timeoutId);
+        this.message = message;
+        this.type = type;
+        this.visible = true;
+        this.timeoutId = setTimeout(() => {
+          this.hide();
+        }, duration);
+      },
+      hide() {
+        this.visible = false;
+        this.timeoutId = null;
+      }
+    }
+  });
   const useSocketStore = defineStore("socket", {
     state: () => ({
       socketTask: null,
@@ -10323,7 +10347,7 @@ This will fail in production if not fixed.`);
         const authStore = useAuthStore();
         vue.watch(() => authStore.sessionId, (newVal) => {
           if (newVal && !this.isConnected) {
-            formatAppLog("log", "at stores/socket.ts:31", "Socket: Phát hiện Session ID mới, đang kết nối...");
+            formatAppLog("log", "at stores/socket.ts:32", "Socket: Phát hiện Session ID mới, đang kết nối...");
             this.connect();
           }
         });
@@ -10339,17 +10363,17 @@ This will fail in production if not fixed.`);
         this.isManualClose = false;
         this.isConnecting = true;
         const url = `${WS_BASE_URL}?session_id=${sessionId}`;
-        formatAppLog("log", "at stores/socket.ts:48", "Socket: Connecting to...", url);
+        formatAppLog("log", "at stores/socket.ts:49", "Socket: Connecting to...", url);
         this.socketTask = uni.connectSocket({
           url,
-          success: () => formatAppLog("log", "at stores/socket.ts:52", "Socket: Init success"),
+          success: () => formatAppLog("log", "at stores/socket.ts:53", "Socket: Init success"),
           fail: (err) => {
-            formatAppLog("error", "at stores/socket.ts:54", "Socket: Init failed", err);
+            formatAppLog("error", "at stores/socket.ts:55", "Socket: Init failed", err);
             this.isConnecting = false;
           }
         });
         this.socketTask.onOpen(() => {
-          formatAppLog("log", "at stores/socket.ts:60", "Socket: Connected!");
+          formatAppLog("log", "at stores/socket.ts:61", "Socket: Connected!");
           this.isConnected = true;
           this.isConnecting = false;
           if (this.reconnectInterval) {
@@ -10361,29 +10385,29 @@ This will fail in production if not fixed.`);
           this.handleMessage(res.data);
         });
         this.socketTask.onError((err) => {
-          formatAppLog("error", "at stores/socket.ts:75", "Socket Error:", err);
+          formatAppLog("error", "at stores/socket.ts:76", "Socket Error:", err);
           this.isConnected = false;
           this.isConnecting = false;
         });
         this.socketTask.onClose(() => {
-          formatAppLog("log", "at stores/socket.ts:81", "Socket: Closed");
+          formatAppLog("log", "at stores/socket.ts:82", "Socket: Closed");
           this.isConnected = false;
           this.isConnecting = false;
           this.socketTask = null;
           if (!this.isManualClose) {
             if (!this.reconnectInterval) {
               this.reconnectInterval = setInterval(() => {
-                formatAppLog("log", "at stores/socket.ts:88", "Socket: Reconnecting (Auto)...");
+                formatAppLog("log", "at stores/socket.ts:89", "Socket: Reconnecting (Auto)...");
                 this.connect();
               }, 5e3);
             }
           } else {
-            formatAppLog("log", "at stores/socket.ts:93", "Socket: Chủ động ngắt kết nối, không reconnect.");
+            formatAppLog("log", "at stores/socket.ts:94", "Socket: Chủ động ngắt kết nối, không reconnect.");
           }
         });
       },
       disconnect() {
-        formatAppLog("log", "at stores/socket.ts:98", "Socket: Đang thực hiện Cleanup...");
+        formatAppLog("log", "at stores/socket.ts:99", "Socket: Đang thực hiện Cleanup...");
         this.isManualClose = true;
         if (this.reconnectInterval) {
           clearInterval(this.reconnectInterval);
@@ -10444,38 +10468,32 @@ This will fail in production if not fixed.`);
       },
       async handleNotificationReceived(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra và xử lý trước thời hạn.`;
-        this.showNotificationAlert(content);
+        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> sẽ hết hạn vào ${data.dueDate}. Vui lòng kiểm tra!`;
+        this.showNotificationAlert(content, "warning");
       },
       async handleReassigned(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã được thay đổi người phụ trách: ${data.oldData} -> ${data.newData}`;
-        this.showNotificationAlert(content);
+        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã đổi người phụ trách: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+        this.showNotificationAlert(content, "info");
       },
       async handleStatusChanged(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã được cập nhật trạng thái : ${data.oldData} -> ${data.newData}`;
-        this.showNotificationAlert(content);
+        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> trạng thái mới: <b>${data.oldData}</b> ➝ <span class="highlight">${data.newData}</span>`;
+        this.showNotificationAlert(content, "success");
       },
       async handleTaskAssigned(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Bạn có công việc mới: ${data.code} | ${data.title} ở nhóm ${groupName}`;
-        this.showNotificationAlert(content);
+        const content = `Bạn có công việc mới: <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b>`;
+        this.showNotificationAlert(content, "info");
       },
       async handleDueDatePassed(data) {
         const groupName = await this.getGroupName(data.projectCode);
-        const content = `Công việc ${data.code} | ${data.title} ở nhóm ${groupName} đã hết hạn vào ${data.dueDate}. Vui lòng kiểm tra và xử lý ngay.`;
-        this.showNotificationAlert(content);
+        const content = `Công việc <span class="highlight">${data.code}</span> | <b>${data.title}</b> ở nhóm <b>${groupName}</b> đã hết hạn vào ${data.dueDate}. Xử lý ngay!`;
+        this.showNotificationAlert(content, "error");
       },
-      showNotificationAlert(content) {
-        uni.showModal({
-          title: "Thông báo",
-          content,
-          showCancel: false,
-          confirmText: "Đã hiểu",
-          success: () => {
-          }
-        });
+      showNotificationAlert(content, type = "info") {
+        const notificationStore = useNotificationStore();
+        notificationStore.show(content, type);
       }
     }
   });
@@ -11348,7 +11366,7 @@ This will fail in production if not fixed.`);
       loadMoreCustomers
     };
   };
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "StatusBadge",
     props: {
       status: { type: String, required: true }
@@ -11404,7 +11422,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$c(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -11416,8 +11434,8 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-2/components/StatusBadge.vue"]]);
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-2/components/StatusBadge.vue"]]);
+  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
       label: { type: String, required: false, default: "" },
@@ -11441,7 +11459,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("button", {
       class: vue.normalizeClass(["app-btn", [
         `btn-${$props.type}`,
@@ -11467,15 +11485,15 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppButton.vue"]]);
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppButton.vue"]]);
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
       __expose();
       const isVisible = vue.ref(false);
       const msgContent = vue.ref("");
       const msgType = vue.ref("success");
-      const safeAreaTop = vue.ref(0);
+      const safeAreaBottom = vue.ref(0);
       let timer = null;
       const icons2 = {
         success: "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23047857%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm-2%2015l-5-5%201.41-1.41L10%2014.17l7.59-7.59L19%208l-9%209z%22%2F%3E%3C%2Fsvg%3E",
@@ -11501,37 +11519,32 @@ This will fail in production if not fixed.`);
         }, 3e3);
       };
       vue.onMounted(() => {
+        var _a;
         const sysInfo = uni.getSystemInfoSync();
-        safeAreaTop.value = sysInfo.statusBarHeight || 0;
+        safeAreaBottom.value = ((_a = sysInfo.safeAreaInsets) == null ? void 0 : _a.bottom) || 0;
         uni.$on("app-toast-show", handleShowToast);
         uni.onNetworkStatusChange((res) => {
           if (!res.isConnected) {
+            handleShowToast({ message: "Mất kết nối Internet.", type: "error" });
+          } else {
+            handleShowToast({ message: "Đã khôi phục kết nối.", type: "success" });
+          }
+        });
+      });
+      uni.getNetworkType({
+        success: (res) => {
+          if (res.networkType === "none") {
             handleShowToast({
-              message: "Mất kết nối Internet. Vui lòng kiểm tra lại.",
+              message: "Không có kết nối Internet.",
               type: "error"
             });
-          } else {
-            handleShowToast({
-              message: "Đã khôi phục kết nối Internet.",
-              type: "success"
-            });
           }
-        });
-        uni.getNetworkType({
-          success: (res) => {
-            if (res.networkType === "none") {
-              handleShowToast({
-                message: "Không có kết nối Internet.",
-                type: "error"
-              });
-            }
-          }
-        });
+        }
       });
       vue.onUnmounted(() => {
         uni.$off("app-toast-show", handleShowToast);
       });
-      const __returned__ = { isVisible, msgContent, msgType, safeAreaTop, get timer() {
+      const __returned__ = { isVisible, msgContent, msgType, safeAreaBottom, get timer() {
         return timer;
       }, set timer(v) {
         timer = v;
@@ -11540,12 +11553,12 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
         class: vue.normalizeClass(["global-message-container", { "show": $setup.isVisible }]),
-        style: vue.normalizeStyle({ paddingTop: $setup.safeAreaTop + 10 + "px" })
+        style: vue.normalizeStyle({ paddingBottom: $setup.safeAreaBottom + 20 + "px" })
       },
       [
         vue.createElementVNode(
@@ -11575,8 +11588,8 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalMessage.vue"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalMessage.vue"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "ConfirmModal",
     props: {
       visible: { type: Boolean, required: true },
@@ -11603,7 +11616,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
       class: "modal-overlay",
@@ -11651,8 +11664,8 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-2/components/ConfirmModal.vue"]]);
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-2/components/ConfirmModal.vue"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "Pagination",
     props: {
       pageNo: { type: Number, required: true },
@@ -11699,7 +11712,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "pagination-footer" }, [
       vue.createElementVNode("picker", {
         mode: "selector",
@@ -11765,7 +11778,80 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Pagination.vue"]]);
+  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Pagination.vue"]]);
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+    __name: "GlobalNotification",
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const notificationStore = useNotificationStore();
+      const statusBarHeight = vue.ref(0);
+      uni.getSystemInfo({
+        success: (res) => {
+          statusBarHeight.value = (res.statusBarHeight || 0) + 10;
+        }
+      });
+      const formattedMessage = vue.computed(() => {
+        return `<div style="font-size: 14px; line-height: 1.4; color: #333;">${notificationStore.message}</div>`;
+      });
+      const close = () => {
+        notificationStore.hide();
+      };
+      const handleTap = () => {
+        formatAppLog("log", "at components/GlobalNotification.vue:42", "Click vào thông báo");
+        close();
+      };
+      const __returned__ = { notificationStore, statusBarHeight, formattedMessage, close, handleTap };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: vue.normalizeClass(["notification-wrapper", { "show": $setup.notificationStore.visible }]),
+        style: vue.normalizeStyle({ paddingTop: $setup.statusBarHeight + "px" })
+      },
+      [
+        vue.createElementVNode(
+          "view",
+          {
+            class: vue.normalizeClass(["notification-card", $setup.notificationStore.type]),
+            onClick: $setup.handleTap
+          },
+          [
+            vue.createElementVNode("view", { class: "icon-box" }, [
+              $setup.notificationStore.type === "success" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 0,
+                class: "icon"
+              }, "✅")) : $setup.notificationStore.type === "warning" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 1,
+                class: "icon"
+              }, "⚠️")) : $setup.notificationStore.type === "error" ? (vue.openBlock(), vue.createElementBlock("text", {
+                key: 2,
+                class: "icon"
+              }, "⛔")) : (vue.openBlock(), vue.createElementBlock("text", {
+                key: 3,
+                class: "icon"
+              }, "🔔"))
+            ]),
+            vue.createElementVNode("view", { class: "content-box" }, [
+              vue.createElementVNode("rich-text", { nodes: $setup.formattedMessage }, null, 8, ["nodes"])
+            ]),
+            vue.createElementVNode("view", {
+              class: "close-btn",
+              onClick: vue.withModifiers($setup.close, ["stop"])
+            }, "✕")
+          ],
+          2
+          /* CLASS */
+        )
+      ],
+      6
+      /* CLASS, STYLE */
+    );
+  }
+  const GlobalNotification = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-e3127153"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalNotification.vue"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -11836,7 +11922,7 @@ This will fail in production if not fixed.`);
           isConfirmDeleteOpen.value = true;
         }
       };
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12307,7 +12393,8 @@ This will fail in production if not fixed.`);
         2
         /* CLASS */
       ),
-      vue.createVNode($setup["GlobalMessage"])
+      vue.createVNode($setup["GlobalMessage"]),
+      vue.createVNode($setup["GlobalNotification"])
     ]);
   }
   const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/list_todo.vue"]]);
@@ -13444,7 +13531,7 @@ This will fail in production if not fixed.`);
         loadingMore,
         loadMoreCustomers
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage };
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage, GlobalNotification };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -13582,7 +13669,8 @@ This will fail in production if not fixed.`);
           onClick: $setup.submitForm
         }, null, 8, ["label", "loading", "onClick"])
       ]),
-      vue.createVNode($setup["GlobalMessage"])
+      vue.createVNode($setup["GlobalMessage"]),
+      vue.createVNode($setup["GlobalNotification"])
     ]);
   }
   const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/create_todo.vue"]]);
@@ -14906,7 +14994,7 @@ This will fail in production if not fixed.`);
         onRequestEditComment(data.id);
         scrollToInput();
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, isCommentsOpen, scrollTarget, toggleComments, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, isCommentsOpen, scrollTarget, toggleComments, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -15543,7 +15631,8 @@ This will fail in production if not fixed.`);
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
-      vue.createVNode($setup["GlobalMessage"])
+      vue.createVNode($setup["GlobalMessage"]),
+      vue.createVNode($setup["GlobalNotification"])
     ]);
   }
   const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/todo_detail.vue"]]);

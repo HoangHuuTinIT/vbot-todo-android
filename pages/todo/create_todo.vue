@@ -68,6 +68,7 @@
 				class="btn-submit" @click="submitForm" />
 		</view>
 		<GlobalMessage />
+		<GlobalNotification />
 	</view>
 </template>
 <script setup lang="ts">
@@ -77,6 +78,7 @@
 	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
+	import GlobalNotification from '@/components/GlobalNotification.vue';
 	const {
 		loading, form, goBack, submitForm,
 		memberOptions, onMemberChange, currentAssigneeName,
