@@ -1,5 +1,5 @@
 //controllers/create_todo.ts
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { createTodo, uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
 import { PROJECT_CODE, UID } from '@/utils/config';
@@ -16,15 +16,18 @@ export const useCreateTodoController = () => {
 	const authStore = useAuthStore();
 	const pad = (n : number) => n.toString().padStart(2, '0');
 	const getCurrentDateTimeISO = () => {
-	        const d = new Date();
-	        const y = d.getFullYear();
-	        const m = pad(d.getMonth() + 1);
-	        const day = pad(d.getDate());
-	        const h = pad(d.getHours());
-	        const min = pad(d.getMinutes());
-	        return `${y}-${m}-${day} ${h}:${min}:00`;
-	    };
-	
+		const d = new Date();
+		const y = d.getFullYear();
+		const m = pad(d.getMonth() + 1);
+		const day = pad(d.getDate());
+		const h = pad(d.getHours());
+		const min = pad(d.getMinutes());
+		return `${y}-${m}-${day} ${h}:${min}:00`;
+	};
+	const getDateTimestamp = (dateStr : string) => {
+		if (!dateStr) return 0;
+		return new Date(dateStr.replace(/-/g, '/')).getTime();
+	};
 	const {
 		customerList,
 		loadingCustomer,
@@ -35,19 +38,53 @@ export const useCreateTodoController = () => {
 	const loading = ref<boolean>(false);
 
 	const form = ref<TodoForm>({
-	        name: '',
-	        desc: '',
-	        customer: '',
-	        customerUid: '',
-	        assignee: '',
-	        dueDate: getCurrentDateTimeISO(),
-	        notifyAt: getCurrentDateTimeISO()
-	    });
+		name: '',
+		desc: '',
+		customer: '',
+		customerUid: '',
+		assignee: '',
+		dueDate: getCurrentDateTimeISO(),
+		notifyAt: getCurrentDateTimeISO()
+	});
+	const timestampToDateString = (ts: number) => {
+			const d = new Date(ts);
+			const y = d.getFullYear();
+			const m = pad(d.getMonth() + 1);
+			const day = pad(d.getDate());
+			const h = pad(d.getHours());
+			const min = pad(d.getMinutes());
+			return `${y}-${m}-${day} ${h}:${min}:00`;
+		};
+	watch(() => form.value.dueDate, (newDueVal) => {
+			const dueTime = getDateTimestamp(newDueVal);
+			const notifyTime = getDateTimestamp(form.value.notifyAt);
+			if (notifyTime >= dueTime) {
+				
+				const safeTime = dueTime - (30 * 60 * 1000); 
+				form.value.notifyAt = timestampToDateString(safeTime);
+			}
+		});
+	
+		
+		watch(() => form.value.notifyAt, (newNotifyVal) => {
+			const dueTime = getDateTimestamp(form.value.dueDate);
+			const notifyTime = getDateTimestamp(newNotifyVal);
+	
+		
+			if (notifyTime >= dueTime) {
+				showInfo('Ngày thông báo phải sớm hơn hạn xử lý (không được trùng hoặc trễ hơn)!');
+				
+				setTimeout(() => {
+					const safeTime = dueTime - (30 * 60 * 1000);
+					form.value.notifyAt = timestampToDateString(safeTime);
+				}, 0);
+			}
+		});
 	const sourceOptions = computed(() => [
-	        t('source.call'), 
-	        t('source.customer'), 
-	        t('source.conversation')
-	    ]);
+		t('source.call'),
+		t('source.customer'),
+		t('source.conversation')
+	]);
 	const sourceValues = [TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION];
 	const sourceIndex = ref(-1);
 	const memberList = ref<any[]>([]);
@@ -99,83 +136,94 @@ export const useCreateTodoController = () => {
 	});
 
 	const goBack = () => uni.navigateBack();
-	const processDescriptionImages = async (htmlContent: string): Promise<{ newContent: string, fileUrls: string[] }> => {
-			if (!htmlContent) return { newContent: '', fileUrls: [] };
-	
-			const imgRegex = /<img[^>]+src="([^">]+)"/g;
-			let match;
-			const promises: Promise<any>[] = [];
-			const replacements: { oldSrc: string, newSrc: string }[] = [];
-			const uploadedUrls: string[] = [];
+	const processDescriptionImages = async (htmlContent : string) : Promise<{ newContent : string, fileUrls : string[] }> => {
+		if (!htmlContent) return { newContent: '', fileUrls: [] };
 
-			while ((match = imgRegex.exec(htmlContent)) !== null) {
-				const src = match[1];
-	            
-				if (!src.startsWith('http') && !src.startsWith('https')) {
-					const uploadPromise = uploadTodoFile(src)
-						.then(serverUrl => {
-							replacements.push({ oldSrc: src, newSrc: serverUrl });
-							uploadedUrls.push(serverUrl);
-						})
-						.catch(err => {
-							console.error(`Upload ảnh ${src} lỗi:`, err);
-						});
-					promises.push(uploadPromise);
-				}
-			}
+		const imgRegex = /<img[^>]+src="([^">]+)"/g;
+		let match;
+		const promises : Promise<any>[] = [];
+		const replacements : { oldSrc : string, newSrc : string }[] = [];
+		const uploadedUrls : string[] = [];
 
-			if (promises.length > 0) {
-				await Promise.all(promises);
+		while ((match = imgRegex.exec(htmlContent)) !== null) {
+			const src = match[1];
+
+			if (!src.startsWith('http') && !src.startsWith('https')) {
+				const uploadPromise = uploadTodoFile(src)
+					.then(serverUrl => {
+						replacements.push({ oldSrc: src, newSrc: serverUrl });
+						uploadedUrls.push(serverUrl);
+					})
+					.catch(err => {
+						console.error(`Upload ảnh ${src} lỗi:`, err);
+					});
+				promises.push(uploadPromise);
 			}
-	
-			let newHtml = htmlContent;
-			replacements.forEach(rep => {
-				newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
-			});
-	
-			return { newContent: newHtml, fileUrls: uploadedUrls };
-		};
+		}
+
+		if (promises.length > 0) {
+			await Promise.all(promises);
+		}
+
+		let newHtml = htmlContent;
+		replacements.forEach(rep => {
+			newHtml = newHtml.split(rep.oldSrc).join(rep.newSrc);
+		});
+
+		return { newContent: newHtml, fileUrls: uploadedUrls };
+	};
 	const submitForm = async () => {
-	        if (!form.value.name || !form.value.name.trim()) {
-	            showInfo(t('todo.validate_name'));
-	            return;
-	        }
-	
-	        let selectedLink = 'CALL';
-	        if (sourceIndex.value >= 0) {
-	            selectedLink = sourceValues[sourceIndex.value];
-	        }
-	
-	        loading.value = true;
-	        showLoading(t('todo.upload_processing'));
-	
-	        try {
-	            const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
-	            form.value.desc = newContent;
+		// 1. Validate Tên công việc
+		if (!form.value.name || !form.value.name.trim()) {
+			showInfo(t('todo.validate_name'));
+			return;
+		}
 
-	            const payload = buildCreateTodoPayload(form.value, {
-	                projectCode: PROJECT_CODE,
-	                uid: UID,
-	                link: selectedLink,
-	                uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : '' 
-	            });
-	
-	            console.log("Payload Submit:", payload);
-	            await createTodo(payload);
-	
-	            hideLoading();
-	            showSuccess(t('todo.create_success'));
-	            setTimeout(() => { uni.navigateBack(); }, 1500);
-	
-	        } catch (error: any) {
-	            hideLoading();
-	            console.error("Create Error:", error);
-	            const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
-	            showError(t('common.error_load') + ': ' + errorMsg);
-	        } finally {
-	            loading.value = false;
-	        }
-	    };
+		
+		const dueTime = getDateTimestamp(form.value.dueDate);
+		const notifyTime = getDateTimestamp(form.value.notifyAt);
+
+		if (notifyTime > dueTime) {
+			showInfo('Ngày thông báo không được trễ hơn hạn chót!');
+			
+			return;
+		}
+
+		let selectedLink = 'CALL';
+		if (sourceIndex.value >= 0) {
+			selectedLink = sourceValues[sourceIndex.value];
+		}
+
+		loading.value = true;
+		showLoading(t('todo.upload_processing'));
+
+		try {
+			const { newContent, fileUrls } = await processDescriptionImages(form.value.desc);
+			form.value.desc = newContent;
+
+			const payload = buildCreateTodoPayload(form.value, {
+				projectCode: PROJECT_CODE,
+				uid: UID,
+				link: selectedLink,
+				uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ''
+			});
+
+			console.log("Payload Submit:", payload);
+			await createTodo(payload);
+
+			hideLoading();
+			showSuccess(t('todo.create_success'));
+			setTimeout(() => { uni.navigateBack(); }, 1500);
+
+		} catch (error : any) {
+			hideLoading();
+			console.error("Create Error:", error);
+			const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
+			showError(t('common.error_load') + ': ' + errorMsg);
+		} finally {
+			loading.value = false;
+		}
+	};
 
 	onMounted(() => {
 		fetchMembers();

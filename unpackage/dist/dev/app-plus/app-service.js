@@ -12944,6 +12944,11 @@ This will fail in production if not fixed.`);
       const min = pad(d.getMinutes());
       return `${y}-${m}-${day} ${h}:${min}:00`;
     };
+    const getDateTimestamp = (dateStr) => {
+      if (!dateStr)
+        return 0;
+      return new Date(dateStr.replace(/-/g, "/")).getTime();
+    };
     const {
       customerList,
       loadingCustomer,
@@ -12960,6 +12965,34 @@ This will fail in production if not fixed.`);
       assignee: "",
       dueDate: getCurrentDateTimeISO(),
       notifyAt: getCurrentDateTimeISO()
+    });
+    const timestampToDateString = (ts) => {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const h = pad(d.getHours());
+      const min = pad(d.getMinutes());
+      return `${y}-${m}-${day} ${h}:${min}:00`;
+    };
+    vue.watch(() => form.value.dueDate, (newDueVal) => {
+      const dueTime = getDateTimestamp(newDueVal);
+      const notifyTime = getDateTimestamp(form.value.notifyAt);
+      if (notifyTime >= dueTime) {
+        const safeTime = dueTime - 30 * 60 * 1e3;
+        form.value.notifyAt = timestampToDateString(safeTime);
+      }
+    });
+    vue.watch(() => form.value.notifyAt, (newNotifyVal) => {
+      const dueTime = getDateTimestamp(form.value.dueDate);
+      const notifyTime = getDateTimestamp(newNotifyVal);
+      if (notifyTime >= dueTime) {
+        showInfo("Ngày thông báo phải sớm hơn hạn xử lý (không được trùng hoặc trễ hơn)!");
+        setTimeout(() => {
+          const safeTime = dueTime - 30 * 60 * 1e3;
+          form.value.notifyAt = timestampToDateString(safeTime);
+        }, 0);
+      }
     });
     const sourceOptions = vue.computed(() => [
       t("source.call"),
@@ -12982,7 +13015,7 @@ This will fail in production if not fixed.`);
         memberList.value = data;
         memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
       } catch (error) {
-        formatAppLog("error", "at controllers/create_todo.ts:69", "Lỗi lấy thành viên:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:106", "Lỗi lấy thành viên:", error);
         showError("Không thể tải danh sách thành viên");
       }
     };
@@ -13028,7 +13061,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:121", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:158", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -13047,6 +13080,12 @@ This will fail in production if not fixed.`);
         showInfo(t("todo.validate_name"));
         return;
       }
+      const dueTime = getDateTimestamp(form.value.dueDate);
+      const notifyTime = getDateTimestamp(form.value.notifyAt);
+      if (notifyTime > dueTime) {
+        showInfo("Ngày thông báo không được trễ hơn hạn chót!");
+        return;
+      }
       let selectedLink = "CALL";
       if (sourceIndex.value >= 0) {
         selectedLink = sourceValues[sourceIndex.value];
@@ -13062,7 +13101,7 @@ This will fail in production if not fixed.`);
           link: selectedLink,
           uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
-        formatAppLog("log", "at controllers/create_todo.ts:163", "Payload Submit:", payload);
+        formatAppLog("log", "at controllers/create_todo.ts:211", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
         showSuccess(t("todo.create_success"));
@@ -13071,7 +13110,7 @@ This will fail in production if not fixed.`);
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:172", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:220", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError(t("common.error_load") + ": " + errorMsg);
       } finally {
