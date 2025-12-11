@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/auth';
 import { PROJECT_API_URL } from '@/utils/config';
 import type { ApiResponse } from '@/types/common';
 import type { ProjectMember } from '@/types/Project';
-
+import { request } from '@/utils/request';
 export const getAllMembers = (): Promise<ProjectMember[]> => {
     const authStore = useAuthStore();
     const { rootToken, projectCode } = authStore;
@@ -32,6 +32,31 @@ export const getAllMembers = (): Promise<ProjectMember[]> => {
             fail: (err) => {
                 reject(err);
             }
+        });
+    });
+};
+
+export const getProjectByCode = (code: string): Promise<any> => {
+    const authStore = useAuthStore();
+    
+    return new Promise((resolve, reject) => {
+        uni.request({
+            url: `${PROJECT_API_URL}/getByProjectCode`,
+            method: 'GET',
+            data: { code: code },
+            header: {
+                'Authorization': `Bearer ${authStore.rootToken}`, 
+                'Content-Type': 'application/json'
+            },
+            success: (res: UniApp.RequestSuccessCallbackResult) => {
+                const data = res.data as any;
+                if (res.statusCode === 200) {
+                    resolve(data.data || data); 
+                } else {
+                    reject(data);
+                }
+            },
+            fail: (err) => reject(err)
         });
     });
 };

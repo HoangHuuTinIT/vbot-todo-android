@@ -8,6 +8,7 @@ interface LoginResponse {
     expires_in: number;
     uid: string;
     token_type: string;
+	session_id: string;
 }
 
 
