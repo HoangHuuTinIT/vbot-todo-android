@@ -10,10 +10,8 @@ export const changeLanguage = (lang: 'vi' | 'en') => {
         (i18n.global.locale as any).value = lang;
     }
 
-    // 2. Đổi ngôn ngữ cho Uni Framework (Tabbar, NavigationBar, Picker, Calendar...)
     uni.setLocale(lang);
 
-    // 3. Lưu lại để lần sau mở app vẫn giữ nguyên (nếu cần)
     uni.setStorageSync('CURRENT_LANG', lang);
     
     // 4. (Tùy chọn) Reload lại trang hiện tại nếu UI không cập nhật hết

@@ -573,45 +573,32 @@ export const useTodoDetailController = () => {
 	const onRequestEditComment = async (commentId : number) => {
 		const todoId = form.value.id;
 		if (!todoId) return;
-
+		isReplying.value = false;
+		replyingCommentData.value = null;
+		replyingMemberName.value = '';
+		replyingMessagePreview.value = '';
 		try {
-
 			const res = await getTodoMessageDetail(commentId, todoId);
-
 			console.log("API Response Detail:", res);
-
 			if (res) {
-
 				const dataDetail = res.data || res;
-
 				editingCommentData.value = {
 					id: dataDetail.id,
 					todoId: dataDetail.todoId,
 					senderId: dataDetail.senderId
 				};
-
 				const senderId = dataDetail.senderId;
-
-
 				const foundMember = memberList.value.find(m => m.UID === senderId);
-
 				if (foundMember) {
 					editingMemberName.value = foundMember.UserName;
 				} else {
 
 					editingMemberName.value = t('common.me');
 				}
-
 				const content = dataDetail.message || '';
-
 				console.log("Nội dung edit:", content);
-
-
 				isEditingComment.value = true;
-
-
 				await nextTick();
-
 				newCommentText.value = content;
 			}
 		} catch (error) {
