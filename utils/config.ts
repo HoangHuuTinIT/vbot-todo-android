@@ -16,5 +16,3 @@ export const UID: string = import.meta.env.VITE_UID as string;
 
 export const FULL_API_URL: string = `${TODO_API_URL}?projectCode=${PROJECT_CODE}&uid=${UID}&type=${SYSTEM_CONFIG.MODULE_TYPE}&source=${SYSTEM_CONFIG.SOURCE_PARAM}`;
 export const WS_BASE_URL = 'wss://ws-sandbox-h01.vbot.vn/ws/call';
-
-									  

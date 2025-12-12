@@ -71,9 +71,9 @@ export const useTodoDetailController = () => {
 
 	const commentFilterIndex = ref(0);
 	const commentFilterOptions = computed(() => [
-	        t('todo.filter_activity_all'), 
-	        t('todo.filter_activity_comment')
-	    ]);
+		t('todo.filter_activity_all'),
+		t('todo.filter_activity_comment')
+	]);
 	const commentFilterValues = ['', 'COMMENT'];
 
 	const isSavingDescription = ref(false);
@@ -82,15 +82,15 @@ export const useTodoDetailController = () => {
 	const toggleHistory = () => {
 		isHistoryOpen.value = !isHistoryOpen.value;
 	};
-	const convertDateTimeToTimestamp = (dateTimeStr: string): number => {
-	        if (!dateTimeStr) return 0;
-	        try {
-	            const safeStr = dateTimeStr.replace(/-/g, '/');
-	            return new Date(safeStr).getTime();
-	        } catch {
-	            return 0;
-	        }
-	    };
+	const convertDateTimeToTimestamp = (dateTimeStr : string) : number => {
+		if (!dateTimeStr) return 0;
+		try {
+			const safeStr = dateTimeStr.replace(/-/g, '/');
+			return new Date(safeStr).getTime();
+		} catch {
+			return 0;
+		}
+	};
 
 
 	const isStatusDisabled = computed(() => {
@@ -98,52 +98,52 @@ export const useTodoDetailController = () => {
 		return form.value.raw.status === 'DONE';
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
-	        if (!form.value.raw) return;
-	        isLoading.value = true;
-	        try {
-	            const payload = {
-	                ...form.value.raw,
-	                preFixCode: "TODO",
-	                description: form.value.desc,
-	                files: "",
-	                tagCodes: "",
-	                title: form.value.title || form.value.raw.title
-	            };
-	
-	            const ts = convertDateTimeToTimestamp(event.value);
-	
-	            if (event.field === 'dueDate') {
-	                payload.dueDate = ts;
-	            }
-	            else if (event.field === 'notifyAt') { 
-	                payload.notificationReceivedAt = ts;
-	            }
-	
-	            console.log(`Payload Update ${event.field}:`, payload);
-	
-	            const res = await updateTodo(payload);
-	
-	            if (res) {
-	                showSuccess(t('todo.msg_update_success'));
-	              
-	                if (event.field === 'dueDate') {
-	                    form.value.raw.dueDate = payload.dueDate;
-	                    form.value.dueDate = event.value;
-	                } else {
-	                    form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
-	                    form.value.notifyAt = event.value;
-	                }
-	
-	                if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
-	                await fetchComments(form.value.id);
-	            }
-	        } catch (error) {
-	            console.error("Lỗi cập nhật ngày:", error);
-	            showError(t('todo.msg_update_error'));
-	        } finally {
-	            isLoading.value = false;
-	        }
-	    };
+		if (!form.value.raw) return;
+		isLoading.value = true;
+		try {
+			const payload = {
+				...form.value.raw,
+				preFixCode: "TODO",
+				description: form.value.desc,
+				files: "",
+				tagCodes: "",
+				title: form.value.title || form.value.raw.title
+			};
+
+			const ts = convertDateTimeToTimestamp(event.value);
+
+			if (event.field === 'dueDate') {
+				payload.dueDate = ts;
+			}
+			else if (event.field === 'notifyAt') {
+				payload.notificationReceivedAt = ts;
+			}
+
+			console.log(`Payload Update ${event.field}:`, payload);
+
+			const res = await updateTodo(payload);
+
+			if (res) {
+				showSuccess(t('todo.msg_update_success'));
+
+				if (event.field === 'dueDate') {
+					form.value.raw.dueDate = payload.dueDate;
+					form.value.dueDate = event.value;
+				} else {
+					form.value.raw.notificationReceivedAt = payload.notificationReceivedAt;
+					form.value.notifyAt = event.value;
+				}
+
+				if (form.value.customerCode) await fetchHistoryLog(form.value.customerCode);
+				await fetchComments(form.value.id);
+			}
+		} catch (error) {
+			console.error("Lỗi cập nhật ngày:", error);
+			showError(t('todo.msg_update_error'));
+		} finally {
+			isLoading.value = false;
+		}
+	};
 
 	const processCommentInput = async (htmlContent : string) : Promise<{ cleanMessage : string, fileUrl : string }> => {
 		if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
@@ -440,80 +440,80 @@ export const useTodoDetailController = () => {
 	};
 
 	const selectEmoji = async (emoji : string) => {
-			if (!currentReactingComment.value) return;
-	
-			const messageId = currentReactingComment.value.id;
+		if (!currentReactingComment.value) return;
 
-			
-			closeEmojiPicker();
-	
-			const todoId = form.value.id;
-			const senderId = authStore.uid;
-	
-			const payload = {
-				todoId: Number(todoId),
-				senderId: senderId,
-				todoMessageId: Number(messageId),
-				codeEmoji: emoji
-			};
-	
-			try {
-				const res = await reactionTodoMessage(payload);
-	
-				if (res) {
-				
-					let foundComment : any = null;
-					const parentIdx = comments.value.findIndex(c => c.id === messageId);
-					if (parentIdx !== -1) {
-						foundComment = comments.value[parentIdx];
-					} else {
-						for (const parent of comments.value) {
-							if (parent.children) {
-								const child = parent.children.find(c => c.id === messageId);
-								if (child) {
-									foundComment = child;
-									break;
-								}
+		const messageId = currentReactingComment.value.id;
+
+
+		closeEmojiPicker();
+
+		const todoId = form.value.id;
+		const senderId = authStore.uid;
+
+		const payload = {
+			todoId: Number(todoId),
+			senderId: senderId,
+			todoMessageId: Number(messageId),
+			codeEmoji: emoji
+		};
+
+		try {
+			const res = await reactionTodoMessage(payload);
+
+			if (res) {
+
+				let foundComment : any = null;
+				const parentIdx = comments.value.findIndex(c => c.id === messageId);
+				if (parentIdx !== -1) {
+					foundComment = comments.value[parentIdx];
+				} else {
+					for (const parent of comments.value) {
+						if (parent.children) {
+							const child = parent.children.find(c => c.id === messageId);
+							if (child) {
+								foundComment = child;
+								break;
 							}
 						}
 					}
-	
-					if (foundComment) {
-						if (!foundComment.reactions) foundComment.reactions = [];
-	
-	                    
-	                    const existingReactionIndex = foundComment.reactions.findIndex(
-	                        (r: any) => r.senderId === senderId
-	                    );
-	
-	                    if (existingReactionIndex !== -1) {
-	                 
-	                        const currentEmoji = foundComment.reactions[existingReactionIndex].codeEmoji;
-	                        
-	                        if (currentEmoji === emoji) {
-
-	                             console.log('User thả trùng emoji cũ');
-	                        } else {
-	                       
-	                            foundComment.reactions[existingReactionIndex].codeEmoji = emoji;
-	                        }
-	                    } else {
-	                      
-	                        foundComment.reactions.push({
-	                            codeEmoji: emoji,
-	                            senderId: senderId,
-	                         
-	                        });
-	                    }
-	        
-	                    foundComment.reactions = [...foundComment.reactions]; 
-					}
 				}
-			} catch (error) {
-				console.error("Lỗi thả cảm xúc:", error);
-				showError(t('common.error_connection'));
+
+				if (foundComment) {
+					if (!foundComment.reactions) foundComment.reactions = [];
+
+
+					const existingReactionIndex = foundComment.reactions.findIndex(
+						(r : any) => r.senderId === senderId
+					);
+
+					if (existingReactionIndex !== -1) {
+
+						const currentEmoji = foundComment.reactions[existingReactionIndex].codeEmoji;
+
+						if (currentEmoji === emoji) {
+
+							console.log('User thả trùng emoji cũ');
+						} else {
+
+							foundComment.reactions[existingReactionIndex].codeEmoji = emoji;
+						}
+					} else {
+
+						foundComment.reactions.push({
+							codeEmoji: emoji,
+							senderId: senderId,
+
+						});
+					}
+
+					foundComment.reactions = [...foundComment.reactions];
+				}
 			}
-		};
+		} catch (error) {
+			console.error("Lỗi thả cảm xúc:", error);
+			showError(t('common.error_connection'));
+		}
+	};
 	const editingCommentData = ref<{
 		id : number;
 		todoId : number;
@@ -522,13 +522,13 @@ export const useTodoDetailController = () => {
 	const historyFilterIndex = ref(0);
 
 	const historyFilterOptions = computed(() => [
-	        t('todo.history_all'),
-	        t('todo.history_todo'),
-	        t('todo.history_ticket'),
-	        t('todo.history_call'),
-	        t('todo.history_customer'),
-	        t('todo.history_note')
-	    ]);
+		t('todo.history_all'),
+		t('todo.history_todo'),
+		t('todo.history_ticket'),
+		t('todo.history_call'),
+		t('todo.history_customer'),
+		t('todo.history_note')
+	]);
 	const historyFilterValues = [
 		'ALL',
 		'TODO',
@@ -538,37 +538,37 @@ export const useTodoDetailController = () => {
 		'NOTE'
 	];
 	const form = ref<TodoDetailForm>({
-	        id: '', title: '', code: t('common.loading'), desc: '',
-	        statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
-	        dueDate: '', 
-	        notifyAt: '', 
-	        customerCode: '', customerName: '', customerNameLabel: '',
-	        customerPhone: '', customerPhoneLabel: '',
-	        customerManagerName: '', customerManagerLabel: '',
-	        raw: undefined
-	    });
+		id: '', title: '', code: t('common.loading'), desc: '',
+		statusIndex: 0, sourceIndex: 0, assigneeIndex: 0, assigneeId: '',
+		dueDate: '',
+		notifyAt: '',
+		customerCode: '', customerName: '', customerNameLabel: '',
+		customerPhone: '', customerPhoneLabel: '',
+		customerManagerName: '', customerManagerLabel: '',
+		raw: undefined
+	});
 
 
 	const sourceOptions = computed(() => [
-	        t('source.call'), 
-	        t('source.customer'), 
-	        t('source.conversation'), 
-	        t('source.message')
-	    ]);
+		t('source.call'),
+		t('source.customer'),
+		t('source.conversation'),
+		t('source.message')
+	]);
 
 	const memberList = ref<any[]>([]);
 	const assigneeOptions = ref<string[]>([]);
 	const dynamicStatusOptions = computed(() => {
-			const options = [
-				{ label: t('todo.status_todo'), value: 'TO_DO' },
-				{ label: t('todo.status_progress'), value: 'IN_PROGRESS' },
-				{ label: t('todo.status_done'), value: 'DONE' }
-			];
-			if (form.value.raw && form.value.raw.status === 'IN_PROGRESS') {
-				return options.filter(opt => opt.value !== 'TO_DO');
-			}
-			return options;
-		});
+		const options = [
+			{ label: t('todo.status_todo'), value: 'TO_DO' },
+			{ label: t('todo.status_progress'), value: 'IN_PROGRESS' },
+			{ label: t('todo.status_done'), value: 'DONE' }
+		];
+		if (form.value.raw && form.value.raw.status === 'IN_PROGRESS') {
+			return options.filter(opt => opt.value !== 'TO_DO');
+		}
+		return options;
+	});
 	const statusLabels = computed(() => dynamicStatusOptions.value.map(opt => opt.label));
 	const onRequestEditComment = async (commentId : number) => {
 		const todoId = form.value.id;
@@ -795,10 +795,8 @@ export const useTodoDetailController = () => {
 			isSubmittingComment.value = false;
 		}
 	};
-	onLoad((options : any) => {
-
-		fetchMembers();
-
+	onLoad(async (options : any) => {
+		await fetchMembers();
 		if (options && options.id) {
 			fetchDetail(options.id);
 		}
@@ -902,9 +900,9 @@ export const useTodoDetailController = () => {
 
 
 		let actionText = '';
-				if (item.type === 'COMMENT') actionText = t('todo.action_comment');
-				else if (item.type === 'LOG') actionText = t('todo.action_log');
-				else if (item.type === 'UPDATE_TODO') actionText = t('todo.action_update');
+		if (item.type === 'COMMENT') actionText = t('todo.action_comment');
+		else if (item.type === 'LOG') actionText = t('todo.action_log');
+		else if (item.type === 'UPDATE_TODO') actionText = t('todo.action_update');
 
 		const reactionList = item.reactions?.details || [];
 
@@ -985,7 +983,7 @@ export const useTodoDetailController = () => {
 			if (nameField) {
 				form.value.customerName = nameField.value;
 				form.value.customerNameLabel = nameField.name || t('todo.customer_name_label');
-				
+
 			}
 
 
