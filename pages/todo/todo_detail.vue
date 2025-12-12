@@ -7,16 +7,8 @@
 			<view class="header-top">
 				<text class="header-code">#{{ form.code || '...' }}</text>
 			</view>
-			<textarea 
-				class="header-title-input" 
-				v-model="form.title" 
-				:placeholder="$t('todo.header_loading')"
-				auto-height 
-				maxlength="256"
-				confirm-type="done"
-				@confirm="onSaveTitle"
-				@blur="onSaveTitle"
-			/>
+			<textarea class="header-title-input" v-model="form.title" :placeholder="$t('todo.header_loading')"
+				auto-height maxlength="256" confirm-type="done" @confirm="onSaveTitle" @blur="onSaveTitle" />
 		</view>
 
 		<view class="detail-body">
@@ -25,7 +17,8 @@
 				<TodoEditor v-model="form.desc" :placeholder="$t('todo.desc_placeholder')" />
 				<view class="input-actions" style="margin-top: 10px;">
 					<AppButton type="primary" size="small" :loading="isSavingDescription"
-						:label="isSavingDescription ? $t('common.saving') : $t('common.save')" @click="onSaveDescription" />
+						:label="isSavingDescription ? $t('common.saving') : $t('common.save')"
+						@click="onSaveDescription" />
 				</view>
 			</view>
 
@@ -33,17 +26,19 @@
 			<view class="info-group">
 				<view class="flat-item">
 					<view class="item-left">
-						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon"></image>
+						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon">
+						</image>
 						<text class="item-label">{{ $t('todo.status') }}</text>
 					</view>
-					<picker mode="selector" :range="statusOptions" :value="form.statusIndex" :disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
+					<picker mode="selector" :range="statusOptions" :value="form.statusIndex"
+						:disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
 						<view class="picker-text" :class="{ 'disabled-text': isStatusDisabled }">
 							{{ statusOptions[form.statusIndex] || $t('common.loading') }}
 							<text v-if="!isStatusDisabled">▾</text>
 						</view>
 					</picker>
 				</view>
-				
+
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
@@ -61,18 +56,17 @@
 						<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
 						<text class="item-label">{{ $t('todo.assignee') }}</text>
 					</view>
-					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex" @change="onAssigneeChange" class="item-picker-box">
+					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex"
+						@change="onAssigneeChange" class="item-picker-box">
 						<view class="picker-text">
-							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : $t('common.loading') }} ▾
+							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : $t('common.loading') }}
+							▾
 						</view>
 					</picker>
 				</view>
 
-				<TodoDatePicker 
-				    v-model:dueDate="form.dueDate" 
-				    v-model:notifyAt="form.notifyAt" 
-				    @change="onDateUpdate" 
-				/>
+				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt"
+					@change="onDateUpdate" />
 			</view>
 
 			<view class="section-title">{{ $t('todo.customer_section') }}</view>
@@ -86,22 +80,26 @@
 				<view v-else>
 					<view class="flat-item">
 						<view class="item-left">
-							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerNameLabel || $t('todo.customer_name_label') }}</text>
+							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon">
+							</image>
+							<text
+								class="item-label">{{ form.customerNameLabel || $t('todo.customer_name_label') }}</text>
 						</view>
 						<view class="item-right-text">{{ form.customerName }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerPhoneLabel || $t('todo.customer_phone_label') }}</text>
+							<text
+								class="item-label">{{ form.customerPhoneLabel || $t('todo.customer_phone_label') }}</text>
 						</view>
 						<view class="item-right-text phone-text">{{ form.customerPhone }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
-							<text class="item-label">{{ form.customerManagerLabel || $t('todo.customer_manager_label') }}</text>
+							<text
+								class="item-label">{{ form.customerManagerLabel || $t('todo.customer_manager_label') }}</text>
 						</view>
 						<view class="item-right-text highlight-text">
 							{{ form.customerManagerName || $t('todo.manager_none') }}
@@ -113,9 +111,11 @@
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
 					<text class="section-title no-margin">{{ $t('todo.comments_activities') }}</text>
-					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon" :class="{ 'open': isCommentsOpen }"></image>
+					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
+						:class="{ 'open': isCommentsOpen }"></image>
 				</view>
-				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop @change="onCommentFilterChange">
+				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
+					@change="onCommentFilterChange">
 					<view class="filter-badge">{{ commentFilterOptions[commentFilterIndex] }} ▾</view>
 				</picker>
 			</view>
@@ -123,11 +123,12 @@
 			<view class="comments-section" v-if="isCommentsOpen">
 				<view class="comment-input-block" id="comment-input-anchor">
 					<view class="editor-container">
-						<TodoEditor v-model="newCommentText" 
+						<TodoEditor ref="todoEditorRef" v-model="newCommentText"
 							:placeholder="isEditingComment ? $t('todo.comment_placeholder_edit') : (isReplying ? $t('todo.comment_placeholder_reply') : $t('todo.comment_placeholder_write'))" />
 					</view>
 					<view v-if="isEditingComment" class="editing-alert">
-						<text class="editing-text">{{ $t('todo.editing_alert') }} <text class="editing-name">{{ editingMemberName }}</text></text>
+						<text class="editing-text">{{ $t('todo.editing_alert') }} <text
+								class="editing-name">{{ editingMemberName }}</text></text>
 					</view>
 					<view v-if="isReplying && replyingCommentData" class="reply-alert">
 						<view class="reply-info">
@@ -142,14 +143,23 @@
 					</view>
 
 					<view class="input-actions">
-						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('common.save')" @click="submitComment" />
+						<AppButton v-if="!isEditingComment && !isReplying" type="primary" size="small"
+							:loading="isSubmittingComment"
+							:label="isSubmittingComment ? $t('common.saving') : $t('common.save')"
+							@click="submitComment" />
 						<view v-else-if="isEditingComment" class="edit-actions-row">
-							<AppButton type="secondary" size="small" :label="$t('common.cancel')" :disabled="isSubmittingComment" @click="onCancelEditComment" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('todo.update_btn')" @click="submitUpdateComment" />
+							<AppButton type="secondary" size="small" :label="$t('common.cancel')"
+								:disabled="isSubmittingComment" @click="onCancelEditComment" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment"
+								:label="isSubmittingComment ? $t('common.saving') : $t('todo.update_btn')"
+								@click="submitUpdateComment" />
 						</view>
 						<view v-else-if="isReplying" class="edit-actions-row">
-							<AppButton type="secondary" size="small" :label="$t('common.cancel')" :disabled="isSubmittingComment" @click="onCancelReply" />
-							<AppButton type="primary" size="small" :loading="isSubmittingComment" :label="isSubmittingComment ? $t('common.saving') : $t('todo.reply_btn')" @click="submitReply" />
+							<AppButton type="secondary" size="small" :label="$t('common.cancel')"
+								:disabled="isSubmittingComment" @click="onCancelReply" />
+							<AppButton type="primary" size="small" :loading="isSubmittingComment"
+								:label="isSubmittingComment ? $t('common.saving') : $t('todo.reply_btn')"
+								@click="submitReply" />
 						</view>
 					</view>
 				</view>
@@ -163,20 +173,24 @@
 					<text>{{ $t('todo.no_comments') }}</text>
 				</view>
 				<view v-else>
-					<CommentItem v-for="item in comments" :key="item.id" :data="item" @react="onToggleEmojiPicker" @reply="(data) => handleReply(data)" @edit="(data) => handleEdit(data)" @delete="(id) => onRequestDeleteComment(id)" />
+					<CommentItem v-for="item in comments" :key="item.id" :data="item" @react="onToggleEmojiPicker"
+						@reply="(data) => handleReply(data)" @edit="(data) => handleEdit(data)"
+						@delete="(id) => onRequestDeleteComment(id)" />
 				</view>
 			</view>
 
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleHistory">
 					<text class="section-title no-margin">{{ $t('todo.history_section') }}</text>
-					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon" :class="{ 'open': isHistoryOpen }"></image>
+					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
+						:class="{ 'open': isHistoryOpen }"></image>
 				</view>
-				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop @change="onHistoryFilterChange">
+				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop
+					@change="onHistoryFilterChange">
 					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
 				</picker>
 			</view>
-			
+
 			<view class="history-container" v-if="isHistoryOpen">
 				<view v-if="isLoadingHistory" class="loading-row">
 					<text class="loading-text">{{ $t('todo.loading_history') }}</text>
@@ -204,32 +218,25 @@
 			<view style="height: 50px;"></view>
 		</view>
 
-		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" 
-			:title="$t('todo.cancel_edit_title')" 
-			:message="$t('todo.cancel_edit_msg')" 
-			:cancel-label="$t('todo.continue_edit')" 
-			:confirm-label="$t('common.cancel_action')" 
-			confirm-type="danger" 
-			@cancel="continueEditing" @confirm="confirmCancelEdit" />
+		<ConfirmModal v-model:visible="isConfirmCancelEditOpen" :title="$t('todo.cancel_edit_title')"
+			:message="$t('todo.cancel_edit_msg')" :cancel-label="$t('todo.continue_edit')"
+			:confirm-label="$t('common.cancel_action')" confirm-type="danger" @cancel="continueEditing"
+			@confirm="confirmCancelEdit" />
 
-		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" 
-			:title="$t('todo.cancel_reply_title')" 
-			:message="$t('todo.cancel_reply_msg')" 
-			:cancel-label="$t('todo.continue_reply')" 
-			:confirm-label="$t('common.cancel_action')" 
-			confirm-type="danger" 
-			@cancel="continueReplying" @confirm="confirmCancelReply" />
+		<ConfirmModal v-model:visible="isConfirmCancelReplyOpen" :title="$t('todo.cancel_reply_title')"
+			:message="$t('todo.cancel_reply_msg')" :cancel-label="$t('todo.continue_reply')"
+			:confirm-label="$t('common.cancel_action')" confirm-type="danger" @cancel="continueReplying"
+			@confirm="confirmCancelReply" />
 
-		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" 
-			:title="$t('todo.delete_comment_title')" 
-			:message="$t('todo.delete_comment_msg')" 
-			confirm-type="danger" 
-			@confirm="confirmDeleteComment" @cancel="cancelDeleteComment" />
-		
+		<ConfirmModal v-model:visible="isConfirmDeleteCommentOpen" :title="$t('todo.delete_comment_title')"
+			:message="$t('todo.delete_comment_msg')" confirm-type="danger" @confirm="confirmDeleteComment"
+			@cancel="cancelDeleteComment" />
+
 		<view class="modal-overlay" v-if="isEmojiPickerOpen" @click="closeEmojiPicker">
 			<view class="emoji-picker-container" @click.stop>
 				<view class="emoji-grid">
-					<view v-for="(emoji, index) in emojiList" :key="index" class="emoji-item" @click="selectEmoji(emoji)">{{ emoji }}</view>
+					<view v-for="(emoji, index) in emojiList" :key="index" class="emoji-item"
+						@click="selectEmoji(emoji)">{{ emoji }}</view>
 				</view>
 			</view>
 		</view>
@@ -303,16 +310,29 @@
 	const toggleComments = () => {
 		isCommentsOpen.value = !isCommentsOpen.value;
 	};
+	const todoEditorRef = ref<any>(null);
 	const scrollToInput = () => {
 		if (!isCommentsOpen.value) {
 			isCommentsOpen.value = true;
 		}
-		scrollTarget.value = '';
 		setTimeout(() => {
-			scrollTarget.value = 'comment-input-anchor';
-		}, 100);
-	};
+			const query = uni.createSelectorQuery();
+			query.select('#comment-input-anchor').boundingClientRect((data) => {
+				if (data) {
+					uni.createSelectorQuery().selectViewport().scrollOffset((res) => {
+						if (res) {
+							let topPosition = res.scrollTop + data.top - 100;
 
+							uni.pageScrollTo({
+								scrollTop: topPosition,
+								duration: 300,
+							});
+						}
+					}).exec();
+				}
+			}).exec();
+		}, 150);
+	};
 	const handleReply = (data : any) => {
 		onRequestReply(data);
 		scrollToInput();
@@ -924,7 +944,7 @@
 
 	.loading-overlay {
 		z-index: 9999 !important;
-		
+
 	}
 
 	.modal-overlay {
