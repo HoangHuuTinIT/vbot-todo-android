@@ -42,15 +42,15 @@
 				<view class="tool-divider"></view>
 				
 				<view class="tool-item" @touchend.prevent="insertImage">
-					<image src="https://img.icons8.com/ios/50/666666/image.png" class="img-icon"></image>
+					<image src="/static/choseImage.png" class="img-icon"></image>
 				</view>
 				
 				<view class="tool-item" :class="{'active': isLinkSelected}" @touchend.prevent="handleLink">
-					<image src="https://img.icons8.com/ios/50/666666/link--v1.png" class="img-icon"></image>
+					<image src="/static/link.png" class="img-icon"></image>
 				</view>
 
 				<view class="tool-item" @touchend.prevent="openCardLinkModal">
-					<image src="https://img.icons8.com/ios/50/666666/add-link.png" class="img-icon"></image>
+					<image src="/static/add-link.png" class="img-icon"></image>
 				</view>
 				
 				<view class="tool-item" @touchend.prevent="clearFormat">
@@ -146,16 +146,13 @@ const tools = [
 	{ name: 'bold', iconText: 'B', style: 'font-weight:900' },
 	{ name: 'italic', iconText: 'I', style: 'font-style:italic' },
 	{ name: 'underline', iconText: 'U', style: 'text-decoration:underline' },
-
-	{ name: 'color', iconImg: 'https://img.icons8.com/ios-filled/50/000000/text-color.png', action: 'color-picker' },
-	{ name: 'backgroundColor', iconImg: 'https://img.icons8.com/ios-filled/50/000000/marker-pen.png', action: 'bgcolor-picker' },
-
+	{ name: 'color', iconImg: '/static/text_color.png', action: 'color-picker' },
+	{ name: 'backgroundColor', iconImg: '/static/background_color.png', action: 'bgcolor-picker' },
 	{ name: 'strike', iconText: 'S', style: 'text-decoration:line-through' },
-	{ name: 'align', iconImg: 'https://img.icons8.com/ios/50/666666/align-left.png', action: 'align-menu' },
-	{ name: 'list', value: 'ordered', iconImg: 'https://img.icons8.com/ios/50/666666/numbered-list.png' },
-	{ name: 'list', value: 'bullet', iconImg: 'https://img.icons8.com/ios/50/666666/list.png' },
+	{ name: 'align', iconImg: '/static/align-left.png', action: 'align-menu' },
+	{ name: 'list', value: 'ordered', iconImg: '/static/numbered-list.png' },
+	{ name: 'list', value: 'bullet', iconImg: '/static/list.png' },
 ];
-
 const colorList = [
 	'#000000', '#333333', '#888888', '#aaaaaa',
 	'#e60000', '#ff9900', '#ffff00', '#008a00',
@@ -274,14 +271,14 @@ const getDisplayText = (item: any) => {
 	return item.iconText;
 };
 
-const getDisplayImage = (item: any) => {
+const getDisplayImage = (item : any) => {
 	if (item.action === 'align-menu') {
 		const alignVal = formats.value.align || 'left';
 		switch (alignVal) {
-			case 'center': return 'https://img.icons8.com/ios/50/666666/align-center.png';
-			case 'right': return 'https://img.icons8.com/ios/50/666666/align-right.png';
-			case 'justify': return 'https://img.icons8.com/ios/50/666666/align-justify.png';
-			default: return 'https://img.icons8.com/ios/50/666666/align-left.png';
+			case 'center': return '/static/align-center.png'; 
+			case 'right': return '/static/align-right.png';   
+			case 'justify': return '/static/align-justify.png'; 
+			default: return '/static/align-left.png';
 		}
 	}
 	return item.iconImg;

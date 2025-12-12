@@ -8307,6 +8307,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
+  const _imports_0$2 = "/static/filter.png";
   function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
@@ -8335,7 +8336,7 @@ ${codeFrame}` : message);
               },
               [
                 vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/666666/filter--v1.png",
+                  src: _imports_0$2,
                   class: "filter-icon-img"
                 })
               ],
@@ -12428,7 +12429,6 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _imports_0 = "/static/filter.png";
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "header" }, [
@@ -12445,7 +12445,7 @@ This will fail in production if not fixed.`);
           onClick: _cache[0] || (_cache[0] = (...args) => $setup.openFilter && $setup.openFilter(...args))
         }, [
           vue.createElementVNode("image", {
-            src: _imports_0,
+            src: _imports_0$2,
             class: "filter-icon"
           })
         ])
@@ -13260,12 +13260,12 @@ This will fail in production if not fixed.`);
         { name: "bold", iconText: "B", style: "font-weight:900" },
         { name: "italic", iconText: "I", style: "font-style:italic" },
         { name: "underline", iconText: "U", style: "text-decoration:underline" },
-        { name: "color", iconImg: "https://img.icons8.com/ios-filled/50/000000/text-color.png", action: "color-picker" },
-        { name: "backgroundColor", iconImg: "https://img.icons8.com/ios-filled/50/000000/marker-pen.png", action: "bgcolor-picker" },
+        { name: "color", iconImg: "/static/text_color.png", action: "color-picker" },
+        { name: "backgroundColor", iconImg: "/static/background_color.png", action: "bgcolor-picker" },
         { name: "strike", iconText: "S", style: "text-decoration:line-through" },
-        { name: "align", iconImg: "https://img.icons8.com/ios/50/666666/align-left.png", action: "align-menu" },
-        { name: "list", value: "ordered", iconImg: "https://img.icons8.com/ios/50/666666/numbered-list.png" },
-        { name: "list", value: "bullet", iconImg: "https://img.icons8.com/ios/50/666666/list.png" }
+        { name: "align", iconImg: "/static/align-left.png", action: "align-menu" },
+        { name: "list", value: "ordered", iconImg: "/static/numbered-list.png" },
+        { name: "list", value: "bullet", iconImg: "/static/list.png" }
       ];
       const colorList = [
         "#000000",
@@ -13382,13 +13382,13 @@ This will fail in production if not fixed.`);
           const alignVal = formats.value.align || "left";
           switch (alignVal) {
             case "center":
-              return "https://img.icons8.com/ios/50/666666/align-center.png";
+              return "/static/align-center.png";
             case "right":
-              return "https://img.icons8.com/ios/50/666666/align-right.png";
+              return "/static/align-right.png";
             case "justify":
-              return "https://img.icons8.com/ios/50/666666/align-justify.png";
+              return "/static/align-justify.png";
             default:
-              return "https://img.icons8.com/ios/50/666666/align-left.png";
+              return "/static/align-left.png";
           }
         }
         return item.iconImg;
@@ -13574,6 +13574,9 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
+  const _imports_0$1 = "/static/choseImage.png";
+  const _imports_1$1 = "/static/link.png";
+  const _imports_2$1 = "/static/add-link.png";
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "editor-container" }, [
       vue.createElementVNode("editor", {
@@ -13646,7 +13649,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: "https://img.icons8.com/ios/50/666666/image.png",
+                src: _imports_0$1,
                 class: "img-icon"
               })
             ],
@@ -13661,7 +13664,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: "https://img.icons8.com/ios/50/666666/link--v1.png",
+                src: _imports_1$1,
                 class: "img-icon"
               })
             ],
@@ -13676,7 +13679,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: "https://img.icons8.com/ios/50/666666/add-link.png",
+                src: _imports_2$1,
                 class: "img-icon"
               })
             ],
@@ -14500,7 +14503,7 @@ This will fail in production if not fixed.`);
       replyingMessagePreview.value = cleanHtml;
       isReplying.value = true;
       const senderId = item.senderId;
-      const foundMember = memberList.value.find((m) => m.UID === senderId);
+      const foundMember = memberList.value.find((m) => m.memberUID === senderId);
       if (foundMember) {
         replyingMemberName.value = foundMember.UserName;
       } else {
@@ -14800,9 +14803,6 @@ This will fail in production if not fixed.`);
     const confirmCancelEdit = async () => {
       isConfirmCancelEditOpen.value = false;
       resetEditState();
-      if (form.value.id) {
-        await fetchComments(form.value.id);
-      }
     };
     const resetEditState = () => {
       isEditingComment.value = false;
@@ -14837,7 +14837,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:737", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:731", "Lỗi xóa bình luận:", error);
         showError(t("common.fail_delete"));
       } finally {
         commentToDeleteId.value = null;
@@ -14875,7 +14875,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:785", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:779", "Lỗi gửi bình luận:", error);
         showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
@@ -14898,7 +14898,7 @@ This will fail in production if not fixed.`);
             form.value.assigneeIndex = index;
         }
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:808", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:802", "Lỗi lấy members", e);
       }
     };
     const reloadDetail = async () => {
@@ -14911,13 +14911,13 @@ This will fail in production if not fixed.`);
           fetchDetail(form.value.id)
         ]);
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:822", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:816", e);
       } finally {
         uni.stopPullDownRefresh();
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/todo_detail.ts:829", "Refreshing detail...");
+      formatAppLog("log", "at controllers/todo_detail.ts:823", "Refreshing detail...");
       reloadDetail();
     });
     const fetchDetail = async (id) => {
@@ -14949,7 +14949,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:869", "Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:863", "Lỗi lấy chi tiết:", error);
         showError(t("common.error_connection"));
       } finally {
         isLoading.value = false;
@@ -15031,7 +15031,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:955", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:949", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -15072,7 +15072,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : t("todo.unknown");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1013", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1007", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -15083,7 +15083,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:1025", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:1019", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -15112,7 +15112,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1063", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1057", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -15143,7 +15143,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1110", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1104", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_status_changed"));
@@ -15155,7 +15155,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1126", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1120", "Lỗi cập nhật trạng thái:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15187,7 +15187,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1170", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1164", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_assignee_changed"));
@@ -15198,7 +15198,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1188", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1182", "Lỗi cập nhật người giao:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15208,7 +15208,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1197", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1191", "Lưu:", form.value);
       showSuccess(t("todo.msg_saved"));
     };
     return {
@@ -15306,6 +15306,10 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
+  const _imports_0 = "/static/reaction.png";
+  const _imports_1 = "/static/reply_comment.png";
+  const _imports_2 = "/static/edit_comment.png";
+  const _imports_3 = "/static/delete.png";
   function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "comment-thread" }, [
       vue.createElementVNode("view", { class: "flex gap-3 mb-4 items-start" }, [
@@ -15407,7 +15411,7 @@ This will fail in production if not fixed.`);
                 onClick: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("react", $props.data))
               }, [
                 vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/999999/happy--v1.png",
+                  src: _imports_0,
                   class: "icon-action"
                 })
               ]),
@@ -15416,7 +15420,7 @@ This will fail in production if not fixed.`);
                 onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("reply", $props.data))
               }, [
                 vue.createElementVNode("image", {
-                  src: "https://img.icons8.com/ios/50/999999/speech-bubble--v1.png",
+                  src: _imports_1,
                   class: "icon-action"
                 })
               ]),
@@ -15429,7 +15433,7 @@ This will fail in production if not fixed.`);
                     onClick: _cache[3] || (_cache[3] = ($event) => _ctx.$emit("edit", $props.data))
                   }, [
                     vue.createElementVNode("image", {
-                      src: "https://img.icons8.com/ios/50/999999/create-new.png",
+                      src: _imports_2,
                       class: "icon-action"
                     })
                   ]),
@@ -15438,7 +15442,7 @@ This will fail in production if not fixed.`);
                     onClick: _cache[4] || (_cache[4] = ($event) => _ctx.$emit("delete", $props.data.id))
                   }, [
                     vue.createElementVNode("image", {
-                      src: "https://img.icons8.com/ios/50/999999/trash--v1.png",
+                      src: _imports_3,
                       class: "icon-action"
                     })
                   ])

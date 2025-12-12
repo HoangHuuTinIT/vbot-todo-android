@@ -8,7 +8,7 @@
 
 				<view class="header-actions">
 					<view class="filter-toggle-btn" :class="{ 'active': isFilterExpanded }" @click="toggleFilter">
-						<image src="https://img.icons8.com/ios/50/666666/filter--v1.png" class="filter-icon-img" />
+						<image src="/static/filter.png" class="filter-icon-img" />
 					</view>
 					<text class="close-btn" @click="close">✕</text>
 				</view>

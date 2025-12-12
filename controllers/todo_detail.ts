@@ -340,7 +340,7 @@ export const useTodoDetailController = () => {
 		isReplying.value = true;
 
 		const senderId = item.senderId;
-		const foundMember = memberList.value.find(m => m.UID === senderId);
+		const foundMember = memberList.value.find(m => m.memberUID === senderId);
 		if (foundMember) {
 			replyingMemberName.value = foundMember.UserName;
 		} else {
@@ -688,13 +688,7 @@ export const useTodoDetailController = () => {
 
 	const confirmCancelEdit = async () => {
 		isConfirmCancelEditOpen.value = false;
-
-
 		resetEditState();
-
-		if (form.value.id) {
-			await fetchComments(form.value.id);
-		}
 	};
 
 	const resetEditState = () => {

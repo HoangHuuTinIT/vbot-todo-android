@@ -38,21 +38,21 @@
 
 					<view class="action-buttons-container" v-if="data.type == 'COMMENT'">
 						<view class="btn-icon-action" @click="$emit('react', data)">
-							<image src="https://img.icons8.com/ios/50/999999/happy--v1.png" class="icon-action"></image>
+							<image src="/static/reaction.png" class="icon-action"></image>
 						</view>
 
 						<view class="btn-icon-action" @click="$emit('reply', data)">
-							<image src="https://img.icons8.com/ios/50/999999/speech-bubble--v1.png" class="icon-action">
+							<image src="/static/reply_comment.png" class="icon-action">
 							</image>
 						</view>
 
 						<template v-if="isMe && data.type === 'COMMENT'">
 							<view class="btn-icon-action" @click="$emit('edit', data)">
-								<image src="https://img.icons8.com/ios/50/999999/create-new.png" class="icon-action">
+								<image src="/static/edit_comment.png" class="icon-action">
 								</image>
 							</view>
 							<view class="btn-icon-action" @click="$emit('delete', data.id)">
-								<image src="https://img.icons8.com/ios/50/999999/trash--v1.png" class="icon-action">
+								<image src="/static/delete.png" class="icon-action">
 								</image>
 							</view>
 						</template>
