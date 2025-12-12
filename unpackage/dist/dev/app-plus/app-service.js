@@ -15378,9 +15378,36 @@ This will fail in production if not fixed.`);
       const isMe = vue.computed(() => {
         return props.data.isMe === true;
       });
-      const processedContent = vue.computed(() => {
-        const rawHtml = props.data.message || "";
-        return extractLinksAndCleanHtml(rawHtml);
+      const parsedContent = vue.computed(() => {
+        const raw = props.data.message || "";
+        if (props.data.type === "UPDATE_TODO" && raw.includes("->")) {
+          const splitIndex = raw.lastIndexOf("->");
+          if (splitIndex !== -1) {
+            const leftPart = raw.substring(0, splitIndex).trim();
+            const rightPart = raw.substring(splitIndex + 2).trim();
+            const labelMatch = leftPart.match(/^<p>(- .*?:)/) || leftPart.match(/^(- .*?:)/);
+            let label = "";
+            let oldHtmlRaw = leftPart;
+            if (labelMatch) {
+              label = labelMatch[1].replace(/<p>|:$/g, "").trim() + ":";
+              oldHtmlRaw = leftPart.replace(labelMatch[0], "").trim();
+              if (oldHtmlRaw.startsWith("</p>"))
+                oldHtmlRaw = oldHtmlRaw.substring(4);
+            }
+            const oldProcessed = extractLinksAndCleanHtml(oldHtmlRaw);
+            const newProcessed = extractLinksAndCleanHtml(rightPart);
+            return {
+              isUpdate: true,
+              label,
+              old: oldProcessed,
+              new: newProcessed
+            };
+          }
+        }
+        return {
+          isUpdate: false,
+          normal: extractLinksAndCleanHtml(raw)
+        };
       });
       const onPreviewImage = (url) => {
         if (!url)
@@ -15390,7 +15417,7 @@ This will fail in production if not fixed.`);
           current: 0
         });
       };
-      const __returned__ = { props, emit, authStore, isMe, processedContent, onPreviewImage, UserAvatar, LinkCard, CommentItem };
+      const __returned__ = { props, emit, authStore, isMe, parsedContent, onPreviewImage, UserAvatar, LinkCard, CommentItem };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -15432,38 +15459,105 @@ This will fail in production if not fixed.`);
                 }, "• Đã sửa")) : vue.createCommentVNode("v-if", true)
               ])
             ]),
-            vue.createElementVNode("rich-text", {
-              nodes: $setup.processedContent.cleanHtml,
-              class: "text-sm text-gray-700 leading-normal"
-            }, null, 8, ["nodes"]),
-            $setup.processedContent.links.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+            $setup.parsedContent.isUpdate ? (vue.openBlock(), vue.createElementBlock("view", {
               key: 0,
-              class: "mt-2"
+              class: "content-body"
             }, [
-              (vue.openBlock(true), vue.createElementBlock(
-                vue.Fragment,
-                null,
-                vue.renderList($setup.processedContent.links, (link, index) => {
-                  return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
-                    key: index,
-                    url: link
-                  }, null, 8, ["url"]);
-                }),
-                128
-                /* KEYED_FRAGMENT */
-              ))
-            ])) : vue.createCommentVNode("v-if", true),
-            $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
+              vue.createElementVNode(
+                "text",
+                { class: "font-bold text-sm text-gray-700 block mb-1" },
+                vue.toDisplayString($setup.parsedContent.label),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode("view", { class: "change-flow" }, [
+                vue.createElementVNode("view", { class: "part-container" }, [
+                  vue.createElementVNode("rich-text", {
+                    nodes: $setup.parsedContent.old.cleanHtml,
+                    class: "text-sm text-gray-600 inline-html"
+                  }, null, 8, ["nodes"]),
+                  $setup.parsedContent.old.links.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "mt-1 mb-1"
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.parsedContent.old.links, (link, idx) => {
+                        return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
+                          key: "old" + idx,
+                          url: link
+                        }, null, 8, ["url"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ])) : vue.createCommentVNode("v-if", true)
+                ]),
+                vue.createElementVNode("view", { class: "arrow-container" }, [
+                  vue.createElementVNode("text", { class: "arrow-text" }, "→")
+                ]),
+                vue.createElementVNode("view", { class: "part-container" }, [
+                  vue.createElementVNode("rich-text", {
+                    nodes: $setup.parsedContent.new.cleanHtml,
+                    class: "text-sm text-gray-800 inline-html"
+                  }, null, 8, ["nodes"]),
+                  $setup.parsedContent.new.links.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                    key: 0,
+                    class: "mt-1"
+                  }, [
+                    (vue.openBlock(true), vue.createElementBlock(
+                      vue.Fragment,
+                      null,
+                      vue.renderList($setup.parsedContent.new.links, (link, idx) => {
+                        return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
+                          key: "new" + idx,
+                          url: link
+                        }, null, 8, ["url"]);
+                      }),
+                      128
+                      /* KEYED_FRAGMENT */
+                    ))
+                  ])) : vue.createCommentVNode("v-if", true)
+                ])
+              ])
+            ])) : (vue.openBlock(), vue.createElementBlock("view", {
               key: 1,
-              class: "mt-2"
+              class: "content-body"
             }, [
-              vue.createElementVNode("image", {
-                src: $props.data.files,
-                mode: "widthFix",
-                class: "comment-attachment-img",
-                onClick: _cache[0] || (_cache[0] = vue.withModifiers(($event) => $setup.onPreviewImage($props.data.files), ["stop"]))
-              }, null, 8, ["src"])
-            ])) : vue.createCommentVNode("v-if", true)
+              vue.createElementVNode("rich-text", {
+                nodes: $setup.parsedContent.normal.cleanHtml,
+                class: "text-sm text-gray-700 leading-normal"
+              }, null, 8, ["nodes"]),
+              $setup.parsedContent.normal.links.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
+                class: "mt-2"
+              }, [
+                (vue.openBlock(true), vue.createElementBlock(
+                  vue.Fragment,
+                  null,
+                  vue.renderList($setup.parsedContent.normal.links, (link, index) => {
+                    return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
+                      key: index,
+                      url: link
+                    }, null, 8, ["url"]);
+                  }),
+                  128
+                  /* KEYED_FRAGMENT */
+                ))
+              ])) : vue.createCommentVNode("v-if", true),
+              $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "mt-2"
+              }, [
+                vue.createElementVNode("image", {
+                  src: $props.data.files,
+                  mode: "widthFix",
+                  class: "comment-attachment-img",
+                  onClick: _cache[0] || (_cache[0] = vue.withModifiers(($event) => $setup.onPreviewImage($props.data.files), ["stop"]))
+                }, null, 8, ["src"])
+              ])) : vue.createCommentVNode("v-if", true)
+            ]))
           ]),
           vue.createElementVNode("view", { class: "c-footer-actions" }, [
             vue.createElementVNode("view", { class: "reaction-row" }, [

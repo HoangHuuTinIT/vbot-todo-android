@@ -14,18 +14,44 @@
 						</view>
 					</view>
 
-					<rich-text :nodes="processedContent.cleanHtml"
-						class="text-sm text-gray-700 leading-normal"></rich-text>
+					<view v-if="parsedContent.isUpdate" class="content-body">
+						<text class="font-bold text-sm text-gray-700 block mb-1">{{ parsedContent.label }}</text>
+						
+						<view class="change-flow">
+							<view class="part-container">
+								<rich-text :nodes="parsedContent.old.cleanHtml" class="text-sm text-gray-600 inline-html"></rich-text>
+								<view v-if="parsedContent.old.links.length > 0" class="mt-1 mb-1">
+									<LinkCard v-for="(link, idx) in parsedContent.old.links" :key="'old'+idx" :url="link" />
+								</view>
+							</view>
 
-					<view v-if="processedContent.links.length > 0" class="mt-2">
-						<LinkCard v-for="(link, index) in processedContent.links" :key="index" :url="link" />
+							<view class="arrow-container">
+								<text class="arrow-text">→</text>
+							</view>
+
+							<view class="part-container">
+								<rich-text :nodes="parsedContent.new.cleanHtml" class="text-sm text-gray-800 inline-html"></rich-text>
+								<view v-if="parsedContent.new.links.length > 0" class="mt-1">
+									<LinkCard v-for="(link, idx) in parsedContent.new.links" :key="'new'+idx" :url="link" />
+								</view>
+							</view>
+						</view>
 					</view>
 
-					<view v-if="data.files" class="mt-2">
-						<image :src="data.files" mode="widthFix" class="comment-attachment-img"
-							@click.stop="onPreviewImage(data.files)"></image>
+					<view v-else class="content-body">
+						<rich-text :nodes="parsedContent.normal.cleanHtml"
+							class="text-sm text-gray-700 leading-normal"></rich-text>
+
+						<view v-if="parsedContent.normal.links.length > 0" class="mt-2">
+							<LinkCard v-for="(link, index) in parsedContent.normal.links" :key="index" :url="link" />
+						</view>
+
+						<view v-if="data.files" class="mt-2">
+							<image :src="data.files" mode="widthFix" class="comment-attachment-img"
+								@click.stop="onPreviewImage(data.files)"></image>
+						</view>
 					</view>
-				</view>
+					</view>
 
 				<view class="c-footer-actions">
 					<view class="reaction-row">
@@ -40,20 +66,15 @@
 						<view class="btn-icon-action" @click="$emit('react', data)">
 							<image src="/static/reaction.png" class="icon-action"></image>
 						</view>
-
 						<view class="btn-icon-action" @click="$emit('reply', data)">
-							<image src="/static/reply_comment.png" class="icon-action">
-							</image>
+							<image src="/static/reply_comment.png" class="icon-action"></image>
 						</view>
-
 						<template v-if="isMe && data.type === 'COMMENT'">
 							<view class="btn-icon-action" @click="$emit('edit', data)">
-								<image src="/static/edit_comment.png" class="icon-action">
-								</image>
+								<image src="/static/edit_comment.png" class="icon-action"></image>
 							</view>
 							<view class="btn-icon-action" @click="$emit('delete', data.id)">
-								<image src="/static/delete.png" class="icon-action">
-								</image>
+								<image src="/static/delete.png" class="icon-action"></image>
 							</view>
 						</template>
 					</view>
@@ -88,11 +109,38 @@
 	const isMe = computed(() => {
 		return props.data.isMe === true;
 	});
+	const parsedContent = computed(() => {
+		const raw = props.data.message || '';
+		if (props.data.type === 'UPDATE_TODO' && raw.includes('->')) {
+			const splitIndex = raw.lastIndexOf('->'); 
+			
+			if (splitIndex !== -1) {
+				const leftPart = raw.substring(0, splitIndex).trim();
+				const rightPart = raw.substring(splitIndex + 2).trim(); 
+				const labelMatch = leftPart.match(/^<p>(- .*?:)/) || leftPart.match(/^(- .*?:)/);
+				let label = '';
+				let oldHtmlRaw = leftPart;
 
+				if (labelMatch) {
+					label = labelMatch[1].replace(/<p>|:$/g, '').trim() + ':'; 
+					oldHtmlRaw = leftPart.replace(labelMatch[0], '').trim();
+                    if(oldHtmlRaw.startsWith('</p>')) oldHtmlRaw = oldHtmlRaw.substring(4);
+				}
+				const oldProcessed = extractLinksAndCleanHtml(oldHtmlRaw);
+				const newProcessed = extractLinksAndCleanHtml(rightPart);
 
-	const processedContent = computed(() => {
-		const rawHtml = props.data.message || '';
-		return extractLinksAndCleanHtml(rawHtml);
+				return {
+					isUpdate: true,
+					label: label,
+					old: oldProcessed,
+					new: newProcessed
+				};
+			}
+		}
+		return {
+			isUpdate: false,
+			normal: extractLinksAndCleanHtml(raw)
+		};
 	});
 
 	const onPreviewImage = (url : string) => {
@@ -105,118 +153,34 @@
 </script>
 
 <style scoped>
-	.flex {
-		display: flex;
-	}
-
-	.flex-1 {
-		flex: 1;
-	}
-
-	.gap-1 {
-		gap: 4px;
-	}
-
-	.gap-3 {
-		gap: 12px;
-	}
-
-	.mb-1 {
-		margin-bottom: 4px;
-	}
-
-	.mb-4 {
-		margin-bottom: 16px;
-	}
-
-	.mt-1 {
-		margin-top: 4px;
-	}
-
-	.mt-2 {
-		margin-top: 8px;
-	}
-
-	.items-start {
-		align-items: flex-start;
-	}
-
-	.items-center {
-		align-items: center;
-	}
-
-	.justify-between {
-		justify-content: space-between;
-	}
-
-	.shrink-0 {
-		flex-shrink: 0;
-	}
-
-	.overflow-hidden {
-		overflow: hidden;
-	}
-
-	.bg-gray-50 {
-		background-color: #f9fafb;
-	}
-
-	.rounded-2xl {
-		border-radius: 16px;
-	}
-
-	.rounded-tl-none {
-		border-top-left-radius: 0;
-	}
-
-	.p-3 {
-		padding: 12px;
-	}
-
-	.text-sm {
-		font-size: 14px;
-	}
-
-	.text-xs {
-		font-size: 12px;
-	}
-
-	.font-bold {
-		font-weight: 700;
-	}
-
-	.text-gray-900 {
-		color: #111827;
-	}
-
-	.text-gray-700 {
-		color: #374151;
-	}
-
-	.text-gray-400 {
-		color: #9ca3af;
-	}
-
-	.italic {
-		font-style: italic;
-	}
-
-	.ml-1 {
-		margin-left: 4px;
-	}
-
-	.mr-2 {
-		margin-right: 8px;
-	}
-
-	.mr-3 {
-		margin-right: 12px;
-	}
-
-	.pl-12 {
-		padding-left: 48px;
-	}
-
+	.flex { display: flex; }
+	.flex-1 { flex: 1; }
+	.gap-1 { gap: 4px; }
+	.gap-3 { gap: 12px; }
+	.mb-1 { margin-bottom: 4px; }
+	.mb-4 { margin-bottom: 16px; }
+	.mt-1 { margin-top: 4px; }
+	.mt-2 { margin-top: 8px; }
+	.items-start { align-items: flex-start; }
+	.items-center { align-items: center; }
+	.justify-between { justify-content: space-between; }
+	.shrink-0 { flex-shrink: 0; }
+	.overflow-hidden { overflow: hidden; }
+	.bg-gray-50 { background-color: #f9fafb; }
+	.rounded-2xl { border-radius: 16px; }
+	.rounded-tl-none { border-top-left-radius: 0; }
+	.p-3 { padding: 12px; }
+	.text-sm { font-size: 14px; }
+	.text-xs { font-size: 12px; }
+	.font-bold { font-weight: 700; }
+	.text-gray-900 { color: #111827; }
+	.text-gray-700 { color: #374151; }
+	.text-gray-400 { color: #9ca3af; }
+	.italic { font-style: italic; }
+	.ml-1 { margin-left: 4px; }
+	.mr-2 { margin-right: 8px; }
+	.mr-3 { margin-right: 12px; }
+	.pl-12 { padding-left: 48px; }
 	.c-footer-actions {
 		display: flex;
 		justify-content: space-between;
@@ -224,11 +188,7 @@
 		margin-top: 4px;
 		min-height: 24px;
 	}
-
-	.reaction-row {
-		flex: 1;
-	}
-
+	.reaction-row { flex: 1; }
 	.emoji-tag {
 		background-color: #fff;
 		border: 1px solid #eee;
@@ -238,14 +198,12 @@
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 		display: inline-block;
 	}
-
 	.action-buttons-container {
 		display: flex;
 		gap: 15px;
 		align-items: center;
 		margin-left: auto;
 	}
-
 	.btn-icon-action {
 		padding: 4px;
 		opacity: 0.6;
@@ -254,16 +212,8 @@
 		justify-content: center;
 		cursor: pointer;
 	}
-
-	.btn-icon-action:active {
-		opacity: 1;
-	}
-
-	.icon-action {
-		width: 18px;
-		height: 18px;
-	}
-
+	.btn-icon-action:active { opacity: 1; }
+	.icon-action { width: 18px; height: 18px; }
 	.comment-attachment-img {
 		max-width: 200px;
 		max-height: 300px;
@@ -271,9 +221,33 @@
 		border: 1px solid #eee;
 		display: block;
 	}
-
-	:deep(img) {
-		max-width: 100%;
-		height: auto;
+	:deep(img) { max-width: 100%; height: auto; }
+	.block { display: block; }
+	
+	.change-flow {
+		display: block; 
 	}
+
+	.part-container {
+		display: inline; 
+	}
+
+	.arrow-container {
+		display: inline-block;
+		margin: 0 8px;
+	}
+
+	.arrow-text {
+		font-weight: bold;
+		color: #6b7280;
+		font-size: 16px;
+	}
+	.inline-html {
+		display: inline; 
+	}
+    :deep(.link-card) {
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+        display: flex !important;
+    }
 </style>
