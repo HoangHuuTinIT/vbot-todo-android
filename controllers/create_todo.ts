@@ -10,7 +10,7 @@ import { TODO_SOURCE } from '@/utils/enums';
 import { showSuccess, showError, showInfo, showLoading, hideLoading } from '@/utils/toast';
 import { useCustomerFilter } from '@/composables/useCustomerFilter';
 import { useI18n } from 'vue-i18n';
-
+import { getMinuteTimestamp, validateNotifyAndDueDate } from '@/utils/dateUtils';
 export const useCreateTodoController = () => {
 	const { t } = useI18n();
 	const authStore = useAuthStore();
@@ -46,40 +46,21 @@ export const useCreateTodoController = () => {
 		dueDate: getCurrentDateTimeISO(),
 		notifyAt: getCurrentDateTimeISO()
 	});
-	const timestampToDateString = (ts: number) => {
-			const d = new Date(ts);
-			const y = d.getFullYear();
-			const m = pad(d.getMonth() + 1);
-			const day = pad(d.getDate());
-			const h = pad(d.getHours());
-			const min = pad(d.getMinutes());
-			return `${y}-${m}-${day} ${h}:${min}:00`;
-		};
+	const timestampToDateString = (ts : number) => {
+		const d = new Date(ts);
+		const y = d.getFullYear();
+		const m = pad(d.getMonth() + 1);
+		const day = pad(d.getDate());
+		const h = pad(d.getHours());
+		const min = pad(d.getMinutes());
+		return `${y}-${m}-${day} ${h}:${min}:00`;
+	};
 	watch(() => form.value.dueDate, (newDueVal) => {
-			const dueTime = getDateTimestamp(newDueVal);
-			const notifyTime = getDateTimestamp(form.value.notifyAt);
-			if (notifyTime >= dueTime) {
-				
-				const safeTime = dueTime - (30 * 60 * 1000); 
-				form.value.notifyAt = timestampToDateString(safeTime);
-			}
-		});
-	
-		
-		watch(() => form.value.notifyAt, (newNotifyVal) => {
-			const dueTime = getDateTimestamp(form.value.dueDate);
-			const notifyTime = getDateTimestamp(newNotifyVal);
-	
-		
-			if (notifyTime >= dueTime) {
-				showInfo('Ngày thông báo phải sớm hơn hạn xử lý (không được trùng hoặc trễ hơn)!');
-				
-				setTimeout(() => {
-					const safeTime = dueTime - (30 * 60 * 1000);
-					form.value.notifyAt = timestampToDateString(safeTime);
-				}, 0);
-			}
-		});
+		if (!newDueVal) return;
+	});
+	watch(() => form.value.notifyAt, (newNotifyVal) => {
+		if (!newNotifyVal) return;
+	});
 	const sourceOptions = computed(() => [
 		t('source.call'),
 		t('source.customer'),
@@ -173,19 +154,13 @@ export const useCreateTodoController = () => {
 		return { newContent: newHtml, fileUrls: uploadedUrls };
 	};
 	const submitForm = async () => {
-		// 1. Validate Tên công việc
 		if (!form.value.name || !form.value.name.trim()) {
 			showInfo(t('todo.validate_name'));
 			return;
 		}
-
-		
-		const dueTime = getDateTimestamp(form.value.dueDate);
-		const notifyTime = getDateTimestamp(form.value.notifyAt);
-
-		if (notifyTime > dueTime) {
-			showInfo('Ngày thông báo không được trễ hơn hạn chót!');
-			
+		const isValidDate = validateNotifyAndDueDate(form.value.dueDate, form.value.notifyAt);
+		if (!isValidDate) {
+			showError('Ngày thông báo không được trễ hơn hoặc trùng Hạn xử lý!');
 			return;
 		}
 

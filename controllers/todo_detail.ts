@@ -8,7 +8,12 @@ import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
 import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
 import { useAuthStore } from '@/stores/auth';
-import { formatRelativeTime } from '@/utils/dateUtils';
+import {
+	formatRelativeTime,
+	getMinuteTimestamp,
+	validateNotifyAndDueDate,
+	timestampToDateTimeStr
+} from '@/utils/dateUtils';
 import { TODO_STATUS } from '@/utils/constants';
 import { showSuccess, showError, showInfo } from '@/utils/toast';
 import { extractLinksAndCleanHtml } from '@/utils/linkHelper';
@@ -100,6 +105,28 @@ export const useTodoDetailController = () => {
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
 		if (!form.value.raw) return;
+		let tempDueDate = form.value.dueDate;
+		let tempNotifyAt = form.value.notifyAt;
+
+		if (event.field === 'dueDate') {
+			tempDueDate = event.value;
+		} else if (event.field === 'notifyAt') {
+			tempNotifyAt = event.value;
+		}
+
+		const isValid = validateNotifyAndDueDate(tempDueDate, tempNotifyAt);
+
+		if (!isValid) {
+			showInfo('Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!');
+			const oldValue = event.field === 'dueDate' ? form.value.dueDate : form.value.notifyAt;
+			if (event.field === 'dueDate') {
+				form.value.dueDate = form.value.raw.dueDate ? timestampToDateTimeStr(form.value.raw.dueDate) : '';
+			} else {
+				form.value.notifyAt = form.value.raw.notificationReceivedAt ? timestampToDateTimeStr(form.value.raw.notificationReceivedAt) : '';
+			}
+			return; 
+		}
+
 		isLoading.value = true;
 		try {
 			const payload = {
@@ -110,18 +137,15 @@ export const useTodoDetailController = () => {
 				tagCodes: "",
 				title: form.value.title || form.value.raw.title
 			};
-
 			const ts = convertDateTimeToTimestamp(event.value);
 
 			if (event.field === 'dueDate') {
 				payload.dueDate = ts;
-			}
-			else if (event.field === 'notifyAt') {
+			} else if (event.field === 'notifyAt') {
 				payload.notificationReceivedAt = ts;
 			}
 
 			console.log(`Payload Update ${event.field}:`, payload);
-
 			const res = await updateTodo(payload);
 
 			if (res) {
@@ -141,6 +165,11 @@ export const useTodoDetailController = () => {
 		} catch (error) {
 			console.error("Lỗi cập nhật ngày:", error);
 			showError(t('todo.msg_update_error'));
+			if (event.field === 'dueDate') {
+				form.value.dueDate = timestampToDateTimeStr(form.value.raw.dueDate);
+			} else {
+				form.value.notifyAt = timestampToDateTimeStr(form.value.raw.notificationReceivedAt);
+			}
 		} finally {
 			isLoading.value = false;
 		}
@@ -871,7 +900,7 @@ export const useTodoDetailController = () => {
 		let senderName = t('todo.user_hidden');
 		let avatarChar = '?';
 		let avatarColor = '#e3f2fd';
-		let isMe = false; 
+		let isMe = false;
 		const mySystemUid = String(authStore.uid);
 
 		if (item.senderId) {
@@ -920,7 +949,7 @@ export const useTodoDetailController = () => {
 			type: item.type,
 			reactions: reactionList,
 			children: [],
-			isMe: isMe 
+			isMe: isMe
 		};
 	};
 
