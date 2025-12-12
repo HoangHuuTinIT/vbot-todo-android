@@ -1,7 +1,18 @@
 <template>
-	<view class="link-card" @tap.stop="handleOpenLink">
+	<view class="link-card" @tap.stop="handleOpenLink" v-if="url">
 		<view class="link-card-icon">
-			<image src="https://img.icons8.com/ios-filled/50/007aff/internet.png" class="card-icon-img"></image>
+			<image 
+				v-if="!imageError && faviconUrl"
+				:src="faviconUrl" 
+				class="card-icon-img"
+				mode="aspectFit"
+				@error="handleImageError"
+			></image>
+			<image 
+				v-else
+				src="https://img.icons8.com/ios-filled/50/007aff/internet.png" 
+				class="card-icon-img"
+			></image>
 		</view>
 		<view class="link-card-content">
 			<text class="link-domain">{{ domainDisplay }}</text>
@@ -15,8 +26,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { getDomainFromUrl, openExternalLink } from '@/utils/linkHelper';
+import { computed, ref, watch } from 'vue';
+import { getDomainFromUrl, getFaviconFromUrl, openExternalLink } from '@/utils/linkHelper';
 
 const props = defineProps({
 	url: {
@@ -31,11 +42,21 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['remove']);
+const imageError = ref(false);
 
 const domainDisplay = computed(() => getDomainFromUrl(props.url));
+const faviconUrl = computed(() => getFaviconFromUrl(props.url));
+
+watch(() => props.url, () => {
+	imageError.value = false;
+});
+
+const handleImageError = (e: any) => {
+	imageError.value = true;
+};
 
 const handleOpenLink = () => {
-    openExternalLink(props.url);
+	openExternalLink(props.url);
 };
 </script>
 
@@ -48,7 +69,7 @@ const handleOpenLink = () => {
 	border-radius: 8px;
 	padding: 8px 10px;
 	margin-bottom: 8px;
-	margin-top: 4px; 
+	margin-top: 4px;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 	transition: background-color 0.2s;
 	
@@ -67,11 +88,12 @@ const handleOpenLink = () => {
 	justify-content: center;
 	margin-right: 10px;
 	flex-shrink: 0;
+	overflow: hidden;
 }
 
 .card-icon-img {
-	width: 18px;
-	height: 18px;
+	width: 20px;
+	height: 20px;
 }
 
 .link-card-content {

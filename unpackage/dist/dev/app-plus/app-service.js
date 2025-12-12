@@ -13142,6 +13142,20 @@ This will fail in production if not fixed.`);
       loadMoreCustomers
     };
   };
+  const getSafeHostname = (url) => {
+    if (!url)
+      return "";
+    let tempUrl = url.trim();
+    if (!/^https?:\/\//i.test(tempUrl)) {
+      tempUrl = "http://" + tempUrl;
+    }
+    try {
+      return new URL(tempUrl).hostname;
+    } catch (e) {
+      const match = tempUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/im);
+      return match ? match[1] : "";
+    }
+  };
   const extractLinksAndCleanHtml = (html) => {
     if (!html)
       return { cleanHtml: "", links: [] };
@@ -13162,15 +13176,36 @@ This will fail in production if not fixed.`);
     });
     return fullContent;
   };
+  const getFaviconFromUrl = (url) => {
+    const hostname = getSafeHostname(url);
+    if (!hostname)
+      return "";
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+  };
   const getDomainFromUrl = (url) => {
-    try {
-      let tempUrl = url;
-      if (!tempUrl.startsWith("http"))
-        tempUrl = "http://" + tempUrl;
-      const domain = new URL(tempUrl).hostname;
-      return domain.replace("www.", "");
-    } catch (e) {
+    let hostname = getSafeHostname(url);
+    if (!hostname)
       return "Liên kết ngoài";
+    try {
+      hostname = hostname.replace(/^www\./, "");
+      const parts = hostname.split(".");
+      let name = parts[0];
+      if (parts.length > 2) {
+        const lastPart = parts[parts.length - 1];
+        const secondLastPart = parts[parts.length - 2];
+        if (lastPart.length === 2 && ["com", "net", "org", "gov", "edu"].includes(secondLastPart)) {
+          if (parts.length >= 3) {
+            name = parts[parts.length - 3];
+          }
+        } else {
+          name = parts[parts.length - 2];
+        }
+      } else if (parts.length === 2) {
+        name = parts[0];
+      }
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    } catch (e) {
+      return hostname || "Liên kết ngoài";
     }
   };
   const openExternalLink = (url) => {
@@ -13196,25 +13231,41 @@ This will fail in production if not fixed.`);
       __expose();
       const props = __props;
       const emit = __emit;
+      const imageError = vue.ref(false);
       const domainDisplay = vue.computed(() => getDomainFromUrl(props.url));
+      const faviconUrl = vue.computed(() => getFaviconFromUrl(props.url));
+      vue.watch(() => props.url, () => {
+        imageError.value = false;
+      });
+      const handleImageError = (e) => {
+        imageError.value = true;
+      };
       const handleOpenLink = () => {
         openExternalLink(props.url);
       };
-      const __returned__ = { props, emit, domainDisplay, handleOpenLink };
+      const __returned__ = { props, emit, imageError, domainDisplay, faviconUrl, handleImageError, handleOpenLink };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", {
+    return $props.url ? (vue.openBlock(), vue.createElementBlock("view", {
+      key: 0,
       class: "link-card",
       onClick: vue.withModifiers($setup.handleOpenLink, ["stop"])
     }, [
       vue.createElementVNode("view", { class: "link-card-icon" }, [
-        vue.createElementVNode("image", {
+        !$setup.imageError && $setup.faviconUrl ? (vue.openBlock(), vue.createElementBlock("image", {
+          key: 0,
+          src: $setup.faviconUrl,
+          class: "card-icon-img",
+          mode: "aspectFit",
+          onError: $setup.handleImageError
+        }, null, 40, ["src"])) : (vue.openBlock(), vue.createElementBlock("image", {
+          key: 1,
           src: "https://img.icons8.com/ios-filled/50/007aff/internet.png",
           class: "card-icon-img"
-        })
+        }))
       ]),
       vue.createElementVNode("view", { class: "link-card-content" }, [
         vue.createElementVNode(
@@ -13239,7 +13290,7 @@ This will fail in production if not fixed.`);
       }, [
         vue.createElementVNode("text", { class: "remove-btn" }, "✕")
       ])) : vue.createCommentVNode("v-if", true)
-    ]);
+    ])) : vue.createCommentVNode("v-if", true);
   }
   const LinkCard = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-fe26c08a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/LinkCard.vue"]]);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
@@ -13298,6 +13349,10 @@ This will fail in production if not fixed.`);
       const showColorModal = vue.ref(false);
       const colorTab = vue.ref("color");
       const insertedLinks = vue.ref([]);
+      const isLinkListOpen = vue.ref(false);
+      const toggleLinkList = () => {
+        isLinkListOpen.value = !isLinkListOpen.value;
+      };
       const showActionSheet = vue.ref(false);
       const currentActionSheetItems = vue.ref([]);
       const getDomain = (url) => {
@@ -13569,13 +13624,13 @@ This will fail in production if not fixed.`);
           }
         }
       });
-      const __returned__ = { t, props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, showActionSheet, currentActionSheetItems, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, isActive, closeActionSheet, handleActionSheetItemClick, handleToolClick, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, insertImage, processImageSelection, onEditorReady, onInput, onStatusChange, format: format2, applyColor, closeColorModal, isColorSelected, handleLink, confirmLink, clearFormat, LinkCard };
+      const __returned__ = { t, props, emit, tools, colorList, editorId, editorCtx, formats, instance, isLinkSelected, lastVal, showLinkModal, linkUrl, showCardLinkModal, cardLinkUrl, showColorModal, colorTab, insertedLinks, isLinkListOpen, toggleLinkList, showActionSheet, currentActionSheetItems, getDomain, openLink, parseContent, composeContent, openCardLinkModal, confirmCardLink, removeLink, triggerUpdate, getDisplayText, getDisplayImage, isActive, closeActionSheet, handleActionSheetItemClick, handleToolClick, handleAlignSetting, handleFontSizeSetting, handleHeaderSetting, insertImage, processImageSelection, onEditorReady, onInput, onStatusChange, format: format2, applyColor, closeColorModal, isColorSelected, handleLink, confirmLink, clearFormat, LinkCard };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _imports_0$1 = "/static/choseImage.png";
-  const _imports_1$1 = "/static/link.png";
+  const _imports_0$1 = "/static/link.png";
+  const _imports_1$1 = "/static/choseImage.png";
   const _imports_2$1 = "/static/add-link.png";
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "editor-container" }, [
@@ -13592,22 +13647,55 @@ This will fail in production if not fixed.`);
       }, null, 40, ["id", "placeholder"]),
       $setup.insertedLinks.length > 0 ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
-        class: "link-cards-area"
+        class: "link-section-frame"
       }, [
-        (vue.openBlock(true), vue.createElementBlock(
-          vue.Fragment,
-          null,
-          vue.renderList($setup.insertedLinks, (link, index) => {
-            return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
-              key: index,
-              url: link,
-              removable: true,
-              onRemove: ($event) => $setup.removeLink(index)
-            }, null, 8, ["url", "onRemove"]);
-          }),
-          128
-          /* KEYED_FRAGMENT */
-        ))
+        vue.createElementVNode("view", {
+          class: "link-section-header",
+          onClick: $setup.toggleLinkList
+        }, [
+          vue.createElementVNode("view", { class: "header-left" }, [
+            vue.createElementVNode("image", {
+              src: _imports_0$1,
+              class: "header-icon"
+            }),
+            vue.createElementVNode(
+              "text",
+              { class: "header-title" },
+              "Liên kết đính kèm (" + vue.toDisplayString($setup.insertedLinks.length) + ")",
+              1
+              /* TEXT */
+            )
+          ]),
+          vue.createElementVNode(
+            "image",
+            {
+              src: "https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png",
+              class: vue.normalizeClass(["toggle-arrow", { "open": $setup.isLinkListOpen }])
+            },
+            null,
+            2
+            /* CLASS */
+          )
+        ]),
+        $setup.isLinkListOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 0,
+          class: "link-list-content"
+        }, [
+          (vue.openBlock(true), vue.createElementBlock(
+            vue.Fragment,
+            null,
+            vue.renderList($setup.insertedLinks, (link, index) => {
+              return vue.openBlock(), vue.createBlock($setup["LinkCard"], {
+                key: index,
+                url: link,
+                removable: true,
+                onRemove: ($event) => $setup.removeLink(index)
+              }, null, 8, ["url", "onRemove"]);
+            }),
+            128
+            /* KEYED_FRAGMENT */
+          ))
+        ])) : vue.createCommentVNode("v-if", true)
       ])) : vue.createCommentVNode("v-if", true),
       vue.createElementVNode("view", { class: "toolbar" }, [
         vue.createElementVNode("view", { class: "tool-list" }, [
@@ -13649,7 +13737,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: _imports_0$1,
+                src: _imports_1$1,
                 class: "img-icon"
               })
             ],
@@ -13664,7 +13752,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: _imports_1$1,
+                src: _imports_0$1,
                 class: "img-icon"
               })
             ],
@@ -13882,6 +13970,7 @@ This will fail in production if not fixed.`);
               vue.renderList($setup.currentActionSheetItems, (item, index) => {
                 return vue.openBlock(), vue.createElementBlock("view", {
                   key: index,
+                  " ": "",
                   class: "sheet-item",
                   onClick: ($event) => $setup.handleActionSheetItemClick(item)
                 }, [
