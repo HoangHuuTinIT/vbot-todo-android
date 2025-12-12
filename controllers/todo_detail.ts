@@ -28,6 +28,7 @@ interface CommentItem {
 	reactions : any[];
 	children : CommentItem[];
 	rootParentId ?: number;
+	isMe : boolean;
 }
 
 interface HistoryItem {
@@ -366,7 +367,14 @@ export const useTodoDetailController = () => {
 	const continueReplying = () => {
 		isConfirmCancelReplyOpen.value = false;
 	};
-
+	const getCurrentMemberUID = () => {
+		const currentSystemUID = String(authStore.uid);
+		const member = memberList.value.find(m => String(m.UID) === currentSystemUID);
+		if (member) {
+			return member.memberUID;
+		}
+		return currentSystemUID;
+	};
 	const submitReply = async () => {
 		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
 			showInfo(t('todo.msg_empty_content'));
@@ -380,7 +388,7 @@ export const useTodoDetailController = () => {
 			const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
 
 			const todoId = form.value.id;
-			const senderId = authStore.uid;
+			const senderId = getCurrentMemberUID();
 			let apiParentId = replyingCommentData.value.id;
 
 			if (replyingCommentData.value.rootParentId) {
@@ -742,15 +750,13 @@ export const useTodoDetailController = () => {
 			showInfo('Vui lòng nhập nội dung');
 			return;
 		}
-
 		isSubmittingComment.value = true;
-
 		try {
 			const { cleanMessage, fileUrl } = await processCommentInput(newCommentText.value);
 
 
 			const todoId = form.value.id;
-			const senderId = authStore.uid;
+			const senderId = getCurrentMemberUID();
 
 			const payload = {
 				todoId: todoId,
@@ -868,28 +874,41 @@ export const useTodoDetailController = () => {
 		}
 	};
 	const processCommentData = (item : any) : CommentItem => {
-
 		let senderName = t('todo.user_hidden');
 		let avatarChar = '?';
 		let avatarColor = '#e3f2fd';
-		if (item.senderId) {
+		let isMe = false; 
+		const mySystemUid = String(authStore.uid);
 
-			const member = memberList.value.find(m => m.UID === item.senderId || m.memberUID === item.senderId);
+		if (item.senderId) {
+			const searchId = String(item.senderId);
+			const member = memberList.value.find(m =>
+				String(m.UID) === searchId ||
+				String(m.memberUID) === searchId
+			);
+
 			if (member) {
 				senderName = member.UserName;
-
 				if (member.AvatarColor) {
 					avatarColor = member.AvatarColor;
 				}
+				if (String(member.UID) === mySystemUid) {
+					isMe = true;
+				}
+			} else {
+				if (searchId === mySystemUid) {
+					isMe = true;
+				}
 			}
 		}
-		avatarChar = senderName.charAt(0).toUpperCase();
 
+		avatarChar = senderName.charAt(0).toUpperCase();
 
 		let actionText = '';
 		if (item.type === 'COMMENT') actionText = t('todo.action_comment');
 		else if (item.type === 'LOG') actionText = t('todo.action_log');
 		else if (item.type === 'UPDATE_TODO') actionText = t('todo.action_update');
+		else if (item.type === 'NEW_TODO') actionText = 'Đã tạo công việc';
 
 		const reactionList = item.reactions?.details || [];
 
@@ -906,7 +925,8 @@ export const useTodoDetailController = () => {
 			isEdited: !!item.updatedAt,
 			type: item.type,
 			reactions: reactionList,
-			children: []
+			children: [],
+			isMe: isMe 
 		};
 	};
 
