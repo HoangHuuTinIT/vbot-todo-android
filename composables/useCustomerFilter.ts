@@ -68,13 +68,15 @@ export const useCustomerFilter = () => {
 			const mappedData = rawData.map((item : any) => {
 				const nameObj = item.customerFieldItems.find((f : any) => f.code === 'name');
 				const phoneObj = item.customerFieldItems.find((f : any) => f.code === 'phone');
+				const managerObj = item.customerFieldItems.find((f : any) => f.code === 'member_no');
 				return {
 					id: item.id,
 					uid: item.uid,
 					createAt: item.createAt,
 					name: nameObj ? nameObj.value : '(Không tên)',
 					phone: phoneObj ? phoneObj.value : '',
-					code: item.code || ''
+					code: item.code || '',
+					managerUid: managerObj ? managerObj.value : ''
 				};
 			});
 

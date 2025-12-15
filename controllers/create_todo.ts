@@ -100,6 +100,18 @@ export const useCreateTodoController = () => {
 	const onCustomerSelect = (customer : any) => {
 		form.value.customer = `${customer.name} - ${customer.phone}`;
 		form.value.customerUid = customer.uid;
+		if (customer.managerUid) {
+			const foundIndex = memberList.value.findIndex(
+				(m) => m.memberUID === customer.managerUid
+			);
+			if (foundIndex !== -1) {
+				selectedMemberIndex.value = foundIndex;
+				form.value.assignee = customer.managerUid;
+
+				console.log(`Đã tự động chọn quản lý: ${memberList.value[foundIndex].UserName}`);
+			}
+		}
+
 		showCustomerModal.value = false;
 	};
 	const onMemberChange = (e : any) => {

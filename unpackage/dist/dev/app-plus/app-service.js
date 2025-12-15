@@ -11543,13 +11543,15 @@ This will fail in production if not fixed.`);
         const mappedData = rawData.map((item) => {
           const nameObj = item.customerFieldItems.find((f) => f.code === "name");
           const phoneObj = item.customerFieldItems.find((f) => f.code === "phone");
+          const managerObj = item.customerFieldItems.find((f) => f.code === "member_no");
           return {
             id: item.id,
             uid: item.uid,
             createAt: item.createAt,
             name: nameObj ? nameObj.value : "(Không tên)",
             phone: phoneObj ? phoneObj.value : "",
-            code: item.code || ""
+            code: item.code || "",
+            managerUid: managerObj ? managerObj.value : ""
           };
         });
         if (isLoadMore) {
@@ -11561,7 +11563,7 @@ This will fail in production if not fixed.`);
           isFinished.value = true;
         }
       } catch (error) {
-        formatAppLog("error", "at composables/useCustomerFilter.ts:92", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at composables/useCustomerFilter.ts:94", "Lỗi tải khách hàng:", error);
         showError("Lỗi tải dữ liệu CRM");
         if (!isLoadMore)
           customerList.value = [];
@@ -13058,6 +13060,16 @@ This will fail in production if not fixed.`);
     const onCustomerSelect = (customer) => {
       form.value.customer = `${customer.name} - ${customer.phone}`;
       form.value.customerUid = customer.uid;
+      if (customer.managerUid) {
+        const foundIndex = memberList.value.findIndex(
+          (m) => m.memberUID === customer.managerUid
+        );
+        if (foundIndex !== -1) {
+          selectedMemberIndex.value = foundIndex;
+          form.value.assignee = customer.managerUid;
+          formatAppLog("log", "at controllers/create_todo.ts:111", `Đã tự động chọn quản lý: ${memberList.value[foundIndex].UserName}`);
+        }
+      }
       showCustomerModal.value = false;
     };
     const onMemberChange = (e) => {
@@ -13090,7 +13102,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:141", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:153", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -13129,7 +13141,7 @@ This will fail in production if not fixed.`);
           link: selectedLink,
           uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
-        formatAppLog("log", "at controllers/create_todo.ts:188", "Payload Submit:", payload);
+        formatAppLog("log", "at controllers/create_todo.ts:200", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
         showSuccess(t("todo.create_success"));
@@ -13138,7 +13150,7 @@ This will fail in production if not fixed.`);
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:197", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:209", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError(t("common.error_load") + ": " + errorMsg);
       } finally {
