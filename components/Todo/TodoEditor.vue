@@ -1,8 +1,27 @@
 <template>
 	<view class="editor-container">
-		<editor :id="editorId" class="ql-container" :placeholder="placeholder || $t('editor.placeholder')" show-img-size
-			show-img-toolbar show-img-resize @ready="onEditorReady" @input="onInput" @statuschange="onStatusChange">
-		</editor>
+		<view class="editor-wrapper">
+			<editor :id="editorId" class="ql-container" :placeholder="placeholder || $t('editor.placeholder')"
+				show-img-size show-img-toolbar show-img-resize @ready="onEditorReady" @input="onInput"
+				@statuschange="onStatusChange">
+			</editor>
+
+			<view class="link-tooltip" v-if="showLinkTooltip" :style="tooltipStyle" @tap.stop
+				:class="{ 'is-fixed': tooltipPositionMode === 'fixed' }">
+				<view class="tooltip-content">
+					<text class="tooltip-url">{{ currentActiveLink }}</text>
+				</view>
+				<view class="tooltip-actions">
+					<view class="t-btn" @tap="handleTooltipOpen">{{ $t('common.open_link') || 'Mở' }}</view>
+					<view class="t-divider"></view>
+					<view class="t-btn" @tap="handleTooltipCopy">{{ $t('common.copy_link') || 'Copy' }}</view>
+					<view class="t-divider"></view>
+					<view class="t-btn" @tap="handleTooltipEdit">{{ $t('common.edit_link') || 'Sửa' }}</view>
+				</view>
+
+				<view class="tooltip-arrow" :class="tooltipPositionMode" v-if="tooltipPositionMode !== 'fixed'"></view>
+			</view>
+		</view>
 
 		<view class="link-section-frame" v-if="insertedLinks.length > 0">
 			<view class="link-section-header" @tap="toggleLinkList">
@@ -19,6 +38,7 @@
 					@remove="removeLink(index)" />
 			</view>
 		</view>
+
 		<view class="toolbar">
 			<view class="tool-list">
 				<view v-for="(item, index) in tools" :key="index" class="tool-item"
@@ -102,7 +122,8 @@
 
 		<view class="custom-sheet-mask" :class="{ 'show': showActionSheet }" @tap="closeActionSheet">
 			<view class="custom-sheet-panel" @tap.stop>
-				<view v-for="(item, index) in currentActionSheetItems" :key="index"   class="sheet-item"@tap="handleActionSheetItemClick(item)">
+				<view v-for="(item, index) in currentActionSheetItems" :key="index" class="sheet-item"
+					@tap="handleActionSheetItemClick(item)">
 					<text>{{ item.text }}</text>
 				</view>
 
@@ -113,12 +134,11 @@
 				</view>
 			</view>
 		</view>
-
 	</view>
 </template>
 
 <script setup lang="ts">
-	import { ref, watch, getCurrentInstance } from 'vue';
+	import { ref, watch, getCurrentInstance, computed } from 'vue';
 	import LinkCard from '@/components/Todo/LinkCard.vue';
 	import { extractLinksAndCleanHtml, composeHtmlWithIframes } from '@/utils/linkHelper';
 	import { useI18n } from 'vue-i18n';
@@ -157,7 +177,7 @@
 	const isLinkSelected = ref(false);
 	const lastVal = ref('');
 
-
+	const isTyping = ref(false);
 	const showLinkModal = ref(false);
 	const linkUrl = ref('');
 	const showCardLinkModal = ref(false);
@@ -169,7 +189,7 @@
 	const insertedLinks = ref<string[]>([]);
 	const isLinkListOpen = ref(false);
 	const toggleLinkList = () => {
-	    isLinkListOpen.value = !isLinkListOpen.value;
+		isLinkListOpen.value = !isLinkListOpen.value;
 	};
 	interface ActionSheetItem {
 		text : string;
@@ -178,6 +198,71 @@
 	const showActionSheet = ref(false);
 	const currentActionSheetItems = ref<ActionSheetItem[]>([]);
 
+	const showLinkTooltip = ref(false);
+	const currentActiveLink = ref('');
+	const tooltipTop = ref(0);
+	const tooltipLeft = ref(0);
+	const tooltipPositionMode = ref<'top' | 'bottom' | 'fixed'>('top');
+	const tooltipStyle = computed(() => {
+		if (tooltipPositionMode.value === 'fixed') {
+			return {};
+		}
+		return {
+			top: `${tooltipTop.value}px`,
+		};
+	});
+
+	const updateTooltipPosition = () => {
+		if (!editorCtx.value) return;
+
+		if (typeof editorCtx.value.getSelectionRect !== 'function') {
+			tooltipPositionMode.value = 'fixed';
+			return;
+		}
+
+		editorCtx.value.getSelectionRect({
+			success: (rect : any) => {
+				if (rect && rect.bottom !== undefined) {
+					tooltipPositionMode.value = 'bottom';
+					tooltipTop.value = rect.bottom + 8;
+				} else {
+					tooltipPositionMode.value = 'fixed';
+				}
+			},
+			fail: () => {
+				tooltipPositionMode.value = 'fixed';
+			}
+		});
+	};
+
+	const handleTooltipOpen = () => {
+		if (!currentActiveLink.value) return;
+		// #ifdef APP-PLUS
+		plus.runtime.openURL(currentActiveLink.value);
+		// #endif
+		// #ifdef H5
+		window.open(currentActiveLink.value, '_blank');
+		// #endif
+		showLinkTooltip.value = false;
+	};
+
+	const handleTooltipCopy = () => {
+		if (!currentActiveLink.value) return;
+		uni.setClipboardData({
+			data: currentActiveLink.value,
+			success: () => {
+				uni.showToast({ title: 'Đã sao chép link', icon: 'none' });
+				showLinkTooltip.value = false;
+			}
+		});
+	};
+
+	const handleTooltipEdit = () => {
+		if (!currentActiveLink.value) return;
+		linkUrl.value = currentActiveLink.value;
+		showLinkTooltip.value = false;
+		showLinkModal.value = true;
+	};
 
 	const getDomain = (url : string) => {
 		try {
@@ -401,6 +486,11 @@
 	};
 
 	const onInput = (e : any) => {
+		showLinkTooltip.value = false;
+
+
+		isTyping.value = true;
+
 		const val = e.detail.html;
 		lastVal.value = val;
 		const finalContent = composeHtmlWithIframes(val, insertedLinks.value);
@@ -410,6 +500,13 @@
 	const onStatusChange = (e : any) => {
 		formats.value = e.detail;
 		isLinkSelected.value = !!e.detail.link;
+		if (e.detail.link) {
+			currentActiveLink.value = e.detail.link;
+			showLinkTooltip.value = true;
+			updateTooltipPosition();
+		} else {
+			showLinkTooltip.value = false;
+		}
 	};
 
 	const format = (name : string, value : any = null) => {
@@ -437,6 +534,7 @@
 	const handleLink = () => {
 		if (isLinkSelected.value) {
 			editorCtx.value.format('link', null);
+			showLinkTooltip.value = false;
 		} else {
 			linkUrl.value = '';
 			showLinkModal.value = true;
@@ -456,11 +554,17 @@
 
 	watch(() => props.modelValue, (newVal) => {
 		if (editorCtx.value) {
+			if (isTyping.value) {
+				isTyping.value = false;
+				return;
+			}
+
 			const { cleanHtml, links } = extractLinksAndCleanHtml(newVal || '');
 			if (cleanHtml !== lastVal.value) {
 				editorCtx.value.setContents({ html: cleanHtml });
 				lastVal.value = cleanHtml;
 			}
+
 			if (JSON.stringify(links) !== JSON.stringify(insertedLinks.value)) {
 				insertedLinks.value = links;
 			}
@@ -469,6 +573,118 @@
 </script>
 
 <style lang="scss" scoped>
+	.editor-wrapper {
+		position: relative;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.editor-container {
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		overflow: hidden;
+		min-height: 250px;
+	}
+
+	.link-tooltip {
+		position: absolute;
+		z-index: 100;
+		background-color: #333;
+		border-radius: 8px;
+		padding: 8px 12px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
+		max-width: 90%;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		min-width: 200px;
+		animation: fadeIn 0.2s ease-out;
+	}
+
+	.tooltip-content {
+		max-width: 250px;
+	}
+
+	.tooltip-url {
+		color: #fff;
+		font-size: 13px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: block;
+		text-decoration: underline;
+	}
+
+	.tooltip-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.t-btn {
+		color: #fff;
+		font-size: 13px;
+		font-weight: 600;
+		padding: 4px 8px;
+	}
+
+	.t-btn:active {
+		opacity: 0.7;
+	}
+
+	.t-divider {
+		width: 1px;
+		height: 12px;
+		background-color: #666;
+	}
+
+	.tooltip-arrow {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 0;
+		border-left: 6px solid transparent;
+		border-right: 6px solid transparent;
+
+		&.top {
+			bottom: -6px;
+			top: auto;
+			border-top: 6px solid #333;
+			border-bottom: none;
+		}
+
+		&.bottom {
+			top: -6px;
+			bottom: auto;
+			border-bottom: 6px solid #333;
+			border-top: none;
+		}
+	}
+
+	.tooltip-arrow:not(.top):not(.bottom) {
+		bottom: -6px;
+		border-top: 6px solid #333;
+	}
+
+	.ql-container {
+		flex: 1;
+		width: 100%;
+		padding: 15px;
+		font-size: 15px;
+		line-height: 1.5;
+		box-sizing: border-box;
+		color: #333;
+		min-height: 150px;
+	}
+
 	.editor-container {
 		display: flex;
 		flex-direction: column;
@@ -818,6 +1034,7 @@
 			transform: scale(1);
 		}
 	}
+
 	.link-section-frame {
 		margin: 0 15px 10px 15px;
 		border: 1px solid #e9ecef;
@@ -825,7 +1042,7 @@
 		border-radius: 8px;
 		overflow: hidden;
 	}
-	
+
 	.link-section-header {
 		display: flex;
 		justify-content: space-between;
@@ -834,29 +1051,29 @@
 		background-color: #f1f3f5;
 		cursor: pointer;
 	}
-	
+
 	.link-section-header:active {
-	    background-color: #e9ecef;
+		background-color: #e9ecef;
 	}
-	
+
 	.header-left {
 		display: flex;
 		align-items: center;
 	}
-	
+
 	.header-icon {
 		width: 16px;
 		height: 16px;
 		margin-right: 8px;
 		opacity: 0.6;
 	}
-	
+
 	.header-title {
 		font-size: 13px;
 		font-weight: 600;
 		color: #495057;
 	}
-	
+
 	.toggle-arrow {
 		width: 14px;
 		height: 14px;
@@ -864,20 +1081,27 @@
 		transition: transform 0.3s ease;
 		transform: rotate(-90deg);
 	}
-	
+
 	.toggle-arrow.open {
-		transform: rotate(0deg); 
+		transform: rotate(0deg);
 		opacity: 1;
 	}
-	
+
 	.link-list-content {
 		padding: 5px 10px 10px 10px;
 		background-color: #fff;
 		animation: slideDown 0.2s ease-out;
 	}
-	
+
 	@keyframes slideDown {
-	    from { opacity: 0; transform: translateY(-5px); }
-	    to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(-5px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>

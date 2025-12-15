@@ -110,6 +110,105 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.editor-wrapper[data-v-7d79903f] {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.editor-container[data-v-7d79903f] {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 250px;
+}
+.link-tooltip[data-v-7d79903f] {
+  position: absolute;
+  z-index: 100;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 8px 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: -webkit-max-content;
+  width: max-content;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  animation: fadeIn-7d79903f 0.2s ease-out;
+}
+.tooltip-content[data-v-7d79903f] {
+  max-width: 250px;
+}
+.tooltip-url[data-v-7d79903f] {
+  color: #fff;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  text-decoration: underline;
+}
+.tooltip-actions[data-v-7d79903f] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.t-btn[data-v-7d79903f] {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+}
+.t-btn[data-v-7d79903f]:active {
+  opacity: 0.7;
+}
+.t-divider[data-v-7d79903f] {
+  width: 1px;
+  height: 12px;
+  background-color: #666;
+}
+.tooltip-arrow[data-v-7d79903f] {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+.tooltip-arrow.top[data-v-7d79903f] {
+  bottom: -6px;
+  top: auto;
+  border-top: 6px solid #333;
+  border-bottom: none;
+}
+.tooltip-arrow.bottom[data-v-7d79903f] {
+  top: -6px;
+  bottom: auto;
+  border-bottom: 6px solid #333;
+  border-top: none;
+}
+.tooltip-arrow[data-v-7d79903f]:not(.top):not(.bottom) {
+  bottom: -6px;
+  border-top: 6px solid #333;
+}
+.ql-container[data-v-7d79903f] {
+  flex: 1;
+  width: 100%;
+  padding: 15px;
+  font-size: 15px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  color: #333;
+  min-height: 150px;
+}
 .editor-container[data-v-7d79903f] {
   display: flex;
   flex-direction: column;

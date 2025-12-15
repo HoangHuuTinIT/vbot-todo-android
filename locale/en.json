@@ -30,7 +30,10 @@
 		"from_date": "From Date",
 		"to_date": "To Date",
 		"hidden_member": "Hidden Member",
-		"hidden_user": "Hidden User"
+		"hidden_user": "Hidden User",
+		"open_link" :"Open",
+		"copy_link" : "Copy",
+		"edit_link":"Edit"
 	},
 	"todo": {
 		"page_title": "Todo",

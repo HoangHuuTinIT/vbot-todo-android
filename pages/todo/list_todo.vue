@@ -16,7 +16,7 @@
 				</view>
 
 				<view v-else-if="todos.length === 0" class="empty-state">
-					<image src="https://img.icons8.com/ios/100/cccccc/empty-box.png" mode="aspectFit"
+					<image src="/static/empty-box.png" mode="aspectFit"
 						class="empty-icon"></image>
 					<text class="empty-text">{{ $t('common.no_data') }}</text>
 				</view>
@@ -33,18 +33,18 @@
 								</view>
 							</view>
 							<view class="card-info-row">
-								<image src="https://img.icons8.com/ios/50/666666/time.png" class="icon-small"></image>
+								<image src="/static/create-time.png" class="icon-small"></image>
 								<text class="card-date">{{ $t('todo.created_at') }}: {{ item.createdAtFormatted }}</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.dueDateFormatted">
-								<image src="https://img.icons8.com/ios/50/ff3b30/calendar--v1.png" class="icon-small">
+								<image src="/static/due-time.png" class="icon-small">
 								</image>
 								<text class="card-date text-danger">{{ $t('todo.expired_at') }}: {{ item.dueDateFormatted }}</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.notifyAtFormatted">
-								<image src="https://img.icons8.com/ios/50/007aff/alarm.png" class="icon-small"></image>
+								<image src="/static/notify-time.png" class="icon-small"></image>
 								<text class="card-date text-primary">{{ $t('todo.notify_at') }}: {{ item.notifyAtFormatted }}</text>
 							</view>
 							<view class="card-row bot-row">

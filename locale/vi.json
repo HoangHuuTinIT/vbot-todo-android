@@ -30,7 +30,10 @@
 		"from_date": "Từ ngày",
 		"to_date": "Đến ngày",
 		"hidden_member": "Thành viên ẩn",
-		"hidden_user": "Người dùng ẩn"
+		"hidden_user": "Người dùng ẩn",
+		"open_link" :"Mở",
+		"copy_link" : "Sao chép",
+		"edit_link":"Chỉnh sửa"
 	},
 	"todo": {
 		"page_title": "Công việc",
