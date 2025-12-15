@@ -43,8 +43,8 @@ export const useCreateTodoController = () => {
 		customer: '',
 		customerUid: '',
 		assignee: '',
-		dueDate: getCurrentDateTimeISO(),
-		notifyAt: getCurrentDateTimeISO()
+		dueDate: '',
+		notifyAt: ''
 	});
 	const timestampToDateString = (ts : number) => {
 		const d = new Date(ts);
@@ -202,6 +202,11 @@ export const useCreateTodoController = () => {
 
 	onMounted(() => {
 		fetchMembers();
+		setTimeout(() => {
+			const now = getCurrentDateTimeISO();
+			form.value.dueDate = now;
+			form.value.notifyAt = now;
+		}, 100);
 	});
 
 	return {

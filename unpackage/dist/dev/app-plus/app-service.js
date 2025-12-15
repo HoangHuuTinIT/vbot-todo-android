@@ -13003,8 +13003,8 @@ This will fail in production if not fixed.`);
       customer: "",
       customerUid: "",
       assignee: "",
-      dueDate: getCurrentDateTimeISO(),
-      notifyAt: getCurrentDateTimeISO()
+      dueDate: "",
+      notifyAt: ""
     });
     vue.watch(() => form.value.dueDate, (newDueVal) => {
       if (!newDueVal)
@@ -13138,6 +13138,11 @@ This will fail in production if not fixed.`);
     };
     vue.onMounted(() => {
       fetchMembers();
+      setTimeout(() => {
+        const now2 = getCurrentDateTimeISO();
+        form.value.dueDate = now2;
+        form.value.notifyAt = now2;
+      }, 100);
     });
     return {
       loading,
