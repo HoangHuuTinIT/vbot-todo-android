@@ -25,7 +25,13 @@
 
 						<view class="change-flow">
 							<view class="part-container">
-								<mp-html :content="parsedContent.oldRaw" :copy-link="false" @linktap="handleLinkTap" />
+								<mp-html 
+                                    :content="parsedContent.oldRaw" 
+                                    :copy-link="false" 
+                                    :tag-style="htmlStyles"
+                                    container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+                                    @linktap="handleLinkTap" 
+                                />
 							</view>
 
 							<view class="arrow-container">
@@ -33,13 +39,25 @@
 							</view>
 
 							<view class="part-container">
-								<mp-html :content="parsedContent.newRaw" :copy-link="false" @linktap="handleLinkTap" />
+								<mp-html 
+                                    :content="parsedContent.newRaw" 
+                                    :copy-link="false" 
+                                    :tag-style="htmlStyles"
+                                    container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+                                    @linktap="handleLinkTap" 
+                                />
 							</view>
 						</view>
 					</view>
 
 					<view v-else class="content-body">
-						<mp-html :content="data.message" :copy-link="false" @linktap="handleLinkTap" />
+						<mp-html 
+                            :content="data.message" 
+                            :copy-link="false" 
+                            :tag-style="htmlStyles"
+                            container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+                            @linktap="handleLinkTap" 
+                        />
 
 						<view v-if="data.files" class="mt-2">
 							<image :src="data.files" mode="widthFix" class="comment-attachment-img"
@@ -104,6 +122,15 @@
 	const isMe = computed(() => {
 		return props.data.isMe === true;
 	});
+
+    const htmlStyles = {
+        p: 'font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;',
+        div: 'font-size: 14px; line-height: 1.5; color: #374151;',
+        span: 'font-size: 14px; line-height: 1.5; color: #374151;',
+        a: 'color: #007aff; text-decoration: none; font-size: 14px;',
+        img: 'max-width: 100%; border-radius: 6px; margin-top: 4px;'
+    };
+
 	const handleLinkTap = (e : any) => {
 		const url = e.href || e['data-src'] || e.src;
 		if (url) {
@@ -111,6 +138,7 @@
 			openExternalLink(url);
 		}
 	};
+
 	const parsedContent = computed(() => {
 		const raw = props.data.message || '';
 
@@ -155,6 +183,7 @@
 </script>
 
 <style scoped>
+	/* Giữ nguyên các style cũ */
 	.flex { display: flex; }
 	.flex-1 { flex: 1; }
 	.gap-1 { gap: 4px; }

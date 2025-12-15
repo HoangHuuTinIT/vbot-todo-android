@@ -1,7 +1,7 @@
 //controllers/list_todo.ts
 import { ref, computed, onMounted } from 'vue';
 import { onShow, onPullDownRefresh } from '@dcloudio/uni-app';
-import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
+import { getTodos, getTodoCount, deleteTodo, updateTodo } from '@/api/todo';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_STATUS } from '@/utils/constants';
 import { buildTodoParams } from '@/models/todo';
@@ -22,7 +22,9 @@ export const useListTodoController = () => {
 	const isLoading = ref<boolean>(false);
 	const isFilterOpen = ref<boolean>(false);
 	const authStore = useAuthStore();
-
+	const isQuickCompleteOpen = ref<boolean>(false); 
+	const quickTodos = ref<TodoItem[]>([]); 
+	const isLoadingQuick = ref<boolean>(false);
 	const showCustomerModal = ref(false);
 	const selectedCustomerName = ref('');
 
@@ -142,6 +144,59 @@ export const useListTodoController = () => {
 			getTodoList();
 		}
 	};
+	const openQuickComplete = async () => {
+		isQuickCompleteOpen.value = true;
+		isLoadingQuick.value = true;
+		try {
+			const data = await getTodos({
+				pageNo: 1,
+				pageSize: 100, 
+				status: '' 
+			});
+
+			if (Array.isArray(data)) {
+				quickTodos.value = data.filter(item => item.status !== TODO_STATUS.DONE);
+			} else {
+				quickTodos.value = [];
+			}
+		} catch (error) {
+			console.error('Lỗi lấy danh sách hoàn thành nhanh:', error);
+			showError(t('common.error_load'));
+		} finally {
+			isLoadingQuick.value = false;
+		}
+	};
+
+	const closeQuickComplete = () => {
+		isQuickCompleteOpen.value = false;
+	};
+
+	const handleQuickMarkDone = async (item : TodoItem) => {
+		uni.showLoading({ title: 'Đang xử lý...' });
+		try {
+			const payload = {
+				...item,
+				status: TODO_STATUS.DONE,
+				preFixCode: "TODO",
+				description: item.description || "",
+				files: "", 
+				tagCodes: ""
+			};
+
+			const res = await updateTodo(payload as any);
+
+			if (res) {
+				showSuccess('Đã hoàn thành công việc!');
+				quickTodos.value = quickTodos.value.filter(t => t.id !== item.id);
+				getTodoList();
+			}
+		} catch (error) {
+			console.error("Lỗi quick complete:", error);
+			showError(t('common.error_update'));
+		} finally {
+			uni.hideLoading();
+		}
+	};
 	const onUpdatePageSize = (newSize : number) => {
 		changePageSize(newSize);
 		getTodoList();
@@ -222,7 +277,7 @@ export const useListTodoController = () => {
 		resetPage();
 		Promise.all([
 			getTodoList(),
-			fetchCustomers({}) 
+			fetchCustomers({})
 		]).finally(() => {
 			uni.stopPullDownRefresh();
 		});
@@ -315,5 +370,11 @@ export const useListTodoController = () => {
 
 		rawMemberList, fetchCustomers,
 		loadingMore, loadMoreCustomers,
+		isQuickCompleteOpen,
+		quickTodos,
+		isLoadingQuick,
+		openQuickComplete,
+		closeQuickComplete,
+		handleQuickMarkDone,
 	};
 };

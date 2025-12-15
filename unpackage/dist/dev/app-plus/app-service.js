@@ -8342,7 +8342,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
-  const _imports_0$3 = "/static/filter.png";
+  const _imports_1$3 = "/static/filter.png";
   function _sfc_render$f(_ctx, _cache, $props, $setup, $data, $options) {
     return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
       key: 0,
@@ -8371,7 +8371,7 @@ ${codeFrame}` : message);
               },
               [
                 vue.createElementVNode("image", {
-                  src: _imports_0$3,
+                  src: _imports_1$3,
                   class: "filter-icon-img"
                 })
               ],
@@ -10193,7 +10193,7 @@ This will fail in production if not fixed.`);
   const PROJECT_API_URL = `${SERVER_BASE_URL}/api/project`;
   const TODO_API_URL = `${SERVER_BASE_URL}/api/module-todo/todo`;
   const PROJECT_CODE = "PR202511211001129372";
-  const UID = "87d90802634146e29721476337bce64b";
+  const UID = "60566991077e440eafe369eac2e5e3db";
   const WS_BASE_URL = "wss://ws-sandbox-h01.vbot.vn/ws/call";
   const systemLogin = (username, password) => {
     return new Promise((resolve, reject) => {
@@ -11113,9 +11113,9 @@ This will fail in production if not fixed.`);
         }
       },
       async loginDevMode() {
-        const devUser = "hoangtinvpm";
+        const devUser = "hoangtin";
         const devPass = "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f";
-        const devUid = "87d90802634146e29721476337bce64b";
+        const devUid = "60566991077e440eafe369eac2e5e3db";
         const devProject = "PR202511211001129372";
         try {
           formatAppLog("log", "at stores/auth.ts:103", "Store: Đang gọi API đăng nhập hệ thống...");
@@ -11599,6 +11599,9 @@ This will fail in production if not fixed.`);
     const isLoading = vue.ref(false);
     const isFilterOpen = vue.ref(false);
     useAuthStore();
+    const isQuickCompleteOpen = vue.ref(false);
+    const quickTodos = vue.ref([]);
+    const isLoadingQuick = vue.ref(false);
     const showCustomerModal = vue.ref(false);
     const selectedCustomerName = vue.ref("");
     const isConfirmDeleteOpen = vue.ref(false);
@@ -11650,7 +11653,7 @@ This will fail in production if not fixed.`);
         const data = await getAllMembers();
         rawMemberList.value = data;
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:78", "Lỗi lấy danh sách thành viên filter:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:80", "Lỗi lấy danh sách thành viên filter:", error);
       }
     };
     const {
@@ -11698,7 +11701,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:132", error);
+        formatAppLog("error", "at controllers/list_todo.ts:134", error);
         showError("Lỗi tải dữ liệu");
       } finally {
         isLoading.value = false;
@@ -11708,6 +11711,54 @@ This will fail in production if not fixed.`);
       const changed = changePage(step);
       if (changed) {
         getTodoList();
+      }
+    };
+    const openQuickComplete = async () => {
+      isQuickCompleteOpen.value = true;
+      isLoadingQuick.value = true;
+      try {
+        const data = await getTodos({
+          pageNo: 1,
+          pageSize: 100,
+          status: ""
+        });
+        if (Array.isArray(data)) {
+          quickTodos.value = data.filter((item) => item.status !== TODO_STATUS.DONE);
+        } else {
+          quickTodos.value = [];
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/list_todo.ts:163", "Lỗi lấy danh sách hoàn thành nhanh:", error);
+        showError(t("common.error_load"));
+      } finally {
+        isLoadingQuick.value = false;
+      }
+    };
+    const closeQuickComplete = () => {
+      isQuickCompleteOpen.value = false;
+    };
+    const handleQuickMarkDone = async (item) => {
+      uni.showLoading({ title: "Đang xử lý..." });
+      try {
+        const payload = {
+          ...item,
+          status: TODO_STATUS.DONE,
+          preFixCode: "TODO",
+          description: item.description || "",
+          files: "",
+          tagCodes: ""
+        };
+        const res = await updateTodo(payload);
+        if (res) {
+          showSuccess("Đã hoàn thành công việc!");
+          quickTodos.value = quickTodos.value.filter((t2) => t2.id !== item.id);
+          getTodoList();
+        }
+      } catch (error) {
+        formatAppLog("error", "at controllers/list_todo.ts:194", "Lỗi quick complete:", error);
+        showError(t("common.error_update"));
+      } finally {
+        uni.hideLoading();
       }
     };
     const onUpdatePageSize = (newSize) => {
@@ -11770,7 +11821,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:210", error);
+        formatAppLog("error", "at controllers/list_todo.ts:265", error);
         showError(t("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
@@ -11781,7 +11832,7 @@ This will fail in production if not fixed.`);
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/list_todo.ts:221", "Đang làm mới trang...");
+      formatAppLog("log", "at controllers/list_todo.ts:276", "Đang làm mới trang...");
       resetPage();
       Promise.all([
         getTodoList(),
@@ -11800,7 +11851,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:239", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:294", "Delete Error:", error);
         showError(t("common.fail_delete"));
       }
     };
@@ -11915,7 +11966,13 @@ This will fail in production if not fixed.`);
       rawMemberList,
       fetchCustomers,
       loadingMore,
-      loadMoreCustomers
+      loadMoreCustomers,
+      isQuickCompleteOpen,
+      quickTodos,
+      isLoadingQuick,
+      openQuickComplete,
+      closeQuickComplete,
+      handleQuickMarkDone
     };
   };
   const _sfc_main$f = /* @__PURE__ */ vue.defineComponent({
@@ -12459,7 +12516,13 @@ This will fail in production if not fixed.`);
         onUpdatePageSize,
         rawMemberList,
         loadingMore,
-        loadMoreCustomers
+        loadMoreCustomers,
+        isQuickCompleteOpen,
+        quickTodos,
+        isLoadingQuick,
+        openQuickComplete,
+        closeQuickComplete,
+        handleQuickMarkDone
       } = useListTodoController();
       const showCustomActionSheet = vue.ref(false);
       const selectedItemForAction = vue.ref(null);
@@ -12474,15 +12537,16 @@ This will fail in production if not fixed.`);
           isConfirmDeleteOpen.value = true;
         }
       };
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _imports_1$3 = "/static/empty-box.png";
-  const _imports_2$3 = "/static/create-time.png";
-  const _imports_3$2 = "/static/due-time.png";
-  const _imports_4$1 = "/static/notify-time.png";
+  const _imports_0$2 = "/static/checked-checkbox.png";
+  const _imports_2$3 = "/static/empty-box.png";
+  const _imports_3$2 = "/static/create-time.png";
+  const _imports_4$1 = "/static/due-time.png";
+  const _imports_5$1 = "/static/notify-time.png";
   function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "header" }, [
@@ -12494,14 +12558,27 @@ This will fail in production if not fixed.`);
           1
           /* TEXT */
         ),
-        vue.createElementVNode("view", {
-          class: "header-right",
-          onClick: _cache[0] || (_cache[0] = (...args) => $setup.openFilter && $setup.openFilter(...args))
-        }, [
-          vue.createElementVNode("image", {
-            src: _imports_0$3,
-            class: "filter-icon"
-          })
+        vue.createElementVNode("view", { class: "header-right" }, [
+          vue.createElementVNode("view", {
+            class: "icon-btn",
+            onClick: _cache[0] || (_cache[0] = (...args) => $setup.openQuickComplete && $setup.openQuickComplete(...args)),
+            style: { "margin-right": "15px" }
+          }, [
+            vue.createElementVNode("image", {
+              src: _imports_0$2,
+              class: "filter-icon",
+              mode: "aspectFit"
+            })
+          ]),
+          vue.createElementVNode("view", {
+            class: "icon-btn",
+            onClick: _cache[1] || (_cache[1] = (...args) => $setup.openFilter && $setup.openFilter(...args))
+          }, [
+            vue.createElementVNode("image", {
+              src: _imports_1$3,
+              class: "filter-icon"
+            })
+          ])
         ])
       ]),
       vue.createElementVNode("view", { class: "content" }, [
@@ -12522,7 +12599,7 @@ This will fail in production if not fixed.`);
             class: "empty-state"
           }, [
             vue.createElementVNode("image", {
-              src: _imports_1$3,
+              src: _imports_2$3,
               mode: "aspectFit",
               class: "empty-icon"
             }),
@@ -12535,7 +12612,7 @@ This will fail in production if not fixed.`);
             )
           ])) : (vue.openBlock(), vue.createElementBlock("scroll-view", {
             key: 2,
-            "scroll-y": "true",
+            "scroll-y": "",
             class: "list-view"
           }, [
             (vue.openBlock(true), vue.createElementBlock(
@@ -12574,7 +12651,7 @@ This will fail in production if not fixed.`);
                     ]),
                     vue.createElementVNode("view", { class: "card-info-row" }, [
                       vue.createElementVNode("image", {
-                        src: _imports_2$3,
+                        src: _imports_3$2,
                         class: "icon-small"
                       }),
                       vue.createElementVNode(
@@ -12590,7 +12667,7 @@ This will fail in production if not fixed.`);
                       class: "card-info-row"
                     }, [
                       vue.createElementVNode("image", {
-                        src: _imports_3$2,
+                        src: _imports_4$1,
                         class: "icon-small"
                       }),
                       vue.createElementVNode(
@@ -12606,7 +12683,7 @@ This will fail in production if not fixed.`);
                       class: "card-info-row"
                     }, [
                       vue.createElementVNode("image", {
-                        src: _imports_4$1,
+                        src: _imports_5$1,
                         class: "icon-small"
                       }),
                       vue.createElementVNode(
@@ -12649,7 +12726,7 @@ This will fail in production if not fixed.`);
           action: vue.withCtx(() => [
             vue.createElementVNode("view", {
               class: "add-task-simple",
-              onClick: _cache[1] || (_cache[1] = (...args) => $setup.addNewTask && $setup.addNewTask(...args))
+              onClick: _cache[2] || (_cache[2] = (...args) => $setup.addNewTask && $setup.addNewTask(...args))
             }, [
               vue.createElementVNode("text", { class: "plus-icon" }, "+"),
               vue.createElementVNode(
@@ -12668,11 +12745,11 @@ This will fail in production if not fixed.`);
       $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "filter-overlay",
-        onClick: _cache[17] || (_cache[17] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
+        onClick: _cache[18] || (_cache[18] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel",
-          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
+          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
@@ -12685,11 +12762,11 @@ This will fail in production if not fixed.`);
             ),
             vue.createElementVNode("text", {
               class: "close-btn",
-              onClick: _cache[2] || (_cache[2] = (...args) => $setup.closeFilter && $setup.closeFilter(...args))
+              onClick: _cache[3] || (_cache[3] = (...args) => $setup.closeFilter && $setup.closeFilter(...args))
             }, "✕")
           ]),
           vue.createElementVNode("scroll-view", {
-            "scroll-y": "true",
+            "scroll-y": "",
             class: "filter-body"
           }, [
             vue.createElementVNode("view", { class: "f-group" }, [
@@ -12702,7 +12779,7 @@ This will fail in production if not fixed.`);
               ),
               vue.withDirectives(vue.createElementVNode("input", {
                 class: "f-input",
-                "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.filter.title = $event),
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.title = $event),
                 placeholder: _ctx.$t("todo.search_placeholder")
               }, null, 8, ["placeholder"]), [
                 [vue.vModelText, $setup.filter.title]
@@ -12718,7 +12795,7 @@ This will fail in production if not fixed.`);
               ),
               vue.withDirectives(vue.createElementVNode("input", {
                 class: "f-input",
-                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.jobCode = $event),
+                "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.filter.jobCode = $event),
                 placeholder: _ctx.$t("todo.job_code_placeholder")
               }, null, 8, ["placeholder"]), [
                 [vue.vModelText, $setup.filter.jobCode]
@@ -12736,11 +12813,11 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.statusOptions,
                 value: $setup.statusIndex,
-                onChange: _cache[5] || (_cache[5] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args))
+                onChange: _cache[6] || (_cache[6] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.statusIndex]),
+                    vue.toDisplayString($setup.statusOptions[$setup.statusIndex]) + " ",
                     1
                     /* TEXT */
                   ),
@@ -12760,11 +12837,11 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.creatorOptions,
                 value: $setup.creatorIndex,
-                onChange: _cache[6] || (_cache[6] = (...args) => $setup.onCreatorChange && $setup.onCreatorChange(...args))
+                onChange: _cache[7] || (_cache[7] = (...args) => $setup.onCreatorChange && $setup.onCreatorChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.creatorOptions[$setup.creatorIndex]),
+                    vue.toDisplayString($setup.creatorOptions[$setup.creatorIndex]) + " ",
                     1
                     /* TEXT */
                   ),
@@ -12782,7 +12859,7 @@ This will fail in production if not fixed.`);
               ),
               vue.createElementVNode("view", {
                 class: "f-input",
-                onClick: _cache[7] || (_cache[7] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
+                onClick: _cache[8] || (_cache[8] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
                 style: { "justify-content": "space-between" }
               }, [
                 vue.createElementVNode(
@@ -12809,11 +12886,11 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.assigneeOptions,
                 value: $setup.assigneeIndex,
-                onChange: _cache[8] || (_cache[8] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args))
+                onChange: _cache[9] || (_cache[9] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.assigneeOptions[$setup.assigneeIndex]),
+                    vue.toDisplayString($setup.assigneeOptions[$setup.assigneeIndex]) + " ",
                     1
                     /* TEXT */
                   ),
@@ -12833,11 +12910,11 @@ This will fail in production if not fixed.`);
                 mode: "selector",
                 range: $setup.sourceOptions,
                 value: $setup.sourceIndex,
-                onChange: _cache[9] || (_cache[9] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args))
+                onChange: _cache[10] || (_cache[10] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args))
               }, [
                 vue.createElementVNode("view", { class: "f-picker" }, [
                   vue.createTextVNode(
-                    vue.toDisplayString($setup.sourceOptions[$setup.sourceIndex]),
+                    vue.toDisplayString($setup.sourceOptions[$setup.sourceIndex]) + " ",
                     1
                     /* TEXT */
                   ),
@@ -12848,23 +12925,23 @@ This will fail in production if not fixed.`);
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_create"),
               startDate: $setup.filter.createdFrom,
-              "onUpdate:startDate": _cache[10] || (_cache[10] = ($event) => $setup.filter.createdFrom = $event),
+              "onUpdate:startDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.createdFrom = $event),
               endDate: $setup.filter.createdTo,
-              "onUpdate:endDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.createdTo = $event)
+              "onUpdate:endDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.createdTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_expired"),
               startDate: $setup.filter.dueDateFrom,
-              "onUpdate:startDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.dueDateFrom = $event),
+              "onUpdate:startDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.dueDateFrom = $event),
               endDate: $setup.filter.dueDateTo,
-              "onUpdate:endDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.dueDateTo = $event)
+              "onUpdate:endDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.dueDateTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_notify"),
               startDate: $setup.filter.notifyFrom,
-              "onUpdate:startDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.notifyFrom = $event),
+              "onUpdate:startDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.notifyFrom = $event),
               endDate: $setup.filter.notifyTo,
-              "onUpdate:endDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.notifyTo = $event)
+              "onUpdate:endDate": _cache[16] || (_cache[16] = ($event) => $setup.filter.notifyTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
@@ -12872,15 +12949,98 @@ This will fail in production if not fixed.`);
             vue.createVNode($setup["AppButton"], {
               type: "secondary",
               label: _ctx.$t("common.reset"),
-              class: "btn-filter-reset",
               onClick: $setup.resetFilter
             }, null, 8, ["label", "onClick"]),
             vue.createVNode($setup["AppButton"], {
               type: "primary",
               label: _ctx.$t("common.apply"),
-              class: "btn-filter-apply",
               onClick: $setup.applyFilter
             }, null, 8, ["label", "onClick"])
+          ])
+        ])
+      ])) : vue.createCommentVNode("v-if", true),
+      $setup.isQuickCompleteOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 1,
+        class: "filter-overlay",
+        onClick: _cache[21] || (_cache[21] = vue.withModifiers((...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args), ["stop"]))
+      }, [
+        vue.createElementVNode("view", {
+          class: "filter-panel quick-panel",
+          onClick: _cache[20] || (_cache[20] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("view", { class: "filter-header" }, [
+            vue.createElementVNode("text", { class: "filter-title" }, "Đánh dấu hoàn thành nhanh"),
+            vue.createElementVNode("text", {
+              class: "close-btn",
+              onClick: _cache[19] || (_cache[19] = (...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args))
+            }, "✕")
+          ]),
+          vue.createElementVNode("scroll-view", {
+            "scroll-y": "",
+            class: "filter-body"
+          }, [
+            $setup.isLoadingQuick ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "loading-state",
+              style: { "height": "200px" }
+            }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString(_ctx.$t("common.loading")),
+                1
+                /* TEXT */
+              )
+            ])) : $setup.quickTodos.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "empty-state",
+              style: { "height": "200px" }
+            }, [
+              vue.createElementVNode("text", { class: "empty-text" }, "Không có công việc nào cần xử lý")
+            ])) : (vue.openBlock(), vue.createElementBlock("view", {
+              key: 2,
+              class: "quick-list"
+            }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.quickTodos, (item) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: item.id,
+                    class: "quick-item"
+                  }, [
+                    vue.createElementVNode("view", { class: "quick-info" }, [
+                      vue.createElementVNode(
+                        "view",
+                        { class: "quick-code" },
+                        "#" + vue.toDisplayString(item.code),
+                        1
+                        /* TEXT */
+                      ),
+                      vue.createElementVNode(
+                        "view",
+                        { class: "quick-title" },
+                        vue.toDisplayString(item.title),
+                        1
+                        /* TEXT */
+                      )
+                    ]),
+                    vue.createElementVNode("view", { class: "quick-action" }, [
+                      vue.createElementVNode("button", {
+                        class: "btn-complete",
+                        onClick: vue.withModifiers(($event) => $setup.handleQuickMarkDone(item), ["stop"])
+                      }, [
+                        vue.createElementVNode("text", null, "Hoàn thành")
+                      ], 8, ["onClick"])
+                    ])
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              )),
+              vue.createElementVNode("view", { style: { "height": "40px" } })
+            ]))
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
@@ -12890,14 +13050,14 @@ This will fail in production if not fixed.`);
         loadingMore: $setup.loadingMore,
         customers: $setup.customerList,
         managers: $setup.rawMemberList,
-        onClose: _cache[18] || (_cache[18] = ($event) => $setup.showCustomerModal = false),
+        onClose: _cache[22] || (_cache[22] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect,
         onFilter: $setup.onFilterCustomerInModal,
         onLoadMore: $setup.loadMoreCustomers
       }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
-        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
+        "onUpdate:visible": _cache[23] || (_cache[23] = ($event) => $setup.isConfirmDeleteOpen = $event),
         title: _ctx.$t("common.notification"),
         message: $setup.itemToDelete ? _ctx.$t("todo.confirm_delete_msg").replace("{title}", $setup.itemToDelete.title) : "",
         "confirm-type": "danger",
@@ -12909,18 +13069,18 @@ This will fail in production if not fixed.`);
       vue.createElementVNode(
         "view",
         {
-          class: vue.normalizeClass(["custom-sheet-mask", { "show": $setup.showCustomActionSheet }]),
-          onClick: _cache[23] || (_cache[23] = ($event) => $setup.showCustomActionSheet = false)
+          class: vue.normalizeClass(["custom-sheet-mask", { show: $setup.showCustomActionSheet }]),
+          onClick: _cache[27] || (_cache[27] = ($event) => $setup.showCustomActionSheet = false)
         },
         [
           vue.createElementVNode("view", {
             class: "custom-sheet-panel",
-            onClick: _cache[22] || (_cache[22] = vue.withModifiers(() => {
+            onClick: _cache[26] || (_cache[26] = vue.withModifiers(() => {
             }, ["stop"]))
           }, [
             vue.createElementVNode("view", {
               class: "sheet-item delete",
-              onClick: _cache[20] || (_cache[20] = ($event) => $setup.handleCustomAction("delete"))
+              onClick: _cache[24] || (_cache[24] = ($event) => $setup.handleCustomAction("delete"))
             }, [
               vue.createElementVNode(
                 "text",
@@ -12933,7 +13093,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "sheet-gap" }),
             vue.createElementVNode("view", {
               class: "sheet-item cancel",
-              onClick: _cache[21] || (_cache[21] = ($event) => $setup.showCustomActionSheet = false)
+              onClick: _cache[25] || (_cache[25] = ($event) => $setup.showCustomActionSheet = false)
             }, [
               vue.createElementVNode(
                 "text",
@@ -13752,7 +13912,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _imports_0$2 = "/static/link.png";
+  const _imports_0$1 = "/static/link.png";
   const _imports_1$2 = "/static/choseImage.png";
   const _imports_2$2 = "/static/add-link.png";
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
@@ -13847,7 +14007,7 @@ This will fail in production if not fixed.`);
         }, [
           vue.createElementVNode("view", { class: "header-left" }, [
             vue.createElementVNode("image", {
-              src: _imports_0$2,
+              src: _imports_0$1,
               class: "header-icon"
             }),
             vue.createElementVNode(
@@ -13944,7 +14104,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: _imports_0$2,
+                src: _imports_0$1,
                 class: "img-icon"
               })
             ],
@@ -17358,10 +17518,17 @@ This will fail in production if not fixed.`);
       const isMe = vue.computed(() => {
         return props.data.isMe === true;
       });
+      const htmlStyles = {
+        p: "font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;",
+        div: "font-size: 14px; line-height: 1.5; color: #374151;",
+        span: "font-size: 14px; line-height: 1.5; color: #374151;",
+        a: "color: #007aff; text-decoration: none; font-size: 14px;",
+        img: "max-width: 100%; border-radius: 6px; margin-top: 4px;"
+      };
       const handleLinkTap = (e) => {
         const url = e.href || e["data-src"] || e.src;
         if (url) {
-          formatAppLog("log", "at components/Todo/CommentItem.vue:110", "Mở link:", url);
+          formatAppLog("log", "at components/Todo/CommentItem.vue:137", "Mở link:", url);
           openExternalLink(url);
         }
       };
@@ -17401,12 +17568,12 @@ This will fail in production if not fixed.`);
           current: 0
         });
       };
-      const __returned__ = { props, emit, authStore, isMe, handleLinkTap, parsedContent, onPreviewImage, UserAvatar, CommentItem, mpHtml };
+      const __returned__ = { props, emit, authStore, isMe, htmlStyles, handleLinkTap, parsedContent, onPreviewImage, UserAvatar, CommentItem, mpHtml };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _imports_0$1 = "/static/reaction.png";
+  const _imports_0 = "/static/reaction.png";
   const _imports_1$1 = "/static/reply_comment.png";
   const _imports_2$1 = "/static/edit_comment.png";
   const _imports_3$1 = "/static/delete.png";
@@ -17459,6 +17626,8 @@ This will fail in production if not fixed.`);
                   vue.createVNode($setup["mpHtml"], {
                     content: $setup.parsedContent.oldRaw,
                     "copy-link": false,
+                    "tag-style": $setup.htmlStyles,
+                    "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
                     onLinktap: $setup.handleLinkTap
                   }, null, 8, ["content"])
                 ]),
@@ -17469,6 +17638,8 @@ This will fail in production if not fixed.`);
                   vue.createVNode($setup["mpHtml"], {
                     content: $setup.parsedContent.newRaw,
                     "copy-link": false,
+                    "tag-style": $setup.htmlStyles,
+                    "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
                     onLinktap: $setup.handleLinkTap
                   }, null, 8, ["content"])
                 ])
@@ -17480,6 +17651,8 @@ This will fail in production if not fixed.`);
               vue.createVNode($setup["mpHtml"], {
                 content: $props.data.message,
                 "copy-link": false,
+                "tag-style": $setup.htmlStyles,
+                "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
                 onLinktap: $setup.handleLinkTap
               }, null, 8, ["content"]),
               $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -17530,7 +17703,7 @@ This will fail in production if not fixed.`);
                 onClick: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("react", $props.data))
               }, [
                 vue.createElementVNode("image", {
-                  src: _imports_0$1,
+                  src: _imports_0,
                   class: "icon-action"
                 })
               ]),
@@ -17702,7 +17875,6 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _imports_0 = "/static/checked-checkbox.png";
   const _imports_1 = "/static/internet.png";
   const _imports_2 = "/static/user.png";
   const _imports_3 = "/static/user-male-circle.png";
@@ -17776,7 +17948,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
               vue.createElementVNode("image", {
-                src: _imports_0,
+                src: _imports_0$2,
                 class: "item-icon"
               }),
               vue.createElementVNode(

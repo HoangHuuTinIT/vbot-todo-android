@@ -2371,8 +2371,6 @@ to {
   padding: 5px 0;
   margin-left: 10px;
 }
-
-/* CSS cho Menu tự làm */
 .custom-sheet-mask[data-v-1b4e60ea] {
   position: fixed;
   top: 0;
@@ -2380,7 +2378,6 @@ to {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
-  /* Màu nền tối mờ */
   z-index: 9999;
   visibility: hidden;
   opacity: 0;
@@ -2401,7 +2398,6 @@ to {
   transition: transform 0.2s;
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
-  /* Tránh tai thỏ/bottom bar iphone */
 }
 .custom-sheet-mask.show .custom-sheet-panel[data-v-1b4e60ea] {
   transform: translateY(0);
@@ -2418,7 +2414,6 @@ to {
 }
 .sheet-item.delete uni-text[data-v-1b4e60ea] {
   color: #ff3b30;
-  /* Màu đỏ cho chữ Xóa */
 }
 .sheet-item.cancel[data-v-1b4e60ea] {
   font-weight: 600;
@@ -2426,4 +2421,70 @@ to {
 .sheet-gap[data-v-1b4e60ea] {
   height: 8px;
   background-color: #f1f1f1;
+}
+.icon-btn[data-v-1b4e60ea] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+.quick-panel[data-v-1b4e60ea] {
+  background-color: #f5f5f7;
+}
+.quick-list[data-v-1b4e60ea] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quick-item[data-v-1b4e60ea] {
+  background-color: #fff;
+  padding: 12px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.quick-info[data-v-1b4e60ea] {
+  flex: 1;
+  padding-right: 10px;
+  overflow: hidden;
+}
+.quick-code[data-v-1b4e60ea] {
+  font-size: 12px;
+  color: #888;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+.quick-title[data-v-1b4e60ea] {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quick-action[data-v-1b4e60ea] {
+  flex-shrink: 0;
+}
+.btn-complete[data-v-1b4e60ea] {
+  background-color: #2dce89;
+  color: #fff;
+  font-size: 12px;
+  padding: 0 12px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 15px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-complete[data-v-1b4e60ea]:active {
+  opacity: 0.8;
 }

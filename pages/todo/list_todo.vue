@@ -1,14 +1,20 @@
-//pages/todo/list_todo.vue
 <template>
 	<view class="container">
 		<view class="header">
 			<view class="header-left"></view>
+
 			<text class="header-title">{{ $t('todo.page_title') }}</text>
-			<view class="header-right" @click="openFilter">
-				<image src="/static/filter.png" class="filter-icon"></image>
+
+			<view class="header-right">
+				<view class="icon-btn" @click="openQuickComplete" style="margin-right: 15px;">
+					<image src="/static/checked-checkbox.png" class="filter-icon" mode="aspectFit"></image>
+				</view>
+
+				<view class="icon-btn" @click="openFilter">
+					<image src="/static/filter.png" class="filter-icon"></image>
+				</view>
 			</view>
 		</view>
-
 		<view class="content">
 			<view class="list-container">
 				<view v-if="isLoading" class="loading-state">
@@ -16,47 +22,54 @@
 				</view>
 
 				<view v-else-if="todos.length === 0" class="empty-state">
-					<image src="/static/empty-box.png" mode="aspectFit"
-						class="empty-icon"></image>
+					<image src="/static/empty-box.png" mode="aspectFit" class="empty-icon"></image>
 					<text class="empty-text">{{ $t('common.no_data') }}</text>
 				</view>
 
-				<scroll-view v-else scroll-y="true" class="list-view">
+				<scroll-view v-else scroll-y class="list-view">
 					<view v-for="(item, index) in todos" :key="item.id || index" class="card-item"
 						@click="goToDetail(item)">
 						<view class="status-bar" :class="item.statusClass"></view>
+
 						<view class="card-body">
 							<view class="card-row top-row">
 								<text class="card-title">{{ item.title }}</text>
 								<view class="action-btn" @click.stop="openCustomMenu(item)">
-								    <text class="dots">•••</text>
+									<text class="dots">•••</text>
 								</view>
 							</view>
+
 							<view class="card-info-row">
 								<image src="/static/create-time.png" class="icon-small"></image>
-								<text class="card-date">{{ $t('todo.created_at') }}: {{ item.createdAtFormatted }}</text>
+								<text class="card-date">
+									{{ $t('todo.created_at') }}: {{ item.createdAtFormatted }}
+								</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.dueDateFormatted">
-								<image src="/static/due-time.png" class="icon-small">
-								</image>
-								<text class="card-date text-danger">{{ $t('todo.expired_at') }}: {{ item.dueDateFormatted }}</text>
+								<image src="/static/due-time.png" class="icon-small"></image>
+								<text class="card-date text-danger">
+									{{ $t('todo.expired_at') }}: {{ item.dueDateFormatted }}
+								</text>
 							</view>
 
 							<view class="card-info-row" v-if="item.notifyAtFormatted">
 								<image src="/static/notify-time.png" class="icon-small"></image>
-								<text class="card-date text-primary">{{ $t('todo.notify_at') }}: {{ item.notifyAtFormatted }}</text>
+								<text class="card-date text-primary">
+									{{ $t('todo.notify_at') }}: {{ item.notifyAtFormatted }}
+								</text>
 							</view>
+
 							<view class="card-row bot-row">
 								<view class="code-tag">#{{ item.code }}</view>
 								<StatusBadge :status="item.status" />
 							</view>
 						</view>
 					</view>
+
 					<view style="height: 20px;"></view>
 				</scroll-view>
 			</view>
-
 			<Pagination :pageNo="pageNo" :pageSize="pageSize" :total="totalCount" :pageSizeOptions="pageSizeOptions"
 				@changePage="onChangePage" @update:pageSize="onUpdatePageSize">
 				<template #action>
@@ -67,7 +80,6 @@
 				</template>
 			</Pagination>
 		</view>
-
 		<view class="filter-overlay" v-if="isFilterOpen" @click.stop="closeFilter">
 			<view class="filter-panel" @click.stop>
 				<view class="filter-header">
@@ -75,27 +87,33 @@
 					<text class="close-btn" @click="closeFilter">✕</text>
 				</view>
 
-				<scroll-view scroll-y="true" class="filter-body">
+				<scroll-view scroll-y class="filter-body">
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.search_label') }}</text>
 						<input class="f-input" v-model="filter.title" :placeholder="$t('todo.search_placeholder')" />
 					</view>
+
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.code_prefix') }}</text>
-						<input class="f-input" v-model="filter.jobCode" :placeholder="$t('todo.job_code_placeholder')" />
+						<input class="f-input" v-model="filter.jobCode"
+							:placeholder="$t('todo.job_code_placeholder')" />
 					</view>
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.status') }}</text>
 						<picker mode="selector" :range="statusOptions" :value="statusIndex" @change="onStatusChange">
-							<view class="f-picker">{{ statusOptions[statusIndex] }}<text class="arrow">▼</text></view>
+							<view class="f-picker">
+								{{ statusOptions[statusIndex] }} <text class="arrow">▼</text>
+							</view>
 						</picker>
 					</view>
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.creator') }}</text>
 						<picker mode="selector" :range="creatorOptions" :value="creatorIndex" @change="onCreatorChange">
-							<view class="f-picker">{{ creatorOptions[creatorIndex] }}<text class="arrow">▼</text></view>
+							<view class="f-picker">
+								{{ creatorOptions[creatorIndex] }} <text class="arrow">▼</text>
+							</view>
 						</picker>
 					</view>
 
@@ -113,7 +131,8 @@
 						<text class="f-label">{{ $t('todo.assignee') }}</text>
 						<picker mode="selector" :range="assigneeOptions" :value="assigneeIndex"
 							@change="onAssigneeChange">
-							<view class="f-picker">{{ assigneeOptions[assigneeIndex] }}<text class="arrow">▼</text>
+							<view class="f-picker">
+								{{ assigneeOptions[assigneeIndex] }} <text class="arrow">▼</text>
 							</view>
 						</picker>
 					</view>
@@ -121,7 +140,9 @@
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.source') }}</text>
 						<picker mode="selector" :range="sourceOptions" :value="sourceIndex" @change="onSourceChange">
-							<view class="f-picker">{{ sourceOptions[sourceIndex] }}<text class="arrow">▼</text></view>
+							<view class="f-picker">
+								{{ sourceOptions[sourceIndex] }} <text class="arrow">▼</text>
+							</view>
 						</picker>
 					</view>
 
@@ -130,48 +151,82 @@
 
 					<DateRangeFilter :title="$t('todo.time_expired')" v-model:startDate="filter.dueDateFrom"
 						v-model:endDate="filter.dueDateTo" />
+
 					<DateRangeFilter :title="$t('todo.time_notify')" v-model:startDate="filter.notifyFrom"
 						v-model:endDate="filter.notifyTo" />
+
 					<view style="height: 20px;"></view>
 				</scroll-view>
 
 				<view class="filter-footer">
-					<AppButton type="secondary" :label="$t('common.reset')" class="btn-filter-reset" @click="resetFilter" />
-					<AppButton type="primary" :label="$t('common.apply')" class="btn-filter-apply" @click="applyFilter" />
+					<AppButton type="secondary" :label="$t('common.reset')" @click="resetFilter" />
+					<AppButton type="primary" :label="$t('common.apply')" @click="applyFilter" />
 				</view>
+			</view>
+		</view>
+		<view class="filter-overlay" v-if="isQuickCompleteOpen" @click.stop="closeQuickComplete">
+			<view class="filter-panel quick-panel" @click.stop>
+				<view class="filter-header">
+					<text class="filter-title">Đánh dấu hoàn thành nhanh</text>
+					<text class="close-btn" @click="closeQuickComplete">✕</text>
+				</view>
+
+				<scroll-view scroll-y class="filter-body">
+					<view v-if="isLoadingQuick" class="loading-state" style="height: 200px;">
+						<text>{{ $t('common.loading') }}</text>
+					</view>
+
+					<view v-else-if="quickTodos.length === 0" class="empty-state" style="height: 200px;">
+						<text class="empty-text">Không có công việc nào cần xử lý</text>
+					</view>
+
+					<view v-else class="quick-list">
+						<view v-for="item in quickTodos" :key="item.id" class="quick-item">
+							<view class="quick-info">
+								<view class="quick-code">#{{ item.code }}</view>
+								<view class="quick-title">{{ item.title }}</view>
+							</view>
+
+							<view class="quick-action">
+								<button class="btn-complete" @click.stop="handleQuickMarkDone(item)">
+									<text>Hoàn thành</text>
+								</button>
+							</view>
+						</view>
+						<view style="height: 40px;"></view>
+					</view>
+				</scroll-view>
 			</view>
 		</view>
 		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
 			:customers="customerList" :managers="rawMemberList" @close="showCustomerModal = false"
 			@select="onCustomerSelect" @filter="onFilterCustomerInModal" @loadMore="loadMoreCustomers" />
-		
-		<ConfirmModal 
-		    v-model:visible="isConfirmDeleteOpen" 
-		    :title="$t('common.notification')"
-		    :message="itemToDelete ? $t('todo.confirm_delete_msg').replace('{title}', itemToDelete.title) : ''" 
-		    confirm-type="danger"
-		    :cancel-label="$t('common.cancel')"
-		    :confirm-label="$t('common.delete')"
-		    @confirm="confirmDelete" 
-		    @cancel="cancelDelete" 
-		/>
-		<view class="custom-sheet-mask" :class="{ 'show': showCustomActionSheet }" @click="showCustomActionSheet = false">
-		    <view class="custom-sheet-panel" @click.stop>
-		        <view class="sheet-item delete" @click="handleCustomAction('delete')">
-		            <text>{{ $t('common.delete') }}</text>
-		        </view>
-		        
-		        <view class="sheet-gap"></view>
-		        
-		        <view class="sheet-item cancel" @click="showCustomActionSheet = false">
-		            <text>{{ $t('common.cancel') }}</text>
-		        </view>
-		    </view>
+
+		<ConfirmModal v-model:visible="isConfirmDeleteOpen" :title="$t('common.notification')"
+			:message="itemToDelete ? $t('todo.confirm_delete_msg').replace('{title}', itemToDelete.title) : ''"
+			confirm-type="danger" :cancel-label="$t('common.cancel')" :confirm-label="$t('common.delete')"
+			@confirm="confirmDelete" @cancel="cancelDelete" />
+
+		<view class="custom-sheet-mask" :class="{ show: showCustomActionSheet }" @click="showCustomActionSheet = false">
+			<view class="custom-sheet-panel" @click.stop>
+				<view class="sheet-item delete" @click="handleCustomAction('delete')">
+					<text>{{ $t('common.delete') }}</text>
+				</view>
+
+				<view class="sheet-gap"></view>
+
+				<view class="sheet-item cancel" @click="showCustomActionSheet = false">
+					<text>{{ $t('common.cancel') }}</text>
+				</view>
+			</view>
 		</view>
+
 		<GlobalMessage />
 		<GlobalNotification />
 	</view>
 </template>
+
+
 
 <script setup lang="ts">
 	import { ref } from 'vue';
@@ -204,24 +259,30 @@
 		rawMemberList,
 		loadingMore,
 		loadMoreCustomers,
+		isQuickCompleteOpen,
+		quickTodos,
+		isLoadingQuick,
+		openQuickComplete,
+		closeQuickComplete,
+		handleQuickMarkDone
 	} = useListTodoController();
 	const showCustomActionSheet = ref(false);
 	const selectedItemForAction = ref<any>(null);
-	
-	
-	const openCustomMenu = (item: any) => {
-	    selectedItemForAction.value = item;
-	    showCustomActionSheet.value = true;
+
+
+	const openCustomMenu = (item : any) => {
+		selectedItemForAction.value = item;
+		showCustomActionSheet.value = true;
 	};
-	
-	const handleCustomAction = (action: string) => {
-	    showCustomActionSheet.value = false;
-	    
-	    if (action === 'delete') {
-	       
-	        itemToDelete.value = selectedItemForAction.value; 
-	        isConfirmDeleteOpen.value = true;
-	    }
+
+	const handleCustomAction = (action : string) => {
+		showCustomActionSheet.value = false;
+
+		if (action === 'delete') {
+
+			itemToDelete.value = selectedItemForAction.value;
+			isConfirmDeleteOpen.value = true;
+		}
 	};
 </script>
 
@@ -667,64 +728,143 @@
 		padding: 5px 0;
 		margin-left: 10px;
 	}
-	/* CSS cho Menu tự làm */
+
 	.custom-sheet-mask {
-	    position: fixed;
-	    top: 0; left: 0; right: 0; bottom: 0;
-	    background: rgba(0,0,0,0.4); /* Màu nền tối mờ */
-	    z-index: 9999;
-	    visibility: hidden;
-	    opacity: 0;
-	    transition: all 0.2s;
-	    display: flex;
-	    flex-direction: column;
-	    justify-content: flex-end;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.4);
+		z-index: 9999;
+		visibility: hidden;
+		opacity: 0;
+		transition: all 0.2s;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
 	}
-	
+
 	.custom-sheet-mask.show {
-	    visibility: visible;
-	    opacity: 1;
+		visibility: visible;
+		opacity: 1;
 	}
-	
+
 	.custom-sheet-panel {
-	    background-color: #f1f1f1;
-	    border-top-left-radius: 12px;
-	    border-top-right-radius: 12px;
-	    transform: translateY(100%);
-	    transition: transform 0.2s;
-	    overflow: hidden;
-	    padding-bottom: env(safe-area-inset-bottom); /* Tránh tai thỏ/bottom bar iphone */
+		background-color: #f1f1f1;
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
+		transform: translateY(100%);
+		transition: transform 0.2s;
+		overflow: hidden;
+		padding-bottom: env(safe-area-inset-bottom);
 	}
-	
+
 	.custom-sheet-mask.show .custom-sheet-panel {
-	    transform: translateY(0);
+		transform: translateY(0);
 	}
-	
+
 	.sheet-item {
-	    background-color: #fff;
-	    padding: 16px;
-	    text-align: center;
-	    font-size: 17px;
-	    border-bottom: 1px solid #eee;
+		background-color: #fff;
+		padding: 16px;
+		text-align: center;
+		font-size: 17px;
+		border-bottom: 1px solid #eee;
 	}
-	
+
 	.sheet-item:active {
-	    background-color: #ddd;
+		background-color: #ddd;
 	}
-	
+
 	.sheet-item.delete text {
-	    color: #ff3b30; /* Màu đỏ cho chữ Xóa */
+		color: #ff3b30;
 	}
-	
+
 	.sheet-item.cancel {
-	    font-weight: 600;
+		font-weight: 600;
 	}
-	
+
 	.sheet-gap {
-	    height: 8px;
-	    background-color: #f1f1f1;
+		height: 8px;
+		background-color: #f1f1f1;
 	}
+
 	// .bg-red {
 	//     background-color: #ff3b30 !important; /* Màu đỏ */
 	// }
+	.icon-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 30px;
+		height: 30px;
+	}
+
+	.quick-panel {
+		background-color: #f5f5f7;
+	}
+
+	.quick-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.quick-item {
+		background-color: #fff;
+		padding: 12px 15px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	}
+
+	.quick-info {
+		flex: 1;
+		padding-right: 10px;
+		overflow: hidden;
+	}
+
+	.quick-code {
+		font-size: 12px;
+		color: #888;
+		font-weight: bold;
+		background-color: #f0f0f0;
+		display: inline-block;
+		padding: 2px 6px;
+		border-radius: 4px;
+		margin-bottom: 4px;
+	}
+
+	.quick-title {
+		font-size: 15px;
+		color: #333;
+		font-weight: 500;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.quick-action {
+		flex-shrink: 0;
+	}
+
+	.btn-complete {
+		background-color: #2dce89;
+		color: #fff;
+		font-size: 12px;
+		padding: 0 12px;
+		height: 30px;
+		line-height: 30px;
+		border-radius: 15px;
+		border: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.btn-complete:active {
+		opacity: 0.8;
+	}
 </style>
