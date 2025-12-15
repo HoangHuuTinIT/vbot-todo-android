@@ -70,7 +70,6 @@ export const getDomainFromUrl = (url : string) => {
 export const openExternalLink = (url : string) => {
 	if (!url) return;
 	let safeUrl = url.trim();
-	// Xử lý tương đối -> tuyệt đối nếu cần
 	if (!safeUrl.startsWith('http')) {
 		safeUrl = 'https://' + safeUrl;
 	}

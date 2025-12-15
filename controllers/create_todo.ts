@@ -90,7 +90,9 @@ export const useCreateTodoController = () => {
 	};
 	const openCustomerPopup = () => {
 		showCustomerModal.value = true;
-		fetchCustomers({});
+		if (customerList.value.length === 0) {
+			fetchCustomers({});
+		}
 	};
 	const onCustomerFilter = (filterParams : any) => {
 		fetchCustomers(filterParams);
@@ -202,6 +204,7 @@ export const useCreateTodoController = () => {
 
 	onMounted(() => {
 		fetchMembers();
+		fetchCustomers({});
 		setTimeout(() => {
 			const now = getCurrentDateTimeISO();
 			form.value.dueDate = now;

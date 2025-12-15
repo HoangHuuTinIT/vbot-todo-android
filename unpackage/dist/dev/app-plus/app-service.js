@@ -11508,7 +11508,6 @@ This will fail in production if not fixed.`);
       } else {
         loadingCustomer.value = true;
         currentPage.value = 1;
-        customerList.value = [];
         isFinished.value = false;
         savedFilter.value = searchFilter;
       }
@@ -11564,6 +11563,8 @@ This will fail in production if not fixed.`);
       } catch (error) {
         formatAppLog("error", "at composables/useCustomerFilter.ts:92", "Lỗi tải khách hàng:", error);
         showError("Lỗi tải dữ liệu CRM");
+        if (!isLoadMore)
+          customerList.value = [];
       } finally {
         loadingCustomer.value = false;
         loadingMore.value = false;
@@ -11767,7 +11768,7 @@ This will fail in production if not fixed.`);
         todos.value = listData || [];
         setTotal(countData || 0);
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:211", error);
+        formatAppLog("error", "at controllers/list_todo.ts:210", error);
         showError(t("common.error_load"));
         if (todos.value.length === 0) {
           todos.value = [];
@@ -11778,9 +11779,14 @@ This will fail in production if not fixed.`);
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/list_todo.ts:222", "Đang làm mới trang...");
+      formatAppLog("log", "at controllers/list_todo.ts:221", "Đang làm mới trang...");
       resetPage();
-      getTodoList();
+      Promise.all([
+        getTodoList(),
+        fetchCustomers({})
+      ]).finally(() => {
+        uni.stopPullDownRefresh();
+      });
     });
     const confirmDelete = async () => {
       if (!itemToDelete.value)
@@ -11792,7 +11798,7 @@ This will fail in production if not fixed.`);
         itemToDelete.value = null;
         getTodoList();
       } catch (error) {
-        formatAppLog("error", "at controllers/list_todo.ts:235", "Delete Error:", error);
+        formatAppLog("error", "at controllers/list_todo.ts:239", "Delete Error:", error);
         showError(t("common.fail_delete"));
       }
     };
@@ -11856,6 +11862,7 @@ This will fail in production if not fixed.`);
     };
     onShow(() => {
       getTodoList();
+      fetchCustomers({});
     });
     const goToDetail = (item) => {
       uni.navigateTo({
@@ -13041,7 +13048,9 @@ This will fail in production if not fixed.`);
     };
     const openCustomerPopup = () => {
       showCustomerModal.value = true;
-      fetchCustomers({});
+      if (customerList.value.length === 0) {
+        fetchCustomers({});
+      }
     };
     const onCustomerFilter = (filterParams) => {
       fetchCustomers(filterParams);
@@ -13081,7 +13090,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/create_todo.ts:139", `Upload ảnh ${src} lỗi:`, err);
+            formatAppLog("error", "at controllers/create_todo.ts:141", `Upload ảnh ${src} lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -13120,7 +13129,7 @@ This will fail in production if not fixed.`);
           link: selectedLink,
           uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ""
         });
-        formatAppLog("log", "at controllers/create_todo.ts:186", "Payload Submit:", payload);
+        formatAppLog("log", "at controllers/create_todo.ts:188", "Payload Submit:", payload);
         await createTodo(payload);
         hideLoading();
         showSuccess(t("todo.create_success"));
@@ -13129,7 +13138,7 @@ This will fail in production if not fixed.`);
         }, 1500);
       } catch (error) {
         hideLoading();
-        formatAppLog("error", "at controllers/create_todo.ts:195", "Create Error:", error);
+        formatAppLog("error", "at controllers/create_todo.ts:197", "Create Error:", error);
         const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
         showError(t("common.error_load") + ": " + errorMsg);
       } finally {
@@ -13138,6 +13147,7 @@ This will fail in production if not fixed.`);
     };
     vue.onMounted(() => {
       fetchMembers();
+      fetchCustomers({});
       setTimeout(() => {
         const now2 = getCurrentDateTimeISO();
         form.value.dueDate = now2;

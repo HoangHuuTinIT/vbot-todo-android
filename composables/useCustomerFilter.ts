@@ -26,7 +26,7 @@ export const useCustomerFilter = () => {
 		} else {
 			loadingCustomer.value = true;
 			currentPage.value = 1;
-			customerList.value = [];
+			// customerList.value = [];
 			isFinished.value = false;
 			savedFilter.value = searchFilter;
 		}
@@ -91,6 +91,7 @@ export const useCustomerFilter = () => {
 		} catch (error) {
 			console.error('Lỗi tải khách hàng:', error);
 			showError('Lỗi tải dữ liệu CRM');
+			if (!isLoadMore) customerList.value = [];
 		} finally {
 			loadingCustomer.value = false;
 			loadingMore.value = false;

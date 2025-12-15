@@ -1,6 +1,6 @@
 //controllers/list_todo.ts
 import { ref, computed, onMounted } from 'vue';
-import { onShow ,onPullDownRefresh} from '@dcloudio/uni-app';
+import { onShow, onPullDownRefresh } from '@dcloudio/uni-app';
 import { getTodos, getTodoCount, deleteTodo } from '@/api/todo';
 import { useAuthStore } from '@/stores/auth';
 import { TODO_STATUS } from '@/utils/constants';
@@ -30,35 +30,35 @@ export const useListTodoController = () => {
 	const itemToDelete = ref<TodoItem | null>(null);
 
 	const statusOptions = computed(() => [
-	        t('common.all'),
-	        t('todo.status_todo'),
-	        t('todo.status_progress'),
-	        t('todo.status_done'),
-			t('todo.status_overdue')
-	    ]);
-	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE,TODO_STATUS.OVERDUE];
+		t('common.all'),
+		t('todo.status_todo'),
+		t('todo.status_progress'),
+		t('todo.status_done'),
+		t('todo.status_overdue')
+	]);
+	const statusValues = ['', TODO_STATUS.NEW, TODO_STATUS.IN_PROGRESS, TODO_STATUS.DONE, TODO_STATUS.OVERDUE];
 	const statusIndex = ref<number>(0);
 
 	const rawMemberList = ref<any[]>([]);
 	const creatorOptions = computed(() => {
-	        const names = rawMemberList.value.map(m => m.UserName || t('common.hidden_member'));
-	        return [t('common.all'), ...names];
-	    });
-	    const creatorIndex = ref(0);
-	    
-	    const assigneeOptions = computed(() => {
-	        const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
-	        return [t('common.all'), ...names];
-	    });
-	    const assigneeIndex = ref(0);
+		const names = rawMemberList.value.map(m => m.UserName || t('common.hidden_member'));
+		return [t('common.all'), ...names];
+	});
+	const creatorIndex = ref(0);
+
+	const assigneeOptions = computed(() => {
+		const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
+		return [t('common.all'), ...names];
+	});
+	const assigneeIndex = ref(0);
 
 	const sourceOptions = computed(() => [
-	        t('common.all'), 
-	        t('source.call'), 
-	        t('source.customer'), 
-	        t('source.conversation'), 
-	        t('source.message')
-	    ]);
+		t('common.all'),
+		t('source.call'),
+		t('source.customer'),
+		t('source.conversation'),
+		t('source.message')
+	]);
 	const sourceValues = ['', TODO_SOURCE.CALL, TODO_SOURCE.CUSTOMER, TODO_SOURCE.CONVERSATION, TODO_SOURCE.CHAT_MESSAGE];
 	const sourceIndex = ref<number>(0);
 
@@ -70,14 +70,14 @@ export const useListTodoController = () => {
 		notifyFrom: '', notifyTo: '',
 	});
 	const fetchFilterMembers = async () => {
-			if (rawMemberList.value.length > 0) return;
-			try {
-				const data = await getAllMembers();
-				rawMemberList.value = data;
-			} catch (error) {
-				console.error('Lỗi lấy danh sách thành viên filter:', error);
-			}
-		};
+		if (rawMemberList.value.length > 0) return;
+		try {
+			const data = await getAllMembers();
+			rawMemberList.value = data;
+		} catch (error) {
+			console.error('Lỗi lấy danh sách thành viên filter:', error);
+		}
+	};
 	const {
 		customerList,
 		loadingCustomer,
@@ -87,15 +87,15 @@ export const useListTodoController = () => {
 	} = useCustomerFilter();
 	const fetchData = async () => {
 		if (todos.value.length === 0) {
-		            isLoading.value = true;
-		        }
+			isLoading.value = true;
+		}
 		try {
 			const params = {
 				...filter.value,
 				pageNo: pageNo.value,
 				pageSize: pageSize.value
 			};
-			
+
 			let selectedCreatorId = '';
 			if (creatorIndex.value > 0) {
 				const member = rawMemberList.value[creatorIndex.value - 1];
@@ -115,7 +115,7 @@ export const useListTodoController = () => {
 				selectedCreatorId,
 				selectedAssigneeId
 			);
-			
+
 			const [listData, countData] = await Promise.all([
 				getTodos({
 					...filterParams,
@@ -149,7 +149,6 @@ export const useListTodoController = () => {
 	const openCustomerPopup = () => {
 		showCustomerModal.value = true;
 		fetchFilterMembers();
-
 		if (customerList.value.length === 0) {
 			fetchCustomers({});
 		}
@@ -169,60 +168,65 @@ export const useListTodoController = () => {
 	const onRequestDelete = (item : TodoItem) => { itemToDelete.value = item; isConfirmDeleteOpen.value = true; };
 	const cancelDelete = () => { isConfirmDeleteOpen.value = false; itemToDelete.value = null; };
 	const getTodoList = async () => {
-	
+
+		if (todos.value.length === 0) {
+			isLoading.value = true;
+		}
+
+		try {
+			let selectedCreatorId = '';
+			if (creatorIndex.value > 0) {
+				const member = rawMemberList.value[creatorIndex.value - 1];
+				selectedCreatorId = member.UID || '';
+			}
+
+			let selectedAssigneeId = '';
+			if (assigneeIndex.value > 0) {
+				const member = rawMemberList.value[assigneeIndex.value - 1];
+				selectedAssigneeId = member.UID || '';
+			}
+
+			const filterParams = buildTodoParams(
+				filter.value,
+				statusValues[statusIndex.value],
+				sourceValues[sourceIndex.value],
+				selectedCreatorId,
+				selectedAssigneeId
+			);
+
+			const [listData, countData] = await Promise.all([
+				getTodos({
+					...filterParams,
+					pageNo: pageNo.value,
+					pageSize: pageSize.value
+				}),
+				getTodoCount(filterParams)
+			]);
+
+			todos.value = listData || [];
+			setTotal(countData || 0);
+
+		} catch (error) {
+			console.error(error);
+			showError(t('common.error_load'));
 			if (todos.value.length === 0) {
-				isLoading.value = true;
+				todos.value = [];
 			}
-		
-			try {
-				let selectedCreatorId = '';
-				if (creatorIndex.value > 0) {
-					const member = rawMemberList.value[creatorIndex.value - 1];
-					selectedCreatorId = member.UID || '';
-				}
-	
-				let selectedAssigneeId = '';
-				if (assigneeIndex.value > 0) {
-					const member = rawMemberList.value[assigneeIndex.value - 1];
-					selectedAssigneeId = member.UID || '';
-				}
-	
-				const filterParams = buildTodoParams(
-					filter.value,
-					statusValues[statusIndex.value],
-					sourceValues[sourceIndex.value],
-					selectedCreatorId,
-					selectedAssigneeId
-				);
-	
-				const [listData, countData] = await Promise.all([
-					getTodos({
-						...filterParams,
-						pageNo: pageNo.value,
-						pageSize: pageSize.value
-					}),
-					getTodoCount(filterParams)
-				]);
-	
-				todos.value = listData || [];
-				setTotal(countData || 0);
-	
-			} catch (error) {
-				console.error(error);
-				showError(t('common.error_load'));
-	            if (todos.value.length === 0) {
-	                todos.value = [];
-	            }
-			} finally {
-				isLoading.value = false;
-uni.stopPullDownRefresh();
-			}
-		};
-		onPullDownRefresh(() => {
-		        console.log('Đang làm mới trang...');
-		        resetPage(); 
-		        getTodoList(); 
-		    });
+		} finally {
+			isLoading.value = false;
+			uni.stopPullDownRefresh();
+		}
+	};
+	onPullDownRefresh(() => {
+		console.log('Đang làm mới trang...');
+		resetPage();
+		Promise.all([
+			getTodoList(),
+			fetchCustomers({}) 
+		]).finally(() => {
+			uni.stopPullDownRefresh();
+		});
+	});
 	const confirmDelete = async () => {
 		if (!itemToDelete.value) return;
 		try {
@@ -260,23 +264,23 @@ uni.stopPullDownRefresh();
 	const onSourceChange = (e : any) => { sourceIndex.value = e.detail.value; };
 
 	const resetFilter = () => {
-			filter.value = {
-				title: '', jobCode: '',
-				createdFrom: '', createdTo: '',
-				dueDateFrom: '', dueDateTo: '',
-				customerCode: '',
-				notifyFrom: '', notifyTo: ''
-			};
-			statusIndex.value = 0;
-			creatorIndex.value = 0;
-			assigneeIndex.value = 0;
-			sourceIndex.value = 0;
-			selectedCustomerName.value = '';
-			
-			resetPage();
-			getTodoList(); 
-			closeFilter();
+		filter.value = {
+			title: '', jobCode: '',
+			createdFrom: '', createdTo: '',
+			dueDateFrom: '', dueDateTo: '',
+			customerCode: '',
+			notifyFrom: '', notifyTo: ''
 		};
+		statusIndex.value = 0;
+		creatorIndex.value = 0;
+		assigneeIndex.value = 0;
+		sourceIndex.value = 0;
+		selectedCustomerName.value = '';
+
+		resetPage();
+		getTodoList();
+		closeFilter();
+	};
 
 	const applyFilter = () => {
 		resetPage();
@@ -286,6 +290,7 @@ uni.stopPullDownRefresh();
 
 	onShow(() => {
 		getTodoList();
+		fetchCustomers({});
 	});
 	const goToDetail = (item : TodoItem) => {
 		uni.navigateTo({
