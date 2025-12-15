@@ -7,22 +7,25 @@
 			<view class="flex-1 overflow-hidden">
 				<view class="bg-gray-50 rounded-2xl p-3 rounded-tl-none relative">
 					<view class="flex justify-between items-start mb-1">
-						<text class="font-bold text-sm text-gray-900">{{ data.senderName }}</text>
+						<text class="font-bold text-sm text-gray-900">
+							{{ data.senderName }}
+						</text>
 						<view class="flex items-center">
 							<text class="text-xs text-gray-400">{{ data.timeDisplay }}</text>
-							<text v-if="data.isEdited" class="text-xs text-gray-400 italic ml-1">• Đã sửa</text>
+							<text v-if="data.isEdited" class="text-xs text-gray-400 italic ml-1">
+								• Đã sửa
+							</text>
 						</view>
 					</view>
 
 					<view v-if="parsedContent.isUpdate" class="content-body">
-						<text class="font-bold text-sm text-gray-700 block mb-1">{{ parsedContent.label }}</text>
-						
+						<text class="font-bold text-sm text-gray-700 block mb-1">
+							{{ parsedContent.label }}
+						</text>
+
 						<view class="change-flow">
 							<view class="part-container">
-								<rich-text :nodes="parsedContent.old.cleanHtml" class="text-sm text-gray-600 inline-html"></rich-text>
-								<view v-if="parsedContent.old.links.length > 0" class="mt-1 mb-1">
-									<LinkCard v-for="(link, idx) in parsedContent.old.links" :key="'old'+idx" :url="link" />
-								</view>
+								<mp-html :content="parsedContent.oldRaw" :copy-link="false" @linktap="handleLinkTap" />
 							</view>
 
 							<view class="arrow-container">
@@ -30,28 +33,20 @@
 							</view>
 
 							<view class="part-container">
-								<rich-text :nodes="parsedContent.new.cleanHtml" class="text-sm text-gray-800 inline-html"></rich-text>
-								<view v-if="parsedContent.new.links.length > 0" class="mt-1">
-									<LinkCard v-for="(link, idx) in parsedContent.new.links" :key="'new'+idx" :url="link" />
-								</view>
+								<mp-html :content="parsedContent.newRaw" :copy-link="false" @linktap="handleLinkTap" />
 							</view>
 						</view>
 					</view>
 
 					<view v-else class="content-body">
-						<rich-text :nodes="parsedContent.normal.cleanHtml"
-							class="text-sm text-gray-700 leading-normal"></rich-text>
-
-						<view v-if="parsedContent.normal.links.length > 0" class="mt-2">
-							<LinkCard v-for="(link, index) in parsedContent.normal.links" :key="index" :url="link" />
-						</view>
+						<mp-html :content="data.message" :copy-link="false" @linktap="handleLinkTap" />
 
 						<view v-if="data.files" class="mt-2">
 							<image :src="data.files" mode="widthFix" class="comment-attachment-img"
-								@click.stop="onPreviewImage(data.files)"></image>
+								@click.stop="onPreviewImage(data.files)" />
 						</view>
 					</view>
-					</view>
+				</view>
 
 				<view class="c-footer-actions">
 					<view class="reaction-row">
@@ -62,19 +57,19 @@
 						</view>
 					</view>
 
-					<view class="action-buttons-container" v-if="data.type == 'COMMENT'">
+					<view class="action-buttons-container" v-if="data.type === 'COMMENT'">
 						<view class="btn-icon-action" @click="$emit('react', data)">
-							<image src="/static/reaction.png" class="icon-action"></image>
+							<image src="/static/reaction.png" class="icon-action" />
 						</view>
 						<view class="btn-icon-action" @click="$emit('reply', data)">
-							<image src="/static/reply_comment.png" class="icon-action"></image>
+							<image src="/static/reply_comment.png" class="icon-action" />
 						</view>
-						<template v-if="isMe && data.type === 'COMMENT'">
+						<template v-if="isMe">
 							<view class="btn-icon-action" @click="$emit('edit', data)">
-								<image src="/static/edit_comment.png" class="icon-action"></image>
+								<image src="/static/edit_comment.png" class="icon-action" />
 							</view>
 							<view class="btn-icon-action" @click="$emit('delete', data.id)">
-								<image src="/static/delete.png" class="icon-action"></image>
+								<image src="/static/delete.png" class="icon-action" />
 							</view>
 						</template>
 					</view>
@@ -93,10 +88,10 @@
 <script setup lang="ts">
 	import { computed } from 'vue';
 	import UserAvatar from '@/components/UserAvatar.vue';
-	import LinkCard from '@/components/Todo/LinkCard.vue';
-	import { extractLinksAndCleanHtml } from '@/utils/linkHelper';
 	import { useAuthStore } from '@/stores/auth';
 	import CommentItem from './CommentItem.vue';
+	import { openExternalLink } from '@/utils/linkHelper';
+	import mpHtml from 'mp-html/dist/uni-app/components/mp-html/mp-html.vue';
 
 	const props = defineProps<{
 		data : any,
@@ -109,37 +104,44 @@
 	const isMe = computed(() => {
 		return props.data.isMe === true;
 	});
+	const handleLinkTap = (e : any) => {
+		const url = e.href || e['data-src'] || e.src;
+		if (url) {
+			console.log("Mở link:", url);
+			openExternalLink(url);
+		}
+	};
 	const parsedContent = computed(() => {
 		const raw = props.data.message || '';
+
 		if (props.data.type === 'UPDATE_TODO' && raw.includes('->')) {
-			const splitIndex = raw.lastIndexOf('->'); 
-			
+			const splitIndex = raw.lastIndexOf('->');
+
 			if (splitIndex !== -1) {
 				const leftPart = raw.substring(0, splitIndex).trim();
-				const rightPart = raw.substring(splitIndex + 2).trim(); 
+				const rightPart = raw.substring(splitIndex + 2).trim();
+
 				const labelMatch = leftPart.match(/^<p>(- .*?:)/) || leftPart.match(/^(- .*?:)/);
 				let label = '';
 				let oldHtmlRaw = leftPart;
 
 				if (labelMatch) {
-					label = labelMatch[1].replace(/<p>|:$/g, '').trim() + ':'; 
+					label = labelMatch[1].replace(/<p>|:$/g, '').trim() + ':';
 					oldHtmlRaw = leftPart.replace(labelMatch[0], '').trim();
-                    if(oldHtmlRaw.startsWith('</p>')) oldHtmlRaw = oldHtmlRaw.substring(4);
+					if (oldHtmlRaw.startsWith('</p>')) oldHtmlRaw = oldHtmlRaw.substring(4);
 				}
-				const oldProcessed = extractLinksAndCleanHtml(oldHtmlRaw);
-				const newProcessed = extractLinksAndCleanHtml(rightPart);
 
 				return {
 					isUpdate: true,
 					label: label,
-					old: oldProcessed,
-					new: newProcessed
+					oldRaw: oldHtmlRaw,
+					newRaw: rightPart
 				};
 			}
 		}
+
 		return {
-			isUpdate: false,
-			normal: extractLinksAndCleanHtml(raw)
+			isUpdate: false
 		};
 	});
 
@@ -181,6 +183,7 @@
 	.mr-2 { margin-right: 8px; }
 	.mr-3 { margin-right: 12px; }
 	.pl-12 { padding-left: 48px; }
+
 	.c-footer-actions {
 		display: flex;
 		justify-content: space-between;
@@ -223,31 +226,13 @@
 	}
 	:deep(img) { max-width: 100%; height: auto; }
 	.block { display: block; }
-	
-	.change-flow {
-		display: block; 
+	.change-flow { display: block; }
+	.part-container { display: inline; }
+	.arrow-container { display: inline-block; margin: 0 8px; }
+	.arrow-text { font-weight: bold; color: #6b7280; font-size: 16px; }
+	.inline-html { display: inline; }
+	:deep(a) {
+		color: #007aff;
+		text-decoration: underline;
 	}
-
-	.part-container {
-		display: inline; 
-	}
-
-	.arrow-container {
-		display: inline-block;
-		margin: 0 8px;
-	}
-
-	.arrow-text {
-		font-weight: bold;
-		color: #6b7280;
-		font-size: 16px;
-	}
-	.inline-html {
-		display: inline; 
-	}
-    :deep(.link-card) {
-        margin-top: 4px !important;
-        margin-bottom: 4px !important;
-        display: flex !important;
-    }
 </style>

@@ -26,7 +26,7 @@
 			<view class="info-group">
 				<view class="flat-item">
 					<view class="item-left">
-						<image src="https://img.icons8.com/ios/50/666666/checked-checkbox.png" class="item-icon">
+						<image src="/static/checked-checkbox.png" class="item-icon">
 						</image>
 						<text class="item-label">{{ $t('todo.status') }}</text>
 					</view>
@@ -41,7 +41,7 @@
 
 				<view class="flat-item">
 					<view class="item-left">
-						<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
+						<image src="/static/internet.png" class="item-icon"></image>
 						<text class="item-label">{{ $t('todo.source') }}</text>
 					</view>
 					<view class="item-picker-box">
@@ -53,7 +53,7 @@
 
 				<view class="flat-item">
 					<view class="item-left">
-						<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
+						<image src="/static/user.png" class="item-icon"></image>
 						<text class="item-label">{{ $t('todo.assignee') }}</text>
 					</view>
 					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex"
@@ -80,7 +80,7 @@
 				<view v-else>
 					<view class="flat-item">
 						<view class="item-left">
-							<image src="https://img.icons8.com/ios/50/666666/user-male-circle.png" class="item-icon">
+							<image src="/static/user-male-circle.png" class="item-icon">
 							</image>
 							<text
 								class="item-label">{{ form.customerNameLabel || $t('todo.customer_name_label') }}</text>
@@ -89,7 +89,7 @@
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
-							<image src="https://img.icons8.com/ios/50/666666/phone.png" class="item-icon"></image>
+							<image src="/static/phone.png" class="item-icon"></image>
 							<text
 								class="item-label">{{ form.customerPhoneLabel || $t('todo.customer_phone_label') }}</text>
 						</view>
@@ -97,7 +97,7 @@
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
-							<image src="https://img.icons8.com/ios/50/666666/manager.png" class="item-icon"></image>
+							<image src="/static/manager.png" class="item-icon"></image>
 							<text
 								class="item-label">{{ form.customerManagerLabel || $t('todo.customer_manager_label') }}</text>
 						</view>
@@ -111,7 +111,7 @@
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
 					<text class="section-title no-margin">{{ $t('todo.comments_activities') }}</text>
-					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
+					<image src="/static/expand-arrow.png" class="toggle-icon"
 						:class="{ 'open': isCommentsOpen }"></image>
 				</view>
 				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
@@ -182,7 +182,7 @@
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleHistory">
 					<text class="section-title no-margin">{{ $t('todo.history_section') }}</text>
-					<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-icon"
+					<image src="/static/expand-arrow.png" class="toggle-icon"
 						:class="{ 'open': isHistoryOpen }"></image>
 				</view>
 				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop
@@ -958,7 +958,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
+	}a
 
 	.loading-section {
 		display: flex;
