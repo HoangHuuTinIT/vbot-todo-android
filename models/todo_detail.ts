@@ -34,7 +34,7 @@ const timestampToDateTimeStr = (ts: number): string => {
         const d = date.getDate().toString().padStart(2, '0');
         const h = date.getHours().toString().padStart(2, '0');
         const min = date.getMinutes().toString().padStart(2, '0');
-        const sec = '00'; // Mặc định giây
+        const sec = '00'; 
         return `${y}-${m}-${d} ${h}:${min}:${sec}`;
     } catch { return ''; }
 };

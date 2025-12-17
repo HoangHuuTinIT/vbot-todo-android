@@ -10188,38 +10188,12 @@ This will fail in production if not fixed.`);
     PHONE_PLACEHOLDER: "072836272322"
   };
   const SERVER_BASE_URL = "https://api-sandbox-h01.vbot.vn/v1.0";
-  const AUTH_API_URL = SERVER_BASE_URL;
   const CRM_API_URL = `${SERVER_BASE_URL}/api/module-crm`;
   const PROJECT_API_URL = `${SERVER_BASE_URL}/api/project`;
   const TODO_API_URL = `${SERVER_BASE_URL}/api/module-todo/todo`;
   const PROJECT_CODE = "PR202511211001129372";
   const UID = "60566991077e440eafe369eac2e5e3db";
   const WS_BASE_URL = "wss://ws-sandbox-h01.vbot.vn/ws/call";
-  const systemLogin = (username, password) => {
-    return new Promise((resolve, reject) => {
-      uni.request({
-        url: `${AUTH_API_URL}/token`,
-        method: "POST",
-        header: { "Content-Type": "application/x-www-form-urlencoded" },
-        data: {
-          username,
-          password,
-          grant_type: "password",
-          type_account: 0,
-          source: SYSTEM_CONFIG.SOURCE_PARAM
-        },
-        success: (res) => {
-          const data = res.data;
-          if (res.statusCode === 200 && data.access_token) {
-            resolve(data);
-          } else {
-            reject(data);
-          }
-        },
-        fail: (err) => reject(err)
-      });
-    });
-  };
   const getTodoToken = (rootToken, projectCode, uid) => {
     return new Promise((resolve, reject) => {
       uni.request({
@@ -11055,8 +11029,10 @@ This will fail in production if not fixed.`);
     getters: {
       isLoggedIn: (state) => !!state.todoToken && !!state.crmToken && !!state.sessionId,
       isRootTokenValid: (state) => {
-        if (!state.rootToken || !state.rootLoginTime)
+        if (!state.rootToken)
           return false;
+        if (!state.rootLoginTime)
+          return true;
         const now2 = Date.now();
         return now2 - state.rootLoginTime < SEVEN_DAYS_MS;
       }
@@ -11090,13 +11066,39 @@ This will fail in production if not fixed.`);
           uni.setStorageSync("crm_access_token", data.crmToken);
         }
       },
+      // --- ACTION MỚI: HỨNG DỮ LIỆU TỪ NATIVE ---
+      async initFromNative(nativeData) {
+        formatAppLog("log", "at stores/auth.ts:64", "Store: Nhận dữ liệu từ Native Android", nativeData);
+        if (!nativeData || !nativeData.uid || !nativeData.access_token) {
+          formatAppLog("error", "at stores/auth.ts:67", "Dữ liệu từ Native bị thiếu!");
+          return;
+        }
+        if (this.rootToken && this.rootToken !== nativeData.access_token) {
+          formatAppLog("warn", "at stores/auth.ts:74", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
+          const socketStore = useSocketStore();
+          socketStore.disconnect();
+          this.todoToken = "";
+          this.crmToken = "";
+          this.sessionId = "";
+          uni.removeStorageSync("todo_access_token");
+          uni.removeStorageSync("crm_access_token");
+          uni.removeStorageSync("vbot_session_id");
+        }
+        this.setAuthData({
+          uid: nativeData.uid,
+          rootToken: nativeData.access_token,
+          projectCode: nativeData.projectCode,
+          sessionId: nativeData.session_id
+        });
+        await this.fetchModuleTokens();
+      },
       async fetchModuleTokens() {
         try {
-          if (!this.isRootTokenValid) {
-            formatAppLog("log", "at stores/auth.ts:66", "Root Token hết hạn, login lại...");
-            await this.loginDevMode();
+          if (!this.rootToken || !this.projectCode || !this.uid) {
+            formatAppLog("error", "at stores/auth.ts:111", "Thiếu thông tin để lấy Module Token");
+            return;
           }
-          formatAppLog("log", "at stores/auth.ts:71", "Store: Đang lấy Token cho Todo và CRM...");
+          formatAppLog("log", "at stores/auth.ts:115", "Store: Đang lấy Token cho Todo và CRM...");
           const [newTodoToken, newCrmToken] = await Promise.all([
             getTodoToken(this.rootToken, this.projectCode, this.uid),
             getCrmToken(this.projectCode, this.uid)
@@ -11105,43 +11107,16 @@ This will fail in production if not fixed.`);
             todoToken: newTodoToken,
             crmToken: newCrmToken
           });
-          formatAppLog("log", "at stores/auth.ts:83", "Store: Đã lấy đủ Token (Todo & CRM).");
+          formatAppLog("log", "at stores/auth.ts:127", "Store: Đã lấy đủ Token (Todo & CRM).");
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:85", "Store: Lỗi lấy module tokens:", error);
+          formatAppLog("error", "at stores/auth.ts:129", "Store: Lỗi lấy module tokens:", error);
           this.logout();
           throw error;
         }
       },
-      async loginDevMode() {
-        const devUser = "hoangtin";
-        const devPass = "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f";
-        const devUid = "60566991077e440eafe369eac2e5e3db";
-        const devProject = "PR202511211001129372";
-        try {
-          formatAppLog("log", "at stores/auth.ts:103", "Store: Đang gọi API đăng nhập hệ thống...");
-          const loginData = await systemLogin(devUser, devPass);
-          this.setAuthData({
-            rootToken: loginData.access_token,
-            uid: devUid,
-            projectCode: devProject,
-            sessionId: loginData.session_id
-          });
-        } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:115", "Store: Đăng nhập Dev thất bại", error);
-          throw error;
-        }
-      },
-      async initialize(options) {
-        formatAppLog("log", "at stores/auth.ts:121", "🚀 Store: Khởi tạo Auth...");
-        if (this.todoToken && this.crmToken && this.sessionId) {
-          formatAppLog("log", "at stores/auth.ts:124", ">> Đã có đủ Token cũ. Ready!");
-          return;
-        }
-        await this.exchangeForTodoToken();
-      },
+      // Giữ lại hàm này để refresh token khi hết hạn (401)
       async exchangeForTodoToken() {
         if (this.refreshPromise) {
-          formatAppLog("log", "at stores/auth.ts:132", "🔄 Đang có tiến trình refresh token, vui lòng chờ...");
           return this.refreshPromise;
         }
         this.refreshPromise = this.fetchModuleTokens().finally(() => {
@@ -11150,20 +11125,14 @@ This will fail in production if not fixed.`);
         return this.refreshPromise;
       },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:143", "Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:148", "Store: Đăng xuất...");
         const socketStore = useSocketStore();
         socketStore.disconnect();
         this.rootToken = "";
-        this.rootLoginTime = 0;
         this.todoToken = "";
         this.crmToken = "";
-        this.refreshPromise = null;
         this.sessionId = "";
-        uni.removeStorageSync("crm_access_token");
-        uni.removeStorageSync("todo_access_token");
-        uni.removeStorageSync("vbot_root_token");
-        uni.removeStorageSync("vbot_root_login_time");
-        uni.removeStorageSync("vbot_session_id");
+        uni.clearStorageSync();
       }
     }
   });
@@ -18526,39 +18495,62 @@ This will fail in production if not fixed.`);
     __name: "App",
     setup(__props, { expose: __expose }) {
       __expose();
-      onLaunch(async (options) => {
-        formatAppLog("log", "at App.vue:6", "App Launch");
-        const authStore = useAuthStore();
-        try {
-          await authStore.initialize(options);
-          if (authStore.isLoggedIn) {
-            const socketStore = useSocketStore();
-            formatAppLog("log", "at App.vue:13", "Auth OK -> Connecting Socket...");
-            socketStore.connect();
-          }
-        } catch (e) {
-          formatAppLog("error", "at App.vue:17", "Lỗi khởi tạo App:", e);
-        }
-      });
-      onShow(() => {
-        formatAppLog("log", "at App.vue:22", "App Show");
+      const handleNativeData = async (eventName, options = null) => {
+        formatAppLog("log", "at App.vue:8", `[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
         const authStore = useAuthStore();
         const socketStore = useSocketStore();
-        if (authStore.isLoggedIn && !socketStore.isConnected) {
-          socketStore.connect();
+        let nativeData = null;
+        if (options && options.referrerInfo && options.referrerInfo.extraData) {
+          formatAppLog("log", "at App.vue:16", "-> Tìm thấy dữ liệu trong options.referrerInfo");
+          nativeData = options.referrerInfo.extraData;
+        } else if (typeof plus !== "undefined" && plus.runtime && plus.runtime.arguments) {
+          formatAppLog("log", "at App.vue:21", "-> Tìm thấy dữ liệu trong plus.runtime.arguments");
+          const args = plus.runtime.arguments;
+          try {
+            nativeData = typeof args === "string" && args.startsWith("{") ? JSON.parse(args) : args;
+          } catch (e) {
+            formatAppLog("error", "at App.vue:27", "Lỗi parse arguments:", e);
+            if (typeof args === "object")
+              nativeData = args;
+          }
+        } else {
+          const launchOpts = uni.getLaunchOptionsSync();
+          if (launchOpts && launchOpts.extraData) {
+            nativeData = launchOpts.extraData;
+          }
         }
+        if (nativeData && nativeData.uid && nativeData.access_token) {
+          formatAppLog("log", "at App.vue:41", "✅ Dữ liệu hợp lệ -> Tiến hành đồng bộ Store");
+          await authStore.initFromNative(nativeData);
+          if (authStore.isLoggedIn) {
+            socketStore.connect();
+          }
+        } else {
+          formatAppLog("log", "at App.vue:51", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
+          if (eventName === "Launch") {
+            formatAppLog("warn", "at App.vue:55", "App Launch thiếu data");
+          }
+        }
+      };
+      onLaunch((options) => {
+        formatAppLog("log", "at App.vue:64", " App Launch");
+        handleNativeData("Launch", options);
+      });
+      onShow((options) => {
+        formatAppLog("log", "at App.vue:70", "App Show");
+        handleNativeData("Show", options);
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:31", "App Hide");
+        formatAppLog("log", "at App.vue:77", " App Hide");
       });
-      const __returned__ = { get useAuthStore() {
-        return useAuthStore;
-      }, get onLaunch() {
+      const __returned__ = { handleNativeData, get onLaunch() {
         return onLaunch;
       }, get onShow() {
         return onShow;
       }, get onHide() {
         return onHide;
+      }, get useAuthStore() {
+        return useAuthStore;
       }, get useSocketStore() {
         return useSocketStore;
       } };

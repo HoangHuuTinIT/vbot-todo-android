@@ -1,27 +1,27 @@
-
 import { defineStore } from 'pinia';
-import { systemLogin, getTodoToken } from '@/api/auth';
+import { getTodoToken } from '@/api/auth';
 import { getCrmToken } from '@/api/crm';
-import { PROJECT_CODE, UID } from '@/utils/config';
 import { useSocketStore } from '@/stores/socket';
+
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         rootToken: uni.getStorageSync('vbot_root_token') || '',
-        rootLoginTime: uni.getStorageSync('vbot_root_login_time') || 0, 
+        rootLoginTime: uni.getStorageSync('vbot_root_login_time') || 0,
         sessionId: uni.getStorageSync('vbot_session_id') || '',
         todoToken: uni.getStorageSync('todo_access_token') || '',
         crmToken: uni.getStorageSync('crm_access_token') || '',
         uid: uni.getStorageSync('vbot_uid') || '',
         projectCode: uni.getStorageSync('vbot_project_code') || '',
-		refreshPromise: null as Promise<void> | null,
+        refreshPromise: null as Promise<void> | null,
     }),
 
     getters: {
         isLoggedIn: (state) => !!state.todoToken && !!state.crmToken && !!state.sessionId,
         isRootTokenValid: (state) => {
-            if (!state.rootToken || !state.rootLoginTime) return false;
+            if (!state.rootToken) return false;
+            if (!state.rootLoginTime) return true; 
             const now = Date.now();
             return (now - state.rootLoginTime) < SEVEN_DAYS_MS;
         }
@@ -32,14 +32,13 @@ export const useAuthStore = defineStore('auth', {
             if (data.rootToken) {
                 this.rootToken = data.rootToken;
                 uni.setStorageSync('vbot_root_token', data.rootToken);
-                
                 this.rootLoginTime = Date.now();
                 uni.setStorageSync('vbot_root_login_time', this.rootLoginTime);
             }
-			if (data.sessionId) {
-			                this.sessionId = data.sessionId;
-			                uni.setStorageSync('vbot_session_id', data.sessionId);
-			}
+            if (data.sessionId) {
+                this.sessionId = data.sessionId;
+                uni.setStorageSync('vbot_session_id', data.sessionId);
+            }
             if (data.uid) {
                 this.uid = data.uid;
                 uni.setStorageSync('vbot_uid', data.uid);
@@ -48,112 +47,89 @@ export const useAuthStore = defineStore('auth', {
                 this.projectCode = data.projectCode;
                 uni.setStorageSync('vbot_project_code', data.projectCode);
             }
-
             if (data.todoToken) {
                 this.todoToken = data.todoToken;
                 uni.setStorageSync('todo_access_token', data.todoToken);
             }
-			if (data.crmToken) {
-			                this.crmToken = data.crmToken;
-			                uni.setStorageSync('crm_access_token', data.crmToken);
-			            }
+            if (data.crmToken) {
+                this.crmToken = data.crmToken;
+                uni.setStorageSync('crm_access_token', data.crmToken);
+            }
         },
+        async initFromNative(nativeData: any) {
+                    console.log('Store: Nhận dữ liệu từ Native Android', nativeData);
+        
+                    if (!nativeData || !nativeData.uid || !nativeData.access_token) {
+                        console.error('Dữ liệu từ Native bị thiếu!');
+                        return;
+                    }
+                    if (this.rootToken && this.rootToken !== nativeData.access_token) {
+                        console.warn('Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...');
+                        const socketStore = useSocketStore();
+                        socketStore.disconnect();
+                        this.todoToken = '';
+                        this.crmToken = '';
+                        this.sessionId = ''; 
+                        uni.removeStorageSync('todo_access_token');
+                        uni.removeStorageSync('crm_access_token');
+                        uni.removeStorageSync('vbot_session_id');
+                    }
+                    this.setAuthData({
+                        uid: nativeData.uid,
+                        rootToken: nativeData.access_token, 
+                        projectCode: nativeData.projectCode,
+                        sessionId: nativeData.session_id
+                    });
+                    await this.fetchModuleTokens();
+                },
 
         async fetchModuleTokens() {
-                    try {
-                        
-                        if (!this.isRootTokenValid) {
-                            console.log('Root Token hết hạn, login lại...');
-                            await this.loginDevMode(); 
-                    
-                        }
-        
-                        console.log('Store: Đang lấy Token cho Todo và CRM...');
-                        
-                        const [newTodoToken, newCrmToken] = await Promise.all([
-                            getTodoToken(this.rootToken, this.projectCode, this.uid),
-                            getCrmToken(this.projectCode, this.uid)
-                        ]);
-        
-                        this.setAuthData({ 
-                            todoToken: newTodoToken,
-                            crmToken: newCrmToken
-                        });
-                        
-                        console.log('Store: Đã lấy đủ Token (Todo & CRM).');
-                    } catch (error) {
-                        console.error('Store: Lỗi lấy module tokens:', error);
-                        this.logout();
-                        throw error;
-                    }
-                },
-        async loginDevMode() {
-            const devUser = import.meta.env.VITE_TEST_USERNAME;
-            const devPass = import.meta.env.VITE_TEST_PASSWORD;
-            const devUid = import.meta.env.VITE_UID;
-            const devProject = import.meta.env.VITE_PROJECT_CODE;
-			
-			
-            if (!devUser || !devPass) {
-                console.warn('Chưa cấu hình tài khoản Dev trong .env');
-                return;
-            }
-
             try {
-                console.log('Store: Đang gọi API đăng nhập hệ thống...');
-                const loginData = await systemLogin(devUser, devPass);
-    
+                if (!this.rootToken || !this.projectCode || !this.uid) {
+                    console.error('Thiếu thông tin để lấy Module Token');
+                    return;
+                }
+
+                console.log('Store: Đang lấy Token cho Todo và CRM...');
+
+                const [newTodoToken, newCrmToken] = await Promise.all([
+                    getTodoToken(this.rootToken, this.projectCode, this.uid),
+                    getCrmToken(this.projectCode, this.uid)
+                ]);
+
                 this.setAuthData({
-                    rootToken: loginData.access_token,
-                    uid: devUid,
-                    projectCode: devProject,
-					sessionId: loginData.session_id,
+                    todoToken: newTodoToken,
+                    crmToken: newCrmToken
                 });
 
-                // await this.fetchModuleTokens();
+                console.log('Store: Đã lấy đủ Token (Todo & CRM).');
             } catch (error) {
-                console.error('Store: Đăng nhập Dev thất bại', error);
-				throw error; 
+                console.error('Store: Lỗi lấy module tokens:', error);
+                this.logout();
+                throw error;
             }
         },
-
-        async initialize(options: any) {
-                    console.log('🚀 Store: Khởi tạo Auth...');
-                    
-                    if (this.todoToken && this.crmToken && this.sessionId) {
-                        console.log('>> Đã có đủ Token cũ. Ready!');
-                        return; 
-                    }
-
-                    await this.exchangeForTodoToken();
-                },
-async exchangeForTodoToken() {
+        async exchangeForTodoToken() {
             if (this.refreshPromise) {
-                console.log('🔄 Đang có tiến trình refresh token, vui lòng chờ...');
                 return this.refreshPromise;
             }
-
             this.refreshPromise = this.fetchModuleTokens().finally(() => {
                 this.refreshPromise = null;
             });
-
             return this.refreshPromise;
         },
+
         logout() {
             console.log('Store: Đăng xuất...');
-			const socketStore = useSocketStore();
-			socketStore.disconnect();
+            const socketStore = useSocketStore();
+            socketStore.disconnect();
+            
             this.rootToken = '';
-            this.rootLoginTime = 0;
             this.todoToken = '';
             this.crmToken = '';
-			this.refreshPromise = null;
-			this.sessionId = '';
-            uni.removeStorageSync('crm_access_token');
-            uni.removeStorageSync('todo_access_token');
-            uni.removeStorageSync('vbot_root_token');
-            uni.removeStorageSync('vbot_root_login_time');
-			uni.removeStorageSync('vbot_session_id');
+            this.sessionId = '';
+            
+            uni.clearStorageSync(); 
         }
     }
 });

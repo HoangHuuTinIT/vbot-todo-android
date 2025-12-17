@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 
 export const themeState = reactive({
-  currentTheme: 'system' // 'light' | 'dark' | 'system'
+  currentTheme: 'system'
 });
 
 export const ThemeManager = {

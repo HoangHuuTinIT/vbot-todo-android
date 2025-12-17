@@ -2,7 +2,6 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { createTodo, uploadTodoFile } from '@/api/todo';
 import { getAllMembers } from '@/api/project';
-import { PROJECT_CODE, UID } from '@/utils/config';
 import { buildCreateTodoPayload } from '@/models/create_todo';
 import type { TodoForm } from '@/types/todo';
 import { useAuthStore } from '@/stores/auth';
@@ -191,12 +190,12 @@ export const useCreateTodoController = () => {
 			form.value.desc = newContent;
 
 			const payload = buildCreateTodoPayload(form.value, {
-				projectCode: PROJECT_CODE,
-				uid: UID,
+				projectCode: authStore.projectCode, 
+				uid: authStore.uid,
 				link: selectedLink,
 				uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ''
 			});
-
+		
 			console.log("Payload Submit:", payload);
 			await createTodo(payload);
 

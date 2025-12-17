@@ -1,33 +1,63 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
+import { useAuthStore } from '@/stores/auth';
 import { useSocketStore } from '@/stores/socket';
-onLaunch(async (options: UniApp.LaunchOptions) => {
-    console.log('App Launch');
-    
-    const authStore = useAuthStore();
-    try {
-        await authStore.initialize(options);
-        if (authStore.isLoggedIn) {
-            const socketStore = useSocketStore();
-            console.log('Auth OK -> Connecting Socket...');
-            socketStore.connect();
-        }
-    } catch (e) {
-        console.error('Lỗi khởi tạo App:', e);
-    }
-});
-
-onShow(() => {
-    console.log('App Show');
+const handleNativeData = async (eventName: string, options: any = null) => {
+    console.log(`[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
     const authStore = useAuthStore();
     const socketStore = useSocketStore();
-    if (authStore.isLoggedIn && !socketStore.isConnected) {
-        socketStore.connect();
+    
+    let nativeData = null;
+
+    if (options && options.referrerInfo && options.referrerInfo.extraData) {
+        console.log("-> Tìm thấy dữ liệu trong options.referrerInfo");
+        nativeData = options.referrerInfo.extraData;
+    } 
+    else if (typeof plus !== 'undefined' && plus.runtime && plus.runtime.arguments) {
+        console.log("-> Tìm thấy dữ liệu trong plus.runtime.arguments");
+        const args = plus.runtime.arguments;
+        try {
+            nativeData = (typeof args === 'string' && args.startsWith('{')) ? JSON.parse(args) : args;
+        } catch (e) {
+            console.error("Lỗi parse arguments:", e);
+            if (typeof args === 'object') nativeData = args;
+        }
     }
+    else {
+        const launchOpts = uni.getLaunchOptionsSync();
+        if (launchOpts && launchOpts.extraData) {
+             nativeData = launchOpts.extraData;
+        }
+    }
+
+    if (nativeData && nativeData.uid && nativeData.access_token) {
+        console.log("✅ Dữ liệu hợp lệ -> Tiến hành đồng bộ Store");
+        await authStore.initFromNative(nativeData);
+        
+        if (authStore.isLoggedIn) {
+            socketStore.connect();
+        }
+    } else {
+        console.log("⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
+        if (eventName === 'Launch') {
+             console.warn("App Launch thiếu data");
+        }
+    }
+};
+
+onLaunch((options: UniApp.LaunchOptions) => {
+    console.log(' App Launch');
+    handleNativeData('Launch', options);
 });
 
-onHide(() => {
-    console.log('App Hide');
+onShow((options: UniApp.ShowOptions) => {
+    console.log('App Show');
+    handleNativeData('Show', options);
 });
+
+
+onHide(() => {
+    console.log(' App Hide');
+});
+
 </script>

@@ -1,6 +1,6 @@
 import { request } from '@/utils/request';
 import { mapTodoFromApi } from '@/models/todo';
-import { PROJECT_CODE, TODO_API_URL, SERVER_BASE_URL } from '@/utils/config';
+import { TODO_API_URL, SERVER_BASE_URL } from '@/utils/config';
 import { useAuthStore } from '@/stores/auth';
 import type { 
     TodoItem, 
@@ -16,11 +16,13 @@ import type {
 } from '@/types/todo_message';
 
 export const getTodos = async (params: Partial<GetTodoParams>): Promise<TodoItem[]> => {
+	const authStore = useAuthStore();
+	console.log('API getTodos đang dùng ProjectCode:', authStore.projectCode);
     const response = await request<TodoItem[]>({
         url: `${TODO_API_URL}/getAll`,
         method: 'GET',
         data: {
-            projectCode: PROJECT_CODE,
+            projectCode: authStore.projectCode,
             pageNo: 1,
             pageSize: 15,
             ...params
@@ -34,11 +36,12 @@ export const getTodos = async (params: Partial<GetTodoParams>): Promise<TodoItem
 };
 
 export const getTodoCount = async (params: Partial<GetTodoParams>): Promise<number> => {
+	const authStore = useAuthStore();
     const response = await request<number>({
         url: `${TODO_API_URL}/countAll`,
         method: 'GET',
         data: {
-            projectCode: PROJECT_CODE,
+            projectCode: authStore.projectCode,
             ...params
         }
     });
@@ -63,12 +66,13 @@ export const deleteTodo = (id: string | number): Promise<boolean> => {
 };
 
 export const getTodoDetail = (id: string | number): Promise<TodoItem> => {
+	const authStore = useAuthStore();
     return request<TodoItem>({
         url: `${TODO_API_URL}/getDetail`,
         method: 'GET',
         data: {
             id: id,
-            projectCode: PROJECT_CODE
+            projectCode: authStore.projectCode
         }
     });
 };

@@ -5,7 +5,6 @@ import { updateTodo, getTodoDetail, getTodoMessages, createTodoMessage, deleteTo
 import { getAllMembers } from '@/api/project';
 import { getCrmCustomerDetail, getCrmActionTimeline } from '@/api/crm';
 import { mapTodoDetailToForm, type TodoDetailForm } from '@/models/todo_detail';
-import { PROJECT_CODE, UID } from '@/utils/config';
 import { TIMELINE_TYPE_MAP } from '@/utils/constants';
 import { useAuthStore } from '@/stores/auth';
 import {
@@ -46,8 +45,7 @@ interface HistoryItem {
 export const useTodoDetailController = () => {
 	const { t } = useI18n();
 	const authStore = useAuthStore();
-
-	const currentUserId = authStore.uid;
+	const currentUserId = computed(() => authStore.uid);
 	const isLoading = ref(false);
 	const isLoadingCustomer = ref(false);
 	const isLoadingHistory = ref(false);
@@ -124,7 +122,7 @@ export const useTodoDetailController = () => {
 			} else {
 				form.value.notifyAt = form.value.raw.notificationReceivedAt ? timestampToDateTimeStr(form.value.raw.notificationReceivedAt) : '';
 			}
-			return; 
+			return;
 		}
 
 		isLoading.value = true;
