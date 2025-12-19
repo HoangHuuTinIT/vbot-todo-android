@@ -239,6 +239,7 @@
 	import ConfirmModal from '@/components/ConfirmModal.vue';
 	import Pagination from '@/components/Pagination.vue';
 	import GlobalNotification from '@/components/GlobalNotification.vue';
+	import { useI18n } from 'vue-i18n';
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,

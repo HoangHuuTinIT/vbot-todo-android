@@ -2,6 +2,9 @@
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
 import { useAuthStore } from '@/stores/auth';
 import { useSocketStore } from '@/stores/socket';
+// 1. IMPORT HÀM ĐỔI NGÔN NGỮ
+import { changeLanguage } from '@/utils/language'; 
+
 const handleNativeData = async (eventName: string, options: any = null) => {
     console.log(`[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
     const authStore = useAuthStore();
@@ -9,6 +12,7 @@ const handleNativeData = async (eventName: string, options: any = null) => {
     
     let nativeData = null;
 
+    // --- (Giữ nguyên logic lấy nativeData cũ của bạn) ---
     if (options && options.referrerInfo && options.referrerInfo.extraData) {
         console.log("-> Tìm thấy dữ liệu trong options.referrerInfo");
         nativeData = options.referrerInfo.extraData;
@@ -29,13 +33,26 @@ const handleNativeData = async (eventName: string, options: any = null) => {
              nativeData = launchOpts.extraData;
         }
     }
+    // -----------------------------------------------------
 
-    if (nativeData && nativeData.uid && nativeData.access_token) {
-        console.log("✅ Dữ liệu hợp lệ -> Tiến hành đồng bộ Store");
-        await authStore.initFromNative(nativeData);
+    // 2. XỬ LÝ DỮ LIỆU
+    if (nativeData) { // Chỉ cần có data là check ngay
         
-        if (authStore.isLoggedIn) {
-            socketStore.connect();
+        // --- [QUAN TRỌNG] SETUP NGÔN NGỮ NGAY TẠI ĐÂY ---
+        // Vì auth lấy được data ở đây, thì language chắc chắn cũng lấy được ở đây
+        if (nativeData.language === 'en' || nativeData.language === 'vi') {
+            console.log("🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
+            changeLanguage(nativeData.language);
+        }
+        // -------------------------------------------------
+
+        if (nativeData.uid && nativeData.access_token) {
+            console.log("✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
+            await authStore.initFromNative(nativeData);
+            
+            if (authStore.isLoggedIn) {
+                socketStore.connect();
+            }
         }
     } else {
         console.log("⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
@@ -55,9 +72,7 @@ onShow((options: UniApp.ShowOptions) => {
     handleNativeData('Show', options);
 });
 
-
 onHide(() => {
     console.log(' App Hide');
 });
-
 </script>
