@@ -113,7 +113,7 @@
 	const managerDisplayOptions = computed(() => {
 			const defaultOption = t('customer_modal.manager_default');
 			const list = props.managers || [];
-			const memberNames = list.map(m => m.UserName || 'Thành viên ẩn danh');
+			const memberNames = list.map(m => m.UserName || t('common.unknown_member'));
 			return [defaultOption, ...memberNames];
 		});
 

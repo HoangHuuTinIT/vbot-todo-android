@@ -27,7 +27,7 @@
 			<view class="link-section-header" @tap="toggleLinkList">
 				<view class="header-left">
 					<image src="/static/link.png" class="header-icon"></image>
-					<text class="header-title">Liên kết đính kèm ({{ insertedLinks.length }})</text>
+					<text class="header-title">{{ $t('todo.attached_links') }} ({{ insertedLinks.length }})</text>
 				</view>
 				<image src="https://img.icons8.com/ios-glyphs/30/666666/expand-arrow--v1.png" class="toggle-arrow"
 					:class="{ 'open': isLinkListOpen }"></image>

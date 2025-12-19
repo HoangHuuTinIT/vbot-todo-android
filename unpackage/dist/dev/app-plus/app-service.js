@@ -8303,7 +8303,7 @@ ${codeFrame}` : message);
       const managerDisplayOptions = vue.computed(() => {
         const defaultOption = t("customer_modal.manager_default");
         const list = props.managers || [];
-        const memberNames = list.map((m) => m.UserName || "Thành viên ẩn danh");
+        const memberNames = list.map((m) => m.UserName || t("common.unknown_member"));
         return [defaultOption, ...memberNames];
       });
       const toggleFilter = () => {
@@ -10417,9 +10417,17 @@ This will fail in production if not fixed.`);
     edit_link: "Chỉnh sửa",
     time_just_now: "Vừa xong",
     time_minutes_ago: "{n} phút trước",
-    time_hours_ago: "{n} giờ trước"
+    time_hours_ago: "{n} giờ trước",
+    failed: "Thất bại",
+    processing: "Đang xử lý...",
+    msg_completed: "Đã hoàn thành công việc!",
+    network_lost: "Mất kết nối Internet",
+    network_restored: "Đã khôi phục kết nối",
+    no_internet: "Không có kết nối Internet",
+    no_name: "(Không tên)"
   };
   const todo$1 = {
+    attached_links: "Liên kết đính kèm",
     page_title: "Công việc",
     create_page_title: "Tạo công việc",
     add_task: "Thêm công việc",
@@ -10520,7 +10528,12 @@ This will fail in production if not fixed.`);
     action_UPDATE_TODO: "đã cập nhật công việc",
     action_UPLOAD_ATTACHMENT: "đã tải lên tài liệu",
     action_COMMENT: "thêm một bình luận",
-    msg_notify_must_be_before_due: "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!"
+    msg_notify_must_be_before_due: "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!",
+    error_load_member: "Không thể tải danh sách thành viên",
+    quick_done_title: "Đánh dấu hoàn thành nhanh",
+    msg_no_task_quick_done: "Không có công việc nào cần xử lý",
+    done_action: "Hoàn thành",
+    error_load_crm: "Lỗi tải dữ liệu CRM"
   };
   const customer_modal$1 = {
     title: "Chọn khách hàng",
@@ -10646,9 +10659,17 @@ This will fail in production if not fixed.`);
     edit_link: "Edit",
     time_just_now: "Just now",
     time_minutes_ago: "{n} minutes ago",
-    time_hours_ago: "{n} hours ago"
+    time_hours_ago: "{n} hours ago",
+    failed: "Failed",
+    processing: "Processing...",
+    msg_completed: "Task completed!",
+    network_lost: "Internet connection lost",
+    network_restored: "Connection restored",
+    no_internet: "No internet connection",
+    no_name: "(No Name)"
   };
   const todo = {
+    attached_links: "Attached Links",
     page_title: "Todo",
     create_page_title: "Create Task",
     add_task: "Add Task",
@@ -10749,7 +10770,12 @@ This will fail in production if not fixed.`);
     action_UPDATE_TODO: "updated the task",
     action_UPLOAD_ATTACHMENT: "uploaded an attachment",
     action_COMMENT: "added a comment",
-    msg_notify_must_be_before_due: "Notification time must be earlier than due date!"
+    msg_notify_must_be_before_due: "Notification time must be earlier than due date!",
+    error_load_member: "Cannot load member list",
+    quick_done_title: "Quick Mark Done",
+    msg_no_task_quick_done: "No pending tasks",
+    done_action: "Done",
+    error_load_crm: "Failed to load CRM data"
   };
   const customer_modal = {
     title: "Select Customer",
@@ -11548,6 +11574,7 @@ This will fail in production if not fixed.`);
     };
   };
   const useCustomerFilter = () => {
+    const { t } = useI18n();
     const authStore = useAuthStore();
     const customerList = vue.ref([]);
     const loadingCustomer = vue.ref(false);
@@ -11605,7 +11632,7 @@ This will fail in production if not fixed.`);
             id: item.id,
             uid: item.uid,
             createAt: item.createAt,
-            name: nameObj ? nameObj.value : "(Không tên)",
+            name: nameObj ? nameObj.value : t("common.no_name"),
             phone: phoneObj ? phoneObj.value : "",
             code: item.code || "",
             managerUid: managerObj ? managerObj.value : ""
@@ -11620,8 +11647,8 @@ This will fail in production if not fixed.`);
           isFinished.value = true;
         }
       } catch (error) {
-        formatAppLog("error", "at composables/useCustomerFilter.ts:94", "Lỗi tải khách hàng:", error);
-        showError("Lỗi tải dữ liệu CRM");
+        formatAppLog("error", "at composables/useCustomerFilter.ts:95", "Lỗi tải khách hàng:", error);
+        showError(t("todo.error_load_crm"));
         if (!isLoadMore)
           customerList.value = [];
       } finally {
@@ -11674,12 +11701,12 @@ This will fail in production if not fixed.`);
     const statusIndex = vue.ref(0);
     const rawMemberList = vue.ref([]);
     const creatorOptions = vue.computed(() => {
-      const names = rawMemberList.value.map((m) => m.UserName || t("common.hidden_member"));
+      const names = rawMemberList.value.map((m) => m.UserName || t("common.unknown_member"));
       return [t("common.all"), ...names];
     });
     const creatorIndex = vue.ref(0);
     const assigneeOptions = vue.computed(() => {
-      const names = rawMemberList.value.map((m) => m.UserName || "Thành viên ẩn");
+      const names = rawMemberList.value.map((m) => m.UserName || t("common.hidden_member"));
       return [t("common.all"), ...names];
     });
     const assigneeIndex = vue.ref(0);
@@ -11759,7 +11786,7 @@ This will fail in production if not fixed.`);
         setTotal(countData || 0);
       } catch (error) {
         formatAppLog("error", "at controllers/list_todo.ts:134", error);
-        showError("Lỗi tải dữ liệu");
+        showError(t("common.error_load"));
       } finally {
         isLoading.value = false;
       }
@@ -11795,7 +11822,7 @@ This will fail in production if not fixed.`);
       isQuickCompleteOpen.value = false;
     };
     const handleQuickMarkDone = async (item) => {
-      uni.showLoading({ title: "Đang xử lý..." });
+      uni.showLoading({ title: t("common.processing") });
       try {
         const payload = {
           ...item,
@@ -11807,7 +11834,7 @@ This will fail in production if not fixed.`);
         };
         const res = await updateTodo(payload);
         if (res) {
-          showSuccess("Đã hoàn thành công việc!");
+          showSuccess(t("common.msg_completed"));
           quickTodos.value = quickTodos.value.filter((t2) => t2.id !== item.id);
           getTodoList();
         }
@@ -12156,6 +12183,7 @@ This will fail in production if not fixed.`);
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
       __expose();
+      const { t } = useI18n();
       const isVisible = vue.ref(false);
       const msgContent = vue.ref("");
       const msgType = vue.ref("success");
@@ -12191,9 +12219,9 @@ This will fail in production if not fixed.`);
         uni.$on("app-toast-show", handleShowToast);
         uni.onNetworkStatusChange((res) => {
           if (!res.isConnected) {
-            handleShowToast({ message: "Mất kết nối Internet.", type: "error" });
+            handleShowToast({ message: t("common.network_lost"), type: "error" });
           } else {
-            handleShowToast({ message: "Đã khôi phục kết nối.", type: "success" });
+            handleShowToast({ message: t("common.network_restored"), type: "success" });
           }
         });
       });
@@ -12201,7 +12229,7 @@ This will fail in production if not fixed.`);
         success: (res) => {
           if (res.networkType === "none") {
             handleShowToast({
-              message: "Không có kết nối Internet.",
+              message: t("common.no_internet"),
               type: "error"
             });
           }
@@ -12210,7 +12238,7 @@ This will fail in production if not fixed.`);
       vue.onUnmounted(() => {
         uni.$off("app-toast-show", handleShowToast);
       });
-      const __returned__ = { isVisible, msgContent, msgType, safeAreaBottom, get timer() {
+      const __returned__ = { t, isVisible, msgContent, msgType, safeAreaBottom, get timer() {
         return timer;
       }, set timer(v) {
         timer = v;
@@ -13027,7 +13055,13 @@ This will fail in production if not fixed.`);
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
-            vue.createElementVNode("text", { class: "filter-title" }, "Đánh dấu hoàn thành nhanh"),
+            vue.createElementVNode(
+              "text",
+              { class: "filter-title" },
+              vue.toDisplayString(_ctx.$t("todo.quick_done_title")),
+              1
+              /* TEXT */
+            ),
             vue.createElementVNode("text", {
               class: "close-btn",
               onClick: _cache[19] || (_cache[19] = (...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args))
@@ -13054,7 +13088,13 @@ This will fail in production if not fixed.`);
               class: "empty-state",
               style: { "height": "200px" }
             }, [
-              vue.createElementVNode("text", { class: "empty-text" }, "Không có công việc nào cần xử lý")
+              vue.createElementVNode(
+                "text",
+                { class: "empty-text" },
+                vue.toDisplayString(_ctx.$t("todo.msg_no_task_quick_done")),
+                1
+                /* TEXT */
+              )
             ])) : (vue.openBlock(), vue.createElementBlock("view", {
               key: 2,
               class: "quick-list"
@@ -13088,7 +13128,13 @@ This will fail in production if not fixed.`);
                         class: "btn-complete",
                         onClick: vue.withModifiers(($event) => $setup.handleQuickMarkDone(item), ["stop"])
                       }, [
-                        vue.createElementVNode("text", null, "Hoàn thành")
+                        vue.createElementVNode(
+                          "text",
+                          null,
+                          vue.toDisplayString(_ctx.$t("todo.done_action")),
+                          1
+                          /* TEXT */
+                        )
                       ], 8, ["onClick"])
                     ])
                   ]);
@@ -13259,10 +13305,10 @@ This will fail in production if not fixed.`);
       try {
         const data = await getAllMembers();
         memberList.value = data;
-        memberOptions.value = data.map((m) => m.UserName || "Thành viên ẩn danh");
+        memberOptions.value = data.map((m) => m.UserName || t("common.unknown_member"));
       } catch (error) {
         formatAppLog("error", "at controllers/create_todo.ts:86", "Lỗi lấy thành viên:", error);
-        showError("Không thể tải danh sách thành viên");
+        showError(t("todo.error_load_member"));
       }
     };
     const openCustomerPopup = () => {
@@ -13340,7 +13386,7 @@ This will fail in production if not fixed.`);
       }
       const isValidDate = validateNotifyAndDueDate(form.value.dueDate, form.value.notifyAt);
       if (!isValidDate) {
-        showError("Ngày thông báo không được trễ hơn hoặc trùng Hạn xử lý!");
+        showError(t("todo.msg_notify_must_be_before_due"));
         return;
       }
       let selectedLink = "CALL";
@@ -13368,7 +13414,7 @@ This will fail in production if not fixed.`);
       } catch (error) {
         hideLoading();
         formatAppLog("error", "at controllers/create_todo.ts:208", "Create Error:", error);
-        const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : "Thất bại");
+        const errorMsg = (error == null ? void 0 : error.message) || (typeof error === "string" ? error : t("common.failed"));
         showError(t("common.error_load") + ": " + errorMsg);
       } finally {
         loading.value = false;
@@ -14070,7 +14116,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode(
               "text",
               { class: "header-title" },
-              "Liên kết đính kèm (" + vue.toDisplayString($setup.insertedLinks.length) + ")",
+              vue.toDisplayString(_ctx.$t("todo.attached_links")) + " (" + vue.toDisplayString($setup.insertedLinks.length) + ")",
               1
               /* TEXT */
             )

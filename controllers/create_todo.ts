@@ -81,10 +81,10 @@ export const useCreateTodoController = () => {
 		try {
 			const data = await getAllMembers();
 			memberList.value = data;
-			memberOptions.value = data.map(m => m.UserName || 'Thành viên ẩn danh');
+			memberOptions.value = data.map(m => m.UserName || t('common.unknown_member'));
 		} catch (error) {
 			console.error('Lỗi lấy thành viên:', error);
-			showError('Không thể tải danh sách thành viên');
+			showError(t('todo.error_load_member'));
 		}
 	};
 	const openCustomerPopup = () => {
@@ -173,7 +173,7 @@ export const useCreateTodoController = () => {
 		}
 		const isValidDate = validateNotifyAndDueDate(form.value.dueDate, form.value.notifyAt);
 		if (!isValidDate) {
-			showError('Ngày thông báo không được trễ hơn hoặc trùng Hạn xử lý!');
+			showError(t('todo.msg_notify_must_be_before_due'));
 			return;
 		}
 
@@ -206,7 +206,7 @@ export const useCreateTodoController = () => {
 		} catch (error : any) {
 			hideLoading();
 			console.error("Create Error:", error);
-			const errorMsg = error?.message || (typeof error === 'string' ? error : 'Thất bại');
+			const errorMsg = error?.message || (typeof error === 'string' ? error : t('common.failed'));
 			showError(t('common.error_load') + ': ' + errorMsg);
 		} finally {
 			loading.value = false;

@@ -4,9 +4,10 @@ import { useAuthStore } from '@/stores/auth';
 import { getCrmFieldSearch, getCrmCustomers } from '@/api/crm';
 import { showError } from '@/utils/toast';
 import { convertDateRangeToValue } from '@/utils/dateUtils';
-
+import { useI18n } from 'vue-i18n';
 
 export const useCustomerFilter = () => {
+	const { t } = useI18n();
 	const authStore = useAuthStore();
 	const customerList = ref<any[]>([]);
 	const loadingCustomer = ref(false);
@@ -73,7 +74,7 @@ export const useCustomerFilter = () => {
 					id: item.id,
 					uid: item.uid,
 					createAt: item.createAt,
-					name: nameObj ? nameObj.value : '(Không tên)',
+					name: nameObj ? nameObj.value : t('common.no_name'),
 					phone: phoneObj ? phoneObj.value : '',
 					code: item.code || '',
 					managerUid: managerObj ? managerObj.value : ''
@@ -92,7 +93,7 @@ export const useCustomerFilter = () => {
 
 		} catch (error) {
 			console.error('Lỗi tải khách hàng:', error);
-			showError('Lỗi tải dữ liệu CRM');
+			showError(t('todo.error_load_crm'));
 			if (!isLoadMore) customerList.value = [];
 		} finally {
 			loadingCustomer.value = false;

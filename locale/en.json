@@ -36,9 +36,17 @@
 		"edit_link": "Edit",
 		"time_just_now": "Just now",
 		"time_minutes_ago": "{n} minutes ago",
-		"time_hours_ago": "{n} hours ago"
+		"time_hours_ago": "{n} hours ago",
+		"failed": "Failed",
+		"processing": "Processing...",
+		"msg_completed": "Task completed!",
+		"network_lost": "Internet connection lost",
+		"network_restored": "Connection restored",
+		"no_internet": "No internet connection",
+		"no_name": "(No Name)"
 	},
 	"todo": {
+		"attached_links": "Attached Links",
 		"page_title": "Todo",
 		"create_page_title": "Create Task",
 		"add_task": "Add Task",
@@ -145,7 +153,12 @@
 		"action_UPDATE_TODO": "updated the task",
 		"action_UPLOAD_ATTACHMENT": "uploaded an attachment",
 		"action_COMMENT": "added a comment",
-		"msg_notify_must_be_before_due": "Notification time must be earlier than due date!"
+		"msg_notify_must_be_before_due": "Notification time must be earlier than due date!",
+		"error_load_member": "Cannot load member list",
+		"quick_done_title": "Quick Mark Done",
+		"msg_no_task_quick_done": "No pending tasks",
+		"done_action": "Done",
+		"error_load_crm": "Failed to load CRM data"
 	},
 	"customer_modal": {
 		"title": "Select Customer",

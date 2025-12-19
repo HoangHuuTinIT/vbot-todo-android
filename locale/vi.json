@@ -36,9 +36,17 @@
 		"edit_link": "Chỉnh sửa",
 		"time_just_now": "Vừa xong",
 		"time_minutes_ago": "{n} phút trước",
-		"time_hours_ago": "{n} giờ trước"
+		"time_hours_ago": "{n} giờ trước",
+		"failed": "Thất bại",
+		"processing": "Đang xử lý...",
+		"msg_completed": "Đã hoàn thành công việc!",
+		"network_lost": "Mất kết nối Internet",
+		"network_restored": "Đã khôi phục kết nối",
+		"no_internet": "Không có kết nối Internet",
+		"no_name": "(Không tên)"
 	},
 	"todo": {
+		"attached_links": "Liên kết đính kèm",
 		"page_title": "Công việc",
 		"create_page_title": "Tạo công việc",
 		"add_task": "Thêm công việc",
@@ -145,7 +153,12 @@
 		"action_UPDATE_TODO": "đã cập nhật công việc",
 		"action_UPLOAD_ATTACHMENT": "đã tải lên tài liệu",
 		"action_COMMENT": "thêm một bình luận",
-		"msg_notify_must_be_before_due": "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!"
+		"msg_notify_must_be_before_due": "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!",
+		"error_load_member": "Không thể tải danh sách thành viên",
+		"quick_done_title": "Đánh dấu hoàn thành nhanh",
+		"msg_no_task_quick_done": "Không có công việc nào cần xử lý",
+		"done_action": "Hoàn thành",
+		"error_load_crm": "Lỗi tải dữ liệu CRM"
 	},
 	"customer_modal": {
 		"title": "Chọn khách hàng",

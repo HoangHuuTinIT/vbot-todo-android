@@ -167,7 +167,7 @@
 		<view class="filter-overlay" v-if="isQuickCompleteOpen" @click.stop="closeQuickComplete">
 			<view class="filter-panel quick-panel" @click.stop>
 				<view class="filter-header">
-					<text class="filter-title">Đánh dấu hoàn thành nhanh</text>
+					<text class="filter-title">{{ $t('todo.quick_done_title') }}</text>
 					<text class="close-btn" @click="closeQuickComplete">✕</text>
 				</view>
 
@@ -177,7 +177,7 @@
 					</view>
 
 					<view v-else-if="quickTodos.length === 0" class="empty-state" style="height: 200px;">
-						<text class="empty-text">Không có công việc nào cần xử lý</text>
+						<text class="empty-text">{{ $t('todo.msg_no_task_quick_done') }}</text>
 					</view>
 
 					<view v-else class="quick-list">
@@ -189,7 +189,7 @@
 
 							<view class="quick-action">
 								<button class="btn-complete" @click.stop="handleQuickMarkDone(item)">
-									<text>Hoàn thành</text>
+									<text>{{ $t('todo.done_action') }}</text>
 								</button>
 							</view>
 						</view>

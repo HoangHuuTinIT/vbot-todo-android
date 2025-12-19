@@ -10,7 +10,8 @@
 
 <script setup lang="ts">
 	import { ref, onMounted, onUnmounted, computed } from 'vue';
-
+	import { useI18n } from 'vue-i18n';
+	const { t } = useI18n();
 	const isVisible = ref(false);
 	const msgContent = ref('');
 	const msgType = ref('success');
@@ -57,9 +58,9 @@
 
 		uni.onNetworkStatusChange((res) => {
 			if (!res.isConnected) {
-				handleShowToast({ message: 'Mất kết nối Internet.', type: 'error' });
+				handleShowToast({ message: t('common.network_lost'), type: 'error' });
 			} else {
-				handleShowToast({ message: 'Đã khôi phục kết nối.', type: 'success' });
+				handleShowToast({ message: t('common.network_restored'), type: 'success' });
 			}
 		});
 	});
@@ -68,7 +69,7 @@
 		success: (res) => {
 			if (res.networkType === 'none') {
 				handleShowToast({
-					message: 'Không có kết nối Internet.',
+					message: t('common.no_internet'),
 					type: 'error'
 				});
 			}

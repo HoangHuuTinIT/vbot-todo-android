@@ -43,13 +43,13 @@ export const useListTodoController = () => {
 
 	const rawMemberList = ref<any[]>([]);
 	const creatorOptions = computed(() => {
-		const names = rawMemberList.value.map(m => m.UserName || t('common.hidden_member'));
+		const names = rawMemberList.value.map(m => m.UserName || t('common.unknown_member'));
 		return [t('common.all'), ...names];
 	});
 	const creatorIndex = ref(0);
 
 	const assigneeOptions = computed(() => {
-		const names = rawMemberList.value.map(m => m.UserName || 'Thành viên ẩn');
+		const names = rawMemberList.value.map(m => m.UserName || t('common.hidden_member'));
 		return [t('common.all'), ...names];
 	});
 	const assigneeIndex = ref(0);
@@ -132,7 +132,7 @@ export const useListTodoController = () => {
 
 		} catch (error) {
 			console.error(error);
-			showError('Lỗi tải dữ liệu');
+			showError(t('common.error_load'));
 		} finally {
 			isLoading.value = false;
 
@@ -172,7 +172,7 @@ export const useListTodoController = () => {
 	};
 
 	const handleQuickMarkDone = async (item : TodoItem) => {
-		uni.showLoading({ title: 'Đang xử lý...' });
+		uni.showLoading({ title: t('common.processing') });
 		try {
 			const payload = {
 				...item,
@@ -186,7 +186,7 @@ export const useListTodoController = () => {
 			const res = await updateTodo(payload as any);
 
 			if (res) {
-				showSuccess('Đã hoàn thành công việc!');
+				showSuccess(t('common.msg_completed'));
 				quickTodos.value = quickTodos.value.filter(t => t.id !== item.id);
 				getTodoList();
 			}
