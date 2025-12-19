@@ -78,9 +78,9 @@
 		"customer_section": "Thông tin khách hàng",
 		"loading_crm": "⏳ Đang tải thông tin từ CRM...",
 		"no_customer_attached": "(Công việc này chưa gắn với khách hàng nào)",
-		"customer_name_label": "Khách hàng",
-		"customer_phone_label": "SĐT",
-		"customer_manager_label": "Phụ trách",
+		"customer_name_label": "Tên Khách hàng",
+		"customer_phone_label": "Số điện thoại",
+		"customer_manager_label": "Thành viên quản lý",
 		"manager_none": "(Chưa có)",
 		"comments_activities": "Bình luận và hoạt động",
 		"comment_placeholder_edit": "Đang chỉnh sửa...",
@@ -144,7 +144,8 @@
 		"action_NEW_SUB_TODO": "đã tạo việc con",
 		"action_UPDATE_TODO": "đã cập nhật công việc",
 		"action_UPLOAD_ATTACHMENT": "đã tải lên tài liệu",
-		"action_COMMENT": "thêm một bình luận"
+		"action_COMMENT": "thêm một bình luận",
+		"msg_notify_must_be_before_due": "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!"
 	},
 	"customer_modal": {
 		"title": "Chọn khách hàng",

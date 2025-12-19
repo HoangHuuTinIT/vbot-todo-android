@@ -78,8 +78,8 @@
 		"customer_section": "Customer Information",
 		"loading_crm": "⏳ Loading CRM info...",
 		"no_customer_attached": "(No customer attached)",
-		"customer_name_label": "Customer",
-		"customer_phone_label": "Phone",
+		"customer_name_label": "Customer name",
+		"customer_phone_label": "Phone number",
 		"customer_manager_label": "In charge",
 		"manager_none": "(None)",
 		"comments_activities": "Comments & Activities",
@@ -144,7 +144,8 @@
 		"action_NEW_SUB_TODO": "created a sub-task",
 		"action_UPDATE_TODO": "updated the task",
 		"action_UPLOAD_ATTACHMENT": "uploaded an attachment",
-		"action_COMMENT": "added a comment"
+		"action_COMMENT": "added a comment",
+		"msg_notify_must_be_before_due": "Notification time must be earlier than due date!"
 	},
 	"customer_modal": {
 		"title": "Select Customer",

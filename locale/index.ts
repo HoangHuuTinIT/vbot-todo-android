@@ -49,9 +49,7 @@ const getSavedLocale = () => {
     }
 };
 
-// Gọi hàm vừa viết để lấy ngôn ngữ khởi tạo
 const curLocale = getSavedLocale();
-
 console.log("🌐 Ngôn ngữ khởi tạo i18n:", curLocale);
 
 const i18n = createI18n({

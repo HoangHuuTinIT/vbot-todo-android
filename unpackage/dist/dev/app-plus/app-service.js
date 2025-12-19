@@ -10459,9 +10459,9 @@ This will fail in production if not fixed.`);
     customer_section: "Thông tin khách hàng",
     loading_crm: "⏳ Đang tải thông tin từ CRM...",
     no_customer_attached: "(Công việc này chưa gắn với khách hàng nào)",
-    customer_name_label: "Khách hàng",
-    customer_phone_label: "SĐT",
-    customer_manager_label: "Phụ trách",
+    customer_name_label: "Tên Khách hàng",
+    customer_phone_label: "Số điện thoại",
+    customer_manager_label: "Thành viên quản lý",
     manager_none: "(Chưa có)",
     comments_activities: "Bình luận và hoạt động",
     comment_placeholder_edit: "Đang chỉnh sửa...",
@@ -10519,7 +10519,8 @@ This will fail in production if not fixed.`);
     action_NEW_SUB_TODO: "đã tạo việc con",
     action_UPDATE_TODO: "đã cập nhật công việc",
     action_UPLOAD_ATTACHMENT: "đã tải lên tài liệu",
-    action_COMMENT: "thêm một bình luận"
+    action_COMMENT: "thêm một bình luận",
+    msg_notify_must_be_before_due: "Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!"
   };
   const customer_modal$1 = {
     title: "Chọn khách hàng",
@@ -10687,8 +10688,8 @@ This will fail in production if not fixed.`);
     customer_section: "Customer Information",
     loading_crm: "⏳ Loading CRM info...",
     no_customer_attached: "(No customer attached)",
-    customer_name_label: "Customer",
-    customer_phone_label: "Phone",
+    customer_name_label: "Customer name",
+    customer_phone_label: "Phone number",
     customer_manager_label: "In charge",
     manager_none: "(None)",
     comments_activities: "Comments & Activities",
@@ -10747,7 +10748,8 @@ This will fail in production if not fixed.`);
     action_NEW_SUB_TODO: "created a sub-task",
     action_UPDATE_TODO: "updated the task",
     action_UPLOAD_ATTACHMENT: "uploaded an attachment",
-    action_COMMENT: "added a comment"
+    action_COMMENT: "added a comment",
+    msg_notify_must_be_before_due: "Notification time must be earlier than due date!"
   };
   const customer_modal = {
     title: "Select Customer",
@@ -10872,7 +10874,7 @@ This will fail in production if not fixed.`);
     }
   };
   const curLocale = getSavedLocale();
-  formatAppLog("log", "at locale/index.ts:55", "🌐 Ngôn ngữ khởi tạo i18n:", curLocale);
+  formatAppLog("log", "at locale/index.ts:53", "🌐 Ngôn ngữ khởi tạo i18n:", curLocale);
   const i18n = createI18n({
     locale: curLocale,
     fallbackLocale: "vi",
@@ -14823,7 +14825,7 @@ This will fail in production if not fixed.`);
       }
       const isValid = validateNotifyAndDueDate(tempDueDate, tempNotifyAt);
       if (!isValid) {
-        showInfo("Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!");
+        showInfo(t("todo.msg_notify_must_be_before_due"));
         event.field === "dueDate" ? form.value.dueDate : form.value.notifyAt;
         if (event.field === "dueDate") {
           form.value.dueDate = form.value.raw.dueDate ? timestampToDateTimeStr$1(form.value.raw.dueDate) : "";
@@ -15367,7 +15369,7 @@ This will fail in production if not fixed.`);
     };
     const submitComment = async () => {
       if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
-        showInfo("Vui lòng nhập nội dung");
+        showInfo(t("todo.msg_empty_content"));
         return;
       }
       isSubmittingComment.value = true;
@@ -18168,7 +18170,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerNameLabel || _ctx.$t("todo.customer_name_label")),
+                  vue.toDisplayString(_ctx.$t("todo.customer_name_label")),
                   1
                   /* TEXT */
                 )
@@ -18190,7 +18192,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerPhoneLabel || _ctx.$t("todo.customer_phone_label")),
+                  vue.toDisplayString(_ctx.$t("todo.customer_phone_label")),
                   1
                   /* TEXT */
                 )
@@ -18212,7 +18214,7 @@ This will fail in production if not fixed.`);
                 vue.createElementVNode(
                   "text",
                   { class: "item-label" },
-                  vue.toDisplayString($setup.form.customerManagerLabel || _ctx.$t("todo.customer_manager_label")),
+                  vue.toDisplayString(_ctx.$t("todo.customer_manager_label")),
                   1
                   /* TEXT */
                 )

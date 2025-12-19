@@ -83,7 +83,7 @@
 							<image src="/static/user-male-circle.png" class="item-icon">
 							</image>
 							<text
-								class="item-label">{{ form.customerNameLabel || $t('todo.customer_name_label') }}</text>
+								class="item-label">{{ $t('todo.customer_name_label') }}</text>
 						</view>
 						<view class="item-right-text">{{ form.customerName }}</view>
 					</view>
@@ -91,7 +91,7 @@
 						<view class="item-left">
 							<image src="/static/phone.png" class="item-icon"></image>
 							<text
-								class="item-label">{{ form.customerPhoneLabel || $t('todo.customer_phone_label') }}</text>
+								class="item-label">{{$t('todo.customer_phone_label') }}</text>
 						</view>
 						<view class="item-right-text phone-text">{{ form.customerPhone }}</view>
 					</view>
@@ -99,7 +99,7 @@
 						<view class="item-left">
 							<image src="/static/manager.png" class="item-icon"></image>
 							<text
-								class="item-label">{{ form.customerManagerLabel || $t('todo.customer_manager_label') }}</text>
+								class="item-label">{{$t('todo.customer_manager_label') }}</text>
 						</view>
 						<view class="item-right-text highlight-text">
 							{{ form.customerManagerName || $t('todo.manager_none') }}

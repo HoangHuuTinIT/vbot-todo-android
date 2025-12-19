@@ -115,7 +115,7 @@ export const useTodoDetailController = () => {
 		const isValid = validateNotifyAndDueDate(tempDueDate, tempNotifyAt);
 
 		if (!isValid) {
-			showInfo('Ngày thông báo phải nhỏ hơn hạn xử lý (không được trùng)!');
+			showInfo(t('todo.msg_notify_must_be_before_due'));
 			const oldValue = event.field === 'dueDate' ? form.value.dueDate : form.value.notifyAt;
 			if (event.field === 'dueDate') {
 				form.value.dueDate = form.value.raw.dueDate ? timestampToDateTimeStr(form.value.raw.dueDate) : '';
@@ -768,7 +768,7 @@ export const useTodoDetailController = () => {
 	};
 	const submitComment = async () => {
 		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
-			showInfo('Vui lòng nhập nội dung');
+			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
 		isSubmittingComment.value = true;
