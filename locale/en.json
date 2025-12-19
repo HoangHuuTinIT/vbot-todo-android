@@ -31,9 +31,12 @@
 		"to_date": "To Date",
 		"hidden_member": "Hidden Member",
 		"hidden_user": "Hidden User",
-		"open_link" :"Open",
-		"copy_link" : "Copy",
-		"edit_link":"Edit"
+		"open_link": "Open",
+		"copy_link": "Copy",
+		"edit_link": "Edit",
+		"time_just_now": "Just now",
+		"time_minutes_ago": "{n} minutes ago",
+		"time_hours_ago": "{n} hours ago"
 	},
 	"todo": {
 		"page_title": "Todo",
@@ -135,7 +138,13 @@
 		"confirm_delete_msg": "Are you sure you want to delete \"{title}\"?",
 		"status_todo": "To Do",
 		"status_progress": "In Progress",
-		"status_done": "Done"
+		"status_done": "Done",
+		"action_NEW_TODO": "created the task",
+		"action_REOPEN_TODO": "reopened the task",
+		"action_NEW_SUB_TODO": "created a sub-task",
+		"action_UPDATE_TODO": "updated the task",
+		"action_UPLOAD_ATTACHMENT": "uploaded an attachment",
+		"action_COMMENT": "added a comment"
 	},
 	"customer_modal": {
 		"title": "Select Customer",

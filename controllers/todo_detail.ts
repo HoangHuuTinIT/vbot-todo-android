@@ -926,10 +926,28 @@ export const useTodoDetailController = () => {
 		avatarChar = senderName.charAt(0).toUpperCase();
 
 		let actionText = '';
-		if (item.type === 'COMMENT') actionText = t('todo.action_comment');
-		else if (item.type === 'LOG') actionText = t('todo.action_log');
-		else if (item.type === 'UPDATE_TODO') actionText = t('todo.action_update');
-		else if (item.type === 'NEW_TODO') actionText = 'Đã tạo công việc';
+		switch (item.type) {
+			case 'NEW_TODO':
+				actionText = t('todo.action_NEW_TODO');
+				break;
+			case 'REOPEN_TODO':
+				actionText = t('todo.action_REOPEN_TODO');
+				break;
+			case 'NEW_SUB_TODO':
+				actionText = t('todo.action_NEW_SUB_TODO');
+				break;
+			case 'UPDATE_TODO':
+				actionText = t('todo.action_UPDATE_TODO');
+				break;
+			case 'UPLOAD_ATTACHMENT':
+				actionText = t('todo.action_UPLOAD_ATTACHMENT');
+				break;
+			case 'COMMENT':
+				actionText = t('todo.action_COMMENT');
+				break;
+			default:
+				actionText = '';
+		}
 
 		const reactionList = item.reactions?.details || [];
 
@@ -941,7 +959,7 @@ export const useTodoDetailController = () => {
 			senderAvatarColor: avatarColor,
 			message: item.message || '',
 			files: item.files || '',
-			timeDisplay: formatRelativeTime(item.createdAt),
+			timeDisplay: formatRelativeTime(item.createdAt, t),
 			actionText,
 			isEdited: !!item.updatedAt,
 			type: item.type,

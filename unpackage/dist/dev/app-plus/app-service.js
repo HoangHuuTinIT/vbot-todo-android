@@ -4547,20 +4547,37 @@ if (uni.restoreGlobal) {
     ]);
   }
   const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
-  const formatRelativeTime = (timestamp) => {
+  const formatRelativeTime = (timestamp, t) => {
     if (!timestamp)
       return "";
     const now2 = Date.now();
     const diff = now2 - timestamp;
+    const translate2 = (key, value) => {
+      let text = "";
+      if (t) {
+        text = t(key);
+      } else {
+        if (key === "common.time_just_now")
+          return "Vừa xong";
+        if (key === "common.time_minutes_ago")
+          text = "{n} phút trước";
+        if (key === "common.time_hours_ago")
+          text = "{n} giờ trước";
+      }
+      if (value !== void 0) {
+        return text.replace("{n}", String(value));
+      }
+      return text;
+    };
     if (diff < 6e4)
-      return "Vừa xong";
+      return translate2("common.time_just_now");
     if (diff < 36e5) {
       const minutes = Math.floor(diff / 6e4);
-      return `${minutes} phút trước`;
+      return translate2("common.time_minutes_ago", minutes);
     }
     if (diff < 864e5) {
       const hours = Math.floor(diff / 36e5);
-      return `${hours} giờ trước`;
+      return translate2("common.time_hours_ago", hours);
     }
     const date = new Date(timestamp);
     const d = date.getDate().toString().padStart(2, "0");
@@ -10397,7 +10414,10 @@ This will fail in production if not fixed.`);
     hidden_user: "Người dùng ẩn",
     open_link: "Mở",
     copy_link: "Sao chép",
-    edit_link: "Chỉnh sửa"
+    edit_link: "Chỉnh sửa",
+    time_just_now: "Vừa xong",
+    time_minutes_ago: "{n} phút trước",
+    time_hours_ago: "{n} giờ trước"
   };
   const todo$1 = {
     page_title: "Công việc",
@@ -10493,7 +10513,13 @@ This will fail in production if not fixed.`);
     unknown: "Chưa xác định",
     msg_deleted: "Đã xóa",
     msg_saved: "Đã lưu",
-    interaction_other: "Tương tác khác"
+    interaction_other: "Tương tác khác",
+    action_NEW_TODO: "đã tạo công việc",
+    action_REOPEN_TODO: "đã mở lại công việc",
+    action_NEW_SUB_TODO: "đã tạo việc con",
+    action_UPDATE_TODO: "đã cập nhật công việc",
+    action_UPLOAD_ATTACHMENT: "đã tải lên tài liệu",
+    action_COMMENT: "thêm một bình luận"
   };
   const customer_modal$1 = {
     title: "Chọn khách hàng",
@@ -10616,7 +10642,10 @@ This will fail in production if not fixed.`);
     hidden_user: "Hidden User",
     open_link: "Open",
     copy_link: "Copy",
-    edit_link: "Edit"
+    edit_link: "Edit",
+    time_just_now: "Just now",
+    time_minutes_ago: "{n} minutes ago",
+    time_hours_ago: "{n} hours ago"
   };
   const todo = {
     page_title: "Todo",
@@ -10712,7 +10741,13 @@ This will fail in production if not fixed.`);
     unknown: "Unknown",
     msg_deleted: "Deleted",
     msg_saved: "Saved",
-    interaction_other: "Other interaction"
+    interaction_other: "Other interaction",
+    action_NEW_TODO: "created the task",
+    action_REOPEN_TODO: "reopened the task",
+    action_NEW_SUB_TODO: "created a sub-task",
+    action_UPDATE_TODO: "updated the task",
+    action_UPLOAD_ATTACHMENT: "uploaded an attachment",
+    action_COMMENT: "added a comment"
   };
   const customer_modal = {
     title: "Select Customer",
@@ -15467,14 +15502,28 @@ This will fail in production if not fixed.`);
       }
       avatarChar = senderName.charAt(0).toUpperCase();
       let actionText = "";
-      if (item.type === "COMMENT")
-        actionText = t("todo.action_comment");
-      else if (item.type === "LOG")
-        actionText = t("todo.action_log");
-      else if (item.type === "UPDATE_TODO")
-        actionText = t("todo.action_update");
-      else if (item.type === "NEW_TODO")
-        actionText = "Đã tạo công việc";
+      switch (item.type) {
+        case "NEW_TODO":
+          actionText = t("todo.action_NEW_TODO");
+          break;
+        case "REOPEN_TODO":
+          actionText = t("todo.action_REOPEN_TODO");
+          break;
+        case "NEW_SUB_TODO":
+          actionText = t("todo.action_NEW_SUB_TODO");
+          break;
+        case "UPDATE_TODO":
+          actionText = t("todo.action_UPDATE_TODO");
+          break;
+        case "UPLOAD_ATTACHMENT":
+          actionText = t("todo.action_UPLOAD_ATTACHMENT");
+          break;
+        case "COMMENT":
+          actionText = t("todo.action_COMMENT");
+          break;
+        default:
+          actionText = "";
+      }
       const reactionList = ((_a = item.reactions) == null ? void 0 : _a.details) || [];
       return {
         id: item.id,
@@ -15484,7 +15533,7 @@ This will fail in production if not fixed.`);
         senderAvatarColor: avatarColor,
         message: item.message || "",
         files: item.files || "",
-        timeDisplay: formatRelativeTime(item.createdAt),
+        timeDisplay: formatRelativeTime(item.createdAt, t),
         actionText,
         isEdited: !!item.updatedAt,
         type: item.type,
@@ -15514,7 +15563,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:976", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:994", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -15555,7 +15604,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : t("todo.unknown");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1034", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1052", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -15566,7 +15615,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:1046", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:1064", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -15595,7 +15644,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1084", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1102", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -15626,7 +15675,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1131", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1149", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_status_changed"));
@@ -15638,7 +15687,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1147", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1165", "Lỗi cập nhật trạng thái:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15670,7 +15719,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1191", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1209", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_assignee_changed"));
@@ -15681,7 +15730,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1209", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1227", "Lỗi cập nhật người giao:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15691,7 +15740,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1218", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1236", "Lưu:", form.value);
       showSuccess(t("todo.msg_saved"));
     };
     return {
@@ -17548,7 +17597,7 @@ This will fail in production if not fixed.`);
       const handleLinkTap = (e) => {
         const url = e.href || e["data-src"] || e.src;
         if (url) {
-          formatAppLog("log", "at components/Todo/CommentItem.vue:137", "Mở link:", url);
+          formatAppLog("log", "at components/Todo/CommentItem.vue:131", "Mở link:", url);
           openExternalLink(url);
         }
       };
@@ -17608,15 +17657,27 @@ This will fail in production if not fixed.`);
         }, null, 8, ["name", "avatar-color", "size", "class"]),
         vue.createElementVNode("view", { class: "flex-1 overflow-hidden" }, [
           vue.createElementVNode("view", { class: "bg-gray-50 rounded-2xl p-3 rounded-tl-none relative" }, [
-            vue.createElementVNode("view", { class: "flex justify-between items-start mb-1" }, [
-              vue.createElementVNode(
-                "text",
-                { class: "font-bold text-sm text-gray-900" },
-                vue.toDisplayString($props.data.senderName),
-                1
-                /* TEXT */
-              ),
-              vue.createElementVNode("view", { class: "flex items-center" }, [
+            vue.createElementVNode("view", { class: "flex flex-col items-start mb-2" }, [
+              vue.createElementVNode("view", { class: "flex flex-wrap items-center gap-1" }, [
+                vue.createElementVNode(
+                  "text",
+                  { class: "font-bold text-sm text-gray-900" },
+                  vue.toDisplayString($props.data.senderName),
+                  1
+                  /* TEXT */
+                ),
+                $props.data.actionText ? (vue.openBlock(), vue.createElementBlock(
+                  "text",
+                  {
+                    key: 0,
+                    class: "text-xs text-gray-500 font-normal"
+                  },
+                  vue.toDisplayString($props.data.actionText),
+                  1
+                  /* TEXT */
+                )) : vue.createCommentVNode("v-if", true)
+              ]),
+              vue.createElementVNode("view", { class: "flex items-center mt-1" }, [
                 vue.createElementVNode(
                   "text",
                   { class: "text-xs text-gray-400" },
@@ -18546,61 +18607,85 @@ This will fail in production if not fixed.`);
     __name: "App",
     setup(__props, { expose: __expose }) {
       __expose();
+      const TEST_ENV = {
+        URL: "https://api-sandbox-h01.vbot.vn/v1.0",
+        USER: "hoangtin",
+        PASS: "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
+        // Pass này đã hash sẵn trong env
+        UID: "60566991077e440eafe369eac2e5e3db",
+        P_CODE: "PR202511211001129372"
+      };
       const handleNativeData = async (eventName, options = null) => {
-        formatAppLog("log", "at App.vue:9", `[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
+        formatAppLog("log", "at App.vue:17", `[${eventName}] Bắt đầu quy trình khởi tạo...`);
         const authStore = useAuthStore();
         const socketStore = useSocketStore();
         let nativeData = null;
-        if (options && options.referrerInfo && options.referrerInfo.extraData) {
-          formatAppLog("log", "at App.vue:17", "-> Tìm thấy dữ liệu trong options.referrerInfo");
-          nativeData = options.referrerInfo.extraData;
-        } else if (typeof plus !== "undefined" && plus.runtime && plus.runtime.arguments) {
-          formatAppLog("log", "at App.vue:21", "-> Tìm thấy dữ liệu trong plus.runtime.arguments");
-          const args = plus.runtime.arguments;
+        if (!nativeData) {
+          formatAppLog("log", "at App.vue:50", "⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
           try {
-            nativeData = typeof args === "string" && args.startsWith("{") ? JSON.parse(args) : args;
+            const res = await new Promise((resolve) => {
+              uni.request({
+                url: `${TEST_ENV.URL}/token`,
+                method: "POST",
+                header: { "Content-Type": "application/x-www-form-urlencoded" },
+                data: {
+                  username: TEST_ENV.USER,
+                  password: TEST_ENV.PASS,
+                  // Pass trong env của bạn đã hash rồi nên gửi luôn
+                  grant_type: "password",
+                  source: "Desktop-RTC"
+                  // Giả mạo nguồn
+                },
+                success: (r) => resolve(r.data),
+                fail: (e) => resolve(null)
+              });
+            });
+            if (res && res.access_token) {
+              formatAppLog("log", "at App.vue:71", "✅ DEV LOGIN THÀNH CÔNG!");
+              nativeData = {
+                uid: TEST_ENV.UID,
+                // Lấy từ env
+                projectCode: TEST_ENV.P_CODE,
+                // Lấy từ env
+                access_token: res.access_token,
+                session_id: res.session_id,
+                language: "en"
+                // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
+              };
+            } else {
+              formatAppLog("error", "at App.vue:81", "❌ DEV LOGIN THẤT BẠI:", res);
+            }
           } catch (e) {
-            formatAppLog("error", "at App.vue:26", "Lỗi parse arguments:", e);
-            if (typeof args === "object")
-              nativeData = args;
-          }
-        } else {
-          const launchOpts = uni.getLaunchOptionsSync();
-          if (launchOpts && launchOpts.extraData) {
-            nativeData = launchOpts.extraData;
+            formatAppLog("error", "at App.vue:84", "Lỗi login dev:", e);
           }
         }
         if (nativeData) {
-          if (nativeData.language === "en" || nativeData.language === "vi") {
-            formatAppLog("log", "at App.vue:44", "🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
+          if (nativeData.language) {
+            formatAppLog("log", "at App.vue:94", "🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);
           }
           if (nativeData.uid && nativeData.access_token) {
-            formatAppLog("log", "at App.vue:50", "✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
+            formatAppLog("log", "at App.vue:99", "✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
             await authStore.initFromNative(nativeData);
             if (authStore.isLoggedIn) {
               socketStore.connect();
             }
           }
         } else {
-          formatAppLog("log", "at App.vue:58", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
-          if (eventName === "Launch") {
-            formatAppLog("warn", "at App.vue:60", "App Launch thiếu data");
-          }
+          formatAppLog("log", "at App.vue:107", "⚠️ Không có dữ liệu để chạy App.");
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:66", " App Launch");
+        formatAppLog("log", "at App.vue:112", " App Launch");
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:71", "App Show");
-        handleNativeData("Show", options);
+        formatAppLog("log", "at App.vue:117", "App Show");
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:76", " App Hide");
+        formatAppLog("log", "at App.vue:122", " App Hide");
       });
-      const __returned__ = { handleNativeData, get onLaunch() {
+      const __returned__ = { TEST_ENV, handleNativeData, get onLaunch() {
         return onLaunch;
       }, get onShow() {
         return onShow;

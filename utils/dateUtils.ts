@@ -1,17 +1,34 @@
 // utils/dateUtils.ts
-
-export const formatRelativeTime = (timestamp : number | null) : string => {
+export const formatRelativeTime = (timestamp : number | null, t ?: any) : string => {
 	if (!timestamp) return '';
 	const now = Date.now();
 	const diff = now - timestamp;
-	if (diff < 60000) return 'Vừa xong';
+	const translate = (key : string, value ?: number) => {
+		let text = '';
+		if (t) {
+			text = t(key);
+		} else {
+			if (key === 'common.time_just_now') return 'Vừa xong';
+			if (key === 'common.time_minutes_ago') text = '{n} phút trước';
+			if (key === 'common.time_hours_ago') text = '{n} giờ trước';
+		}
+		if (value !== undefined) {
+			return text.replace('{n}', String(value));
+		}
+
+		return text;
+	};
+
+	if (diff < 60000) return translate('common.time_just_now');
+
 	if (diff < 3600000) {
 		const minutes = Math.floor(diff / 60000);
-		return `${minutes} phút trước`;
+		return translate('common.time_minutes_ago', minutes);
 	}
+
 	if (diff < 86400000) {
 		const hours = Math.floor(diff / 3600000);
-		return `${hours} giờ trước`;
+		return translate('common.time_hours_ago', hours);
 	}
 	const date = new Date(timestamp);
 	const d = date.getDate().toString().padStart(2, '0');

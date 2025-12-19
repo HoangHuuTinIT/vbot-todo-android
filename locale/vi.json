@@ -31,9 +31,12 @@
 		"to_date": "Đến ngày",
 		"hidden_member": "Thành viên ẩn",
 		"hidden_user": "Người dùng ẩn",
-		"open_link" :"Mở",
-		"copy_link" : "Sao chép",
-		"edit_link":"Chỉnh sửa"
+		"open_link": "Mở",
+		"copy_link": "Sao chép",
+		"edit_link": "Chỉnh sửa",
+		"time_just_now": "Vừa xong",
+		"time_minutes_ago": "{n} phút trước",
+		"time_hours_ago": "{n} giờ trước"
 	},
 	"todo": {
 		"page_title": "Công việc",
@@ -135,7 +138,13 @@
 		"confirm_delete_msg": "Bạn có chắc muốn xóa công việc \"{title}\"?",
 		"status_todo": "Chưa xử lý",
 		"status_progress": "Đang xử lý",
-		"status_done": "Hoàn thành"
+		"status_done": "Hoàn thành",
+		"action_NEW_TODO": "đã tạo công việc",
+		"action_REOPEN_TODO": "đã mở lại công việc",
+		"action_NEW_SUB_TODO": "đã tạo việc con",
+		"action_UPDATE_TODO": "đã cập nhật công việc",
+		"action_UPLOAD_ATTACHMENT": "đã tải lên tài liệu",
+		"action_COMMENT": "thêm một bình luận"
 	},
 	"customer_modal": {
 		"title": "Chọn khách hàng",

@@ -2,28 +2,36 @@
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
 import { useAuthStore } from '@/stores/auth';
 import { useSocketStore } from '@/stores/socket';
-// 1. IMPORT HÀM ĐỔI NGÔN NGỮ
 import { changeLanguage } from '@/utils/language'; 
 
+// --- KHU VỰC CONFIG TEST NHANH (Lấy từ .env) ---
+const TEST_ENV = {
+    URL: import.meta.env.VITE_SERVER_BASE_URL,
+    USER: import.meta.env.VITE_TEST_USERNAME,
+    PASS: import.meta.env.VITE_TEST_PASSWORD, // Pass này đã hash sẵn trong env
+    UID: import.meta.env.VITE_UID,
+    P_CODE: import.meta.env.VITE_PROJECT_CODE
+};
+
 const handleNativeData = async (eventName: string, options: any = null) => {
-    console.log(`[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
+    console.log(`[${eventName}] Bắt đầu quy trình khởi tạo...`);
     const authStore = useAuthStore();
     const socketStore = useSocketStore();
     
     let nativeData = null;
 
-    // --- (Giữ nguyên logic lấy nativeData cũ của bạn) ---
+    // =================================================================
+    // 🔴 1. LOGIC LẤY TỪ APP CHÍNH (ĐÃ COMMENT ĐỂ CHẠY TEST)
+    // =================================================================
+    /*
     if (options && options.referrerInfo && options.referrerInfo.extraData) {
-        console.log("-> Tìm thấy dữ liệu trong options.referrerInfo");
         nativeData = options.referrerInfo.extraData;
     } 
     else if (typeof plus !== 'undefined' && plus.runtime && plus.runtime.arguments) {
-        console.log("-> Tìm thấy dữ liệu trong plus.runtime.arguments");
         const args = plus.runtime.arguments;
         try {
             nativeData = (typeof args === 'string' && args.startsWith('{')) ? JSON.parse(args) : args;
         } catch (e) {
-            console.error("Lỗi parse arguments:", e);
             if (typeof args === 'object') nativeData = args;
         }
     }
@@ -33,21 +41,62 @@ const handleNativeData = async (eventName: string, options: any = null) => {
              nativeData = launchOpts.extraData;
         }
     }
-    // -----------------------------------------------------
+    */
 
-    // 2. XỬ LÝ DỮ LIỆU
-    if (nativeData) { // Chỉ cần có data là check ngay
+    // =================================================================
+    // 🟢 2. LOGIC CHẠY TEST (TỰ LOGIN LẤY TOKEN TỪ ENV)
+    // =================================================================
+    if (!nativeData) {
+        console.log("⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
         
-        // --- [QUAN TRỌNG] SETUP NGÔN NGỮ NGAY TẠI ĐÂY ---
-        // Vì auth lấy được data ở đây, thì language chắc chắn cũng lấy được ở đây
-        if (nativeData.language === 'en' || nativeData.language === 'vi') {
-            console.log("🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
+        try {
+            // Gọi API Login giả lập để lấy Access Token xịn
+            const res: any = await new Promise((resolve) => {
+                uni.request({
+                    url: `${TEST_ENV.URL}/token`,
+                    method: 'POST',
+                    header: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    data: {
+                        username: TEST_ENV.USER,
+                        password: TEST_ENV.PASS, // Pass trong env của bạn đã hash rồi nên gửi luôn
+                        grant_type: 'password',
+                        source: 'Desktop-RTC' // Giả mạo nguồn
+                    },
+                    success: (r) => resolve(r.data),
+                    fail: (e) => resolve(null)
+                });
+            });
+
+            if (res && res.access_token) {
+                console.log("✅ DEV LOGIN THÀNH CÔNG!");
+                // Tạo gói tin giả lập y hệt Android gửi sang
+                nativeData = {
+                    uid: TEST_ENV.UID,           // Lấy từ env
+                    projectCode: TEST_ENV.P_CODE,// Lấy từ env
+                    access_token: res.access_token,
+                    session_id: res.session_id,
+                    language: 'en'               // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
+                };
+            } else {
+                console.error("❌ DEV LOGIN THẤT BẠI:", res);
+            }
+        } catch (e) {
+            console.error("Lỗi login dev:", e);
+        }
+    }
+
+    // =================================================================
+    // 🔵 3. XỬ LÝ DỮ LIỆU (KHÔNG CẦN SỬA)
+    // =================================================================
+    if (nativeData) { 
+        // Setup ngôn ngữ ngay lập tức
+        if (nativeData.language) {
+            console.log("🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);
         }
-        // -------------------------------------------------
 
         if (nativeData.uid && nativeData.access_token) {
-            console.log("✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
+            console.log("✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
             await authStore.initFromNative(nativeData);
             
             if (authStore.isLoggedIn) {
@@ -55,10 +104,7 @@ const handleNativeData = async (eventName: string, options: any = null) => {
             }
         }
     } else {
-        console.log("⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
-        if (eventName === 'Launch') {
-             console.warn("App Launch thiếu data");
-        }
+        console.log("⚠️ Không có dữ liệu để chạy App.");
     }
 };
 
@@ -69,7 +115,7 @@ onLaunch((options: UniApp.LaunchOptions) => {
 
 onShow((options: UniApp.ShowOptions) => {
     console.log('App Show');
-    handleNativeData('Show', options);
+    // handleNativeData('Show', options); // Tạm tắt cái này để đỡ spam login mỗi khi reload
 });
 
 onHide(() => {

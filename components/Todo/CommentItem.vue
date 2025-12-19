@@ -6,18 +6,24 @@
 
 			<view class="flex-1 overflow-hidden">
 				<view class="bg-gray-50 rounded-2xl p-3 rounded-tl-none relative">
-					<view class="flex justify-between items-start mb-1">
-						<text class="font-bold text-sm text-gray-900">
-							{{ data.senderName }}
-						</text>
-						<view class="flex items-center">
+
+					<view class="flex flex-col items-start mb-2">
+						<view class="flex flex-wrap items-center gap-1">
+							<text class="font-bold text-sm text-gray-900">
+								{{ data.senderName }}
+							</text>
+							<text v-if="data.actionText" class="text-xs text-gray-500 font-normal">
+								{{ data.actionText }}
+							</text>
+						</view>
+
+						<view class="flex items-center mt-1">
 							<text class="text-xs text-gray-400">{{ data.timeDisplay }}</text>
 							<text v-if="data.isEdited" class="text-xs text-gray-400 italic ml-1">
 								• Đã sửa
 							</text>
 						</view>
 					</view>
-
 					<view v-if="parsedContent.isUpdate" class="content-body">
 						<text class="font-bold text-sm text-gray-700 block mb-1">
 							{{ parsedContent.label }}
@@ -25,13 +31,9 @@
 
 						<view class="change-flow">
 							<view class="part-container">
-								<mp-html 
-                                    :content="parsedContent.oldRaw" 
-                                    :copy-link="false" 
-                                    :tag-style="htmlStyles"
-                                    container-style="font-size: 14px; color: #374151; line-height: 1.5;"
-                                    @linktap="handleLinkTap" 
-                                />
+								<mp-html :content="parsedContent.oldRaw" :copy-link="false" :tag-style="htmlStyles"
+									container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+									@linktap="handleLinkTap" />
 							</view>
 
 							<view class="arrow-container">
@@ -39,25 +41,17 @@
 							</view>
 
 							<view class="part-container">
-								<mp-html 
-                                    :content="parsedContent.newRaw" 
-                                    :copy-link="false" 
-                                    :tag-style="htmlStyles"
-                                    container-style="font-size: 14px; color: #374151; line-height: 1.5;"
-                                    @linktap="handleLinkTap" 
-                                />
+								<mp-html :content="parsedContent.newRaw" :copy-link="false" :tag-style="htmlStyles"
+									container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+									@linktap="handleLinkTap" />
 							</view>
 						</view>
 					</view>
 
 					<view v-else class="content-body">
-						<mp-html 
-                            :content="data.message" 
-                            :copy-link="false" 
-                            :tag-style="htmlStyles"
-                            container-style="font-size: 14px; color: #374151; line-height: 1.5;"
-                            @linktap="handleLinkTap" 
-                        />
+						<mp-html :content="data.message" :copy-link="false" :tag-style="htmlStyles"
+							container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+							@linktap="handleLinkTap" />
 
 						<view v-if="data.files" class="mt-2">
 							<image :src="data.files" mode="widthFix" class="comment-attachment-img"
@@ -123,13 +117,13 @@
 		return props.data.isMe === true;
 	});
 
-    const htmlStyles = {
-        p: 'font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;',
-        div: 'font-size: 14px; line-height: 1.5; color: #374151;',
-        span: 'font-size: 14px; line-height: 1.5; color: #374151;',
-        a: 'color: #007aff; text-decoration: none; font-size: 14px;',
-        img: 'max-width: 100%; border-radius: 6px; margin-top: 4px;'
-    };
+	const htmlStyles = {
+		p: 'font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;',
+		div: 'font-size: 14px; line-height: 1.5; color: #374151;',
+		span: 'font-size: 14px; line-height: 1.5; color: #374151;',
+		a: 'color: #007aff; text-decoration: none; font-size: 14px;',
+		img: 'max-width: 100%; border-radius: 6px; margin-top: 4px;'
+	};
 
 	const handleLinkTap = (e : any) => {
 		const url = e.href || e['data-src'] || e.src;
@@ -183,35 +177,126 @@
 </script>
 
 <style scoped>
-	/* Giữ nguyên các style cũ */
-	.flex { display: flex; }
-	.flex-1 { flex: 1; }
-	.gap-1 { gap: 4px; }
-	.gap-3 { gap: 12px; }
-	.mb-1 { margin-bottom: 4px; }
-	.mb-4 { margin-bottom: 16px; }
-	.mt-1 { margin-top: 4px; }
-	.mt-2 { margin-top: 8px; }
-	.items-start { align-items: flex-start; }
-	.items-center { align-items: center; }
-	.justify-between { justify-content: space-between; }
-	.shrink-0 { flex-shrink: 0; }
-	.overflow-hidden { overflow: hidden; }
-	.bg-gray-50 { background-color: #f9fafb; }
-	.rounded-2xl { border-radius: 16px; }
-	.rounded-tl-none { border-top-left-radius: 0; }
-	.p-3 { padding: 12px; }
-	.text-sm { font-size: 14px; }
-	.text-xs { font-size: 12px; }
-	.font-bold { font-weight: 700; }
-	.text-gray-900 { color: #111827; }
-	.text-gray-700 { color: #374151; }
-	.text-gray-400 { color: #9ca3af; }
-	.italic { font-style: italic; }
-	.ml-1 { margin-left: 4px; }
-	.mr-2 { margin-right: 8px; }
-	.mr-3 { margin-right: 12px; }
-	.pl-12 { padding-left: 48px; }
+	.flex-col {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.mb-2 {
+		margin-bottom: 8px;
+	}
+
+	.flex {
+		display: flex;
+	}
+
+	.flex-1 {
+		flex: 1;
+	}
+
+	.gap-1 {
+		gap: 4px;
+	}
+
+	.gap-3 {
+		gap: 12px;
+	}
+
+	.mb-1 {
+		margin-bottom: 4px;
+	}
+
+	.mb-4 {
+		margin-bottom: 16px;
+	}
+
+	.mt-1 {
+		margin-top: 4px;
+	}
+
+	.mt-2 {
+		margin-top: 8px;
+	}
+
+	.items-start {
+		align-items: flex-start;
+	}
+
+	.items-center {
+		align-items: center;
+	}
+
+	.justify-between {
+		justify-content: space-between;
+	}
+
+	.shrink-0 {
+		flex-shrink: 0;
+	}
+
+	.overflow-hidden {
+		overflow: hidden;
+	}
+
+	.bg-gray-50 {
+		background-color: #f9fafb;
+	}
+
+	.rounded-2xl {
+		border-radius: 16px;
+	}
+
+	.rounded-tl-none {
+		border-top-left-radius: 0;
+	}
+
+	.p-3 {
+		padding: 12px;
+	}
+
+	.text-sm {
+		font-size: 14px;
+	}
+
+	.text-xs {
+		font-size: 12px;
+	}
+
+	.font-bold {
+		font-weight: 700;
+	}
+
+	.text-gray-900 {
+		color: #111827;
+	}
+
+	.text-gray-700 {
+		color: #374151;
+	}
+
+	.text-gray-400 {
+		color: #9ca3af;
+	}
+
+	.italic {
+		font-style: italic;
+	}
+
+	.ml-1 {
+		margin-left: 4px;
+	}
+
+	.mr-2 {
+		margin-right: 8px;
+	}
+
+	.mr-3 {
+		margin-right: 12px;
+	}
+
+	.pl-12 {
+		padding-left: 48px;
+	}
 
 	.c-footer-actions {
 		display: flex;
@@ -220,7 +305,11 @@
 		margin-top: 4px;
 		min-height: 24px;
 	}
-	.reaction-row { flex: 1; }
+
+	.reaction-row {
+		flex: 1;
+	}
+
 	.emoji-tag {
 		background-color: #fff;
 		border: 1px solid #eee;
@@ -230,12 +319,14 @@
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 		display: inline-block;
 	}
+
 	.action-buttons-container {
 		display: flex;
 		gap: 15px;
 		align-items: center;
 		margin-left: auto;
 	}
+
 	.btn-icon-action {
 		padding: 4px;
 		opacity: 0.6;
@@ -244,8 +335,16 @@
 		justify-content: center;
 		cursor: pointer;
 	}
-	.btn-icon-action:active { opacity: 1; }
-	.icon-action { width: 18px; height: 18px; }
+
+	.btn-icon-action:active {
+		opacity: 1;
+	}
+
+	.icon-action {
+		width: 18px;
+		height: 18px;
+	}
+
 	.comment-attachment-img {
 		max-width: 200px;
 		max-height: 300px;
@@ -253,13 +352,39 @@
 		border: 1px solid #eee;
 		display: block;
 	}
-	:deep(img) { max-width: 100%; height: auto; }
-	.block { display: block; }
-	.change-flow { display: block; }
-	.part-container { display: inline; }
-	.arrow-container { display: inline-block; margin: 0 8px; }
-	.arrow-text { font-weight: bold; color: #6b7280; font-size: 16px; }
-	.inline-html { display: inline; }
+
+	:deep(img) {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.block {
+		display: block;
+	}
+
+	.change-flow {
+		display: block;
+	}
+
+	.part-container {
+		display: inline;
+	}
+
+	.arrow-container {
+		display: inline-block;
+		margin: 0 8px;
+	}
+
+	.arrow-text {
+		font-weight: bold;
+		color: #6b7280;
+		font-size: 16px;
+	}
+
+	.inline-html {
+		display: inline;
+	}
+
 	:deep(a) {
 		color: #007aff;
 		text-decoration: underline;
