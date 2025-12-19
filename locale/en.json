@@ -238,5 +238,23 @@
 		"status_changed": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> status updated: <b>{oldData}</b> ➝ <span class='highlight'>{newData}</span>",
 		"task_assigned": "New task assigned: <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b>",
 		"due_date_passed": "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> expired on {date}. Action required!"
+	},
+	"timeline": {
+		"HISTORY_CALL_IN": "Incoming call",
+		"HISTORY_CALL_OUT": "Outgoing call",
+		"HISTORY_MISS_CALL": "Missed call",
+		"NEW_TICKET": "Ticket created",
+		"REOPEN_TICKET": "Ticket reopened",
+		"NEW_SUB_TICKET": "Sub-ticket created",
+		"UPDATE_STATUS_TICKET": "Ticket status updated",
+		"UPDATE_ASSIGNEE_TICKET": "Ticket assignee changed",
+		"NEW_TODO": "Task created",
+		"REOPEN_TODO": "Task reopened",
+		"UPDATE_STATUS_TODO": "Task status updated",
+		"UPDATE_ASSIGNEE_TODO": "Task assignee changed",
+		"CUSTOMER_UPDATE": "Customer info updated",
+		"NOTE_INSERT": "Note added",
+		"NOTE_UPDATE": "Note edited",
+		"NOTE_DELETE": "Note deleted"
 	}
 }

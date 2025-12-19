@@ -65,7 +65,6 @@ export const useAuthStore = defineStore('auth', {
 			}
 			if (nativeData.language) {
 				console.log("🌍 Native yêu cầu ngôn ngữ:", nativeData.language);
-				// Kiểm tra xem language có hợp lệ không ('vi' hoặc 'en')
 				if (nativeData.language === 'en' || nativeData.language === 'vi') {
 					changeLanguage(nativeData.language);
 				}

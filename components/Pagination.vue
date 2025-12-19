@@ -1,11 +1,12 @@
 <template>
 	<view class="pagination-footer">
-		<picker mode="selector" :range="pageSizeOptions" :value="pageSizeIndex" @change="onPageSizeChange">
+		<AppPicker :range="pageSizeStringOptions" :value="pageSizeIndex" @change="onPageSizeChange"
+			:title="$t('common.page_unit')">
 			<view class="page-size-selector">
 				<text class="size-text">{{ pageSize }} / {{ $t('common.page_unit') }}</text>
 				<text class="dropdown-arrow">▼</text>
 			</view>
-		</picker>
+		</AppPicker>
 
 		<text class="total-text" v-if="showTotal">{{ $t('common.total') }}: {{ total }}</text>
 
@@ -23,6 +24,7 @@
 
 <script setup lang="ts">
 	import { computed } from 'vue';
+	import AppPicker from '@/components/AppPicker.vue';
 
 	const props = defineProps<{
 		pageNo : number;
@@ -37,6 +39,11 @@
 	const totalPages = computed(() => {
 		if (!props.pageSize || props.pageSize === 0) return 1;
 		return Math.ceil(props.total / props.pageSize) || 1;
+	});
+
+	const pageSizeStringOptions = computed(() => {
+		if (!props.pageSizeOptions) return [];
+		return props.pageSizeOptions.map(opt => String(opt));
 	});
 
 	const pageSizeIndex = computed(() => {

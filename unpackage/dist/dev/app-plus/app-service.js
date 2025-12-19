@@ -10710,6 +10710,24 @@ This will fail in production if not fixed.`);
     task_assigned: "Bạn có công việc mới: <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b>",
     due_date_passed: "Công việc <span class='highlight'>{code}</span> | <b>{title}</b> ở nhóm <b>{group}</b> đã hết hạn vào {date}. Xử lý ngay!"
   };
+  const timeline$1 = {
+    HISTORY_CALL_IN: "Cuộc gọi đến",
+    HISTORY_CALL_OUT: "Cuộc gọi đi",
+    HISTORY_MISS_CALL: "Cuộc gọi nhỡ",
+    NEW_TICKET: "Tạo mới ticket",
+    REOPEN_TICKET: "Mở lại ticket",
+    NEW_SUB_TICKET: "Tạo ticket con",
+    UPDATE_STATUS_TICKET: "Cập nhật trạng thái ticket",
+    UPDATE_ASSIGNEE_TICKET: "Đổi người xử lý ticket",
+    NEW_TODO: "Tạo mới công việc",
+    REOPEN_TODO: "Mở lại công việc",
+    UPDATE_STATUS_TODO: "Cập nhật trạng thái công việc",
+    UPDATE_ASSIGNEE_TODO: "Đổi người thực hiện công việc",
+    CUSTOMER_UPDATE: "Cập nhật thông tin khách hàng",
+    NOTE_INSERT: "Thêm ghi chú",
+    NOTE_UPDATE: "Sửa ghi chú",
+    NOTE_DELETE: "Xóa ghi chú"
+  };
   const vi = {
     common: common$1,
     todo: todo$1,
@@ -10751,7 +10769,8 @@ This will fail in production if not fixed.`);
       nov: "Tháng 11",
       dec: "Tháng 12"
     },
-    socket: socket$1
+    socket: socket$1,
+    timeline: timeline$1
   };
   const common = {
     loading: "Loading data...",
@@ -10952,6 +10971,24 @@ This will fail in production if not fixed.`);
     task_assigned: "New task assigned: <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b>",
     due_date_passed: "Task <span class='highlight'>{code}</span> | <b>{title}</b> in group <b>{group}</b> expired on {date}. Action required!"
   };
+  const timeline = {
+    HISTORY_CALL_IN: "Incoming call",
+    HISTORY_CALL_OUT: "Outgoing call",
+    HISTORY_MISS_CALL: "Missed call",
+    NEW_TICKET: "Ticket created",
+    REOPEN_TICKET: "Ticket reopened",
+    NEW_SUB_TICKET: "Sub-ticket created",
+    UPDATE_STATUS_TICKET: "Ticket status updated",
+    UPDATE_ASSIGNEE_TICKET: "Ticket assignee changed",
+    NEW_TODO: "Task created",
+    REOPEN_TODO: "Task reopened",
+    UPDATE_STATUS_TODO: "Task status updated",
+    UPDATE_ASSIGNEE_TODO: "Task assignee changed",
+    CUSTOMER_UPDATE: "Customer info updated",
+    NOTE_INSERT: "Note added",
+    NOTE_UPDATE: "Note edited",
+    NOTE_DELETE: "Note deleted"
+  };
   const en = {
     common,
     todo,
@@ -10993,7 +11030,8 @@ This will fail in production if not fixed.`);
       nov: "Nov",
       dec: "Dec"
     },
-    socket
+    socket,
+    timeline
   };
   const getSavedLocale = () => {
     try {
@@ -11009,17 +11047,17 @@ This will fail in production if not fixed.`);
             args = rawArgs;
           }
           if (args && args.language && (args.language === "en" || args.language === "vi")) {
-            formatAppLog("log", "at locale/index.ts:25", "🚀 [locale] Ưu tiên lấy ngôn ngữ từ Android:", args.language);
+            formatAppLog("log", "at locale/index.ts:22", "🚀 [locale] Ưu tiên lấy ngôn ngữ từ Android:", args.language);
             uni.setStorageSync("CURRENT_LANG", args.language);
             return args.language;
           }
         } catch (e) {
-          formatAppLog("error", "at locale/index.ts:31", "Lỗi đọc language từ Android arguments:", e);
+          formatAppLog("error", "at locale/index.ts:27", "Lỗi đọc language từ Android arguments:", e);
         }
       }
       const saved = uni.getStorageSync("CURRENT_LANG");
       if (saved) {
-        formatAppLog("log", "at locale/index.ts:38", "💾 [locale] Lấy ngôn ngữ từ Storage:", saved);
+        formatAppLog("log", "at locale/index.ts:32", "💾 [locale] Lấy ngôn ngữ từ Storage:", saved);
         return saved;
       }
       const systemInfo2 = uni.getSystemInfoSync();
@@ -11030,7 +11068,7 @@ This will fail in production if not fixed.`);
     }
   };
   const curLocale = getSavedLocale();
-  formatAppLog("log", "at locale/index.ts:53", "🌐 Ngôn ngữ khởi tạo i18n:", curLocale);
+  formatAppLog("log", "at locale/index.ts:45", "🌐 Ngôn ngữ khởi tạo i18n:", curLocale);
   const i18n = createI18n({
     locale: curLocale,
     fallbackLocale: "vi",
@@ -11248,7 +11286,7 @@ This will fail in production if not fixed.`);
     }
     uni.setLocale(lang);
     uni.setStorageSync("CURRENT_LANG", lang);
-    formatAppLog("log", "at utils/language.ts:17", "🔀 Đã đổi ngôn ngữ sang:", lang);
+    formatAppLog("log", "at utils/language.ts:13", "🔀 Đã đổi ngôn ngữ sang:", lang);
   };
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1e3;
   const useAuthStore = defineStore("auth", {
@@ -11315,7 +11353,7 @@ This will fail in production if not fixed.`);
           }
         }
         if (this.rootToken && this.rootToken !== nativeData.access_token) {
-          formatAppLog("warn", "at stores/auth.ts:74", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
+          formatAppLog("warn", "at stores/auth.ts:73", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
           const socketStore = useSocketStore();
           socketStore.disconnect();
           this.todoToken = "";
@@ -11336,10 +11374,10 @@ This will fail in production if not fixed.`);
       async fetchModuleTokens() {
         try {
           if (!this.rootToken || !this.projectCode || !this.uid) {
-            formatAppLog("error", "at stores/auth.ts:96", "Thiếu thông tin để lấy Module Token");
+            formatAppLog("error", "at stores/auth.ts:95", "Thiếu thông tin để lấy Module Token");
             return;
           }
-          formatAppLog("log", "at stores/auth.ts:100", "Store: Đang lấy Token cho Todo và CRM...");
+          formatAppLog("log", "at stores/auth.ts:99", "Store: Đang lấy Token cho Todo và CRM...");
           const [newTodoToken, newCrmToken] = await Promise.all([
             getTodoToken(this.rootToken, this.projectCode, this.uid),
             getCrmToken(this.projectCode, this.uid)
@@ -11348,9 +11386,9 @@ This will fail in production if not fixed.`);
             todoToken: newTodoToken,
             crmToken: newCrmToken
           });
-          formatAppLog("log", "at stores/auth.ts:112", "Store: Đã lấy đủ Token (Todo & CRM).");
+          formatAppLog("log", "at stores/auth.ts:111", "Store: Đã lấy đủ Token (Todo & CRM).");
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:114", "Store: Lỗi lấy module tokens:", error);
+          formatAppLog("error", "at stores/auth.ts:113", "Store: Lỗi lấy module tokens:", error);
           this.logout();
           throw error;
         }
@@ -11365,7 +11403,7 @@ This will fail in production if not fixed.`);
         return this.refreshPromise;
       },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:130", "Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:129", "Store: Đăng xuất...");
         const socketStore = useSocketStore();
         socketStore.disconnect();
         this.rootToken = "";
@@ -11777,7 +11815,7 @@ This will fail in production if not fixed.`);
           isFinished.value = true;
         }
       } catch (error) {
-        formatAppLog("error", "at composables/useCustomerFilter.ts:95", "Lỗi tải khách hàng:", error);
+        formatAppLog("error", "at composables/useCustomerFilter.ts:94", "Lỗi tải khách hàng:", error);
         showError(t("todo.error_load_crm"));
         if (!isLoadMore)
           customerList.value = [];
@@ -12508,6 +12546,11 @@ This will fail in production if not fixed.`);
           return 1;
         return Math.ceil(props.total / props.pageSize) || 1;
       });
+      const pageSizeStringOptions = vue.computed(() => {
+        if (!props.pageSizeOptions)
+          return [];
+        return props.pageSizeOptions.map((opt) => String(opt));
+      });
       const pageSizeIndex = vue.computed(() => {
         if (!props.pageSizeOptions)
           return 0;
@@ -12531,30 +12574,34 @@ This will fail in production if not fixed.`);
           emit("changePage", 1);
         }
       };
-      const __returned__ = { props, emit, totalPages, pageSizeIndex, onPageSizeChange, onPrev, onNext };
+      const __returned__ = { props, emit, totalPages, pageSizeStringOptions, pageSizeIndex, onPageSizeChange, onPrev, onNext, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   function _sfc_render$a(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "pagination-footer" }, [
-      vue.createElementVNode("picker", {
-        mode: "selector",
-        range: $props.pageSizeOptions,
+      vue.createVNode($setup["AppPicker"], {
+        range: $setup.pageSizeStringOptions,
         value: $setup.pageSizeIndex,
-        onChange: $setup.onPageSizeChange
-      }, [
-        vue.createElementVNode("view", { class: "page-size-selector" }, [
-          vue.createElementVNode(
-            "text",
-            { class: "size-text" },
-            vue.toDisplayString($props.pageSize) + " / " + vue.toDisplayString(_ctx.$t("common.page_unit")),
-            1
-            /* TEXT */
-          ),
-          vue.createElementVNode("text", { class: "dropdown-arrow" }, "▼")
-        ])
-      ], 40, ["range", "value"]),
+        onChange: $setup.onPageSizeChange,
+        title: _ctx.$t("common.page_unit")
+      }, {
+        default: vue.withCtx(() => [
+          vue.createElementVNode("view", { class: "page-size-selector" }, [
+            vue.createElementVNode(
+              "text",
+              { class: "size-text" },
+              vue.toDisplayString($props.pageSize) + " / " + vue.toDisplayString(_ctx.$t("common.page_unit")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode("text", { class: "dropdown-arrow" }, "▼")
+          ])
+        ]),
+        _: 1
+        /* STABLE */
+      }, 8, ["range", "value", "title"]),
       $props.showTotal ? (vue.openBlock(), vue.createElementBlock(
         "text",
         {
@@ -12752,7 +12799,7 @@ This will fail in production if not fixed.`);
           isConfirmDeleteOpen.value = true;
         }
       };
-      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification };
+      const __returned__ = { todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12960,11 +13007,11 @@ This will fail in production if not fixed.`);
       $setup.isFilterOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "filter-overlay",
-        onClick: _cache[18] || (_cache[18] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
+        onClick: _cache[14] || (_cache[14] = vue.withModifiers((...args) => $setup.closeFilter && $setup.closeFilter(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel",
-          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
+          onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
@@ -13024,21 +13071,25 @@ This will fail in production if not fixed.`);
                 1
                 /* TEXT */
               ),
-              vue.createElementVNode("picker", {
-                mode: "selector",
+              vue.createVNode($setup["AppPicker"], {
                 range: $setup.statusOptions,
                 value: $setup.statusIndex,
-                onChange: _cache[6] || (_cache[6] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args))
-              }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.statusIndex]) + " ",
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["range", "value"])
+                onChange: $setup.onStatusChange,
+                title: _ctx.$t("todo.status")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode("view", { class: "f-picker" }, [
+                    vue.createTextVNode(
+                      vue.toDisplayString($setup.statusOptions[$setup.statusIndex]) + " ",
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode("text", { class: "arrow" }, "▼")
+                  ])
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
               vue.createElementVNode(
@@ -13048,21 +13099,25 @@ This will fail in production if not fixed.`);
                 1
                 /* TEXT */
               ),
-              vue.createElementVNode("picker", {
-                mode: "selector",
+              vue.createVNode($setup["AppPicker"], {
                 range: $setup.creatorOptions,
                 value: $setup.creatorIndex,
-                onChange: _cache[7] || (_cache[7] = (...args) => $setup.onCreatorChange && $setup.onCreatorChange(...args))
-              }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.creatorOptions[$setup.creatorIndex]) + " ",
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["range", "value"])
+                onChange: $setup.onCreatorChange,
+                title: _ctx.$t("todo.creator")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode("view", { class: "f-picker" }, [
+                    vue.createTextVNode(
+                      vue.toDisplayString($setup.creatorOptions[$setup.creatorIndex]) + " ",
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode("text", { class: "arrow" }, "▼")
+                  ])
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
               vue.createElementVNode(
@@ -13074,7 +13129,7 @@ This will fail in production if not fixed.`);
               ),
               vue.createElementVNode("view", {
                 class: "f-input",
-                onClick: _cache[8] || (_cache[8] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
+                onClick: _cache[6] || (_cache[6] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args)),
                 style: { "justify-content": "space-between" }
               }, [
                 vue.createElementVNode(
@@ -13097,21 +13152,25 @@ This will fail in production if not fixed.`);
                 1
                 /* TEXT */
               ),
-              vue.createElementVNode("picker", {
-                mode: "selector",
+              vue.createVNode($setup["AppPicker"], {
                 range: $setup.assigneeOptions,
                 value: $setup.assigneeIndex,
-                onChange: _cache[9] || (_cache[9] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args))
-              }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.assigneeOptions[$setup.assigneeIndex]) + " ",
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["range", "value"])
+                onChange: $setup.onAssigneeChange,
+                title: _ctx.$t("todo.assignee")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode("view", { class: "f-picker" }, [
+                    vue.createTextVNode(
+                      vue.toDisplayString($setup.assigneeOptions[$setup.assigneeIndex]) + " ",
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode("text", { class: "arrow" }, "▼")
+                  ])
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
             ]),
             vue.createElementVNode("view", { class: "f-group" }, [
               vue.createElementVNode(
@@ -13121,42 +13180,46 @@ This will fail in production if not fixed.`);
                 1
                 /* TEXT */
               ),
-              vue.createElementVNode("picker", {
-                mode: "selector",
+              vue.createVNode($setup["AppPicker"], {
                 range: $setup.sourceOptions,
                 value: $setup.sourceIndex,
-                onChange: _cache[10] || (_cache[10] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args))
-              }, [
-                vue.createElementVNode("view", { class: "f-picker" }, [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.sourceOptions[$setup.sourceIndex]) + " ",
-                    1
-                    /* TEXT */
-                  ),
-                  vue.createElementVNode("text", { class: "arrow" }, "▼")
-                ])
-              ], 40, ["range", "value"])
+                onChange: $setup.onSourceChange,
+                title: _ctx.$t("todo.source")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode("view", { class: "f-picker" }, [
+                    vue.createTextVNode(
+                      vue.toDisplayString($setup.sourceOptions[$setup.sourceIndex]) + " ",
+                      1
+                      /* TEXT */
+                    ),
+                    vue.createElementVNode("text", { class: "arrow" }, "▼")
+                  ])
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
             ]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_create"),
               startDate: $setup.filter.createdFrom,
-              "onUpdate:startDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.createdFrom = $event),
+              "onUpdate:startDate": _cache[7] || (_cache[7] = ($event) => $setup.filter.createdFrom = $event),
               endDate: $setup.filter.createdTo,
-              "onUpdate:endDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.createdTo = $event)
+              "onUpdate:endDate": _cache[8] || (_cache[8] = ($event) => $setup.filter.createdTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_expired"),
               startDate: $setup.filter.dueDateFrom,
-              "onUpdate:startDate": _cache[13] || (_cache[13] = ($event) => $setup.filter.dueDateFrom = $event),
+              "onUpdate:startDate": _cache[9] || (_cache[9] = ($event) => $setup.filter.dueDateFrom = $event),
               endDate: $setup.filter.dueDateTo,
-              "onUpdate:endDate": _cache[14] || (_cache[14] = ($event) => $setup.filter.dueDateTo = $event)
+              "onUpdate:endDate": _cache[10] || (_cache[10] = ($event) => $setup.filter.dueDateTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createVNode($setup["DateRangeFilter"], {
               title: _ctx.$t("todo.time_notify"),
               startDate: $setup.filter.notifyFrom,
-              "onUpdate:startDate": _cache[15] || (_cache[15] = ($event) => $setup.filter.notifyFrom = $event),
+              "onUpdate:startDate": _cache[11] || (_cache[11] = ($event) => $setup.filter.notifyFrom = $event),
               endDate: $setup.filter.notifyTo,
-              "onUpdate:endDate": _cache[16] || (_cache[16] = ($event) => $setup.filter.notifyTo = $event)
+              "onUpdate:endDate": _cache[12] || (_cache[12] = ($event) => $setup.filter.notifyTo = $event)
             }, null, 8, ["title", "startDate", "endDate"]),
             vue.createElementVNode("view", { style: { "height": "20px" } })
           ]),
@@ -13177,11 +13240,11 @@ This will fail in production if not fixed.`);
       $setup.isQuickCompleteOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "filter-overlay",
-        onClick: _cache[21] || (_cache[21] = vue.withModifiers((...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args), ["stop"]))
+        onClick: _cache[17] || (_cache[17] = vue.withModifiers((...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args), ["stop"]))
       }, [
         vue.createElementVNode("view", {
           class: "filter-panel quick-panel",
-          onClick: _cache[20] || (_cache[20] = vue.withModifiers(() => {
+          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "filter-header" }, [
@@ -13194,7 +13257,7 @@ This will fail in production if not fixed.`);
             ),
             vue.createElementVNode("text", {
               class: "close-btn",
-              onClick: _cache[19] || (_cache[19] = (...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args))
+              onClick: _cache[15] || (_cache[15] = (...args) => $setup.closeQuickComplete && $setup.closeQuickComplete(...args))
             }, "✕")
           ]),
           vue.createElementVNode("scroll-view", {
@@ -13283,14 +13346,14 @@ This will fail in production if not fixed.`);
         loadingMore: $setup.loadingMore,
         customers: $setup.customerList,
         managers: $setup.rawMemberList,
-        onClose: _cache[22] || (_cache[22] = ($event) => $setup.showCustomerModal = false),
+        onClose: _cache[18] || (_cache[18] = ($event) => $setup.showCustomerModal = false),
         onSelect: $setup.onCustomerSelect,
         onFilter: $setup.onFilterCustomerInModal,
         onLoadMore: $setup.loadMoreCustomers
       }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteOpen,
-        "onUpdate:visible": _cache[23] || (_cache[23] = ($event) => $setup.isConfirmDeleteOpen = $event),
+        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteOpen = $event),
         title: _ctx.$t("common.notification"),
         message: $setup.itemToDelete ? _ctx.$t("todo.confirm_delete_msg").replace("{title}", $setup.itemToDelete.title) : "",
         "confirm-type": "danger",
@@ -13303,17 +13366,17 @@ This will fail in production if not fixed.`);
         "view",
         {
           class: vue.normalizeClass(["custom-sheet-mask", { show: $setup.showCustomActionSheet }]),
-          onClick: _cache[27] || (_cache[27] = ($event) => $setup.showCustomActionSheet = false)
+          onClick: _cache[23] || (_cache[23] = ($event) => $setup.showCustomActionSheet = false)
         },
         [
           vue.createElementVNode("view", {
             class: "custom-sheet-panel",
-            onClick: _cache[26] || (_cache[26] = vue.withModifiers(() => {
+            onClick: _cache[22] || (_cache[22] = vue.withModifiers(() => {
             }, ["stop"]))
           }, [
             vue.createElementVNode("view", {
               class: "sheet-item delete",
-              onClick: _cache[24] || (_cache[24] = ($event) => $setup.handleCustomAction("delete"))
+              onClick: _cache[20] || (_cache[20] = ($event) => $setup.handleCustomAction("delete"))
             }, [
               vue.createElementVNode(
                 "text",
@@ -13326,7 +13389,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "sheet-gap" }),
             vue.createElementVNode("view", {
               class: "sheet-item cancel",
-              onClick: _cache[25] || (_cache[25] = ($event) => $setup.showCustomActionSheet = false)
+              onClick: _cache[21] || (_cache[21] = ($event) => $setup.showCustomActionSheet = false)
             }, [
               vue.createElementVNode(
                 "text",
@@ -14747,7 +14810,13 @@ This will fail in production if not fixed.`);
         loadingMore,
         loadMoreCustomers
       } = useCreateTodoController();
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage, GlobalNotification };
+      const memberIndex = vue.computed(() => {
+        if (!form.value.assignee || !memberList.value.length)
+          return 0;
+        const idx = memberList.value.findIndex((m) => m.memberUID === form.value.assignee);
+        return idx !== -1 ? idx : 0;
+      });
+      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, memberIndex, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -14822,22 +14891,27 @@ This will fail in production if not fixed.`);
             class: "item-icon"
           })
         ]),
-        vue.createElementVNode("picker", {
-          mode: "selector",
+        vue.createVNode($setup["AppPicker"], {
           range: $setup.sourceOptions,
-          onChange: _cache[4] || (_cache[4] = (...args) => $setup.onSourceChange && $setup.onSourceChange(...args)),
-          class: "full-width-picker"
-        }, [
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
-            },
-            vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
-            3
-            /* TEXT, CLASS */
-          )
-        ], 40, ["range"]),
+          value: $setup.sourceIndex > -1 ? $setup.sourceIndex : 0,
+          onChange: $setup.onSourceChange,
+          class: "full-width-picker",
+          title: _ctx.$t("todo.source")
+        }, {
+          default: vue.withCtx(() => [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
+              },
+              vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
+              3
+              /* TEXT, CLASS */
+            )
+          ]),
+          _: 1
+          /* STABLE */
+        }, 8, ["range", "value", "onChange", "title"]),
         vue.createElementVNode("text", { class: "arrow-icon" }, "›")
       ]),
       vue.createElementVNode("view", { class: "flat-item" }, [
@@ -14847,28 +14921,34 @@ This will fail in production if not fixed.`);
             class: "item-icon"
           })
         ]),
-        vue.createElementVNode("picker", {
-          mode: "selector",
+        vue.createVNode($setup["AppPicker"], {
           range: $setup.memberOptions,
-          onChange: _cache[5] || (_cache[5] = (...args) => $setup.onMemberChange && $setup.onMemberChange(...args)),
-          class: "full-width-picker"
-        }, [
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
-            },
-            vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
-            3
-            /* TEXT, CLASS */
-          )
-        ], 40, ["range"])
+          value: $setup.memberIndex,
+          onChange: $setup.onMemberChange,
+          class: "full-width-picker",
+          title: _ctx.$t("todo.assignee")
+        }, {
+          default: vue.withCtx(() => [
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
+              },
+              vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
+              3
+              /* TEXT, CLASS */
+            )
+          ]),
+          _: 1
+          /* STABLE */
+        }, 8, ["range", "value", "onChange", "title"]),
+        vue.createElementVNode("text", { class: "arrow-icon" }, "›")
       ]),
       vue.createVNode($setup["TodoDatePicker"], {
         dueDate: $setup.form.dueDate,
-        "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
+        "onUpdate:dueDate": _cache[4] || (_cache[4] = ($event) => $setup.form.dueDate = $event),
         notifyAt: $setup.form.notifyAt,
-        "onUpdate:notifyAt": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyAt = $event)
+        "onUpdate:notifyAt": _cache[5] || (_cache[5] = ($event) => $setup.form.notifyAt = $event)
       }, null, 8, ["dueDate", "notifyAt"]),
       vue.createElementVNode("view", { class: "footer-action" }, [
         vue.createVNode($setup["AppButton"], {
@@ -15811,7 +15891,16 @@ This will fail in production if not fixed.`);
                 actorName = foundMember.UserName;
               }
             }
-            const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t("todo.interaction_other");
+            let content = "";
+            if (item.typeSub) {
+              const key = `timeline.${item.typeSub}`;
+              content = t(key);
+              if (content === key) {
+                content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub;
+              }
+            } else {
+              content = t("todo.interaction_other");
+            }
             return {
               id: item.id,
               timeStr,
@@ -15822,7 +15911,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1102", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1111", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -15853,7 +15942,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1149", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1158", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_status_changed"));
@@ -15865,7 +15954,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1165", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1174", "Lỗi cập nhật trạng thái:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15897,7 +15986,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1209", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1218", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_assignee_changed"));
@@ -15908,7 +15997,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1227", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1236", "Lỗi cập nhật người giao:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -15918,7 +16007,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1236", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1245", "Lưu:", form.value);
       showSuccess(t("todo.msg_saved"));
     };
     return {
@@ -18129,7 +18218,7 @@ This will fail in production if not fixed.`);
         onRequestEditComment(data.id);
         scrollToInput();
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -18218,31 +18307,35 @@ This will fail in production if not fixed.`);
                 /* TEXT */
               )
             ]),
-            vue.createElementVNode("picker", {
-              mode: "selector",
-              range: $setup.statusOptions,
-              value: $setup.form.statusIndex,
-              disabled: $setup.isStatusDisabled,
-              onChange: _cache[4] || (_cache[4] = (...args) => $setup.onStatusChange && $setup.onStatusChange(...args)),
-              class: "item-picker-box"
-            }, [
-              vue.createElementVNode(
-                "view",
-                {
-                  class: vue.normalizeClass(["picker-text", { "disabled-text": $setup.isStatusDisabled }])
-                },
-                [
-                  vue.createTextVNode(
-                    vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || _ctx.$t("common.loading")) + " ",
-                    1
-                    /* TEXT */
-                  ),
-                  !$setup.isStatusDisabled ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "▾")) : vue.createCommentVNode("v-if", true)
-                ],
-                2
-                /* CLASS */
-              )
-            ], 40, ["range", "value", "disabled"])
+            vue.createElementVNode("view", { class: "item-picker-box" }, [
+              vue.createVNode($setup["AppPicker"], {
+                range: $setup.statusOptions,
+                value: $setup.form.statusIndex,
+                onChange: $setup.onStatusChange,
+                title: _ctx.$t("todo.status")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode(
+                    "view",
+                    {
+                      class: vue.normalizeClass(["picker-text", { "disabled-text": $setup.isStatusDisabled }])
+                    },
+                    [
+                      vue.createTextVNode(
+                        vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || _ctx.$t("common.loading")) + " ",
+                        1
+                        /* TEXT */
+                      ),
+                      !$setup.isStatusDisabled ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "▾")) : vue.createCommentVNode("v-if", true)
+                    ],
+                    2
+                    /* CLASS */
+                  )
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
+            ])
           ]),
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
@@ -18282,27 +18375,32 @@ This will fail in production if not fixed.`);
                 /* TEXT */
               )
             ]),
-            vue.createElementVNode("picker", {
-              mode: "selector",
-              range: $setup.assigneeOptions,
-              value: $setup.form.assigneeIndex,
-              onChange: _cache[5] || (_cache[5] = (...args) => $setup.onAssigneeChange && $setup.onAssigneeChange(...args)),
-              class: "item-picker-box"
-            }, [
-              vue.createElementVNode(
-                "view",
-                { class: "picker-text" },
-                vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : _ctx.$t("common.loading")) + " ▾ ",
-                1
-                /* TEXT */
-              )
-            ], 40, ["range", "value"])
+            vue.createElementVNode("view", { class: "item-picker-box" }, [
+              vue.createVNode($setup["AppPicker"], {
+                range: $setup.assigneeOptions,
+                value: $setup.form.assigneeIndex,
+                onChange: $setup.onAssigneeChange,
+                title: _ctx.$t("todo.assignee")
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createElementVNode(
+                    "view",
+                    { class: "picker-text" },
+                    vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : _ctx.$t("common.loading")) + " ▾ ",
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                _: 1
+                /* STABLE */
+              }, 8, ["range", "value", "onChange", "title"])
+            ])
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[6] || (_cache[6] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[4] || (_cache[4] = ($event) => $setup.form.dueDate = $event),
             notifyAt: $setup.form.notifyAt,
-            "onUpdate:notifyAt": _cache[7] || (_cache[7] = ($event) => $setup.form.notifyAt = $event),
+            "onUpdate:notifyAt": _cache[5] || (_cache[5] = ($event) => $setup.form.notifyAt = $event),
             onChange: $setup.onDateUpdate
           }, null, 8, ["dueDate", "notifyAt", "onChange"])
         ]),
@@ -18428,22 +18526,26 @@ This will fail in production if not fixed.`);
               /* CLASS */
             )
           ]),
-          vue.createElementVNode("picker", {
-            mode: "selector",
+          vue.createVNode($setup["AppPicker"], {
             range: $setup.commentFilterOptions,
             value: $setup.commentFilterIndex,
-            onClick: _cache[8] || (_cache[8] = vue.withModifiers(() => {
+            onClick: _cache[6] || (_cache[6] = vue.withModifiers(() => {
             }, ["stop"])),
-            onChange: _cache[9] || (_cache[9] = (...args) => $setup.onCommentFilterChange && $setup.onCommentFilterChange(...args))
-          }, [
-            vue.createElementVNode(
-              "view",
-              { class: "filter-badge" },
-              vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾",
-              1
-              /* TEXT */
-            )
-          ], 40, ["range", "value"])
+            onChange: $setup.onCommentFilterChange,
+            title: _ctx.$t("common.filter")
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                { class: "filter-badge" },
+                vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾",
+                1
+                /* TEXT */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["range", "value", "onChange", "title"])
         ]),
         $setup.isCommentsOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 0,
@@ -18457,7 +18559,7 @@ This will fail in production if not fixed.`);
               vue.createVNode($setup["TodoEditor"], {
                 ref: "todoEditorRef",
                 modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => $setup.newCommentText = $event),
+                "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.newCommentText = $event),
                 placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
@@ -18588,9 +18690,9 @@ This will fail in production if not fixed.`);
                   key: item.id,
                   data: item,
                   onReact: $setup.onToggleEmojiPicker,
-                  onReply: _cache[11] || (_cache[11] = (data) => $setup.handleReply(data)),
-                  onEdit: _cache[12] || (_cache[12] = (data) => $setup.handleEdit(data)),
-                  onDelete: _cache[13] || (_cache[13] = (id) => $setup.onRequestDeleteComment(id))
+                  onReply: _cache[8] || (_cache[8] = (data) => $setup.handleReply(data)),
+                  onEdit: _cache[9] || (_cache[9] = (data) => $setup.handleEdit(data)),
+                  onDelete: _cache[10] || (_cache[10] = (id) => $setup.onRequestDeleteComment(id))
                 }, null, 8, ["data", "onReact"]);
               }),
               128
@@ -18601,7 +18703,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("view", { class: "section-header-row" }, [
           vue.createElementVNode("view", {
             class: "toggle-header",
-            onClick: _cache[14] || (_cache[14] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
+            onClick: _cache[11] || (_cache[11] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
           }, [
             vue.createElementVNode(
               "text",
@@ -18621,22 +18723,26 @@ This will fail in production if not fixed.`);
               /* CLASS */
             )
           ]),
-          vue.createElementVNode("picker", {
-            mode: "selector",
+          vue.createVNode($setup["AppPicker"], {
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onClick: _cache[15] || (_cache[15] = vue.withModifiers(() => {
+            onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
             }, ["stop"])),
-            onChange: _cache[16] || (_cache[16] = (...args) => $setup.onHistoryFilterChange && $setup.onHistoryFilterChange(...args))
-          }, [
-            vue.createElementVNode(
-              "view",
-              { class: "filter-badge" },
-              vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾",
-              1
-              /* TEXT */
-            )
-          ], 40, ["range", "value"])
+            onChange: $setup.onHistoryFilterChange,
+            title: _ctx.$t("common.filter")
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                { class: "filter-badge" },
+                vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾",
+                1
+                /* TEXT */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["range", "value", "onChange", "title"])
         ]),
         $setup.isHistoryOpen ? (vue.openBlock(), vue.createElementBlock("view", {
           key: 1,
@@ -18717,7 +18823,7 @@ This will fail in production if not fixed.`);
       ]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelEditOpen,
-        "onUpdate:visible": _cache[17] || (_cache[17] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+        "onUpdate:visible": _cache[13] || (_cache[13] = ($event) => $setup.isConfirmCancelEditOpen = $event),
         title: _ctx.$t("todo.cancel_edit_title"),
         message: _ctx.$t("todo.cancel_edit_msg"),
         "cancel-label": _ctx.$t("todo.continue_edit"),
@@ -18728,7 +18834,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelReplyOpen,
-        "onUpdate:visible": _cache[18] || (_cache[18] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
+        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
         title: _ctx.$t("todo.cancel_reply_title"),
         message: _ctx.$t("todo.cancel_reply_msg"),
         "cancel-label": _ctx.$t("todo.continue_reply"),
@@ -18739,7 +18845,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteCommentOpen,
-        "onUpdate:visible": _cache[19] || (_cache[19] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
+        "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
         title: _ctx.$t("todo.delete_comment_title"),
         message: _ctx.$t("todo.delete_comment_msg"),
         "confirm-type": "danger",
@@ -18749,11 +18855,11 @@ This will fail in production if not fixed.`);
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[21] || (_cache[21] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
+        onClick: _cache[17] || (_cache[17] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
       }, [
         vue.createElementVNode("view", {
           class: "emoji-picker-container",
-          onClick: _cache[20] || (_cache[20] = vue.withModifiers(() => {
+          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "emoji-grid" }, [
@@ -18785,85 +18891,61 @@ This will fail in production if not fixed.`);
     __name: "App",
     setup(__props, { expose: __expose }) {
       __expose();
-      const TEST_ENV = {
-        URL: "https://api-sandbox-h01.vbot.vn/v1.0",
-        USER: "hoangtin",
-        PASS: "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
-        // Pass này đã hash sẵn trong env
-        UID: "60566991077e440eafe369eac2e5e3db",
-        P_CODE: "PR202511211001129372"
-      };
       const handleNativeData = async (eventName, options = null) => {
-        formatAppLog("log", "at App.vue:18", `[${eventName}] Bắt đầu quy trình khởi tạo...`);
+        formatAppLog("log", "at App.vue:8", `[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
         const authStore = useAuthStore();
         const socketStore = useSocketStore();
         let nativeData = null;
-        if (!nativeData) {
-          formatAppLog("log", "at App.vue:51", "⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
+        if (options && options.referrerInfo && options.referrerInfo.extraData) {
+          formatAppLog("log", "at App.vue:13", "-> Tìm thấy dữ liệu trong options.referrerInfo");
+          nativeData = options.referrerInfo.extraData;
+        } else if (typeof plus !== "undefined" && plus.runtime && plus.runtime.arguments) {
+          formatAppLog("log", "at App.vue:17", "-> Tìm thấy dữ liệu trong plus.runtime.arguments");
+          const args = plus.runtime.arguments;
           try {
-            const res = await new Promise((resolve) => {
-              uni.request({
-                url: `${TEST_ENV.URL}/token`,
-                method: "POST",
-                header: { "Content-Type": "application/x-www-form-urlencoded" },
-                data: {
-                  username: TEST_ENV.USER,
-                  password: TEST_ENV.PASS,
-                  // Pass trong env của bạn đã hash rồi nên gửi luôn
-                  grant_type: "password",
-                  source: "Desktop-RTC"
-                  // Giả mạo nguồn
-                },
-                success: (r) => resolve(r.data),
-                fail: (e) => resolve(null)
-              });
-            });
-            if (res && res.access_token) {
-              formatAppLog("log", "at App.vue:72", "✅ DEV LOGIN THÀNH CÔNG!");
-              nativeData = {
-                uid: TEST_ENV.UID,
-                // Lấy từ env
-                projectCode: TEST_ENV.P_CODE,
-                // Lấy từ env
-                access_token: res.access_token,
-                session_id: res.session_id,
-                language: "en"
-                // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
-              };
-            } else {
-              formatAppLog("error", "at App.vue:82", "❌ DEV LOGIN THẤT BẠI:", res);
-            }
+            nativeData = typeof args === "string" && args.startsWith("{") ? JSON.parse(args) : args;
           } catch (e) {
-            formatAppLog("error", "at App.vue:85", "Lỗi login dev:", e);
+            formatAppLog("error", "at App.vue:22", "Lỗi parse arguments:", e);
+            if (typeof args === "object")
+              nativeData = args;
+          }
+        } else {
+          const launchOpts = uni.getLaunchOptionsSync();
+          if (launchOpts && launchOpts.extraData) {
+            nativeData = launchOpts.extraData;
           }
         }
         if (nativeData) {
-          if (nativeData.language) {
-            formatAppLog("log", "at App.vue:95", "🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
+          if (nativeData.language === "en" || nativeData.language === "vi") {
+            formatAppLog("log", "at App.vue:34", "🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);
           }
           if (nativeData.uid && nativeData.access_token) {
-            formatAppLog("log", "at App.vue:100", "✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
+            formatAppLog("log", "at App.vue:39", "✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
             await authStore.initFromNative(nativeData);
             if (authStore.isLoggedIn) {
               socketStore.connect();
             }
           }
         } else {
-          formatAppLog("log", "at App.vue:108", "⚠️ Không có dữ liệu để chạy App.");
+          formatAppLog("log", "at App.vue:47", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
+          if (eventName === "Launch") {
+            formatAppLog("warn", "at App.vue:49", "App Launch thiếu data");
+          }
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:113", " App Launch");
+        formatAppLog("log", "at App.vue:55", " App Launch");
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:118", "App Show");
+        formatAppLog("log", "at App.vue:60", "App Show");
+        handleNativeData("Show", options);
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:123", " App Hide");
+        formatAppLog("log", "at App.vue:65", " App Hide");
       });
-      const __returned__ = { TEST_ENV, handleNativeData, get onLaunch() {
+      const __returned__ = { handleNativeData, get onLaunch() {
         return onLaunch;
       }, get onShow() {
         return onShow;

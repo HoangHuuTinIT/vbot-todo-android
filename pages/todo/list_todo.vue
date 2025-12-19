@@ -101,20 +101,22 @@
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.status') }}</text>
-						<picker mode="selector" :range="statusOptions" :value="statusIndex" @change="onStatusChange">
+						<AppPicker :range="statusOptions" :value="statusIndex" @change="onStatusChange"
+							:title="$t('todo.status')">
 							<view class="f-picker">
 								{{ statusOptions[statusIndex] }} <text class="arrow">▼</text>
 							</view>
-						</picker>
+						</AppPicker>
 					</view>
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.creator') }}</text>
-						<picker mode="selector" :range="creatorOptions" :value="creatorIndex" @change="onCreatorChange">
+						<AppPicker :range="creatorOptions" :value="creatorIndex" @change="onCreatorChange"
+							:title="$t('todo.creator')">
 							<view class="f-picker">
 								{{ creatorOptions[creatorIndex] }} <text class="arrow">▼</text>
 							</view>
-						</picker>
+						</AppPicker>
 					</view>
 
 					<view class="f-group">
@@ -129,21 +131,22 @@
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.assignee') }}</text>
-						<picker mode="selector" :range="assigneeOptions" :value="assigneeIndex"
-							@change="onAssigneeChange">
+						<AppPicker :range="assigneeOptions" :value="assigneeIndex" @change="onAssigneeChange"
+							:title="$t('todo.assignee')">
 							<view class="f-picker">
 								{{ assigneeOptions[assigneeIndex] }} <text class="arrow">▼</text>
 							</view>
-						</picker>
+						</AppPicker>
 					</view>
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.source') }}</text>
-						<picker mode="selector" :range="sourceOptions" :value="sourceIndex" @change="onSourceChange">
+						<AppPicker :range="sourceOptions" :value="sourceIndex" @change="onSourceChange"
+							:title="$t('todo.source')">
 							<view class="f-picker">
 								{{ sourceOptions[sourceIndex] }} <text class="arrow">▼</text>
 							</view>
-						</picker>
+						</AppPicker>
 					</view>
 
 					<DateRangeFilter :title="$t('todo.time_create')" v-model:startDate="filter.createdFrom"
@@ -164,6 +167,7 @@
 				</view>
 			</view>
 		</view>
+
 		<view class="filter-overlay" v-if="isQuickCompleteOpen" @click.stop="closeQuickComplete">
 			<view class="filter-panel quick-panel" @click.stop>
 				<view class="filter-header">
@@ -239,6 +243,7 @@
 	import ConfirmModal from '@/components/ConfirmModal.vue';
 	import Pagination from '@/components/Pagination.vue';
 	import GlobalNotification from '@/components/GlobalNotification.vue';
+	import AppPicker from '@/components/AppPicker.vue';
 	import { useI18n } from 'vue-i18n';
 	const {
 		todos, isLoading, isFilterOpen, filter,

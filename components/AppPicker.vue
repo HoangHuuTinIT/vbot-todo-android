@@ -29,18 +29,17 @@
 	import { ref, watch } from 'vue';
 
 	const props = defineProps<{
-		range : string[]; // Danh sách lựa chọn
-		value : number;   // Index đang chọn
+		range : string[];
+		value : number;   
 		title ?: string;
 	}>();
 
 	const emit = defineEmits(['update:value', 'change']);
 
 	const isVisible = ref(false);
-	const pickerValue = ref([0]); // Picker view yêu cầu mảng số
-	const tempIndex = ref(0);     // Lưu tạm giá trị khi đang cuộn
+	const pickerValue = ref([0]); 
+	const tempIndex = ref(0);
 
-	// Đồng bộ khi props thay đổi
 	watch(() => props.value, (val) => {
 		pickerValue.value = [val];
 		tempIndex.value = val;
@@ -62,7 +61,6 @@
 	};
 
 	const confirm = () => {
-		// Emit sự kiện change giống hệt picker gốc để dễ thay thế
 		emit('change', { detail: { value: tempIndex.value } });
 		emit('update:value', tempIndex.value);
 		close();

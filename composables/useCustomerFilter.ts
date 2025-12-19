@@ -27,7 +27,6 @@ export const useCustomerFilter = () => {
 		} else {
 			loadingCustomer.value = true;
 			currentPage.value = 1;
-			// customerList.value = [];
 			isFinished.value = false;
 			savedFilter.value = searchFilter;
 		}

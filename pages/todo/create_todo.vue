@@ -5,17 +5,17 @@
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
 			</view>
-            <textarea class="item-input title-textarea" v-model="form.name" :placeholder="$t('todo.enter_task_name')"
+			<textarea class="item-input title-textarea" v-model="form.name" :placeholder="$t('todo.enter_task_name')"
 				maxlength="256" auto-height />
 			<text class="char-count">
-			    {{ $t('todo.char_count')
+				{{ $t('todo.char_count')
 			        .replace('{current}', String(form.name ? form.name.length : 0))
 			        .replace('{max}', '256') 
 			    }}
 			</text>
 		</view>
 
-        <TodoEditor v-model="form.desc" :placeholder="$t('editor.placeholder')" />
+		<TodoEditor v-model="form.desc" :placeholder="$t('editor.placeholder')" />
 
 		<view class="flat-item" @click="openCustomerPopup">
 			<view class="item-left">
@@ -30,17 +30,18 @@
 		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
 			:customers="customerList" :managers="memberList" @close="showCustomerModal = false"
 			@select="onCustomerSelect" @filter="onCustomerFilter" @loadMore="loadMoreCustomers" />
-		
-        <view class="flat-item">
+
+		<view class="flat-item">
 			<view class="item-left">
 				<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
 			</view>
 
-			<picker mode="selector" :range="sourceOptions" @change="onSourceChange" class="full-width-picker">
+			<AppPicker :range="sourceOptions" :value="sourceIndex > -1 ? sourceIndex : 0" @change="onSourceChange"
+				class="full-width-picker" :title="$t('todo.source')">
 				<view class="picker-display" :class="{ 'placeholder-color': sourceIndex === -1 }">
 					{{ sourceIndex > -1 ? sourceOptions[sourceIndex] : $t('todo.select_source') }}
 				</view>
-			</picker>
+			</AppPicker>
 
 			<text class="arrow-icon">›</text>
 		</view>
@@ -50,17 +51,17 @@
 				<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
 			</view>
 
-			<picker mode="selector" :range="memberOptions" @change="onMemberChange" class="full-width-picker">
+			<AppPicker :range="memberOptions" :value="memberIndex" @change="onMemberChange" class="full-width-picker"
+				:title="$t('todo.assignee')">
 				<view class="picker-display" :class="{ 'placeholder-color': !currentAssigneeName }">
 					{{ currentAssigneeName ? currentAssigneeName : $t('todo.assignee') }}
 				</view>
-			</picker>
+			</AppPicker>
+
+			<text class="arrow-icon">›</text>
 		</view>
 
-		<TodoDatePicker 
-		    v-model:dueDate="form.dueDate" 
-		    v-model:notifyAt="form.notifyAt" 
-		/>
+		<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt" />
 
 		<view class="footer-action">
 			<AppButton type="secondary" :label="$t('common.cancel_action')" class="btn-cancel" @click="goBack" />
@@ -79,6 +80,8 @@
 	import AppButton from '@/components/AppButton.vue';
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import GlobalNotification from '@/components/GlobalNotification.vue';
+	import AppPicker from '@/components/AppPicker.vue';
+	import { computed } from 'vue';
 	const {
 		loading, form, goBack, submitForm,
 		memberOptions, onMemberChange, currentAssigneeName,
@@ -92,6 +95,11 @@
 		loadingMore,
 		loadMoreCustomers
 	} = useCreateTodoController();
+	const memberIndex = computed(() => {
+		if (!form.value.assignee || !memberList.value.length) return 0;
+		const idx = memberList.value.findIndex(m => m.memberUID === form.value.assignee);
+		return idx !== -1 ? idx : 0;
+	});
 </script>
 
 <style lang="scss">

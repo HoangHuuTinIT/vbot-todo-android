@@ -1086,7 +1086,16 @@ export const useTodoDetailController = () => {
 						}
 					}
 
-					const content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub || t('todo.interaction_other');
+					let content = '';
+					if (item.typeSub) {
+						const key = `timeline.${item.typeSub}`;
+						content = t(key);
+						if (content === key) {
+							content = TIMELINE_TYPE_MAP[item.typeSub] || item.typeSub;
+						}
+					} else {
+						content = t('todo.interaction_other');
+					}
 
 					return {
 						id: item.id,

@@ -30,13 +30,16 @@
 						</image>
 						<text class="item-label">{{ $t('todo.status') }}</text>
 					</view>
-					<picker mode="selector" :range="statusOptions" :value="form.statusIndex"
-						:disabled="isStatusDisabled" @change="onStatusChange" class="item-picker-box">
-						<view class="picker-text" :class="{ 'disabled-text': isStatusDisabled }">
-							{{ statusOptions[form.statusIndex] || $t('common.loading') }}
-							<text v-if="!isStatusDisabled">▾</text>
-						</view>
-					</picker>
+
+					<view class="item-picker-box">
+						<AppPicker :range="statusOptions" :value="form.statusIndex" @change="onStatusChange"
+							:title="$t('todo.status')">
+							<view class="picker-text" :class="{ 'disabled-text': isStatusDisabled }">
+								{{ statusOptions[form.statusIndex] || $t('common.loading') }}
+								<text v-if="!isStatusDisabled">▾</text>
+							</view>
+						</AppPicker>
+					</view>
 				</view>
 
 				<view class="flat-item">
@@ -56,13 +59,16 @@
 						<image src="/static/user.png" class="item-icon"></image>
 						<text class="item-label">{{ $t('todo.assignee') }}</text>
 					</view>
-					<picker mode="selector" :range="assigneeOptions" :value="form.assigneeIndex"
-						@change="onAssigneeChange" class="item-picker-box">
-						<view class="picker-text">
-							{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : $t('common.loading') }}
-							▾
-						</view>
-					</picker>
+
+					<view class="item-picker-box">
+						<AppPicker :range="assigneeOptions" :value="form.assigneeIndex" @change="onAssigneeChange"
+							:title="$t('todo.assignee')">
+							<view class="picker-text">
+								{{ (assigneeOptions.length > 0 && form.assigneeIndex > -1) ? assigneeOptions[form.assigneeIndex] : $t('common.loading') }}
+								▾
+							</view>
+						</AppPicker>
+					</view>
 				</view>
 
 				<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt"
@@ -82,24 +88,21 @@
 						<view class="item-left">
 							<image src="/static/user-male-circle.png" class="item-icon">
 							</image>
-							<text
-								class="item-label">{{ $t('todo.customer_name_label') }}</text>
+							<text class="item-label">{{ $t('todo.customer_name_label') }}</text>
 						</view>
 						<view class="item-right-text">{{ form.customerName }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="/static/phone.png" class="item-icon"></image>
-							<text
-								class="item-label">{{$t('todo.customer_phone_label') }}</text>
+							<text class="item-label">{{$t('todo.customer_phone_label') }}</text>
 						</view>
 						<view class="item-right-text phone-text">{{ form.customerPhone }}</view>
 					</view>
 					<view class="flat-item">
 						<view class="item-left">
 							<image src="/static/manager.png" class="item-icon"></image>
-							<text
-								class="item-label">{{$t('todo.customer_manager_label') }}</text>
+							<text class="item-label">{{$t('todo.customer_manager_label') }}</text>
 						</view>
 						<view class="item-right-text highlight-text">
 							{{ form.customerManagerName || $t('todo.manager_none') }}
@@ -111,13 +114,14 @@
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleComments">
 					<text class="section-title no-margin">{{ $t('todo.comments_activities') }}</text>
-					<image src="/static/expand-arrow.png" class="toggle-icon"
-						:class="{ 'open': isCommentsOpen }"></image>
+					<image src="/static/expand-arrow.png" class="toggle-icon" :class="{ 'open': isCommentsOpen }">
+					</image>
 				</view>
-				<picker mode="selector" :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
-					@change="onCommentFilterChange">
+
+				<AppPicker :range="commentFilterOptions" :value="commentFilterIndex" @click.stop
+					@change="onCommentFilterChange" :title="$t('common.filter')">
 					<view class="filter-badge">{{ commentFilterOptions[commentFilterIndex] }} ▾</view>
-				</picker>
+				</AppPicker>
 			</view>
 
 			<view class="comments-section" v-if="isCommentsOpen">
@@ -182,13 +186,14 @@
 			<view class="section-header-row">
 				<view class="toggle-header" @click="toggleHistory">
 					<text class="section-title no-margin">{{ $t('todo.history_section') }}</text>
-					<image src="/static/expand-arrow.png" class="toggle-icon"
-						:class="{ 'open': isHistoryOpen }"></image>
+					<image src="/static/expand-arrow.png" class="toggle-icon" :class="{ 'open': isHistoryOpen }">
+					</image>
 				</view>
-				<picker mode="selector" :range="historyFilterOptions" :value="historyFilterIndex" @click.stop
-					@change="onHistoryFilterChange">
+
+				<AppPicker :range="historyFilterOptions" :value="historyFilterIndex" @click.stop
+					@change="onHistoryFilterChange" :title="$t('common.filter')">
 					<view class="filter-badge">{{ historyFilterOptions[historyFilterIndex] }} ▾</view>
-				</picker>
+				</AppPicker>
 			</view>
 
 			<view class="history-container" v-if="isHistoryOpen">
@@ -256,6 +261,7 @@
 	import GlobalMessage from '@/components/GlobalMessage.vue';
 	import ConfirmModal from '@/components/ConfirmModal.vue';
 	import GlobalNotification from '@/components/GlobalNotification.vue';
+	import AppPicker from '@/components/AppPicker.vue';
 	const {
 		isLoading, isLoadingCustomer,
 		isLoadingHistory, historyList,
@@ -958,9 +964,9 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}a
+	}
 
-	.loading-section {
+	a .loading-section {
 		display: flex;
 		justify-content: center;
 		align-items: center;
