@@ -4,7 +4,7 @@
 		<view class="modal-content" @click.stop>
 
 			<view class="modal-header">
-                <text class="modal-title">{{ $t('customer_modal.title') }}</text>
+				<text class="modal-title">{{ $t('customer_modal.title') }}</text>
 
 				<view class="header-actions">
 					<view class="filter-toggle-btn" :class="{ 'active': isFilterExpanded }" @click="toggleFilter">
@@ -16,25 +16,25 @@
 
 			<view class="filter-section" v-if="isFilterExpanded">
 				<view class="f-item">
-                    <input class="f-input" v-model="filter.name" :placeholder="$t('customer_modal.placeholder_name')"
+					<input class="f-input" v-model="filter.name" :placeholder="$t('customer_modal.placeholder_name')"
 						placeholder-class="ph-style" />
 				</view>
 
 				<view class="f-item">
-					<input class="f-input" v-model="filter.phone" type="number" :placeholder="$t('customer_modal.placeholder_phone')"
-						placeholder-class="ph-style" />
+					<input class="f-input" v-model="filter.phone" type="number"
+						:placeholder="$t('customer_modal.placeholder_phone')" placeholder-class="ph-style" />
 				</view>
 
 				<view class="f-item">
-					<picker mode="selector" :range="managerDisplayOptions" :value="filter.managerIndex"
-						@change="onManagerChange">
+					<AppPicker :range="managerDisplayOptions" :value="filter.managerIndex" @change="onManagerChange"
+						:title="$t('customer_modal.manager_default')">
 						<view class="f-picker-box">
 							<text :class="filter.managerIndex === 0 ? 'text-ph' : 'text-val'">
 								{{ managerDisplayOptions[filter.managerIndex] }}
 							</text>
 							<text class="arrow">▼</text>
 						</view>
-					</picker>
+					</AppPicker>
 				</view>
 
 				<view class="f-item">
@@ -76,6 +76,7 @@
 	import UserAvatar from '@/components/UserAvatar.vue';
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
 	import type { ProjectMember } from '@/types/Project';
+	import AppPicker from '@/components/AppPicker.vue';
 	import { useI18n } from 'vue-i18n';
 	const { t } = useI18n();
 	interface CustomerDisplay {
@@ -111,11 +112,11 @@
 		emit('loadMore');
 	};
 	const managerDisplayOptions = computed(() => {
-			const defaultOption = t('customer_modal.manager_default');
-			const list = props.managers || [];
-			const memberNames = list.map(m => m.UserName || t('common.unknown_member'));
-			return [defaultOption, ...memberNames];
-		});
+		const defaultOption = t('customer_modal.manager_default');
+		const list = props.managers || [];
+		const memberNames = list.map(m => m.UserName || t('common.unknown_member'));
+		return [defaultOption, ...memberNames];
+	});
 
 	const toggleFilter = () => {
 		isFilterExpanded.value = !isFilterExpanded.value;
@@ -252,7 +253,7 @@
 		background-color: #fff;
 		border-bottom: 1px solid #eee;
 		flex-shrink: 0;
-		animation: slideDown 0.3s ease-out;
+		// animation: slideDown 0.3s ease-out;
 	}
 
 	@keyframes slideDown {

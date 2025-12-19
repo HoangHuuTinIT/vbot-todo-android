@@ -1,3 +1,4 @@
+//code khi để test khi không nhận thông tin từ app chính
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
 import { useAuthStore } from '@/stores/auth';

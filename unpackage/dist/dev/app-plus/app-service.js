@@ -81,7 +81,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$n = {
+  const _sfc_main$o = {
     __name: "UserAvatar",
     props: {
       name: {
@@ -114,7 +114,7 @@ if (uni.restoreGlobal) {
       return __returned__;
     }
   };
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -152,7 +152,7 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
   const icons = {
     "id": "2852637",
     "name": "uniui图标库",
@@ -1328,7 +1328,7 @@ if (uni.restoreGlobal) {
     const reg = /^[0-9]*$/g;
     return typeof val === "number" || reg.test(val) ? val + "px" : val;
   };
-  const _sfc_main$m = {
+  const _sfc_main$n = {
     name: "UniIcons",
     emits: ["click"],
     props: {
@@ -1372,7 +1372,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "text",
       {
@@ -1385,7 +1385,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
   let Calendar$1 = class Calendar {
     constructor({
       selected,
@@ -1735,7 +1735,7 @@ if (uni.restoreGlobal) {
     }
     return value;
   }
-  const _sfc_main$l = {
+  const _sfc_main$m = {
     props: {
       weeks: {
         type: Object,
@@ -1769,7 +1769,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$l(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -1825,8 +1825,8 @@ if (uni.restoreGlobal) {
       /* CLASS, NEED_HYDRATION */
     );
   }
-  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
-  const _sfc_main$k = {
+  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
+  const _sfc_main$l = {
     name: "UniDatetimePicker",
     data() {
       return {
@@ -2434,7 +2434,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$k(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-datetime-picker" }, [
       vue.createElementVNode("view", {
         onClick: _cache[0] || (_cache[0] = (...args) => $options.initTimePicker && $options.initTimePicker(...args))
@@ -2709,8 +2709,8 @@ if (uni.restoreGlobal) {
       )) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
-  const _sfc_main$j = {
+  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
+  const _sfc_main$k = {
     components: {
       calendarItem,
       timePicker: TimePicker
@@ -3244,7 +3244,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_calendar_item = vue.resolveComponent("calendar-item");
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
@@ -3537,8 +3537,8 @@ if (uni.restoreGlobal) {
       /* NEED_HYDRATION */
     );
   }
-  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
-  const _sfc_main$i = {
+  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
+  const _sfc_main$j = {
     name: "UniDatetimePicker",
     options: {
       virtualHost: true
@@ -4203,7 +4203,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_Calendar = vue.resolveComponent("Calendar");
@@ -4546,7 +4546,7 @@ if (uni.restoreGlobal) {
       }, null, 8, ["date", "defTime", "start-date", "end-date", "selectableTimes", "startPlaceholder", "endPlaceholder", "default-value", "pleStatus", "range", "hasTime", "hideSecond", "onConfirm", "onMaskClose"])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
   const formatRelativeTime = (timestamp, t) => {
     if (!timestamp)
       return "";
@@ -8182,7 +8182,7 @@ ${codeFrame}` : message);
     target.__INTLIFY__ = true;
     setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
   }
-  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -8208,7 +8208,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
@@ -8271,7 +8271,133 @@ ${codeFrame}` : message);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
+  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
+    __name: "AppPicker",
+    props: {
+      range: { type: Array, required: true },
+      value: { type: Number, required: true },
+      title: { type: String, required: false }
+    },
+    emits: ["update:value", "change"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const isVisible = vue.ref(false);
+      const pickerValue = vue.ref([0]);
+      const tempIndex = vue.ref(0);
+      vue.watch(() => props.value, (val) => {
+        pickerValue.value = [val];
+        tempIndex.value = val;
+      }, { immediate: true });
+      const open2 = () => {
+        tempIndex.value = props.value;
+        pickerValue.value = [props.value];
+        isVisible.value = true;
+      };
+      const close = () => {
+        isVisible.value = false;
+      };
+      const bindChange = (e) => {
+        const val = e.detail.value;
+        tempIndex.value = val[0];
+      };
+      const confirm = () => {
+        emit("change", { detail: { value: tempIndex.value } });
+        emit("update:value", tempIndex.value);
+        close();
+      };
+      const __returned__ = { props, emit, isVisible, pickerValue, tempIndex, open: open2, close, bindChange, confirm };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", null, [
+      vue.createElementVNode("view", { onClick: $setup.open }, [
+        vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
+      ]),
+      $setup.isVisible ? (vue.openBlock(), vue.createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: vue.normalizeClass(["picker-mask", { "show": $setup.isVisible }]),
+          onClick: $setup.close
+        },
+        null,
+        2
+        /* CLASS */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode(
+        "view",
+        {
+          class: vue.normalizeClass(["picker-panel", { "show": $setup.isVisible }])
+        },
+        [
+          vue.createElementVNode("view", { class: "picker-toolbar" }, [
+            vue.createElementVNode(
+              "text",
+              {
+                class: "btn-cancel",
+                onClick: $setup.close
+              },
+              vue.toDisplayString(_ctx.$t("common.cancel")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "text",
+              { class: "title" },
+              vue.toDisplayString($props.title),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "text",
+              {
+                class: "btn-confirm",
+                onClick: $setup.confirm
+              },
+              vue.toDisplayString(_ctx.$t("common.confirm") || "Xong"),
+              1
+              /* TEXT */
+            )
+          ]),
+          vue.createElementVNode("picker-view", {
+            value: $setup.pickerValue,
+            onChange: $setup.bindChange,
+            class: "picker-view-box",
+            "indicator-style": "height: 50px;"
+          }, [
+            vue.createElementVNode("picker-view-column", null, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($props.range, (item, index) => {
+                  return vue.openBlock(), vue.createElementBlock(
+                    "view",
+                    {
+                      class: "picker-item",
+                      key: index
+                    },
+                    vue.toDisplayString(item),
+                    1
+                    /* TEXT */
+                  );
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])
+          ], 40, ["value"])
+        ],
+        2
+        /* CLASS */
+      )
+    ]);
+  }
+  const AppPicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-e6406d7a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppPicker.vue"]]);
   const _sfc_main$g = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -8297,7 +8423,7 @@ ${codeFrame}` : message);
         endDate: ""
       });
       const onScrollToLower = () => {
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:110", "Cuộn xuống đáy -> Load more");
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:111", "Cuộn xuống đáy -> Load more");
         emit("loadMore");
       };
       const managerDisplayOptions = vue.computed(() => {
@@ -8329,7 +8455,7 @@ ${codeFrame}` : message);
         filter.startDate = "";
         filter.endDate = "";
         applyFilter();
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:147", "Đã đặt lại bộ lọc");
+        formatAppLog("log", "at components/Todo/CustomerModal.vue:148", "Đã đặt lại bộ lọc");
       };
       const applyFilter = () => {
         emit("filter", {
@@ -8354,7 +8480,7 @@ ${codeFrame}` : message);
         const date = new Date(timestamp);
         return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
       };
-      const __returned__ = { t, props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter };
+      const __returned__ = { t, props, emit, isFilterExpanded, filter, onScrollToLower, managerDisplayOptions, toggleFilter, onManagerChange, resetFilter, applyFilter, close, selectCustomer, formatDate, UserAvatar, DateRangeFilter, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -8427,25 +8553,29 @@ ${codeFrame}` : message);
             ])
           ]),
           vue.createElementVNode("view", { class: "f-item" }, [
-            vue.createElementVNode("picker", {
-              mode: "selector",
+            vue.createVNode($setup["AppPicker"], {
               range: $setup.managerDisplayOptions,
               value: $setup.filter.managerIndex,
-              onChange: $setup.onManagerChange
-            }, [
-              vue.createElementVNode("view", { class: "f-picker-box" }, [
-                vue.createElementVNode(
-                  "text",
-                  {
-                    class: vue.normalizeClass($setup.filter.managerIndex === 0 ? "text-ph" : "text-val")
-                  },
-                  vue.toDisplayString($setup.managerDisplayOptions[$setup.filter.managerIndex]),
-                  3
-                  /* TEXT, CLASS */
-                ),
-                vue.createElementVNode("text", { class: "arrow" }, "▼")
-              ])
-            ], 40, ["range", "value"])
+              onChange: $setup.onManagerChange,
+              title: _ctx.$t("customer_modal.manager_default")
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", { class: "f-picker-box" }, [
+                  vue.createElementVNode(
+                    "text",
+                    {
+                      class: vue.normalizeClass($setup.filter.managerIndex === 0 ? "text-ph" : "text-val")
+                    },
+                    vue.toDisplayString($setup.managerDisplayOptions[$setup.filter.managerIndex]),
+                    3
+                    /* TEXT, CLASS */
+                  ),
+                  vue.createElementVNode("text", { class: "arrow" }, "▼")
+                ])
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["range", "value", "title"])
           ]),
           vue.createElementVNode("view", { class: "f-item" }, [
             vue.createVNode($setup["DateRangeFilter"], {
@@ -18664,12 +18794,12 @@ This will fail in production if not fixed.`);
         P_CODE: "PR202511211001129372"
       };
       const handleNativeData = async (eventName, options = null) => {
-        formatAppLog("log", "at App.vue:17", `[${eventName}] Bắt đầu quy trình khởi tạo...`);
+        formatAppLog("log", "at App.vue:18", `[${eventName}] Bắt đầu quy trình khởi tạo...`);
         const authStore = useAuthStore();
         const socketStore = useSocketStore();
         let nativeData = null;
         if (!nativeData) {
-          formatAppLog("log", "at App.vue:50", "⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
+          formatAppLog("log", "at App.vue:51", "⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
           try {
             const res = await new Promise((resolve) => {
               uni.request({
@@ -18689,7 +18819,7 @@ This will fail in production if not fixed.`);
               });
             });
             if (res && res.access_token) {
-              formatAppLog("log", "at App.vue:71", "✅ DEV LOGIN THÀNH CÔNG!");
+              formatAppLog("log", "at App.vue:72", "✅ DEV LOGIN THÀNH CÔNG!");
               nativeData = {
                 uid: TEST_ENV.UID,
                 // Lấy từ env
@@ -18701,37 +18831,37 @@ This will fail in production if not fixed.`);
                 // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
               };
             } else {
-              formatAppLog("error", "at App.vue:81", "❌ DEV LOGIN THẤT BẠI:", res);
+              formatAppLog("error", "at App.vue:82", "❌ DEV LOGIN THẤT BẠI:", res);
             }
           } catch (e) {
-            formatAppLog("error", "at App.vue:84", "Lỗi login dev:", e);
+            formatAppLog("error", "at App.vue:85", "Lỗi login dev:", e);
           }
         }
         if (nativeData) {
           if (nativeData.language) {
-            formatAppLog("log", "at App.vue:94", "🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
+            formatAppLog("log", "at App.vue:95", "🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);
           }
           if (nativeData.uid && nativeData.access_token) {
-            formatAppLog("log", "at App.vue:99", "✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
+            formatAppLog("log", "at App.vue:100", "✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
             await authStore.initFromNative(nativeData);
             if (authStore.isLoggedIn) {
               socketStore.connect();
             }
           }
         } else {
-          formatAppLog("log", "at App.vue:107", "⚠️ Không có dữ liệu để chạy App.");
+          formatAppLog("log", "at App.vue:108", "⚠️ Không có dữ liệu để chạy App.");
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:112", " App Launch");
+        formatAppLog("log", "at App.vue:113", " App Launch");
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:117", "App Show");
+        formatAppLog("log", "at App.vue:118", "App Show");
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:122", " App Hide");
+        formatAppLog("log", "at App.vue:123", " App Hide");
       });
       const __returned__ = { TEST_ENV, handleNativeData, get onLaunch() {
         return onLaunch;

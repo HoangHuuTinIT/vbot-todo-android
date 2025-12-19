@@ -1966,6 +1966,69 @@ to {
 .f-picker.placeholder[data-v-645c14d9] {
   color: #999;
 }
+
+.picker-mask[data-v-e6406d7a] {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.4);
+		z-index: 9998;
+}
+.picker-panel[data-v-e6406d7a] {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: #fff;
+		z-index: 9999;
+		transform: translateY(100%);
+		transition: transform 0.3s ease;
+		padding-bottom: env(safe-area-inset-bottom);
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
+}
+.picker-panel.show[data-v-e6406d7a] {
+		transform: translateY(0);
+}
+.picker-toolbar[data-v-e6406d7a] {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 44px;
+		border-bottom: 1px solid #eee;
+		padding: 0 15px;
+		background-color: #f9f9f9;
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
+}
+.btn-cancel[data-v-e6406d7a] {
+		color: #666;
+		font-size: 15px;
+}
+.btn-confirm[data-v-e6406d7a] {
+		color: #007aff;
+		font-size: 15px;
+		font-weight: bold;
+}
+.title[data-v-e6406d7a] {
+		font-size: 15px;
+		font-weight: 500;
+		color: #333;
+}
+.picker-view-box[data-v-e6406d7a] {
+		width: 100%;
+		height: 250px;
+		background-color: #fff;
+}
+.picker-item[data-v-e6406d7a] {
+		line-height: 50px;
+		text-align: center;
+		font-size: 16px;
+		color: #333;
+}
+
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -2059,7 +2122,6 @@ to {
   background-color: #fff;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
-  animation: slideDown-0c007ba7 0.3s ease-out;
 }
 @keyframes slideDown-0c007ba7 {
 from {
