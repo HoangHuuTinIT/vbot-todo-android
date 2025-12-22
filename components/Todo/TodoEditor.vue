@@ -414,10 +414,10 @@
 
 	const handleFontSizeSetting = () => {
 		currentActionSheetItems.value = [
-			{ text: t('editor.size_small'), handler: () => format('fontSize', 'small') },
-			{ text: t('editor.size_normal'), handler: () => format('fontSize', null) },
-			{ text: t('editor.size_large'), handler: () => format('fontSize', 'large') },
-			{ text: t('editor.size_huge'), handler: () => format('fontSize', 'huge') }
+			{ text: t('editor.size_small'), handler: () => format('fontSize', '12px') },
+			{ text: t('editor.size_normal'), handler: () => format('fontSize', '16px') },
+			{ text: t('editor.size_large'), handler: () => format('fontSize', '24px') },
+			{ text: t('editor.size_huge'), handler: () => format('fontSize', '32px') }
 		];
 		showActionSheet.value = true;
 	};

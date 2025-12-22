@@ -14068,10 +14068,10 @@ This will fail in production if not fixed.`);
       };
       const handleFontSizeSetting = () => {
         currentActionSheetItems.value = [
-          { text: t("editor.size_small"), handler: () => format2("fontSize", "small") },
-          { text: t("editor.size_normal"), handler: () => format2("fontSize", null) },
-          { text: t("editor.size_large"), handler: () => format2("fontSize", "large") },
-          { text: t("editor.size_huge"), handler: () => format2("fontSize", "huge") }
+          { text: t("editor.size_small"), handler: () => format2("fontSize", "12px") },
+          { text: t("editor.size_normal"), handler: () => format2("fontSize", "16px") },
+          { text: t("editor.size_large"), handler: () => format2("fontSize", "24px") },
+          { text: t("editor.size_huge"), handler: () => format2("fontSize", "32px") }
         ];
         showActionSheet.value = true;
       };
