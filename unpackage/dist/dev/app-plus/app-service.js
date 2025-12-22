@@ -15187,6 +15187,16 @@ This will fail in production if not fixed.`);
         isLoading.value = false;
       }
     };
+    const isHtmlContentEmpty = (html) => {
+      if (!html)
+        return true;
+      if (html.includes("<img") || html.includes("<iframe")) {
+        return false;
+      }
+      let textOnly = html.replace(/&nbsp;/gi, " ");
+      textOnly = textOnly.replace(/<[^>]+>/g, "");
+      return textOnly.trim().length === 0;
+    };
     const processCommentInput = async (htmlContent) => {
       if (!htmlContent)
         return { cleanMessage: "", fileUrl: "" };
@@ -15201,7 +15211,7 @@ This will fail in production if not fixed.`);
         cleanMessage = cleanMessage.replace(fullImgTag, "");
         if (!src.startsWith("http") && !src.startsWith("https")) {
           const p = uploadTodoFile(src).then((serverUrl) => serverUrl).catch((err) => {
-            formatAppLog("error", "at controllers/todo_detail.ts:199", "Upload ảnh bình luận lỗi:", err);
+            formatAppLog("error", "at controllers/todo_detail.ts:215", "Upload ảnh bình luận lỗi:", err);
             return "";
           });
           uploadPromises.push(p);
@@ -15234,7 +15244,7 @@ This will fail in production if not fixed.`);
             replacements.push({ oldSrc: src, newSrc: serverUrl });
             uploadedUrls.push(serverUrl);
           }).catch((err) => {
-            formatAppLog("error", "at controllers/todo_detail.ts:239", `Upload ảnh detail lỗi:`, err);
+            formatAppLog("error", "at controllers/todo_detail.ts:255", `Upload ảnh detail lỗi:`, err);
           });
           promises.push(uploadPromise);
         }
@@ -15268,7 +15278,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:284", "Payload Update Description:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:300", "Payload Update Description:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_desc_saved"));
@@ -15279,7 +15289,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:299", "Lỗi cập nhật công việc:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:315", "Lỗi cập nhật công việc:", error);
         showError(t("common.error_update"));
       } finally {
         isSavingDescription.value = false;
@@ -15309,7 +15319,7 @@ This will fail in production if not fixed.`);
           files: form.value.raw.files || "",
           tagCodes: form.value.raw.tagCodes || ""
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:334", "Payload Update Title:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:350", "Payload Update Title:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_title_changed"));
@@ -15320,7 +15330,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:349", "Lỗi cập nhật tiêu đề:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:365", "Lỗi cập nhật tiêu đề:", error);
         showError(t("todo.msg_update_error"));
         form.value.title = oldTitle;
       } finally {
@@ -15368,7 +15378,7 @@ This will fail in production if not fixed.`);
       return currentSystemUID;
     };
     const submitReply = async () => {
-      if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
+      if (isHtmlContentEmpty(newCommentText.value)) {
         showInfo(t("todo.msg_empty_content"));
         return;
       }
@@ -15406,7 +15416,7 @@ This will fail in production if not fixed.`);
           resetReplyState();
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:456", "Lỗi gửi trả lời:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:472", "Lỗi gửi trả lời:", error);
         showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
@@ -15467,7 +15477,7 @@ This will fail in production if not fixed.`);
             if (existingReactionIndex !== -1) {
               const currentEmoji = foundComment.reactions[existingReactionIndex].codeEmoji;
               if (currentEmoji === emoji) {
-                formatAppLog("log", "at controllers/todo_detail.ts:534", "User thả trùng emoji cũ");
+                formatAppLog("log", "at controllers/todo_detail.ts:550", "User thả trùng emoji cũ");
               } else {
                 foundComment.reactions[existingReactionIndex].codeEmoji = emoji;
               }
@@ -15481,7 +15491,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:552", "Lỗi thả cảm xúc:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:568", "Lỗi thả cảm xúc:", error);
         showError(t("common.error_connection"));
       }
     };
@@ -15553,7 +15563,7 @@ This will fail in production if not fixed.`);
       replyingMessagePreview.value = "";
       try {
         const res = await getTodoMessageDetail(commentId, todoId);
-        formatAppLog("log", "at controllers/todo_detail.ts:621", "API Response Detail:", res);
+        formatAppLog("log", "at controllers/todo_detail.ts:637", "API Response Detail:", res);
         if (res) {
           const dataDetail = res.data || res;
           editingCommentData.value = {
@@ -15569,13 +15579,13 @@ This will fail in production if not fixed.`);
             editingMemberName.value = t("common.me");
           }
           const content = dataDetail.message || "";
-          formatAppLog("log", "at controllers/todo_detail.ts:638", "Nội dung edit:", content);
+          formatAppLog("log", "at controllers/todo_detail.ts:654", "Nội dung edit:", content);
           isEditingComment.value = true;
           await vue.nextTick();
           newCommentText.value = content;
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:644", "Lỗi lấy chi tiết bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:660", "Lỗi lấy chi tiết bình luận:", error);
         showError(t("common.error_load"));
       } finally {
         isLoading.value = false;
@@ -15584,7 +15594,7 @@ This will fail in production if not fixed.`);
     const submitUpdateComment = async () => {
       if (!editingCommentData.value)
         return;
-      if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
+      if (isHtmlContentEmpty(newCommentText.value)) {
         showInfo(t("todo.msg_empty_content"));
         return;
       }
@@ -15622,7 +15632,7 @@ This will fail in production if not fixed.`);
           resetEditState();
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:702", "Lỗi cập nhật:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:718", "Lỗi cập nhật:", error);
         showError(t("common.error_update"));
       } finally {
         isSubmittingComment.value = false;
@@ -15671,7 +15681,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:762", "Lỗi xóa bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:778", "Lỗi xóa bình luận:", error);
         showError(t("common.fail_delete"));
       } finally {
         commentToDeleteId.value = null;
@@ -15682,7 +15692,7 @@ This will fail in production if not fixed.`);
       commentToDeleteId.value = null;
     };
     const submitComment = async () => {
-      if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes("<img")) {
+      if (isHtmlContentEmpty(newCommentText.value)) {
         showInfo(t("todo.msg_empty_content"));
         return;
       }
@@ -15709,7 +15719,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:810", "Lỗi gửi bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:826", "Lỗi gửi bình luận:", error);
         showError(t("common.error_send"));
       } finally {
         isSubmittingComment.value = false;
@@ -15732,7 +15742,7 @@ This will fail in production if not fixed.`);
             form.value.assigneeIndex = index;
         }
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:833", "Lỗi lấy members", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:849", "Lỗi lấy members", e);
       }
     };
     const reloadDetail = async () => {
@@ -15745,13 +15755,13 @@ This will fail in production if not fixed.`);
           fetchDetail(form.value.id)
         ]);
       } catch (e) {
-        formatAppLog("error", "at controllers/todo_detail.ts:847", e);
+        formatAppLog("error", "at controllers/todo_detail.ts:863", e);
       } finally {
         uni.stopPullDownRefresh();
       }
     };
     onPullDownRefresh(() => {
-      formatAppLog("log", "at controllers/todo_detail.ts:854", "Refreshing detail...");
+      formatAppLog("log", "at controllers/todo_detail.ts:870", "Refreshing detail...");
       reloadDetail();
     });
     const fetchDetail = async (id) => {
@@ -15783,7 +15793,7 @@ This will fail in production if not fixed.`);
           }
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:894", "Lỗi lấy chi tiết:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:910", "Lỗi lấy chi tiết:", error);
         showError(t("common.error_connection"));
       } finally {
         isLoading.value = false;
@@ -15879,7 +15889,7 @@ This will fail in production if not fixed.`);
           comments.value = [];
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:998", "Lỗi lấy bình luận:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1014", "Lỗi lấy bình luận:", error);
       } finally {
         isLoadingComments.value = false;
       }
@@ -15920,7 +15930,7 @@ This will fail in production if not fixed.`);
           form.value.customerManagerName = manager ? manager.UserName : t("todo.unknown");
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1056", "Lỗi CRM:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1072", "Lỗi CRM:", error);
       } finally {
         isLoadingCustomer.value = false;
       }
@@ -15931,7 +15941,7 @@ This will fail in production if not fixed.`);
         const currentType = historyFilterValues[historyFilterIndex.value];
         const crmToken = authStore.todoToken;
         if (!crmToken) {
-          formatAppLog("error", "at controllers/todo_detail.ts:1068", "Chưa có Token CRM/Todo");
+          formatAppLog("error", "at controllers/todo_detail.ts:1084", "Chưa có Token CRM/Todo");
           return;
         }
         const rawHistory = await getCrmActionTimeline(crmToken, customerUid, currentType);
@@ -15969,7 +15979,7 @@ This will fail in production if not fixed.`);
           });
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1115", "Lỗi lấy lịch sử:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1131", "Lỗi lấy lịch sử:", error);
       } finally {
         isLoadingHistory.value = false;
       }
@@ -16000,7 +16010,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1162", "Payload Update Status:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1178", "Payload Update Status:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_status_changed"));
@@ -16012,7 +16022,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1178", "Lỗi cập nhật trạng thái:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1194", "Lỗi cập nhật trạng thái:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -16044,7 +16054,7 @@ This will fail in production if not fixed.`);
           tagCodes: "",
           title: form.value.title || form.value.raw.title
         };
-        formatAppLog("log", "at controllers/todo_detail.ts:1222", "Payload Update Assignee:", payload);
+        formatAppLog("log", "at controllers/todo_detail.ts:1238", "Payload Update Assignee:", payload);
         const res = await updateTodo(payload);
         if (res) {
           showSuccess(t("todo.msg_assignee_changed"));
@@ -16055,7 +16065,7 @@ This will fail in production if not fixed.`);
           await fetchComments(form.value.id);
         }
       } catch (error) {
-        formatAppLog("error", "at controllers/todo_detail.ts:1240", "Lỗi cập nhật người giao:", error);
+        formatAppLog("error", "at controllers/todo_detail.ts:1256", "Lỗi cập nhật người giao:", error);
         showError(t("todo.msg_update_error"));
       } finally {
         isLoading.value = false;
@@ -16065,7 +16075,7 @@ This will fail in production if not fixed.`);
       uni.navigateBack();
     };
     const saveTodo = () => {
-      formatAppLog("log", "at controllers/todo_detail.ts:1249", "Lưu:", form.value);
+      formatAppLog("log", "at controllers/todo_detail.ts:1265", "Lưu:", form.value);
       showSuccess(t("todo.msg_saved"));
     };
     return {

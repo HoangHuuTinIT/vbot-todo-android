@@ -175,7 +175,23 @@ export const useTodoDetailController = () => {
 			isLoading.value = false;
 		}
 	};
+	const isHtmlContentEmpty = (html : string) => {
+		if (!html) return true;
 
+		// 1. Nếu có ảnh hoặc video (iframe) thì coi như KHÔNG rỗng
+		if (html.includes('<img') || html.includes('<iframe')) {
+			return false;
+		}
+
+		// 2. Thay thế các ký tự khoảng trắng đặc biệt (&nbsp;) thành khoảng trắng thường
+		let textOnly = html.replace(/&nbsp;/gi, ' ');
+
+		// 3. Loại bỏ toàn bộ thẻ HTML (<p>, <br>, <div>...)
+		textOnly = textOnly.replace(/<[^>]+>/g, '');
+
+		// 4. Cắt khoảng trắng đầu đuôi và kiểm tra độ dài
+		return textOnly.trim().length === 0;
+	};
 	const processCommentInput = async (htmlContent : string) : Promise<{ cleanMessage : string, fileUrl : string }> => {
 		if (!htmlContent) return { cleanMessage: '', fileUrl: '' };
 
@@ -407,7 +423,7 @@ export const useTodoDetailController = () => {
 		return currentSystemUID;
 	};
 	const submitReply = async () => {
-		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+		if (isHtmlContentEmpty(newCommentText.value)) {
 			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
@@ -653,7 +669,7 @@ export const useTodoDetailController = () => {
 		if (!editingCommentData.value) return;
 
 
-		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+		if (isHtmlContentEmpty(newCommentText.value)) {
 			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
@@ -771,7 +787,7 @@ export const useTodoDetailController = () => {
 		commentToDeleteId.value = null;
 	};
 	const submitComment = async () => {
-		if ((!newCommentText.value || !newCommentText.value.trim()) && !newCommentText.value.includes('<img')) {
+		if (isHtmlContentEmpty(newCommentText.value)) {
 			showInfo(t('todo.msg_empty_content'));
 			return;
 		}
@@ -1308,6 +1324,6 @@ export const useTodoDetailController = () => {
 		onSaveTitle,
 		replyingMessagePreview,
 		isHistoryOpen,
-		toggleHistory,isDone,
+		toggleHistory, isDone,
 	};
 };
