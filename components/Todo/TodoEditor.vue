@@ -458,16 +458,24 @@
 		];
 		showActionSheet.value = true;
 	};
-
 	const processImageSelection = (imageRes : any) => {
 		const tempPath = imageRes.tempFilePaths[0];
-		if (editorCtx.value) {
-			editorCtx.value.insertImage({
-				src: tempPath,
-				width: '80%',
-				alt: 'image'
-			});
-		}
+		setTimeout(() => {
+			if (editorCtx.value) {
+
+				editorCtx.value.insertImage({
+					src: tempPath,
+					width: '80%',
+					alt: 'image',
+					success: function () {
+						console.log('Chèn ảnh thành công');
+					},
+					fail: function (e : any) {
+						console.error('Chèn ảnh thất bại', e);
+					}
+				});
+			}
+		}, 200);
 	};
 
 

@@ -152,7 +152,7 @@ if (uni.restoreGlobal) {
       /* STYLE */
     );
   }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-2/components/UserAvatar.vue"]]);
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-3/components/UserAvatar.vue"]]);
   const icons = {
     "id": "2852637",
     "name": "uniui图标库",
@@ -1385,7 +1385,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
   let Calendar$1 = class Calendar {
     constructor({
       selected,
@@ -1825,7 +1825,7 @@ if (uni.restoreGlobal) {
       /* CLASS, NEED_HYDRATION */
     );
   }
-  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
+  const calendarItem = /* @__PURE__ */ _export_sfc(_sfc_main$m, [["render", _sfc_render$l], ["__scopeId", "data-v-3c762a01"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar-item.vue"]]);
   const _sfc_main$l = {
     name: "UniDatetimePicker",
     data() {
@@ -2709,7 +2709,7 @@ if (uni.restoreGlobal) {
       )) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
+  const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
   const _sfc_main$k = {
     components: {
       calendarItem,
@@ -3537,7 +3537,7 @@ if (uni.restoreGlobal) {
       /* NEED_HYDRATION */
     );
   }
-  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
+  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
   const _sfc_main$j = {
     name: "UniDatetimePicker",
     options: {
@@ -4546,7 +4546,7 @@ if (uni.restoreGlobal) {
       }, null, 8, ["date", "defTime", "start-date", "end-date", "selectableTimes", "startPlaceholder", "endPlaceholder", "default-value", "pleStatus", "range", "hasTime", "hideSecond", "onConfirm", "onMaskClose"])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-2/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
   const formatRelativeTime = (timestamp, t) => {
     if (!timestamp)
       return "";
@@ -8271,7 +8271,7 @@ ${codeFrame}` : message);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-2/components/DateRangeFilter.vue"]]);
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-3/components/DateRangeFilter.vue"]]);
   const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
     __name: "AppPicker",
     props: {
@@ -8397,7 +8397,7 @@ ${codeFrame}` : message);
       )
     ]);
   }
-  const AppPicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-e6406d7a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppPicker.vue"]]);
+  const AppPicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-e6406d7a"], ["__file", "D:/uni_app/vbot-todo-android-3/components/AppPicker.vue"]]);
   const _sfc_main$g = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -8700,7 +8700,7 @@ ${codeFrame}` : message);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CustomerModal.vue"]]);
+  const CustomerModal = /* @__PURE__ */ _export_sfc(_sfc_main$g, [["render", _sfc_render$f], ["__scopeId", "data-v-0c007ba7"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Todo/CustomerModal.vue"]]);
   var isVue2 = false;
   function set(target, key, val) {
     if (Array.isArray(target)) {
@@ -12297,7 +12297,7 @@ This will fail in production if not fixed.`);
       /* TEXT, CLASS, STYLE */
     );
   }
-  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-2/components/StatusBadge.vue"]]);
+  const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-3/components/StatusBadge.vue"]]);
   const _sfc_main$e = /* @__PURE__ */ vue.defineComponent({
     __name: "AppButton",
     props: {
@@ -12348,7 +12348,7 @@ This will fail in production if not fixed.`);
       ], true)
     ], 10, ["disabled"]);
   }
-  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android-2/components/AppButton.vue"]]);
+  const AppButton = /* @__PURE__ */ _export_sfc(_sfc_main$e, [["render", _sfc_render$d], ["__scopeId", "data-v-2f131dae"], ["__file", "D:/uni_app/vbot-todo-android-3/components/AppButton.vue"]]);
   const _sfc_main$d = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalMessage",
     setup(__props, { expose: __expose }) {
@@ -12452,7 +12452,7 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalMessage.vue"]]);
+  const GlobalMessage = /* @__PURE__ */ _export_sfc(_sfc_main$d, [["render", _sfc_render$c], ["__scopeId", "data-v-2f57c33b"], ["__file", "D:/uni_app/vbot-todo-android-3/components/GlobalMessage.vue"]]);
   const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
     __name: "ConfirmModal",
     props: {
@@ -12528,7 +12528,7 @@ This will fail in production if not fixed.`);
       ])
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-2/components/ConfirmModal.vue"]]);
+  const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-3/components/ConfirmModal.vue"]]);
   const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "Pagination",
     props: {
@@ -12651,7 +12651,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Pagination.vue"]]);
+  const Pagination = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["render", _sfc_render$a], ["__scopeId", "data-v-813f2b74"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Pagination.vue"]]);
   const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "GlobalNotification",
     setup(__props, { expose: __expose }) {
@@ -12724,7 +12724,7 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const GlobalNotification = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-e3127153"], ["__file", "D:/uni_app/vbot-todo-android-2/components/GlobalNotification.vue"]]);
+  const GlobalNotification = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-e3127153"], ["__file", "D:/uni_app/vbot-todo-android-3/components/GlobalNotification.vue"]]);
   const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "list_todo",
     setup(__props, { expose: __expose }) {
@@ -13410,7 +13410,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalNotification"])
     ]);
   }
-  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/list_todo.vue"]]);
+  const PagesTodoListTodo = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-1b4e60ea"], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/list_todo.vue"]]);
   const dateToTimestamp = (dateStr) => {
     if (!dateStr)
       return 0;
@@ -13800,7 +13800,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ])) : vue.createCommentVNode("v-if", true);
   }
-  const LinkCard = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-fe26c08a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/LinkCard.vue"]]);
+  const LinkCard = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-fe26c08a"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Todo/LinkCard.vue"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoEditor",
     props: {
@@ -14112,13 +14112,21 @@ This will fail in production if not fixed.`);
       };
       const processImageSelection = (imageRes) => {
         const tempPath = imageRes.tempFilePaths[0];
-        if (editorCtx.value) {
-          editorCtx.value.insertImage({
-            src: tempPath,
-            width: "80%",
-            alt: "image"
-          });
-        }
+        setTimeout(() => {
+          if (editorCtx.value) {
+            editorCtx.value.insertImage({
+              src: tempPath,
+              width: "80%",
+              alt: "image",
+              success: function() {
+                formatAppLog("log", "at components/Todo/TodoEditor.vue:471", "Chèn ảnh thành công");
+              },
+              fail: function(e) {
+                formatAppLog("error", "at components/Todo/TodoEditor.vue:474", "Chèn ảnh thất bại", e);
+              }
+            });
+          }
+        }, 200);
       };
       const onEditorReady = () => {
         uni.createSelectorQuery().in(instance).select(`#${editorId.value}`).context((res) => {
@@ -14655,7 +14663,7 @@ This will fail in production if not fixed.`);
       )
     ]);
   }
-  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/TodoEditor.vue"]]);
+  const TodoEditor = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-7d79903f"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Todo/TodoEditor.vue"]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "TodoDatePicker",
     props: {
@@ -14786,7 +14794,7 @@ This will fail in production if not fixed.`);
       ])
     ]);
   }
-  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/TodoDatePicker.vue"]]);
+  const TodoDatePicker = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-245edb6a"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Todo/TodoDatePicker.vue"]]);
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
@@ -14997,7 +15005,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalNotification"])
     ]);
   }
-  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/create_todo.vue"]]);
+  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/create_todo.vue"]]);
   const timestampToDateTimeStr = (ts) => {
     if (!ts || ts <= 0)
       return "";
@@ -16580,7 +16588,7 @@ This will fail in production if not fixed.`);
   }
   if (typeof block0 === "function")
     block0(_sfc_main$4);
-  const node = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-c3c66421"], ["__file", "D:/uni_app/vbot-todo-android-2/node_modules/mp-html/dist/uni-app/components/mp-html/node/node.vue"]]);
+  const node = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-c3c66421"], ["__file", "D:/uni_app/vbot-todo-android-3/node_modules/mp-html/dist/uni-app/components/mp-html/node/node.vue"]]);
   const config = {
     // 信任的标签（保持标签名不变）
     trustTags: makeMap("a,abbr,ad,audio,b,blockquote,br,code,col,colgroup,dd,del,dl,dt,div,em,fieldset,h1,h2,h3,h4,h5,h6,hr,i,img,ins,label,legend,li,ol,p,q,ruby,rt,source,span,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,title,ul,video"),
@@ -17866,7 +17874,7 @@ This will fail in production if not fixed.`);
       /* CLASS, STYLE */
     );
   }
-  const mpHtml = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-35c942de"], ["__file", "D:/uni_app/vbot-todo-android-2/node_modules/mp-html/dist/uni-app/components/mp-html/mp-html.vue"]]);
+  const mpHtml = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-35c942de"], ["__file", "D:/uni_app/vbot-todo-android-3/node_modules/mp-html/dist/uni-app/components/mp-html/mp-html.vue"]]);
   const _sfc_main$2 = /* @__PURE__ */ vue.defineComponent({
     __name: "CommentItem",
     props: {
@@ -18146,7 +18154,7 @@ This will fail in production if not fixed.`);
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const CommentItem = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-8cb873be"], ["__file", "D:/uni_app/vbot-todo-android-2/components/Todo/CommentItem.vue"]]);
+  const CommentItem = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-8cb873be"], ["__file", "D:/uni_app/vbot-todo-android-3/components/Todo/CommentItem.vue"]]);
   const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
     __name: "todo_detail",
     setup(__props, { expose: __expose }) {
@@ -18930,7 +18938,7 @@ This will fail in production if not fixed.`);
       vue.createVNode($setup["GlobalNotification"])
     ]);
   }
-  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android-2/pages/todo/todo_detail.vue"]]);
+  const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/todo_detail.vue"]]);
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
   __definePage("pages/todo/create_todo", PagesTodoCreateTodo);
   __definePage("pages/todo/todo_detail", PagesTodoTodoDetail);
@@ -19033,7 +19041,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android-2/App.vue"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main, [["__file", "D:/uni_app/vbot-todo-android-3/App.vue"]]);
   function createApp() {
     const app = vue.createVueApp(App);
     app.use(createPinia());
