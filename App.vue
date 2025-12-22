@@ -8,7 +8,9 @@ const handleNativeData = async (eventName: string, options: any = null) => {
     console.log(`[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
     const authStore = useAuthStore();
     const socketStore = useSocketStore();
+    
     let nativeData = null;
+
     if (options && options.referrerInfo && options.referrerInfo.extraData) {
         console.log("-> Tìm thấy dữ liệu trong options.referrerInfo");
         nativeData = options.referrerInfo.extraData;
@@ -30,6 +32,7 @@ const handleNativeData = async (eventName: string, options: any = null) => {
         }
     }
     if (nativeData) { 
+        
         if (nativeData.language === 'en' || nativeData.language === 'vi') {
             console.log("🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);

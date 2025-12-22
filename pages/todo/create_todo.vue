@@ -1,73 +1,86 @@
-//pages/todo/create_todo.vue
 <template>
 	<view class="container">
-		<view class="flat-item">
-			<view class="item-left">
-				<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
+		<view class="custom-header">
+			<view @click="goBack" class="back-btn">
+				<image src="/static/expand-arrow.png" class="back-icon" />
 			</view>
-			<textarea class="item-input title-textarea" v-model="form.name" :placeholder="$t('todo.enter_task_name')"
-				maxlength="256" auto-height />
-			<text class="char-count">
-				{{ $t('todo.char_count')
-			        .replace('{current}', String(form.name ? form.name.length : 0))
-			        .replace('{max}', '256') 
-			    }}
-			</text>
+			<text class="header-title">{{ $t('todo.create_page_title') }}</text>
+			<view class="header-right"></view>
 		</view>
-
-		<TodoEditor v-model="form.desc" :placeholder="$t('editor.placeholder')" />
-
-		<view class="flat-item" @click="openCustomerPopup">
-			<view class="item-left">
-				<image src="https://img.icons8.com/ios/50/666666/price-tag.png" class="item-icon"></image>
-			</view>
-			<view class="input-trigger" :class="{ 'placeholder': !form.customer }">
-				{{ form.customer || $t('todo.select_customer') }}
-			</view>
-			<text class="arrow-icon">›</text>
-		</view>
-
-		<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
-			:customers="customerList" :managers="memberList" @close="showCustomerModal = false"
-			@select="onCustomerSelect" @filter="onCustomerFilter" @loadMore="loadMoreCustomers" />
-
-		<view class="flat-item">
-			<view class="item-left">
-				<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
-			</view>
-
-			<AppPicker :range="sourceOptions" :value="sourceIndex > -1 ? sourceIndex : 0" @change="onSourceChange"
-				class="full-width-picker" :title="$t('todo.source')">
-				<view class="picker-display" :class="{ 'placeholder-color': sourceIndex === -1 }">
-					{{ sourceIndex > -1 ? sourceOptions[sourceIndex] : $t('todo.select_source') }}
+		<view class="content-body">
+			<view class="flat-item title-input-group">
+				<view class="item-left">
+					<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
 				</view>
-			</AppPicker>
-
-			<text class="arrow-icon">›</text>
-		</view>
-
-		<view class="flat-item">
-			<view class="item-left">
-				<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
+				<textarea class="item-input title-textarea" v-model="form.name"
+					:placeholder="$t('todo.enter_task_name')" maxlength="256" auto-height />
+				<text class="char-count">
+					{{ $t('todo.char_count')
+			        .replace('{current}', String(form.name ? form.name.length : 0))
+			        .replace('{max}', '256') 
+			    }}
+				</text>
 			</view>
 
-			<AppPicker :range="memberOptions" :value="memberIndex" @change="onMemberChange" class="full-width-picker"
-				:title="$t('todo.assignee')">
-				<view class="picker-display" :class="{ 'placeholder-color': !currentAssigneeName }">
-					{{ currentAssigneeName ? currentAssigneeName : $t('todo.assignee') }}
+			<TodoEditor v-model="form.desc" :placeholder="$t('editor.placeholder')" />
+
+			<view class="flat-item" @click="openCustomerPopup">
+				<view class="item-left">
+					<image src="https://img.icons8.com/ios/50/666666/price-tag.png" class="item-icon"></image>
 				</view>
-			</AppPicker>
+				<view class="input-trigger" :class="{ 'placeholder': !form.customer }">
+					{{ form.customer || $t('todo.select_customer') }}
+				</view>
+				<text class="arrow-icon">›</text>
+			</view>
 
-			<text class="arrow-icon">›</text>
+			<CustomerModal :visible="showCustomerModal" :loading="loadingCustomer" :loadingMore="loadingMore"
+				:customers="customerList" :managers="memberList" @close="showCustomerModal = false"
+				@select="onCustomerSelect" @filter="onCustomerFilter" @loadMore="loadMoreCustomers" />
+
+			<view class="flat-item">
+				<view class="item-left">
+					<image src="https://img.icons8.com/ios/50/666666/internet.png" class="item-icon"></image>
+				</view>
+
+				<AppPicker :range="sourceOptions" :value="sourceIndex > -1 ? sourceIndex : 0" @change="onSourceChange"
+					class="full-width-picker" :title="$t('todo.source')">
+					<view class="picker-display" :class="{ 'placeholder-color': sourceIndex === -1 }">
+						{{ sourceIndex > -1 ? sourceOptions[sourceIndex] : $t('todo.select_source') }}
+					</view>
+				</AppPicker>
+
+				<text class="arrow-icon">›</text>
+			</view>
+
+			<view class="flat-item">
+				<view class="item-left">
+					<image src="https://img.icons8.com/ios/50/666666/user.png" class="item-icon"></image>
+				</view>
+
+				<AppPicker :range="memberOptions" :value="memberIndex" @change="onMemberChange"
+					class="full-width-picker" :title="$t('todo.assignee')">
+					<view class="picker-display" :class="{ 'placeholder-color': !currentAssigneeName }">
+						{{ currentAssigneeName ? currentAssigneeName : $t('todo.assignee') }}
+					</view>
+				</AppPicker>
+
+				<text class="arrow-icon">›</text>
+			</view>
+
+			<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt" />
+			
+			<view class="footer-action">
+				<view style="width: 35%">
+					<AppButton type="secondary" :label="$t('common.cancel_action')" @click="goBack" />
+				</view>
+				<view style="width: 60%">
+					<AppButton type="primary" :label="loading ? $t('common.saving') : $t('common.save')" :loading="loading"
+						@click="submitForm" />
+				</view>
+			</view>
 		</view>
 
-		<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt" />
-
-		<view class="footer-action">
-			<AppButton type="secondary" :label="$t('common.cancel_action')" class="btn-cancel" @click="goBack" />
-			<AppButton type="primary" :label="loading ? $t('common.saving') : $t('common.save')" :loading="loading"
-				class="btn-submit" @click="submitForm" />
-		</view>
 		<GlobalMessage />
 		<GlobalNotification />
 	</view>
@@ -106,8 +119,59 @@
 	.container {
 		min-height: 100vh;
 		background-color: #f5f5f7;
-		padding: 15px;
+		display: flex;
+		flex-direction: column;
+		padding: 0;
 		box-sizing: border-box;
+	}
+
+	.custom-header {
+		height: 44px;
+		background-color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 10px;
+		padding-top: var(--status-bar-height);
+		border-bottom: 1px solid #eee;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+
+	.content-body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 15px;
+	}
+
+	
+	.title-input-group {
+		margin-top: 10px;
+	}
+
+	.back-btn {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.back-icon {
+		width: 20px;
+		height: 20px;
+		transform: rotate(90deg);
+	}
+
+	.header-title {
+		font-size: 17px;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.header-right {
+		width: 40px;
 	}
 
 	.flat-item {
@@ -117,6 +181,7 @@
 		display: flex;
 		align-items: center;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+		border-radius: 8px;
 	}
 
 	.item-left {
@@ -172,27 +237,7 @@
 		display: flex;
 		justify-content: space-between;
 		gap: 15px;
-	}
-
-	.btn {
-		border-radius: 0;
-		font-size: 15px;
-		font-weight: bold;
-		height: 45px;
-		line-height: 45px;
-		border: none;
-	}
-
-	.btn-cancel {
-		width: 35%;
-	}
-
-	.btn-submit {
-		width: 60%;
-	}
-
-	.btn-submit[disabled] {
-		background-color: #8dc2ff;
+		padding-bottom: 30px;
 	}
 
 	.input-trigger {

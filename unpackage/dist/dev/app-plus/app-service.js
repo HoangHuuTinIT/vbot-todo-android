@@ -10557,6 +10557,7 @@ This will fail in production if not fixed.`);
     no_name: "(Không tên)"
   };
   const todo$1 = {
+    todo_detail_title: "Chi tiết công việc",
     attached_links: "Liên kết đính kèm",
     page_title: "Công việc",
     create_page_title: "Tạo công việc",
@@ -10818,6 +10819,7 @@ This will fail in production if not fixed.`);
     no_name: "(No Name)"
   };
   const todo = {
+    todo_detail_title: "Todo Detail",
     attached_links: "Attached Links",
     page_title: "Todo",
     create_page_title: "Create Task",
@@ -12804,7 +12806,7 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _imports_0$2 = "/static/checked-checkbox.png";
+  const _imports_1$2 = "/static/checked-checkbox.png";
   const _imports_2$3 = "/static/empty-box.png";
   const _imports_3$2 = "/static/create-time.png";
   const _imports_4$1 = "/static/due-time.png";
@@ -12827,7 +12829,7 @@ This will fail in production if not fixed.`);
             style: { "margin-right": "15px" }
           }, [
             vue.createElementVNode("image", {
-              src: _imports_0$2,
+              src: _imports_1$2,
               class: "filter-icon",
               mode: "aspectFit"
             })
@@ -14208,8 +14210,8 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
-  const _imports_0$1 = "/static/link.png";
-  const _imports_1$2 = "/static/choseImage.png";
+  const _imports_0$2 = "/static/link.png";
+  const _imports_1$1 = "/static/choseImage.png";
   const _imports_2$2 = "/static/add-link.png";
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "editor-container" }, [
@@ -14303,7 +14305,7 @@ This will fail in production if not fixed.`);
         }, [
           vue.createElementVNode("view", { class: "header-left" }, [
             vue.createElementVNode("image", {
-              src: _imports_0$1,
+              src: _imports_0$2,
               class: "header-icon"
             }),
             vue.createElementVNode(
@@ -14385,7 +14387,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: _imports_1$2,
+                src: _imports_1$1,
                 class: "img-icon"
               })
             ],
@@ -14400,7 +14402,7 @@ This will fail in production if not fixed.`);
             },
             [
               vue.createElementVNode("image", {
-                src: _imports_0$1,
+                src: _imports_0$2,
                 class: "img-icon"
               })
             ],
@@ -14821,149 +14823,175 @@ This will fail in production if not fixed.`);
       return __returned__;
     }
   });
+  const _imports_0$1 = "/static/expand-arrow.png";
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createElementVNode("view", { class: "flat-item" }, [
-        vue.createElementVNode("view", { class: "item-left" }, [
+      vue.createElementVNode("view", { class: "custom-header" }, [
+        vue.createElementVNode("view", {
+          onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
+          class: "back-btn"
+        }, [
           vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios/50/666666/edit--v1.png",
-            class: "item-icon"
+            src: _imports_0$1,
+            class: "back-icon"
           })
-        ]),
-        vue.withDirectives(vue.createElementVNode("textarea", {
-          class: "item-input title-textarea",
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.name = $event),
-          placeholder: _ctx.$t("todo.enter_task_name"),
-          maxlength: "256",
-          "auto-height": ""
-        }, null, 8, ["placeholder"]), [
-          [vue.vModelText, $setup.form.name]
         ]),
         vue.createElementVNode(
           "text",
-          { class: "char-count" },
-          vue.toDisplayString(_ctx.$t("todo.char_count").replace("{current}", String($setup.form.name ? $setup.form.name.length : 0)).replace("{max}", "256")),
+          { class: "header-title" },
+          vue.toDisplayString(_ctx.$t("todo.create_page_title")),
           1
           /* TEXT */
-        )
-      ]),
-      vue.createVNode($setup["TodoEditor"], {
-        modelValue: $setup.form.desc,
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.desc = $event),
-        placeholder: _ctx.$t("editor.placeholder")
-      }, null, 8, ["modelValue", "placeholder"]),
-      vue.createElementVNode("view", {
-        class: "flat-item",
-        onClick: _cache[2] || (_cache[2] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args))
-      }, [
-        vue.createElementVNode("view", { class: "item-left" }, [
-          vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios/50/666666/price-tag.png",
-            class: "item-icon"
-          })
-        ]),
-        vue.createElementVNode(
-          "view",
-          {
-            class: vue.normalizeClass(["input-trigger", { "placeholder": !$setup.form.customer }])
-          },
-          vue.toDisplayString($setup.form.customer || _ctx.$t("todo.select_customer")),
-          3
-          /* TEXT, CLASS */
         ),
-        vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+        vue.createElementVNode("view", { class: "header-right" })
       ]),
-      vue.createVNode($setup["CustomerModal"], {
-        visible: $setup.showCustomerModal,
-        loading: $setup.loadingCustomer,
-        loadingMore: $setup.loadingMore,
-        customers: $setup.customerList,
-        managers: $setup.memberList,
-        onClose: _cache[3] || (_cache[3] = ($event) => $setup.showCustomerModal = false),
-        onSelect: $setup.onCustomerSelect,
-        onFilter: $setup.onCustomerFilter,
-        onLoadMore: $setup.loadMoreCustomers
-      }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
-      vue.createElementVNode("view", { class: "flat-item" }, [
-        vue.createElementVNode("view", { class: "item-left" }, [
-          vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios/50/666666/internet.png",
-            class: "item-icon"
-          })
-        ]),
-        vue.createVNode($setup["AppPicker"], {
-          range: $setup.sourceOptions,
-          value: $setup.sourceIndex > -1 ? $setup.sourceIndex : 0,
-          onChange: $setup.onSourceChange,
-          class: "full-width-picker",
-          title: _ctx.$t("todo.source")
-        }, {
-          default: vue.withCtx(() => [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
-              },
-              vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
-              3
-              /* TEXT, CLASS */
-            )
+      vue.createElementVNode("view", { class: "content-body" }, [
+        vue.createElementVNode("view", { class: "flat-item title-input-group" }, [
+          vue.createElementVNode("view", { class: "item-left" }, [
+            vue.createElementVNode("image", {
+              src: "https://img.icons8.com/ios/50/666666/edit--v1.png",
+              class: "item-icon"
+            })
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["range", "value", "onChange", "title"]),
-        vue.createElementVNode("text", { class: "arrow-icon" }, "›")
-      ]),
-      vue.createElementVNode("view", { class: "flat-item" }, [
-        vue.createElementVNode("view", { class: "item-left" }, [
-          vue.createElementVNode("image", {
-            src: "https://img.icons8.com/ios/50/666666/user.png",
-            class: "item-icon"
-          })
-        ]),
-        vue.createVNode($setup["AppPicker"], {
-          range: $setup.memberOptions,
-          value: $setup.memberIndex,
-          onChange: $setup.onMemberChange,
-          class: "full-width-picker",
-          title: _ctx.$t("todo.assignee")
-        }, {
-          default: vue.withCtx(() => [
-            vue.createElementVNode(
-              "view",
-              {
-                class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
-              },
-              vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
-              3
-              /* TEXT, CLASS */
-            )
+          vue.withDirectives(vue.createElementVNode("textarea", {
+            class: "item-input title-textarea",
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.name = $event),
+            placeholder: _ctx.$t("todo.enter_task_name"),
+            maxlength: "256",
+            "auto-height": ""
+          }, null, 8, ["placeholder"]), [
+            [vue.vModelText, $setup.form.name]
           ]),
-          _: 1
-          /* STABLE */
-        }, 8, ["range", "value", "onChange", "title"]),
-        vue.createElementVNode("text", { class: "arrow-icon" }, "›")
-      ]),
-      vue.createVNode($setup["TodoDatePicker"], {
-        dueDate: $setup.form.dueDate,
-        "onUpdate:dueDate": _cache[4] || (_cache[4] = ($event) => $setup.form.dueDate = $event),
-        notifyAt: $setup.form.notifyAt,
-        "onUpdate:notifyAt": _cache[5] || (_cache[5] = ($event) => $setup.form.notifyAt = $event)
-      }, null, 8, ["dueDate", "notifyAt"]),
-      vue.createElementVNode("view", { class: "footer-action" }, [
-        vue.createVNode($setup["AppButton"], {
-          type: "secondary",
-          label: _ctx.$t("common.cancel_action"),
-          class: "btn-cancel",
-          onClick: $setup.goBack
-        }, null, 8, ["label", "onClick"]),
-        vue.createVNode($setup["AppButton"], {
-          type: "primary",
-          label: $setup.loading ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
-          loading: $setup.loading,
-          class: "btn-submit",
-          onClick: $setup.submitForm
-        }, null, 8, ["label", "loading", "onClick"])
+          vue.createElementVNode(
+            "text",
+            { class: "char-count" },
+            vue.toDisplayString(
+              _ctx.$t("todo.char_count").replace("{current}", String($setup.form.name ? $setup.form.name.length : 0)).replace("{max}", "256")
+            ),
+            1
+            /* TEXT */
+          )
+        ]),
+        vue.createVNode($setup["TodoEditor"], {
+          modelValue: $setup.form.desc,
+          "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event),
+          placeholder: _ctx.$t("editor.placeholder")
+        }, null, 8, ["modelValue", "placeholder"]),
+        vue.createElementVNode("view", {
+          class: "flat-item",
+          onClick: _cache[3] || (_cache[3] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args))
+        }, [
+          vue.createElementVNode("view", { class: "item-left" }, [
+            vue.createElementVNode("image", {
+              src: "https://img.icons8.com/ios/50/666666/price-tag.png",
+              class: "item-icon"
+            })
+          ]),
+          vue.createElementVNode(
+            "view",
+            {
+              class: vue.normalizeClass(["input-trigger", { "placeholder": !$setup.form.customer }])
+            },
+            vue.toDisplayString($setup.form.customer || _ctx.$t("todo.select_customer")),
+            3
+            /* TEXT, CLASS */
+          ),
+          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+        ]),
+        vue.createVNode($setup["CustomerModal"], {
+          visible: $setup.showCustomerModal,
+          loading: $setup.loadingCustomer,
+          loadingMore: $setup.loadingMore,
+          customers: $setup.customerList,
+          managers: $setup.memberList,
+          onClose: _cache[4] || (_cache[4] = ($event) => $setup.showCustomerModal = false),
+          onSelect: $setup.onCustomerSelect,
+          onFilter: $setup.onCustomerFilter,
+          onLoadMore: $setup.loadMoreCustomers
+        }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
+        vue.createElementVNode("view", { class: "flat-item" }, [
+          vue.createElementVNode("view", { class: "item-left" }, [
+            vue.createElementVNode("image", {
+              src: "https://img.icons8.com/ios/50/666666/internet.png",
+              class: "item-icon"
+            })
+          ]),
+          vue.createVNode($setup["AppPicker"], {
+            range: $setup.sourceOptions,
+            value: $setup.sourceIndex > -1 ? $setup.sourceIndex : 0,
+            onChange: $setup.onSourceChange,
+            class: "full-width-picker",
+            title: _ctx.$t("todo.source")
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
+                },
+                vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
+                3
+                /* TEXT, CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["range", "value", "onChange", "title"]),
+          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+        ]),
+        vue.createElementVNode("view", { class: "flat-item" }, [
+          vue.createElementVNode("view", { class: "item-left" }, [
+            vue.createElementVNode("image", {
+              src: "https://img.icons8.com/ios/50/666666/user.png",
+              class: "item-icon"
+            })
+          ]),
+          vue.createVNode($setup["AppPicker"], {
+            range: $setup.memberOptions,
+            value: $setup.memberIndex,
+            onChange: $setup.onMemberChange,
+            class: "full-width-picker",
+            title: _ctx.$t("todo.assignee")
+          }, {
+            default: vue.withCtx(() => [
+              vue.createElementVNode(
+                "view",
+                {
+                  class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
+                },
+                vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
+                3
+                /* TEXT, CLASS */
+              )
+            ]),
+            _: 1
+            /* STABLE */
+          }, 8, ["range", "value", "onChange", "title"]),
+          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+        ]),
+        vue.createVNode($setup["TodoDatePicker"], {
+          dueDate: $setup.form.dueDate,
+          "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
+          notifyAt: $setup.form.notifyAt,
+          "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event)
+        }, null, 8, ["dueDate", "notifyAt"]),
+        vue.createElementVNode("view", { class: "footer-action" }, [
+          vue.createElementVNode("view", { style: { "width": "35%" } }, [
+            vue.createVNode($setup["AppButton"], {
+              type: "secondary",
+              label: _ctx.$t("common.cancel_action"),
+              onClick: $setup.goBack
+            }, null, 8, ["label", "onClick"])
+          ]),
+          vue.createElementVNode("view", { style: { "width": "60%" } }, [
+            vue.createVNode($setup["AppButton"], {
+              type: "primary",
+              label: $setup.loading ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
+              loading: $setup.loading,
+              onClick: $setup.submitForm
+            }, null, 8, ["label", "loading", "onClick"])
+          ])
+        ])
       ]),
       vue.createVNode($setup["GlobalMessage"]),
       vue.createVNode($setup["GlobalNotification"])
@@ -17910,7 +17938,7 @@ This will fail in production if not fixed.`);
     }
   });
   const _imports_0 = "/static/reaction.png";
-  const _imports_1$1 = "/static/reply_comment.png";
+  const _imports_1 = "/static/reply_comment.png";
   const _imports_2$1 = "/static/edit_comment.png";
   const _imports_3$1 = "/static/delete.png";
   function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
@@ -18060,7 +18088,7 @@ This will fail in production if not fixed.`);
                 onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("reply", $props.data))
               }, [
                 vue.createElementVNode("image", {
-                  src: _imports_1$1,
+                  src: _imports_1,
                   class: "icon-action"
                 })
               ]),
@@ -18181,7 +18209,8 @@ This will fail in production if not fixed.`);
         onSaveTitle,
         replyingMessagePreview,
         isHistoryOpen,
-        toggleHistory
+        toggleHistory,
+        goBack
       } = useTodoDetailController();
       const isCommentsOpen = vue.ref(false);
       const scrollTarget = vue.ref("");
@@ -18218,24 +18247,42 @@ This will fail in production if not fixed.`);
         onRequestEditComment(data.id);
         scrollToInput();
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification, AppPicker };
+      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, goBack, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
-  const _imports_1 = "/static/internet.png";
-  const _imports_2 = "/static/user.png";
-  const _imports_3 = "/static/user-male-circle.png";
-  const _imports_4 = "/static/phone.png";
-  const _imports_5 = "/static/manager.png";
-  const _imports_6 = "/static/expand-arrow.png";
+  const _imports_2 = "/static/internet.png";
+  const _imports_3 = "/static/user.png";
+  const _imports_4 = "/static/user-male-circle.png";
+  const _imports_5 = "/static/phone.png";
+  const _imports_6 = "/static/manager.png";
   function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "loading-bar"
       })) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode("view", { class: "detail-header" }, [
+      vue.createElementVNode("view", { class: "custom-header" }, [
+        vue.createElementVNode("view", {
+          onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
+          class: "back-btn"
+        }, [
+          vue.createElementVNode("image", {
+            src: _imports_0$1,
+            class: "back-icon"
+          })
+        ]),
+        vue.createElementVNode(
+          "text",
+          { class: "header-title" },
+          vue.toDisplayString(_ctx.$t("todo.todo_detail_title")),
+          1
+          /* TEXT */
+        ),
+        vue.createElementVNode("view", { class: "header-right" })
+      ]),
+      vue.createElementVNode("view", { class: "detail-header-content" }, [
         vue.createElementVNode("view", { class: "header-top" }, [
           vue.createElementVNode(
             "text",
@@ -18247,13 +18294,13 @@ This will fail in production if not fixed.`);
         ]),
         vue.withDirectives(vue.createElementVNode("textarea", {
           class: "header-title-input",
-          "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $setup.form.title = $event),
+          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.title = $event),
           placeholder: _ctx.$t("todo.header_loading"),
           "auto-height": "",
           maxlength: "256",
           "confirm-type": "done",
-          onConfirm: _cache[1] || (_cache[1] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
-          onBlur: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args))
+          onConfirm: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
+          onBlur: _cache[3] || (_cache[3] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args))
         }, null, 40, ["placeholder"]), [
           [vue.vModelText, $setup.form.title]
         ])
@@ -18269,7 +18316,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("view", { class: "section-block" }, [
           vue.createVNode($setup["TodoEditor"], {
             modelValue: $setup.form.desc,
-            "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => $setup.form.desc = $event),
+            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.form.desc = $event),
             placeholder: _ctx.$t("todo.desc_placeholder")
           }, null, 8, ["modelValue", "placeholder"]),
           vue.createElementVNode("view", {
@@ -18296,7 +18343,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
               vue.createElementVNode("image", {
-                src: _imports_0$2,
+                src: _imports_1$2,
                 class: "item-icon"
               }),
               vue.createElementVNode(
@@ -18340,7 +18387,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
               vue.createElementVNode("image", {
-                src: _imports_1,
+                src: _imports_2,
                 class: "item-icon"
               }),
               vue.createElementVNode(
@@ -18364,7 +18411,7 @@ This will fail in production if not fixed.`);
           vue.createElementVNode("view", { class: "flat-item" }, [
             vue.createElementVNode("view", { class: "item-left" }, [
               vue.createElementVNode("image", {
-                src: _imports_2,
+                src: _imports_3,
                 class: "item-icon"
               }),
               vue.createElementVNode(
@@ -18398,9 +18445,9 @@ This will fail in production if not fixed.`);
           ]),
           vue.createVNode($setup["TodoDatePicker"], {
             dueDate: $setup.form.dueDate,
-            "onUpdate:dueDate": _cache[4] || (_cache[4] = ($event) => $setup.form.dueDate = $event),
+            "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
             notifyAt: $setup.form.notifyAt,
-            "onUpdate:notifyAt": _cache[5] || (_cache[5] = ($event) => $setup.form.notifyAt = $event),
+            "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event),
             onChange: $setup.onDateUpdate
           }, null, 8, ["dueDate", "notifyAt", "onChange"])
         ]),
@@ -18438,7 +18485,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "flat-item" }, [
               vue.createElementVNode("view", { class: "item-left" }, [
                 vue.createElementVNode("image", {
-                  src: _imports_3,
+                  src: _imports_4,
                   class: "item-icon"
                 }),
                 vue.createElementVNode(
@@ -18460,7 +18507,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "flat-item" }, [
               vue.createElementVNode("view", { class: "item-left" }, [
                 vue.createElementVNode("image", {
-                  src: _imports_4,
+                  src: _imports_5,
                   class: "item-icon"
                 }),
                 vue.createElementVNode(
@@ -18482,7 +18529,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode("view", { class: "flat-item" }, [
               vue.createElementVNode("view", { class: "item-left" }, [
                 vue.createElementVNode("image", {
-                  src: _imports_5,
+                  src: _imports_6,
                   class: "item-icon"
                 }),
                 vue.createElementVNode(
@@ -18518,7 +18565,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode(
               "image",
               {
-                src: _imports_6,
+                src: _imports_0$1,
                 class: vue.normalizeClass(["toggle-icon", { "open": $setup.isCommentsOpen }])
               },
               null,
@@ -18529,7 +18576,7 @@ This will fail in production if not fixed.`);
           vue.createVNode($setup["AppPicker"], {
             range: $setup.commentFilterOptions,
             value: $setup.commentFilterIndex,
-            onClick: _cache[6] || (_cache[6] = vue.withModifiers(() => {
+            onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
             }, ["stop"])),
             onChange: $setup.onCommentFilterChange,
             title: _ctx.$t("common.filter")
@@ -18559,7 +18606,7 @@ This will fail in production if not fixed.`);
               vue.createVNode($setup["TodoEditor"], {
                 ref: "todoEditorRef",
                 modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $setup.newCommentText = $event),
+                "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => $setup.newCommentText = $event),
                 placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
               }, null, 8, ["modelValue", "placeholder"])
             ]),
@@ -18690,9 +18737,9 @@ This will fail in production if not fixed.`);
                   key: item.id,
                   data: item,
                   onReact: $setup.onToggleEmojiPicker,
-                  onReply: _cache[8] || (_cache[8] = (data) => $setup.handleReply(data)),
-                  onEdit: _cache[9] || (_cache[9] = (data) => $setup.handleEdit(data)),
-                  onDelete: _cache[10] || (_cache[10] = (id) => $setup.onRequestDeleteComment(id))
+                  onReply: _cache[9] || (_cache[9] = (data) => $setup.handleReply(data)),
+                  onEdit: _cache[10] || (_cache[10] = (data) => $setup.handleEdit(data)),
+                  onDelete: _cache[11] || (_cache[11] = (id) => $setup.onRequestDeleteComment(id))
                 }, null, 8, ["data", "onReact"]);
               }),
               128
@@ -18703,7 +18750,7 @@ This will fail in production if not fixed.`);
         vue.createElementVNode("view", { class: "section-header-row" }, [
           vue.createElementVNode("view", {
             class: "toggle-header",
-            onClick: _cache[11] || (_cache[11] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
+            onClick: _cache[12] || (_cache[12] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
           }, [
             vue.createElementVNode(
               "text",
@@ -18715,7 +18762,7 @@ This will fail in production if not fixed.`);
             vue.createElementVNode(
               "image",
               {
-                src: _imports_6,
+                src: _imports_0$1,
                 class: vue.normalizeClass(["toggle-icon", { "open": $setup.isHistoryOpen }])
               },
               null,
@@ -18726,7 +18773,7 @@ This will fail in production if not fixed.`);
           vue.createVNode($setup["AppPicker"], {
             range: $setup.historyFilterOptions,
             value: $setup.historyFilterIndex,
-            onClick: _cache[12] || (_cache[12] = vue.withModifiers(() => {
+            onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
             }, ["stop"])),
             onChange: $setup.onHistoryFilterChange,
             title: _ctx.$t("common.filter")
@@ -18823,7 +18870,7 @@ This will fail in production if not fixed.`);
       ]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelEditOpen,
-        "onUpdate:visible": _cache[13] || (_cache[13] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelEditOpen = $event),
         title: _ctx.$t("todo.cancel_edit_title"),
         message: _ctx.$t("todo.cancel_edit_msg"),
         "cancel-label": _ctx.$t("todo.continue_edit"),
@@ -18834,7 +18881,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmCancelReplyOpen,
-        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
+        "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
         title: _ctx.$t("todo.cancel_reply_title"),
         message: _ctx.$t("todo.cancel_reply_msg"),
         "cancel-label": _ctx.$t("todo.continue_reply"),
@@ -18845,7 +18892,7 @@ This will fail in production if not fixed.`);
       }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
       vue.createVNode($setup["ConfirmModal"], {
         visible: $setup.isConfirmDeleteCommentOpen,
-        "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
+        "onUpdate:visible": _cache[16] || (_cache[16] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
         title: _ctx.$t("todo.delete_comment_title"),
         message: _ctx.$t("todo.delete_comment_msg"),
         "confirm-type": "danger",
@@ -18855,11 +18902,11 @@ This will fail in production if not fixed.`);
       $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 1,
         class: "modal-overlay",
-        onClick: _cache[17] || (_cache[17] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
+        onClick: _cache[18] || (_cache[18] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
       }, [
         vue.createElementVNode("view", {
           class: "emoji-picker-container",
-          onClick: _cache[16] || (_cache[16] = vue.withModifiers(() => {
+          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
           }, ["stop"]))
         }, [
           vue.createElementVNode("view", { class: "emoji-grid" }, [
@@ -18891,61 +18938,85 @@ This will fail in production if not fixed.`);
     __name: "App",
     setup(__props, { expose: __expose }) {
       __expose();
+      const TEST_ENV = {
+        URL: "https://api-sandbox-h01.vbot.vn/v1.0",
+        USER: "hoangtin",
+        PASS: "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
+        // Pass này đã hash sẵn trong env
+        UID: "60566991077e440eafe369eac2e5e3db",
+        P_CODE: "PR202511211001129372"
+      };
       const handleNativeData = async (eventName, options = null) => {
-        formatAppLog("log", "at App.vue:8", `[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
+        formatAppLog("log", "at App.vue:18", `[${eventName}] Bắt đầu quy trình khởi tạo...`);
         const authStore = useAuthStore();
         const socketStore = useSocketStore();
         let nativeData = null;
-        if (options && options.referrerInfo && options.referrerInfo.extraData) {
-          formatAppLog("log", "at App.vue:13", "-> Tìm thấy dữ liệu trong options.referrerInfo");
-          nativeData = options.referrerInfo.extraData;
-        } else if (typeof plus !== "undefined" && plus.runtime && plus.runtime.arguments) {
-          formatAppLog("log", "at App.vue:17", "-> Tìm thấy dữ liệu trong plus.runtime.arguments");
-          const args = plus.runtime.arguments;
+        if (!nativeData) {
+          formatAppLog("log", "at App.vue:51", "⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
           try {
-            nativeData = typeof args === "string" && args.startsWith("{") ? JSON.parse(args) : args;
+            const res = await new Promise((resolve) => {
+              uni.request({
+                url: `${TEST_ENV.URL}/token`,
+                method: "POST",
+                header: { "Content-Type": "application/x-www-form-urlencoded" },
+                data: {
+                  username: TEST_ENV.USER,
+                  password: TEST_ENV.PASS,
+                  // Pass trong env của bạn đã hash rồi nên gửi luôn
+                  grant_type: "password",
+                  source: "Desktop-RTC"
+                  // Giả mạo nguồn
+                },
+                success: (r) => resolve(r.data),
+                fail: (e) => resolve(null)
+              });
+            });
+            if (res && res.access_token) {
+              formatAppLog("log", "at App.vue:72", "✅ DEV LOGIN THÀNH CÔNG!");
+              nativeData = {
+                uid: TEST_ENV.UID,
+                // Lấy từ env
+                projectCode: TEST_ENV.P_CODE,
+                // Lấy từ env
+                access_token: res.access_token,
+                session_id: res.session_id,
+                language: "en"
+                // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
+              };
+            } else {
+              formatAppLog("error", "at App.vue:82", "❌ DEV LOGIN THẤT BẠI:", res);
+            }
           } catch (e) {
-            formatAppLog("error", "at App.vue:22", "Lỗi parse arguments:", e);
-            if (typeof args === "object")
-              nativeData = args;
-          }
-        } else {
-          const launchOpts = uni.getLaunchOptionsSync();
-          if (launchOpts && launchOpts.extraData) {
-            nativeData = launchOpts.extraData;
+            formatAppLog("error", "at App.vue:85", "Lỗi login dev:", e);
           }
         }
         if (nativeData) {
-          if (nativeData.language === "en" || nativeData.language === "vi") {
-            formatAppLog("log", "at App.vue:34", "🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
+          if (nativeData.language) {
+            formatAppLog("log", "at App.vue:95", "🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
             changeLanguage(nativeData.language);
           }
           if (nativeData.uid && nativeData.access_token) {
-            formatAppLog("log", "at App.vue:39", "✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
+            formatAppLog("log", "at App.vue:100", "✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
             await authStore.initFromNative(nativeData);
             if (authStore.isLoggedIn) {
               socketStore.connect();
             }
           }
         } else {
-          formatAppLog("log", "at App.vue:47", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
-          if (eventName === "Launch") {
-            formatAppLog("warn", "at App.vue:49", "App Launch thiếu data");
-          }
+          formatAppLog("log", "at App.vue:108", "⚠️ Không có dữ liệu để chạy App.");
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:55", " App Launch");
+        formatAppLog("log", "at App.vue:113", " App Launch");
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:60", "App Show");
-        handleNativeData("Show", options);
+        formatAppLog("log", "at App.vue:118", "App Show");
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:65", " App Hide");
+        formatAppLog("log", "at App.vue:123", " App Hide");
       });
-      const __returned__ = { handleNativeData, get onLaunch() {
+      const __returned__ = { TEST_ENV, handleNativeData, get onLaunch() {
         return onLaunch;
       }, get onShow() {
         return onShow;

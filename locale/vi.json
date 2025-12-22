@@ -46,6 +46,7 @@
 		"no_name": "(Không tên)"
 	},
 	"todo": {
+		"todo_detail_title":"Chi tiết công việc",
 		"attached_links": "Liên kết đính kèm",
 		"page_title": "Công việc",
 		"create_page_title": "Tạo công việc",

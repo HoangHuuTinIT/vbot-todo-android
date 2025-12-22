@@ -11,14 +11,16 @@
 		{
 			"path": "pages/todo/create_todo",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "uni-app",
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/todo/todo_detail",
 			"style": {
 				"navigationBarTitleText": "uni-app",
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": true,
+				"navigationStyle": "custom"
 			}
 		}
 	],

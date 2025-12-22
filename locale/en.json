@@ -46,6 +46,7 @@
 		"no_name": "(No Name)"
 	},
 	"todo": {
+		"todo_detail_title":"Todo Detail",
 		"attached_links": "Attached Links",
 		"page_title": "Todo",
 		"create_page_title": "Create Task",

@@ -3,7 +3,15 @@
 	<view class="container">
 		<view class="loading-bar" v-if="isLoading"></view>
 
-		<view class="detail-header">
+		<view class="custom-header">
+			<view @click="goBack" class="back-btn">
+				<image src="/static/expand-arrow.png" class="back-icon" />
+			</view>
+			<text class="header-title">{{ $t('todo.todo_detail_title') }}</text>
+			<view class="header-right">
+			</view>
+		</view>
+		<view class="detail-header-content">
 			<view class="header-top">
 				<text class="header-code">#{{ form.code || '...' }}</text>
 			</view>
@@ -309,7 +317,7 @@
 		onSaveTitle,
 		replyingMessagePreview,
 		isHistoryOpen,
-		toggleHistory,
+		toggleHistory,goBack,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
@@ -351,6 +359,47 @@
 </script>
 
 <style lang="scss" scoped>
+	.custom-header {
+		height: 44px;
+		background-color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 10px;
+		padding-top: var(--status-bar-height);
+		border-bottom: 1px solid #eee;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+
+	.back-btn {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.back-icon {
+		width: 20px;
+		height: 20px;
+		transform: rotate(90deg);
+	}
+
+	.header-title {
+		font-size: 17px;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.header-right {
+		width: 40px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.container {
 
 		min-height: 100vh;
@@ -359,13 +408,10 @@
 		background-color: #f5f5f7;
 	}
 
-	.detail-header {
+	.detail-header-content {
 		background-color: #fff;
 		padding: 15px 15px 10px 15px;
 		border-bottom: 1px solid #eee;
-		position: sticky;
-		top: 0;
-		z-index: 100;
 	}
 
 	.header-top {
