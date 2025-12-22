@@ -16,14 +16,15 @@
 				<text class="header-code">#{{ form.code || '...' }}</text>
 			</view>
 			<textarea class="header-title-input" v-model="form.title" :placeholder="$t('todo.header_loading')"
-				auto-height maxlength="256" confirm-type="done" @confirm="onSaveTitle" @blur="onSaveTitle" />
+				auto-height maxlength="256" confirm-type="done" :disabled="isDone" @confirm="onSaveTitle"
+				@blur="onSaveTitle" />
 		</view>
 
 		<view class="detail-body">
 			<view class="section-title">{{ $t('todo.desc_section') }}</view>
 			<view class="section-block">
-				<TodoEditor v-model="form.desc" :placeholder="$t('todo.desc_placeholder')" />
-				<view class="input-actions" style="margin-top: 10px;">
+				<TodoEditor v-model="form.desc" :placeholder="$t('todo.desc_placeholder')" :read-only="isDone" />
+				<view class="input-actions" style="margin-top: 10px;" v-if="!isDone">
 					<AppButton type="primary" size="small" :loading="isSavingDescription"
 						:label="isSavingDescription ? $t('common.saving') : $t('common.save')"
 						@click="onSaveDescription" />
@@ -31,7 +32,7 @@
 			</view>
 
 			<view class="section-title">{{ $t('todo.info_section') }}</view>
-			<view class="info-group">
+			<view class="info-group" :class="{ 'disabled-group': isDone }">
 				<view class="flat-item">
 					<view class="item-left">
 						<image src="/static/checked-checkbox.png" class="item-icon">
@@ -317,7 +318,7 @@
 		onSaveTitle,
 		replyingMessagePreview,
 		isHistoryOpen,
-		toggleHistory,goBack,
+		toggleHistory, goBack, isDone,
 	} = useTodoDetailController();
 	const isCommentsOpen = ref(false);
 	const scrollTarget = ref('');
@@ -359,6 +360,15 @@
 </script>
 
 <style lang="scss" scoped>
+	.disabled-group {
+		opacity: 0.7;
+		pointer-events: none;
+		background-color: #f9f9f9;
+	}
+	.header-title-input[disabled] {
+		color: #666;
+	}
+
 	.custom-header {
 		height: 44px;
 		background-color: #fff;

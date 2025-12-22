@@ -82,7 +82,9 @@ export const useTodoDetailController = () => {
 
 	const isSavingDescription = ref(false);
 	const replyingMessagePreview = ref('');
-
+	const isDone = computed(() => {
+		return form.value.raw && form.value.raw.status === 'DONE';
+	});
 	const toggleHistory = () => {
 		isHistoryOpen.value = !isHistoryOpen.value;
 	};
@@ -102,6 +104,7 @@ export const useTodoDetailController = () => {
 		return form.value.raw.status === 'DONE';
 	});
 	const onDateUpdate = async (event : { field : string, value : string }) => {
+		if (isDone.value) return;
 		if (!form.value.raw) return;
 		let tempDueDate = form.value.dueDate;
 		let tempNotifyAt = form.value.notifyAt;
@@ -252,6 +255,7 @@ export const useTodoDetailController = () => {
 	};
 
 	const onSaveDescription = async () => {
+		if (isDone.value) return;
 		if (!form.value.raw) {
 			showError(t('common.error_missing_data'));
 			return;
@@ -300,7 +304,7 @@ export const useTodoDetailController = () => {
 		}
 	};
 	const onSaveTitle = async () => {
-
+		if (isDone.value) return;
 		if (!form.value.raw) return;
 
 		const newTitle = form.value.title ? form.value.title.trim() : '';
@@ -1304,6 +1308,6 @@ export const useTodoDetailController = () => {
 		onSaveTitle,
 		replyingMessagePreview,
 		isHistoryOpen,
-		toggleHistory,
+		toggleHistory,isDone,
 	};
 };

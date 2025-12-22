@@ -1,7 +1,8 @@
 <template>
-	<view class="editor-container">
+	<view class="editor-container" :class="{ 'is-readonly': readOnly }">
 		<view class="editor-wrapper">
-			<editor :id="editorId" class="ql-container" :placeholder="placeholder || $t('editor.placeholder')"
+			<editor :id="editorId" class="ql-container"
+				:placeholder="readOnly ? '' : (placeholder || $t('editor.placeholder'))" :read-only="readOnly"
 				show-img-size show-img-toolbar show-img-resize @ready="onEditorReady" @input="onInput"
 				@statuschange="onStatusChange">
 			</editor>
@@ -39,7 +40,7 @@
 			</view>
 		</view>
 
-		<view class="toolbar">
+		<view class="toolbar" v-if="!readOnly">
 			<view class="tool-list">
 				<view v-for="(item, index) in tools" :key="index" class="tool-item"
 					:class="{ 'active': isActive(item) }" @touchend.prevent="handleToolClick(item)">
@@ -146,7 +147,8 @@
 	const { t } = useI18n();
 	const props = defineProps({
 		modelValue: String,
-		placeholder: { type: String, default: '' }
+		placeholder: { type: String, default: '' },
+		readOnly: { type: Boolean, default: false }
 	});
 	const emit = defineEmits(['update:modelValue']);
 
@@ -581,6 +583,11 @@
 </script>
 
 <style lang="scss" scoped>
+
+	.editor-container.is-readonly .ql-container {
+		min-height: auto;
+	}
+
 	.editor-wrapper {
 		position: relative;
 		flex: 1;

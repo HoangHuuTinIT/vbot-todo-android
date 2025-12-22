@@ -110,6 +110,9 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.editor-container.is-readonly .ql-container[data-v-7d79903f] {
+  min-height: auto;
+}
 .editor-wrapper[data-v-7d79903f] {
   position: relative;
   flex: 1;
@@ -2648,6 +2651,14 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.disabled-group[data-v-9f96c8fe] {
+  opacity: 0.7;
+  pointer-events: none;
+  background-color: #f9f9f9;
+}
+.header-title-input[disabled][data-v-9f96c8fe] {
+  color: #666;
+}
 .custom-header[data-v-9f96c8fe] {
   height: 44px;
   background-color: #fff;
