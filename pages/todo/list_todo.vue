@@ -356,36 +356,44 @@
 		flex-direction: column;
 	}
 
+	/* --- ĐÃ SỬA: Footer --- */
 	.fixed-footer {
 		flex-shrink: 0;
-		background-color: #fff;
+		background-color: var(--bg-surface);
+		/* Đã sửa */
 		padding: 10px 15px;
 		padding-bottom: calc(10px + env(safe-area-inset-bottom));
-		border-top: 1px solid #eee;
+		border-top: 1px solid var(--border-color);
+		/* Đã sửa */
 		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
+	/* --- ĐÃ SỬA: Page Size Selector --- */
 	.page-size-selector {
 		display: flex;
 		align-items: center;
-		border: 1px solid #ddd;
+		border: 1px solid var(--border-input);
+		/* Đã sửa */
 		border-radius: 4px;
 		padding: 4px 8px;
-		background-color: #f9f9f9;
+		background-color: var(--bg-input);
+		/* Đã sửa */
 	}
 
 	.size-text {
 		font-size: 12px;
-		color: #333;
+		color: var(--text-primary);
+		/* Đã sửa */
 		margin-right: 4px;
 	}
 
 	.dropdown-arrow {
 		font-size: 10px;
-		color: #666;
+		color: var(--text-secondary);
+		/* Đã sửa */
 	}
 
 	.pagination-controls {
@@ -396,7 +404,8 @@
 
 	.page-arrow {
 		font-size: 18px;
-		color: #666;
+		color: var(--text-secondary);
+		/* Đã sửa */
 		padding: 0 10px;
 		font-weight: bold;
 		cursor: pointer;
@@ -408,16 +417,19 @@
 		pointer-events: none;
 	}
 
+	/* --- ĐÃ SỬA: Page Box --- */
 	.page-box {
 		width: 26px;
 		height: 26px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border: 1px solid #ddd;
+		border: 1px solid var(--border-input);
+		/* Đã sửa */
 		border-radius: 4px;
 		font-size: 12px;
-		color: #333;
+		color: var(--text-primary);
+		/* Đã sửa */
 	}
 
 	.page-box.active {
@@ -515,9 +527,11 @@
 		justify-content: center;
 	}
 
+	/* --- ĐÃ SỬA: Dots --- */
 	.dots {
 		font-size: 18px;
-		color: #999;
+		color: var(--text-hint);
+		/* Đã sửa */
 		font-weight: bold;
 		letter-spacing: 1px;
 		transform: rotate(90deg);
@@ -553,9 +567,7 @@
 
 	.code-tag {
 		background-color: var(--bg-tag);
-		/* Dùng biến */
 		color: var(--text-highlight);
-		/* Dùng biến */
 		padding: 4px 10px;
 		border-radius: 6px;
 		font-size: 13px;
@@ -572,9 +584,11 @@
 		height: 100%;
 		color: var(--text-hint);
 	}
+
 	.empty-text {
-	    color: var(--text-hint);
+		color: var(--text-hint);
 	}
+
 	.empty-icon {
 		width: 80px;
 		height: 80px;
@@ -656,9 +670,7 @@
 	.f-input,
 	.f-picker {
 		background-color: var(--bg-input);
-		/* Dùng biến */
 		border: 1px solid var(--border-input);
-		/* Dùng biến */
 		color: var(--text-primary);
 		border-radius: 8px;
 		padding: 10px;
@@ -669,13 +681,15 @@
 		justify-content: space-between;
 	}
 
+	/* --- ĐÃ SỬA: Filter Section Title --- */
 	.f-section-title {
 		margin-top: 20px;
 		margin-bottom: 10px;
 		font-weight: bold;
 		font-size: 14px;
 		color: #009688;
-		border-top: 1px dashed #eee;
+		border-top: 1px dashed var(--border-color);
+		/* Đã sửa */
 		padding-top: 15px;
 	}
 
@@ -690,20 +704,25 @@
 
 	.arrow {
 		font-size: 10px;
-		color: #999;
+		color: var(--text-hint);
+		/* Đã sửa */
 	}
 
 	.date {
-		color: #333;
+		color: var(--text-primary);
+		/* Đã sửa */
 	}
 
+	/* --- ĐÃ SỬA: Filter Footer --- */
 	.filter-footer {
 		padding: 20px;
 		padding-bottom: calc(20px + env(safe-area-inset-bottom));
-		border-top: 1px solid #eee;
+		border-top: 1px solid var(--border-color);
+		/* Đã sửa */
 		display: flex;
 		justify-content: space-between;
-		background-color: #fff;
+		background-color: var(--bg-surface);
+		/* Đã sửa */
 		gap: 15px;
 	}
 
@@ -714,7 +733,6 @@
 	.btn-filter-apply {
 		width: 60%;
 	}
-
 
 	@keyframes popIn {
 		from {
@@ -732,9 +750,12 @@
 		border: none;
 	}
 
+	/* --- ĐÃ SỬA: Modal Buttons --- */
 	.modal-btn.cancel {
-		color: #666;
-		border-right: 1px solid #eee;
+		color: var(--text-secondary);
+		/* Đã sửa */
+		border-right: 1px solid var(--border-color);
+		/* Đã sửa */
 	}
 
 	.modal-btn.confirm {
@@ -743,7 +764,8 @@
 	}
 
 	.modal-btn:active {
-		background-color: #f9f9f9;
+		background-color: var(--bg-input);
+		/* Đã sửa */
 	}
 
 	.add-task-simple {
@@ -775,8 +797,10 @@
 		opacity: 1;
 	}
 
+	/* --- ĐÃ SỬA: Custom Sheet Panel --- */
 	.custom-sheet-panel {
-		background-color: #f1f1f1;
+		background-color: var(--bg-page);
+		/* Đã sửa: Dùng bg-page để làm màu nền cho khoảng hở */
 		border-top-left-radius: 12px;
 		border-top-right-radius: 12px;
 		transform: translateY(100%);
@@ -789,16 +813,22 @@
 		transform: translateY(0);
 	}
 
+	/* --- ĐÃ SỬA: Sheet Item --- */
 	.sheet-item {
-		background-color: #fff;
+		background-color: var(--bg-surface);
+		/* Đã sửa */
 		padding: 16px;
 		text-align: center;
 		font-size: 17px;
-		border-bottom: 1px solid #eee;
+		border-bottom: 1px solid var(--border-color);
+		/* Đã sửa */
+		color: var(--text-primary);
+		/* Thêm mới: Để chữ không bị ẩn trong dark mode */
 	}
 
 	.sheet-item:active {
-		background-color: #ddd;
+		background-color: var(--bg-input);
+		/* Đã sửa */
 	}
 
 	.sheet-item.delete text {
@@ -809,9 +839,11 @@
 		font-weight: 600;
 	}
 
+	/* --- ĐÃ SỬA: Sheet Gap --- */
 	.sheet-gap {
 		height: 8px;
-		background-color: #f1f1f1;
+		background-color: var(--bg-page);
+		/* Đã sửa */
 	}
 
 	.icon-btn {
@@ -822,8 +854,10 @@
 		height: 30px;
 	}
 
+	/* --- ĐÃ SỬA: Quick Complete --- */
 	.quick-panel {
-		background-color: #f5f5f7;
+		background-color: var(--bg-page);
+		/* Đã sửa */
 	}
 
 	.quick-list {
@@ -833,7 +867,8 @@
 	}
 
 	.quick-item {
-		background-color: #fff;
+		background-color: var(--bg-surface);
+		/* Đã sửa */
 		padding: 12px 15px;
 		border-radius: 8px;
 		display: flex;
@@ -850,9 +885,11 @@
 
 	.quick-code {
 		font-size: 12px;
-		color: #888;
+		color: var(--text-secondary);
+		/* Đã sửa */
 		font-weight: bold;
-		background-color: #f0f0f0;
+		background-color: var(--bg-tag);
+		/* Đã sửa */
 		display: inline-block;
 		padding: 2px 6px;
 		border-radius: 4px;
@@ -861,7 +898,8 @@
 
 	.quick-title {
 		font-size: 15px;
-		color: #333;
+		color: var(--text-primary);
+		/* Đã sửa */
 		font-weight: 500;
 		white-space: nowrap;
 		overflow: hidden;

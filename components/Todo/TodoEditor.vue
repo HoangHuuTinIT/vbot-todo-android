@@ -583,6 +583,18 @@
 </script>
 
 <style lang="scss" scoped>
+	/* --- CONTAINER CHÍNH --- */
+	.editor-container {
+		display: flex;
+		flex-direction: column;
+		/* Thay #fff */
+		background: var(--bg-surface);
+		/* Thay #e0e0e0 */
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		overflow: hidden;
+		min-height: 250px;
+	}
 
 	.editor-container.is-readonly .ql-container {
 		min-height: auto;
@@ -595,20 +607,25 @@
 		flex-direction: column;
 	}
 
-	.editor-container {
-		display: flex;
-		flex-direction: column;
-		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 8px;
-		overflow: hidden;
-		min-height: 250px;
+	/* --- TRÌNH SOẠN THẢO (QL-CONTAINER) --- */
+	.ql-container {
+		flex: 1;
+		width: 100%;
+		padding: 15px;
+		font-size: 15px;
+		line-height: 1.5;
+		box-sizing: border-box;
+		/* Thay #333 */
+		color: var(--text-primary);
+		min-height: 150px;
 	}
 
+	/* --- TOOLTIP LINK (POPUP KHI BẤM VÀO LINK) --- */
 	.link-tooltip {
 		position: absolute;
 		z-index: 100;
-		background-color: #333;
+		/* Giữ màu tối cho tooltip vì nó cần nổi bật */
+		background-color: #333; 
 		border-radius: 8px;
 		padding: 8px 12px;
 		left: 50%;
@@ -689,107 +706,84 @@
 		border-top: 6px solid #333;
 	}
 
-	.ql-container {
-		flex: 1;
-		width: 100%;
-		padding: 15px;
-		font-size: 15px;
-		line-height: 1.5;
-		box-sizing: border-box;
-		color: #333;
-		min-height: 150px;
-	}
-
-	.editor-container {
-		display: flex;
-		flex-direction: column;
-		background: #fff;
-		border: 1px solid #e0e0e0;
+	/* --- KHUNG CHỨA LINK ĐÍNH KÈM (LINK SECTION) --- */
+	.link-section-frame {
+		margin: 0 15px 10px 15px;
+		/* Thay #e9ecef và #f8f9fa */
+		border: 1px solid var(--border-color);
+		background-color: var(--bg-input);
 		border-radius: 8px;
 		overflow: hidden;
-		min-height: 250px;
 	}
 
-	.ql-container {
-		flex: 1;
-		width: 100%;
-		padding: 15px;
-		font-size: 15px;
-		line-height: 1.5;
-		box-sizing: border-box;
-		color: #333;
-		min-height: 150px;
-	}
-
-	.link-cards-area {
-		padding: 0 15px 10px 15px;
-		background: #fff;
-	}
-
-	.link-card {
+	.link-section-header {
 		display: flex;
+		justify-content: space-between;
 		align-items: center;
-		background-color: #f8f9fa;
-		border: 1px solid #e9ecef;
-		border-radius: 8px;
 		padding: 10px;
-		margin-bottom: 8px;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+		/* Thay #f1f3f5 */
+		background-color: var(--bg-input); 
+		cursor: pointer;
+		border-bottom: 1px solid transparent; 
+	}
+	/* Khi mở list ra thì thêm border bottom cho header */
+	.link-section-header:has(+ .link-list-content) {
+		border-bottom-color: var(--border-color);
 	}
 
-	.link-card-icon {
-		width: 40px;
-		height: 40px;
-		background-color: #e7f1ff;
-		border-radius: 8px;
+	.link-section-header:active {
+		opacity: 0.8;
+	}
+
+	.header-left {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		margin-right: 10px;
-		flex-shrink: 0;
 	}
 
-	.card-icon-img {
-		width: 20px;
-		height: 20px;
+	.header-icon {
+		width: 16px;
+		height: 16px;
+		margin-right: 8px;
+		opacity: 0.6;
+		/* Đảo màu icon khi dark mode */
+		filter: var(--icon-filter);
 	}
 
-	.link-card-content {
-		flex: 1;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.link-domain {
-		font-size: 14px;
+	.header-title {
+		font-size: 13px;
 		font-weight: 600;
-		color: #333;
-		margin-bottom: 2px;
+		/* Thay #495057 */
+		color: var(--text-primary);
 	}
 
-	.link-url {
-		font-size: 12px;
-		color: #888;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+	.toggle-arrow {
+		width: 14px;
+		height: 14px;
+		opacity: 0.5;
+		transition: transform 0.3s ease;
+		transform: rotate(-90deg);
+		/* Đảo màu mũi tên */
+		filter: var(--icon-filter);
 	}
 
-	.link-card-remove {
-		padding: 5px;
-		margin-left: 5px;
+	.toggle-arrow.open {
+		transform: rotate(0deg);
+		opacity: 1;
 	}
 
-	.remove-btn {
-		color: #999;
-		font-size: 16px;
-		font-weight: bold;
+	.link-list-content {
+		padding: 5px 10px 10px 10px;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
+		animation: slideDown 0.2s ease-out;
 	}
 
+	/* --- THANH CÔNG CỤ (TOOLBAR) --- */
 	.toolbar {
-		background-color: #f5f7fa;
-		border-top: 1px solid #eee;
+		/* Thay #f5f7fa */
+		background-color: var(--bg-input);
+		/* Thay #eee */
+		border-top: 1px solid var(--border-color);
 		width: 100%;
 		height: auto;
 		padding: 8px 5px;
@@ -811,22 +805,39 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 4px;
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 		flex-shrink: 0;
+		/* Viền mờ để rõ hơn trên nền tối */
+		border: 1px solid var(--border-color);
 	}
 
 	.tool-item.active {
+		/* Giữ màu xanh brand */
 		background-color: #d0e4ff;
 		color: #007aff;
 		border: 1px solid #007aff;
 	}
+    
+    /* Riêng trong dark mode, màu active này có thể hơi chói, ta điều chỉnh nhẹ */
+    :global(.theme-dark) .tool-item.active {
+        background-color: rgba(0, 122, 255, 0.2); /* Xanh trong suốt */
+        color: #66b5ff;
+        border-color: #007aff;
+    }
 
 	.txt-icon {
 		font-size: 16px;
-		color: #555;
+		/* Thay #555 */
+		color: var(--text-secondary);
 		font-weight: 600;
 	}
+    
+    /* Khi active thì text icon đổi màu theo */
+    .tool-item.active .txt-icon {
+         color: inherit;
+    }
 
 	.txt-dynamic {
 		font-size: 14px;
@@ -836,15 +847,18 @@
 		width: 18px;
 		height: 18px;
 		opacity: 0.7;
+		/* Đảo màu icon ảnh */
+		filter: var(--icon-filter);
 	}
 
 	.tool-divider {
 		width: 1px;
 		height: 20px;
-		background-color: #ddd;
+		background-color: var(--border-color); /* Thay #ddd */
 		display: none;
 	}
 
+	/* --- MODAL CHUNG (LINK, CARD LINK, COLOR) --- */
 	.modal-overlay {
 		position: fixed;
 		top: 0;
@@ -860,7 +874,8 @@
 
 	.modal-box {
 		width: 80%;
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		padding: 20px;
 		border-radius: 12px;
 		animation: fadeIn 0.2s;
@@ -872,23 +887,30 @@
 		margin-bottom: 5px;
 		display: block;
 		text-align: center;
+		/* Thay mặc định */
+		color: var(--text-primary);
 	}
 
 	.modal-desc {
 		font-size: 13px;
-		color: #888;
+		/* Thay #888 */
+		color: var(--text-hint);
 		margin-bottom: 15px;
 		display: block;
 		text-align: center;
 	}
 
 	.modal-input {
-		border: 1px solid #ddd;
+		/* Thay border và màu chữ */
+		border: 1px solid var(--border-input);
+		color: var(--text-primary);
 		padding: 10px;
 		border-radius: 6px;
 		margin-bottom: 20px;
 		font-size: 15px;
 		height: 40px;
+		/* Thêm nền input */
+		background-color: var(--bg-input);
 	}
 
 	.modal-actions {
@@ -909,8 +931,10 @@
 	}
 
 	.btn-cancel {
-		background-color: #f5f5f5;
-		color: #666;
+		/* Thay #f5f5f5 */
+		background-color: var(--bg-input);
+		/* Thay #666 */
+		color: var(--text-secondary);
 	}
 
 	.btn-confirm {
@@ -918,6 +942,7 @@
 		color: #fff;
 	}
 
+	/* --- MODAL MÀU SẮC --- */
 	.color-box {
 		padding: 0;
 		overflow: hidden;
@@ -926,7 +951,7 @@
 
 	.color-tabs {
 		display: flex;
-		border-bottom: 1px solid #eee;
+		border-bottom: 1px solid var(--border-color);
 	}
 
 	.color-tab {
@@ -935,12 +960,14 @@
 		padding: 12px;
 		font-size: 15px;
 		font-weight: 500;
-		color: #666;
-		background: #f9f9f9;
+		/* Thay #666 và #f9f9f9 */
+		color: var(--text-secondary);
+		background: var(--bg-input);
 	}
 
 	.color-tab.active {
-		background: #fff;
+		/* Thay #fff */
+		background: var(--bg-surface);
 		color: #007aff;
 		font-weight: bold;
 		border-bottom: 2px solid #007aff;
@@ -958,7 +985,7 @@
 		width: 36px;
 		height: 36px;
 		border-radius: 50%;
-		border: 1px solid #e0e0e0;
+		border: 1px solid var(--border-color);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		position: relative;
 	}
@@ -969,19 +996,20 @@
 	}
 
 	.color-circle.no-color {
-		background: #fff;
+		background: var(--bg-surface);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border: 1px dashed #999;
+		border: 1px dashed var(--text-hint);
 	}
 
 	.x-mark {
 		font-size: 20px;
-		color: #999;
+		color: var(--text-hint);
 		font-weight: bold;
 	}
 
+	/* --- ACTION SHEET --- */
 	.custom-sheet-mask {
 		position: fixed;
 		top: 0;
@@ -1004,7 +1032,8 @@
 	}
 
 	.custom-sheet-panel {
-		background-color: #f1f1f1;
+		/* Thay #f1f1f1 bằng màu nền page */
+		background-color: var(--bg-page);
 		border-top-left-radius: 12px;
 		border-top-right-radius: 12px;
 		transform: translateY(100%);
@@ -1018,15 +1047,20 @@
 	}
 
 	.sheet-item {
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		padding: 16px;
 		text-align: center;
 		font-size: 17px;
-		border-bottom: 1px solid #eee;
+		/* Thay #eee */
+		border-bottom: 1px solid var(--border-color);
+		/* Thêm màu chữ */
+		color: var(--text-primary);
 	}
 
 	.sheet-item:active {
-		background-color: #ddd;
+		/* Thay #ddd */
+		background-color: var(--bg-input);
 	}
 
 	.sheet-item.cancel {
@@ -1035,88 +1069,16 @@
 
 	.sheet-gap {
 		height: 8px;
-		background-color: #f1f1f1;
+		background-color: var(--bg-page);
 	}
 
 	@keyframes fadeIn {
-		from {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-
-		to {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
-
-	.link-section-frame {
-		margin: 0 15px 10px 15px;
-		border: 1px solid #e9ecef;
-		background-color: #f8f9fa;
-		border-radius: 8px;
-		overflow: hidden;
-	}
-
-	.link-section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 10px;
-		background-color: #f1f3f5;
-		cursor: pointer;
-	}
-
-	.link-section-header:active {
-		background-color: #e9ecef;
-	}
-
-	.header-left {
-		display: flex;
-		align-items: center;
-	}
-
-	.header-icon {
-		width: 16px;
-		height: 16px;
-		margin-right: 8px;
-		opacity: 0.6;
-	}
-
-	.header-title {
-		font-size: 13px;
-		font-weight: 600;
-		color: #495057;
-	}
-
-	.toggle-arrow {
-		width: 14px;
-		height: 14px;
-		opacity: 0.5;
-		transition: transform 0.3s ease;
-		transform: rotate(-90deg);
-	}
-
-	.toggle-arrow.open {
-		transform: rotate(0deg);
-		opacity: 1;
-	}
-
-	.link-list-content {
-		padding: 5px 10px 10px 10px;
-		background-color: #fff;
-		animation: slideDown 0.2s ease-out;
+		from { opacity: 0; transform: scale(0.95); }
+		to { opacity: 1; transform: scale(1); }
 	}
 
 	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-5px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+		from { opacity: 0; transform: translateY(-5px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 </style>

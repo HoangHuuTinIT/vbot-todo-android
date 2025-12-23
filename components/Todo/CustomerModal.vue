@@ -1,4 +1,3 @@
-//components/Todo/CustomerModal
 <template>
 	<view class="modal-overlay" v-if="visible" @click.stop="close">
 		<view class="modal-content" @click.stop>
@@ -50,6 +49,7 @@
 			</view>
 
 			<view v-if="loading" class="loading-state">{{ $t('common.loading') }}</view>
+
 			<scroll-view scroll-y class="customer-list" v-else @scrolltolower="onScrollToLower" lower-threshold="50">
 				<view v-for="(item, index) in customers" :key="item.id" class="customer-item"
 					@click="selectCustomer(item)">
@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+	// Logic giữ nguyên như cũ
 	import { reactive, ref, computed } from 'vue';
 	import UserAvatar from '@/components/UserAvatar.vue';
 	import DateRangeFilter from '@/components/DateRangeFilter.vue';
@@ -108,7 +109,6 @@
 		endDate: ''
 	});
 	const onScrollToLower = () => {
-		console.log('Cuộn xuống đáy -> Load more');
 		emit('loadMore');
 	};
 	const managerDisplayOptions = computed(() => {
@@ -144,8 +144,6 @@
 		filter.startDate = '';
 		filter.endDate = '';
 		applyFilter();
-
-		console.log('Đã đặt lại bộ lọc');
 	};
 
 	const applyFilter = () => {
@@ -176,12 +174,15 @@
 </script>
 
 <style lang="scss" scoped>
+	/* Chú ý: Dùng CSS Variables từ theme.scss */
+
 	.modal-overlay {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
+		/* Giữ màu overlay tối mờ, không đổi theo theme */
 		background-color: rgba(0, 0, 0, 0.5);
 		z-index: 999;
 		display: flex;
@@ -192,7 +193,8 @@
 	.modal-content {
 		width: 90%;
 		height: 80vh;
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		border-radius: 12px;
 		display: flex;
 		flex-direction: column;
@@ -201,17 +203,19 @@
 
 	.modal-header {
 		padding: 15px;
-		border-bottom: 1px solid #f0f0f0;
+		/* Thay border và bg */
+		border-bottom: 1px solid var(--border-color);
+		background-color: var(--bg-surface);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background-color: #fff;
 	}
 
 	.modal-title {
 		font-weight: bold;
 		font-size: 16px;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 	}
 
 	.header-actions {
@@ -227,12 +231,14 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background-color: #f5f5f5;
+		/* Thay #f5f5f5 */
+		background-color: var(--bg-input);
 		transition: all 0.2s;
 	}
 
 	.filter-toggle-btn.active {
-		background-color: #e0f2f1;
+		/* Khi active, vẫn giữ màu xanh brand, nhưng dùng rgba để nó không quá chói trên nền đen */
+		background-color: rgba(0, 150, 136, 0.15);
 		border: 1px solid #009688;
 	}
 
@@ -240,32 +246,23 @@
 		width: 20px;
 		height: 20px;
 		opacity: 0.7;
+		/* QUAN TRỌNG: Đảo màu icon đen -> trắng khi ở Dark Mode */
+		filter: var(--icon-filter);
 	}
 
 	.close-btn {
 		font-size: 20px;
 		padding: 5px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-secondary);
 	}
 
 	.filter-section {
 		padding: 15px;
-		background-color: #fff;
-		border-bottom: 1px solid #eee;
+		/* Thay bg và border */
+		background-color: var(--bg-surface);
+		border-bottom: 1px solid var(--border-color);
 		flex-shrink: 0;
-		// animation: slideDown 0.3s ease-out;
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	.f-item {
@@ -274,8 +271,9 @@
 
 	.f-input,
 	.f-picker-box {
-		background-color: #f8f9fa;
-		border: 1px solid #e0e0e0;
+		/* Thay bg, border */
+		background-color: var(--bg-input);
+		border: 1px solid var(--border-input);
 		border-radius: 8px;
 		padding: 0 12px;
 		font-size: 14px;
@@ -284,6 +282,13 @@
 		align-items: center;
 		width: 100%;
 		box-sizing: border-box;
+		/* Màu chữ khi nhập */
+		color: var(--text-primary);
+	}
+
+	/* Override màu placeholder style (cần dùng deep selector hoặc global class) */
+	:deep(.ph-style) {
+		color: var(--text-hint) !important;
 	}
 
 	.f-picker-box {
@@ -291,16 +296,19 @@
 	}
 
 	.text-ph {
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 	}
 
 	.text-val {
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 	}
 
 	.arrow {
 		font-size: 10px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 	}
 
 	.f-actions {
@@ -320,11 +328,13 @@
 	}
 
 	.btn-reset {
-		background-color: #f5f5f5;
-		color: #666;
+		/* Thay bg và text */
+		background-color: var(--bg-input);
+		color: var(--text-secondary);
 	}
 
 	.btn-submit {
+		/* Giữ màu Brand, vì nút submit thường cần nổi bật */
 		background-color: #009688;
 		color: #fff;
 	}
@@ -332,13 +342,16 @@
 	.customer-list {
 		flex: 1;
 		height: 1px;
+		/* Đảm bảo nền list đúng màu */
+		background-color: var(--bg-surface);
 	}
 
 	.loading-state,
 	.empty-state {
 		text-align: center;
 		padding: 30px;
-		color: #888;
+		/* Thay #888 */
+		color: var(--text-hint);
 		font-size: 14px;
 	}
 
@@ -346,12 +359,14 @@
 		display: flex;
 		align-items: center;
 		padding: 12px 15px;
-		border-bottom: 1px solid #f5f5f7;
-		background-color: #fff;
+		/* Thay border và bg */
+		border-bottom: 1px solid var(--border-color);
+		background-color: var(--bg-surface);
 	}
 
 	.customer-item:active {
-		background-color: #f9f9f9;
+		/* Thay màu khi nhấn giữ */
+		background-color: var(--bg-input);
 	}
 
 	.mr-3 {
@@ -369,7 +384,8 @@
 	.name-text {
 		font-size: 15px;
 		font-weight: 600;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 		margin-bottom: 3px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -378,7 +394,8 @@
 
 	.phone-text {
 		font-size: 13px;
-		color: #666;
+		/* Thay #666 */
+		color: var(--text-secondary);
 	}
 
 	.date-column {
@@ -388,7 +405,8 @@
 
 	.date-text {
 		font-size: 12px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 	}
 
 	.loading-more-container {
@@ -400,6 +418,7 @@
 
 	.loading-more-text {
 		font-size: 12px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 	}
 </style>

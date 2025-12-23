@@ -30,14 +30,14 @@
 
 	const props = defineProps<{
 		range : string[];
-		value : number;   
+		value : number;
 		title ?: string;
 	}>();
 
 	const emit = defineEmits(['update:value', 'change']);
 
 	const isVisible = ref(false);
-	const pickerValue = ref([0]); 
+	const pickerValue = ref([0]);
 	const tempIndex = ref(0);
 
 	watch(() => props.value, (val) => {
@@ -74,6 +74,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
+		/* Mask vẫn giữ màu tối mờ bất kể chế độ nào */
 		background: rgba(0, 0, 0, 0.4);
 		z-index: 9998;
 	}
@@ -83,7 +84,8 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		background-color: #fff;
+		/* SỬA: Dùng màu nền surface (Trắng ở Light, Xám đậm ở Dark) */
+		background-color: var(--bg-surface);
 		z-index: 9999;
 		transform: translateY(100%);
 		transition: transform 0.3s ease;
@@ -101,19 +103,23 @@
 		justify-content: space-between;
 		align-items: center;
 		height: 44px;
-		border-bottom: 1px solid #eee;
+		/* SỬA: Border đổi theo theme */
+		border-bottom: 1px solid var(--border-color);
 		padding: 0 15px;
-		background-color: #f9f9f9;
+		/* SỬA: Nền toolbar dùng bg-input để hơi khác màu nền chính 1 chút */
+		background-color: var(--bg-input);
 		border-top-left-radius: 12px;
 		border-top-right-radius: 12px;
 	}
 
 	.btn-cancel {
-		color: #666;
+		/* SỬA: Màu text phụ */
+		color: var(--text-secondary);
 		font-size: 15px;
 	}
 
 	.btn-confirm {
+		/* Nút confirm thường là màu Brand, nếu chưa có biến brand thì giữ cứng hoặc thêm --text-highlight */
 		color: #007aff;
 		font-size: 15px;
 		font-weight: bold;
@@ -122,19 +128,22 @@
 	.title {
 		font-size: 15px;
 		font-weight: 500;
-		color: #333;
+		/* SỬA: Màu text chính */
+		color: var(--text-primary);
 	}
 
 	.picker-view-box {
 		width: 100%;
 		height: 250px;
-		background-color: #fff;
+		/* SỬA: Nền vùng cuộn */
+		background-color: var(--bg-surface);
 	}
 
 	.picker-item {
 		line-height: 50px;
 		text-align: center;
 		font-size: 16px;
-		color: #333;
+		/* SỬA: Màu text item trong vùng cuộn */
+		color: var(--text-primary);
 	}
 </style>

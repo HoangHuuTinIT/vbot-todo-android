@@ -1,5 +1,5 @@
 <template>
-	<view class="container">
+	<view class="container" :class="{ 'theme-dark': isDark }">
 		<view class="custom-header">
 			<view @click="goBack" class="back-btn">
 				<image src="/static/expand-arrow.png" class="back-icon" />
@@ -7,13 +7,15 @@
 			<text class="header-title">{{ $t('todo.create_page_title') }}</text>
 			<view class="header-right"></view>
 		</view>
+
 		<view class="content-body">
 			<view class="flat-item title-input-group">
 				<view class="item-left">
 					<image src="https://img.icons8.com/ios/50/666666/edit--v1.png" class="item-icon"></image>
 				</view>
 				<textarea class="item-input title-textarea" v-model="form.name"
-					:placeholder="$t('todo.enter_task_name')" maxlength="256" auto-height />
+					:placeholder="$t('todo.enter_task_name')" maxlength="256" auto-height
+					placeholder-class="input-placeholder" />
 				<text class="char-count">
 					{{ $t('todo.char_count')
 			        .replace('{current}', String(form.name ? form.name.length : 0))
@@ -69,14 +71,14 @@
 			</view>
 
 			<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt" />
-			
+
 			<view class="footer-action">
 				<view style="width: 35%">
 					<AppButton type="secondary" :label="$t('common.cancel_action')" @click="goBack" />
 				</view>
 				<view style="width: 60%">
-					<AppButton type="primary" :label="loading ? $t('common.saving') : $t('common.save')" :loading="loading"
-						@click="submitForm" />
+					<AppButton type="primary" :label="loading ? $t('common.saving') : $t('common.save')"
+						:loading="loading" @click="submitForm" />
 				</view>
 			</view>
 		</view>
@@ -95,6 +97,9 @@
 	import GlobalNotification from '@/components/GlobalNotification.vue';
 	import AppPicker from '@/components/AppPicker.vue';
 	import { computed } from 'vue';
+	import { useAuthStore } from '@/stores/auth';
+	const authStore = useAuthStore();
+	const isDark = computed(() => authStore.isDark);
 	const {
 		loading, form, goBack, submitForm,
 		memberOptions, onMemberChange, currentAssigneeName,
@@ -116,24 +121,29 @@
 </script>
 
 <style lang="scss">
+	/* --- CONTAINER --- */
 	.container {
 		min-height: 100vh;
-		background-color: #f5f5f7;
+		/* Thay #f5f5f7 */
+		background-color: var(--bg-page);
 		display: flex;
 		flex-direction: column;
 		padding: 0;
 		box-sizing: border-box;
 	}
 
+	/* --- HEADER --- */
 	.custom-header {
 		height: 44px;
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: 0 10px;
 		padding-top: var(--status-bar-height);
-		border-bottom: 1px solid #eee;
+		/* Thay #eee */
+		border-bottom: 1px solid var(--border-color);
 		position: sticky;
 		top: 0;
 		z-index: 100;
@@ -145,7 +155,6 @@
 		padding: 15px;
 	}
 
-	
 	.title-input-group {
 		margin-top: 10px;
 	}
@@ -162,26 +171,33 @@
 		width: 20px;
 		height: 20px;
 		transform: rotate(90deg);
+		/* Đảo màu mũi tên quay lại */
+		filter: var(--icon-filter);
 	}
 
 	.header-title {
 		font-size: 17px;
 		font-weight: bold;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 	}
 
 	.header-right {
 		width: 40px;
 	}
 
+	/* --- FORM ITEMS --- */
 	.flat-item {
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		margin-bottom: 12px;
 		padding: 15px;
 		display: flex;
 		align-items: center;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 		border-radius: 8px;
+		/* Thêm border mờ để rõ hơn trên nền tối */
+		border: 1px solid var(--border-color);
 	}
 
 	.item-left {
@@ -194,16 +210,24 @@
 		width: 22px;
 		height: 22px;
 		opacity: 0.6;
+		/* Đảo màu icon item */
+		filter: var(--icon-filter);
 	}
 
 	.item-input {
 		flex: 1;
 		text-align: left;
 		font-size: 15px;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 		min-height: 24px;
 		line-height: 1.4;
 		padding: 5px 0;
+	}
+
+	/* Class riêng cho placeholder */
+	.input-placeholder {
+		color: var(--text-hint);
 	}
 
 	.title-textarea {
@@ -213,7 +237,8 @@
 
 	.char-count {
 		font-size: 12px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 		margin-left: 10px;
 		flex-shrink: 0;
 	}
@@ -224,12 +249,14 @@
 
 	.picker-display {
 		font-size: 15px;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 		width: 100%;
 	}
 
 	.placeholder-color {
-		color: #808080;
+		/* Thay #808080 */
+		color: var(--text-hint);
 	}
 
 	.footer-action {
@@ -243,15 +270,18 @@
 	.input-trigger {
 		flex: 1;
 		font-size: 15px;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 	}
 
 	.input-trigger.placeholder {
-		color: #808080;
+		/* Thay #808080 */
+		color: var(--text-hint);
 	}
 
 	.arrow-icon {
-		color: #ccc;
+		/* Thay #ccc */
+		color: var(--text-hint);
 		font-size: 18px;
 		margin-left: 5px;
 		padding-bottom: 2px;

@@ -76,10 +76,12 @@
 <style lang="scss" scoped>
 	.pagination-footer {
 		flex-shrink: 0;
-		background-color: #fff;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
 		padding: 10px 15px;
 		padding-bottom: calc(10px + env(safe-area-inset-bottom));
-		border-top: 1px solid #eee;
+		/* Thay #eee */
+		border-top: 1px solid var(--border-color);
 		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 		display: flex;
 		justify-content: space-between;
@@ -89,26 +91,30 @@
 	.page-size-selector {
 		display: flex;
 		align-items: center;
-		border: 1px solid #ddd;
+		/* Thay #ddd và #f9f9f9 */
+		border: 1px solid var(--border-input);
+		background-color: var(--bg-input);
 		border-radius: 4px;
 		padding: 4px 8px;
-		background-color: #f9f9f9;
 	}
 
 	.size-text {
 		font-size: 12px;
-		color: #333;
+		/* Thay #333 */
+		color: var(--text-primary);
 		margin-right: 4px;
 	}
 
 	.dropdown-arrow {
 		font-size: 10px;
-		color: #666;
+		/* Thay #666 */
+		color: var(--text-secondary);
 	}
 
 	.total-text {
 		font-size: 12px;
-		color: #999;
+		/* Thay #999 */
+		color: var(--text-hint);
 		margin: 0 5px;
 	}
 
@@ -120,7 +126,8 @@
 
 	.page-arrow {
 		font-size: 18px;
-		color: #666;
+		/* Thay #666 */
+		color: var(--text-secondary);
 		padding: 0 10px;
 		font-weight: bold;
 		cursor: pointer;
@@ -138,10 +145,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border: 1px solid #ddd;
+		/* Thay border và màu chữ */
+		border: 1px solid var(--border-input);
+		color: var(--text-primary);
 		border-radius: 4px;
 		font-size: 12px;
-		color: #333;
 	}
 
 	.page-box.active {

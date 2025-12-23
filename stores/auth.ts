@@ -63,7 +63,6 @@ export const useAuthStore = defineStore('auth', {
 		applyTheme(mode : string) {
 			this.themeMode = mode;
 			uni.setStorageSync('app_theme_mode', mode);
-
 			if (mode === 'dark') {
 				this.isActualDark = true;
 			} else if (mode === 'light') {

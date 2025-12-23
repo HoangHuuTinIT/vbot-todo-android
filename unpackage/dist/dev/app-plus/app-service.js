@@ -11294,10 +11294,13 @@ This will fail in production if not fixed.`);
       uid: uni.getStorageSync("vbot_uid") || "",
       projectCode: uni.getStorageSync("vbot_project_code") || "",
       refreshPromise: null,
-      themeMode: "light"
+      themeMode: uni.getStorageSync("app_theme_mode") || "auto",
+      // MỚI: Lưu trạng thái thực tế đang hiển thị (true = dark, false = light)
+      isActualDark: false
     }),
     getters: {
       isLoggedIn: (state) => !!state.todoToken && !!state.crmToken && !!state.sessionId,
+      isDark: (state) => state.isActualDark,
       isRootTokenValid: (state) => {
         if (!state.rootToken)
           return false;
@@ -11336,23 +11339,36 @@ This will fail in production if not fixed.`);
           uni.setStorageSync("crm_access_token", data.crmToken);
         }
       },
-      setTheme(mode) {
+      applyTheme(mode) {
         this.themeMode = mode;
+        uni.setStorageSync("app_theme_mode", mode);
+        if (mode === "dark") {
+          this.isActualDark = true;
+        } else if (mode === "light") {
+          this.isActualDark = false;
+        } else {
+          const sysInfo = uni.getSystemInfoSync();
+          this.isActualDark = sysInfo.osTheme === "dark" || sysInfo.hostTheme === "dark";
+        }
+        formatAppLog("log", "at stores/auth.ts:77", `🎨 Theme applied: Mode=${mode}, ActualDark=${this.isActualDark}`);
       },
       async initFromNative(nativeData) {
-        formatAppLog("log", "at stores/auth.ts:64", "Store: Nhận dữ liệu từ Native Android", nativeData);
+        formatAppLog("log", "at stores/auth.ts:80", "Store: Nhận dữ liệu từ Native Android", nativeData);
         if (!nativeData || !nativeData.uid || !nativeData.access_token) {
-          formatAppLog("error", "at stores/auth.ts:67", "Dữ liệu từ Native bị thiếu!");
+          formatAppLog("error", "at stores/auth.ts:83", "Dữ liệu từ Native bị thiếu!");
           return;
         }
         if (nativeData.language) {
-          formatAppLog("log", "at stores/auth.ts:71", "🌍 Native yêu cầu ngôn ngữ:", nativeData.language);
+          formatAppLog("log", "at stores/auth.ts:87", "🌍 Native yêu cầu ngôn ngữ:", nativeData.language);
           if (nativeData.language === "en" || nativeData.language === "vi") {
             changeLanguage(nativeData.language);
           }
         }
+        if (nativeData.themeMode) {
+          this.applyTheme(nativeData.themeMode);
+        }
         if (this.rootToken && this.rootToken !== nativeData.access_token) {
-          formatAppLog("warn", "at stores/auth.ts:77", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
+          formatAppLog("warn", "at stores/auth.ts:96", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
           const socketStore = useSocketStore();
           socketStore.disconnect();
           this.todoToken = "";
@@ -11373,10 +11389,10 @@ This will fail in production if not fixed.`);
       async fetchModuleTokens() {
         try {
           if (!this.rootToken || !this.projectCode || !this.uid) {
-            formatAppLog("error", "at stores/auth.ts:99", "Thiếu thông tin để lấy Module Token");
+            formatAppLog("error", "at stores/auth.ts:118", "Thiếu thông tin để lấy Module Token");
             return;
           }
-          formatAppLog("log", "at stores/auth.ts:103", "Store: Đang lấy Token cho Todo và CRM...");
+          formatAppLog("log", "at stores/auth.ts:122", "Store: Đang lấy Token cho Todo và CRM...");
           const [newTodoToken, newCrmToken] = await Promise.all([
             getTodoToken(this.rootToken, this.projectCode, this.uid),
             getCrmToken(this.projectCode, this.uid)
@@ -11385,9 +11401,9 @@ This will fail in production if not fixed.`);
             todoToken: newTodoToken,
             crmToken: newCrmToken
           });
-          formatAppLog("log", "at stores/auth.ts:115", "Store: Đã lấy đủ Token (Todo & CRM).");
+          formatAppLog("log", "at stores/auth.ts:134", "Store: Đã lấy đủ Token (Todo & CRM).");
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:117", "Store: Lỗi lấy module tokens:", error);
+          formatAppLog("error", "at stores/auth.ts:136", "Store: Lỗi lấy module tokens:", error);
           this.logout();
           throw error;
         }
@@ -11402,7 +11418,7 @@ This will fail in production if not fixed.`);
         return this.refreshPromise;
       },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:133", "Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:152", "Store: Đăng xuất...");
         const socketStore = useSocketStore();
         socketStore.disconnect();
         this.rootToken = "";
@@ -12727,6 +12743,7 @@ This will fail in production if not fixed.`);
     setup(__props, { expose: __expose }) {
       __expose();
       const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const {
         todos,
         isLoading,
@@ -12799,7 +12816,7 @@ This will fail in production if not fixed.`);
           isConfirmDeleteOpen.value = true;
         }
       };
-      const __returned__ = { authStore, todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification, AppPicker };
+      const __returned__ = { authStore, isDark, todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12813,7 +12830,7 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
-        class: vue.normalizeClass(["container", { "dark-mode": $setup.authStore.themeMode === "dark" }])
+        class: vue.normalizeClass(["container", { "theme-dark": $setup.isDark }])
       },
       [
         vue.createElementVNode("view", { class: "header" }, [
@@ -13047,7 +13064,8 @@ This will fail in production if not fixed.`);
                 vue.withDirectives(vue.createElementVNode("input", {
                   class: "f-input",
                   "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.filter.title = $event),
-                  placeholder: _ctx.$t("todo.search_placeholder")
+                  placeholder: _ctx.$t("todo.search_placeholder"),
+                  "placeholder-class": "input-placeholder"
                 }, null, 8, ["placeholder"]), [
                   [vue.vModelText, $setup.filter.title]
                 ])
@@ -13063,7 +13081,8 @@ This will fail in production if not fixed.`);
                 vue.withDirectives(vue.createElementVNode("input", {
                   class: "f-input",
                   "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $setup.filter.jobCode = $event),
-                  placeholder: _ctx.$t("todo.job_code_placeholder")
+                  placeholder: _ctx.$t("todo.job_code_placeholder"),
+                  "placeholder-class": "input-placeholder"
                 }, null, 8, ["placeholder"]), [
                   [vue.vModelText, $setup.filter.jobCode]
                 ])
@@ -13140,11 +13159,11 @@ This will fail in production if not fixed.`);
                   vue.createElementVNode(
                     "text",
                     {
-                      style: vue.normalizeStyle({ color: $setup.selectedCustomerName ? "#333" : "#999" })
+                      class: vue.normalizeClass($setup.selectedCustomerName ? "text-filled" : "text-empty")
                     },
                     vue.toDisplayString($setup.selectedCustomerName || _ctx.$t("todo.select_customer")),
-                    5
-                    /* TEXT, STYLE */
+                    3
+                    /* TEXT, CLASS */
                   ),
                   vue.createElementVNode("text", { class: "arrow" }, "›")
                 ])
@@ -19022,60 +19041,40 @@ This will fail in production if not fixed.`);
           }
         }
         if (nativeData) {
-          if (nativeData) {
-            if (nativeData.darkmode) {
-              const mode = nativeData.darkmode;
-              formatAppLog("log", "at App.vue:44", "🌗 App.vue: Nhận Theme từ Native ->", mode);
-              authStore.setTheme(mode);
-              if (mode === "dark") {
-                uni.setNavigationBarColor({
-                  frontColor: "#ffffff",
-                  // Chữ trắng
-                  backgroundColor: "#1f1f1f",
-                  // Nền đen
-                  animation: { duration: 400, timingFunc: "easeIn" }
-                });
-                uni.setBackgroundColor({ backgroundColor: "#1f1f1f" });
-              } else {
-                uni.setNavigationBarColor({
-                  frontColor: "#000000",
-                  // Chữ đen
-                  backgroundColor: "#ffffff",
-                  // Nền trắng
-                  animation: { duration: 400, timingFunc: "easeIn" }
-                });
-                uni.setBackgroundColor({ backgroundColor: "#ffffff" });
-              }
-            }
-            if (nativeData.language === "en" || nativeData.language === "vi") {
-              formatAppLog("log", "at App.vue:70", "🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
-              changeLanguage(nativeData.language);
-            }
-            if (nativeData.uid && nativeData.access_token) {
-              formatAppLog("log", "at App.vue:76", "✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
-              await authStore.initFromNative(nativeData);
-              if (authStore.isLoggedIn) {
-                socketStore.connect();
-              }
-            }
+          if (nativeData.language === "en" || nativeData.language === "vi") {
+            formatAppLog("log", "at App.vue:44", "🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
+            changeLanguage(nativeData.language);
+          }
+          if (nativeData.themeMode) {
+            formatAppLog("log", "at App.vue:49", "🎨 Native yêu cầu theme:", nativeData.themeMode);
+            authStore.applyTheme(nativeData.themeMode);
           } else {
-            formatAppLog("log", "at App.vue:84", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
-            if (eventName === "Launch") {
-              formatAppLog("warn", "at App.vue:86", "App Launch thiếu data");
+            authStore.applyTheme("auto");
+          }
+          if (nativeData.uid && nativeData.access_token) {
+            formatAppLog("log", "at App.vue:56", "✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
+            await authStore.initFromNative(nativeData);
+            if (authStore.isLoggedIn) {
+              socketStore.connect();
             }
+          }
+        } else {
+          formatAppLog("log", "at App.vue:64", "⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
+          if (eventName === "Launch") {
+            formatAppLog("warn", "at App.vue:66", "App Launch thiếu data");
           }
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:93", " App Launch");
+        formatAppLog("log", "at App.vue:72", " App Launch");
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:98", "App Show");
+        formatAppLog("log", "at App.vue:77", "App Show");
         handleNativeData("Show", options);
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:103", " App Hide");
+        formatAppLog("log", "at App.vue:82", " App Hide");
       });
       const __returned__ = { handleNativeData, get onLaunch() {
         return onLaunch;

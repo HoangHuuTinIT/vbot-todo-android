@@ -25,31 +25,55 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-:root,
-body {
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+:root, body {
+  /* Background */
   --bg-page: #f0f2f5;
-  --bg-card: #ffffff;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
   --text-primary: #333333;
-  --text-secondary: #8898aa;
-  --tag-bg: #f0f2f5;
-  --tag-text: #525f7f;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
 }
-
-/* 2. CHẾ ĐỘ DARK (Kích hoạt bằng Class thay vì Media Query) */
-/* Lưu ý: class 'dark-mode' sẽ được gắn vào thẻ bao ngoài cùng */
-.dark-mode {
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark {
+  /* Background Tối */
   --bg-page: #121212;
-  --bg-card: #1e1e1e;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
   --text-primary: #e0e0e0;
   --text-secondary: #aaaaaa;
-  --tag-bg: #333333;
-  --tag-text: #cccccc;
-}
-
-/* Áp dụng màu nền */
-body {
-  background-color: var(--bg-page);
-  color: var(--text-primary);
-  transition: background-color 0.3s;
-  /* Hiệu ứng chuyển màu mượt */
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
 }
