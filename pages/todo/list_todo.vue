@@ -1,5 +1,5 @@
 <template>
-	<view class="container">
+	<view class="container" :class="{ 'theme-dark': isDark }">
 		<view class="header">
 			<view class="header-left"></view>
 
@@ -90,13 +90,14 @@
 				<scroll-view scroll-y class="filter-body">
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.search_label') }}</text>
-						<input class="f-input" v-model="filter.title" :placeholder="$t('todo.search_placeholder')" />
+						<input class="f-input" v-model="filter.title" :placeholder="$t('todo.search_placeholder')"
+							:placeholder-class="'input-placeholder'" />
 					</view>
 
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.code_prefix') }}</text>
-						<input class="f-input" v-model="filter.jobCode"
-							:placeholder="$t('todo.job_code_placeholder')" />
+						<input class="f-input" v-model="filter.jobCode" :placeholder="$t('todo.job_code_placeholder')"
+							:placeholder-class="'input-placeholder'" />
 					</view>
 
 					<view class="f-group">
@@ -122,7 +123,7 @@
 					<view class="f-group">
 						<text class="f-label">{{ $t('todo.customer') }}</text>
 						<view class="f-input" @click="openCustomerPopup" style="justify-content: space-between;">
-							<text :style="{ color: selectedCustomerName ? '#333' : '#999' }">
+							<text :class="selectedCustomerName ? 'text-filled' : 'text-empty'">
 								{{ selectedCustomerName || $t('todo.select_customer') }}
 							</text>
 							<text class="arrow">›</text>
@@ -233,7 +234,7 @@
 
 
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { ref, computed } from 'vue';
 	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import { useListTodoController } from '@/controllers/list_todo';
 	import StatusBadge from '@/components/StatusBadge.vue';
@@ -245,6 +246,9 @@
 	import GlobalNotification from '@/components/GlobalNotification.vue';
 	import AppPicker from '@/components/AppPicker.vue';
 	import { useI18n } from 'vue-i18n';
+	import { useAuthStore } from '@/stores/auth';
+	const authStore = useAuthStore();
+	const isDark = computed(() => authStore.isDark);
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
@@ -297,18 +301,19 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
-		background-color: #f0f2f5;
+		background-color: var(--bg-page);
 		overflow: hidden;
 	}
 
 	.header {
 		height: 50px;
 		padding: 40px 20px 10px 20px;
-		background-color: #fff;
+		background-color: var(--bg-surface);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		border-bottom: 1px solid var(--border-color);
 	}
 
 	.header-left {
@@ -318,7 +323,7 @@
 	.header-title {
 		font-size: 20px;
 		font-weight: bold;
-		color: #333;
+		color: var(--text-primary);
 		flex: 1;
 		text-align: center;
 	}
@@ -332,6 +337,7 @@
 	.filter-icon {
 		width: 24px;
 		height: 24px;
+		filter: var(--icon-filter);
 	}
 
 	.content {
@@ -452,7 +458,7 @@
 	}
 
 	.card-item {
-		background-color: #fff;
+		background-color: var(--bg-surface);
 		border-radius: 12px;
 		margin-bottom: 15px;
 		padding: 0;
@@ -488,7 +494,7 @@
 	.card-title {
 		font-size: 16px;
 		font-weight: 600;
-		color: #32325d;
+		color: var(--text-primary);
 		flex: 1;
 		line-height: 1.4;
 		padding-right: 10px;
@@ -533,7 +539,7 @@
 
 	.card-date {
 		font-size: 13px;
-		color: #8898aa;
+		color: var(--text-secondary);
 	}
 
 	.bot-row {
@@ -542,12 +548,14 @@
 		margin-bottom: 0;
 		margin-top: 10px;
 		padding-top: 10px;
-		border-top: 1px dashed #eee;
+		border-top: 1px dashed var(--border-color);
 	}
 
 	.code-tag {
-		background-color: #f0f2f5;
-		color: #525f7f;
+		background-color: var(--bg-tag);
+		/* Dùng biến */
+		color: var(--text-highlight);
+		/* Dùng biến */
 		padding: 4px 10px;
 		border-radius: 6px;
 		font-size: 13px;
@@ -562,9 +570,11 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
-		color: #999;
+		color: var(--text-hint);
 	}
-
+	.empty-text {
+	    color: var(--text-hint);
+	}
 	.empty-icon {
 		width: 80px;
 		height: 80px;
@@ -586,7 +596,7 @@
 	.filter-panel {
 		width: 85%;
 		height: 100%;
-		background-color: #fff;
+		background-color: var(--bg-surface);
 		display: flex;
 		flex-direction: column;
 		animation: slideIn 0.3s ease-out;
@@ -607,7 +617,13 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid #eee;
+		border-bottom: 1px solid var(--border-color);
+		font-weight: bold;
+		font-size: 18px;
+	}
+
+	.filter-title {
+		color: var(--text-primary);
 		font-weight: bold;
 		font-size: 18px;
 	}
@@ -615,7 +631,7 @@
 	.close-btn {
 		font-size: 24px;
 		padding: 5px;
-		color: #666;
+		color: var(--text-secondary);
 	}
 
 	.filter-body {
@@ -632,15 +648,18 @@
 
 	.f-label {
 		font-size: 13px;
-		color: #666;
+		color: var(--text-secondary);
 		margin-bottom: 5px;
 		display: block;
 	}
 
 	.f-input,
 	.f-picker {
-		background-color: #f8f9fa;
-		border: 1px solid #e0e0e0;
+		background-color: var(--bg-input);
+		/* Dùng biến */
+		border: 1px solid var(--border-input);
+		/* Dùng biến */
+		color: var(--text-primary);
 		border-radius: 8px;
 		padding: 10px;
 		font-size: 14px;

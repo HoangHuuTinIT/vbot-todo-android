@@ -2,8 +2,8 @@
     "name" : "vbot_todo",
     "appid" : "__UNI__G69F1AC0",
     "description" : "",
-    "versionName" : "1.0.7",
-    "versionCode" : "107",
+    "versionName" : "1.1.0",
+    "versionCode" : "110",
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {

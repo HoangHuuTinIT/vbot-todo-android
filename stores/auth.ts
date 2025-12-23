@@ -15,10 +15,14 @@ export const useAuthStore = defineStore('auth', {
 		uid: uni.getStorageSync('vbot_uid') || '',
 		projectCode: uni.getStorageSync('vbot_project_code') || '',
 		refreshPromise: null as Promise<void> | null,
+		themeMode: uni.getStorageSync('app_theme_mode') || 'auto',
+		// MỚI: Lưu trạng thái thực tế đang hiển thị (true = dark, false = light)
+		isActualDark: false
 	}),
 
 	getters: {
 		isLoggedIn: (state) => !!state.todoToken && !!state.crmToken && !!state.sessionId,
+		isDark: (state) => state.isActualDark,
 		isRootTokenValid: (state) => {
 			if (!state.rootToken) return false;
 			if (!state.rootLoginTime) return true;
@@ -56,6 +60,22 @@ export const useAuthStore = defineStore('auth', {
 				uni.setStorageSync('crm_access_token', data.crmToken);
 			}
 		},
+		applyTheme(mode : string) {
+			this.themeMode = mode;
+			uni.setStorageSync('app_theme_mode', mode);
+
+			if (mode === 'dark') {
+				this.isActualDark = true;
+			} else if (mode === 'light') {
+				this.isActualDark = false;
+			} else {
+				// AUTO: Lấy theo hệ thống máy
+				const sysInfo = uni.getSystemInfoSync();
+				// osTheme có thể trả về 'dark' hoặc 'light' (tuỳ phiên bản UniApp/Android)
+				this.isActualDark = (sysInfo.osTheme === 'dark' || sysInfo.hostTheme === 'dark');
+			}
+			console.log(`🎨 Theme applied: Mode=${mode}, ActualDark=${this.isActualDark}`);
+		},
 		async initFromNative(nativeData : any) {
 			console.log('Store: Nhận dữ liệu từ Native Android', nativeData);
 
@@ -68,6 +88,9 @@ export const useAuthStore = defineStore('auth', {
 				if (nativeData.language === 'en' || nativeData.language === 'vi') {
 					changeLanguage(nativeData.language);
 				}
+			}
+			if (nativeData.themeMode) {
+				this.applyTheme(nativeData.themeMode);
 			}
 			if (this.rootToken && this.rootToken !== nativeData.access_token) {
 				console.warn('Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...');

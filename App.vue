@@ -1,103 +1,59 @@
-//code khi để test khi không nhận thông tin từ app chính
 <script setup lang="ts">
 	import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
 	import { useAuthStore } from '@/stores/auth';
 	import { useSocketStore } from '@/stores/socket';
+	// 1. IMPORT HÀM ĐỔI NGÔN NGỮ
 	import { changeLanguage } from '@/utils/language';
 
-	// --- KHU VỰC CONFIG TEST NHANH (Lấy từ .env) ---
-	const TEST_ENV = {
-		URL: import.meta.env.VITE_SERVER_BASE_URL,
-		USER: import.meta.env.VITE_TEST_USERNAME,
-		PASS: import.meta.env.VITE_TEST_PASSWORD, // Pass này đã hash sẵn trong env
-		UID: import.meta.env.VITE_UID,
-		P_CODE: import.meta.env.VITE_PROJECT_CODE
-	};
-
 	const handleNativeData = async (eventName : string, options : any = null) => {
-		console.log(`[${eventName}] Bắt đầu quy trình khởi tạo...`);
+		console.log(`[${eventName}] Bắt đầu kiểm tra dữ liệu từ Native...`);
 		const authStore = useAuthStore();
 		const socketStore = useSocketStore();
 
 		let nativeData = null;
 
-		// =================================================================
-		// 🔴 1. LOGIC LẤY TỪ APP CHÍNH (ĐÃ COMMENT ĐỂ CHẠY TEST)
-		// =================================================================
-		/*
+		// --- (Giữ nguyên logic lấy nativeData cũ của bạn) ---
 		if (options && options.referrerInfo && options.referrerInfo.extraData) {
+			console.log("-> Tìm thấy dữ liệu trong options.referrerInfo");
 			nativeData = options.referrerInfo.extraData;
-		} 
+		}
 		else if (typeof plus !== 'undefined' && plus.runtime && plus.runtime.arguments) {
+			console.log("-> Tìm thấy dữ liệu trong plus.runtime.arguments");
 			const args = plus.runtime.arguments;
 			try {
 				nativeData = (typeof args === 'string' && args.startsWith('{')) ? JSON.parse(args) : args;
 			} catch (e) {
+				console.error("Lỗi parse arguments:", e);
 				if (typeof args === 'object') nativeData = args;
 			}
 		}
 		else {
 			const launchOpts = uni.getLaunchOptionsSync();
 			if (launchOpts && launchOpts.extraData) {
-				 nativeData = launchOpts.extraData;
+				nativeData = launchOpts.extraData;
 			}
 		}
-		*/
+		// -----------------------------------------------------
 
-		// =================================================================
-		// 🟢 2. LOGIC CHẠY TEST (TỰ LOGIN LẤY TOKEN TỪ ENV)
-		// =================================================================
-		if (!nativeData) {
-			console.log("⚠️ KHÔNG CÓ NATIVE DATA -> CHẠY CHẾ ĐỘ DEV MODE (.ENV)");
+		// 2. XỬ LÝ DỮ LIỆU
+		if (nativeData) { // Chỉ cần có data là check ngay
 
-			try {
-				// Gọi API Login giả lập để lấy Access Token xịn
-				const res : any = await new Promise((resolve) => {
-					uni.request({
-						url: `${TEST_ENV.URL}/token`,
-						method: 'POST',
-						header: { 'Content-Type': 'application/x-www-form-urlencoded' },
-						data: {
-							username: TEST_ENV.USER,
-							password: TEST_ENV.PASS, // Pass trong env của bạn đã hash rồi nên gửi luôn
-							grant_type: 'password',
-							source: 'Desktop-RTC' // Giả mạo nguồn
-						},
-						success: (r) => resolve(r.data),
-						fail: (e) => resolve(null)
-					});
-				});
-
-				if (res && res.access_token) {
-					console.log("✅ DEV LOGIN THÀNH CÔNG!");
-					// Tạo gói tin giả lập y hệt Android gửi sang
-					nativeData = {
-						uid: TEST_ENV.UID,           // Lấy từ env
-						projectCode: TEST_ENV.P_CODE,// Lấy từ env
-						access_token: res.access_token,
-						session_id: res.session_id,
-						language: 'en'               // <--- MUỐN TEST TIẾNG GÌ THÌ SỬA Ở ĐÂY (vi/en)
-					};
-				} else {
-					console.error("❌ DEV LOGIN THẤT BẠI:", res);
-				}
-			} catch (e) {
-				console.error("Lỗi login dev:", e);
-			}
-		}
-
-		// =================================================================
-		// 🔵 3. XỬ LÝ DỮ LIỆU (KHÔNG CẦN SỬA)
-		// =================================================================
-		if (nativeData) {
-			// Setup ngôn ngữ ngay lập tức
-			if (nativeData.language) {
-				console.log("🔥 App.vue: Set ngôn ngữ ->", nativeData.language);
+			// --- [QUAN TRỌNG] SETUP NGÔN NGỮ NGAY TẠI ĐÂY ---
+			// Vì auth lấy được data ở đây, thì language chắc chắn cũng lấy được ở đây
+			if (nativeData.language === 'en' || nativeData.language === 'vi') {
+				console.log("🔥 App.vue: Native yêu cầu ngôn ngữ ->", nativeData.language);
 				changeLanguage(nativeData.language);
 			}
-
+			// -------------------------------------------------
+			if (nativeData.themeMode) {
+				console.log("🎨 Native yêu cầu theme:", nativeData.themeMode);
+				authStore.applyTheme(nativeData.themeMode);
+			} else {
+				// Fallback nếu native không gửi (mặc định auto)
+				authStore.applyTheme('auto');
+			}
 			if (nativeData.uid && nativeData.access_token) {
-				console.log("✅ Dữ liệu Auth hợp lệ -> Đồng bộ Store");
+				console.log("✅ Dữ liệu Auth hợp lệ -> Tiến hành đồng bộ Store");
 				await authStore.initFromNative(nativeData);
 
 				if (authStore.isLoggedIn) {
@@ -105,35 +61,27 @@
 				}
 			}
 		} else {
-			console.log("⚠️ Không có dữ liệu để chạy App.");
+			console.log("⚠️ Không tìm thấy dữ liệu auth hợp lệ từ Native ở pha này.");
+			if (eventName === 'Launch') {
+				console.warn("App Launch thiếu data");
+			}
 		}
 	};
 
 	onLaunch((options : UniApp.LaunchOptions) => {
-		console.log('🚀 App Launch');
-
-		// --- THÊM ĐOẠN NÀY ĐỂ DEBUG THEME ---
-		// 1. Lắng nghe thay đổi theme (ví dụ user kéo thanh trạng thái xuống bật dark mode)
-		uni.onThemeChange((res) => {
-			console.log('🌗 THEME CHANGED DETECTED:', res.theme);
-		});
-
-		// 2. Check lại theme sau 1 khoảng delay nhỏ (Fix bug trên một số dòng Android cũ)
-		setTimeout(() => {
-			const info = uni.getSystemInfoSync();
-			console.log('🕒 Delayed Check Theme:', info.theme || info.osTheme);
-		}, 1000);
-		// ------------------------------------
-
+		console.log(' App Launch');
 		handleNativeData('Launch', options);
 	});
 
 	onShow((options : UniApp.ShowOptions) => {
 		console.log('App Show');
-		// handleNativeData('Show', options); // Tạm tắt cái này để đỡ spam login mỗi khi reload
+		handleNativeData('Show', options);
 	});
 
 	onHide(() => {
 		console.log(' App Hide');
 	});
 </script>
+<style lang="scss">
+    @import '@/common/theme.scss';
+</style>

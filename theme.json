@@ -1,3 +1,4 @@
+//theme.json
 {
 	"light": {
 		"navBgColor": "#ffffff",
@@ -5,7 +6,6 @@
 	},
 	"dark": {
 		"navBgColor": "#1f1f1f",
-		/* Thử để màu ĐỎ chót xem App có nhận không */
 		"navTxtColor": "#ffffff"
 	}
 }

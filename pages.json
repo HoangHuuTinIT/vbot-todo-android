@@ -25,19 +25,12 @@
 		}
 	],
 	"globalStyle": {
-		"navigationBarTextStyle": "black", // Hoặc dùng biến @navTxtColor
+		"navigationBarTextStyle": "@navTxtColor",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "@navBgColor",
-
-		/* 1. Thay đổi màu nền window bằng biến để kích hoạt engine tốt hơn */
 		"backgroundColor": "@navBgColor",
-
 		"rpxCalcMaxDeviceWidth": 960,
-
-		/* 2. SỬA LẠI CHÍNH TẢ DÒNG NÀY */
 		"usingComponents": true
-
-		/* 3. XÓA ĐOẠN "themeConfig" BỊ SAI ĐI */
 	},
 	"uniIdRouter": {}
 }
