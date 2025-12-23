@@ -7,8 +7,8 @@
   "id": "__UNI__G69F1AC0",
   "name": "vbot_todo",
   "version": {
-    "name": "1.0.3",
-    "code": "103"
+    "name": "1.0.7",
+    "code": "107"
   },
   "description": "",
   "developer": {
@@ -38,6 +38,8 @@
       "id": "1",
       "kernel": "WKWebview"
     },
+    "darkmode": true,
+    "themeLocation": "theme.json",
     "usingComponents": true,
     "nvueStyleCompiler": "uni-app",
     "compilerVersion": 3,
@@ -67,10 +69,12 @@
           "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
           "<uses-feature android:name=\"android.hardware.camera\"/>",
           "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
-        ]
+        ],
+        "defaultNightMode": "auto"
       },
       "apple": {
-        "dSYMs": false
+        "dSYMs": false,
+        "UIUserInterfaceStyle": "Automatic"
       },
       "plugins": {
         "audio": {
@@ -83,7 +87,7 @@
     "statusbar": {
       "immersed": "supportedDevice",
       "style": "dark",
-      "background": "#F8F8F8"
+      "background": "#ffffff"
     },
     "uniStatistics": {
       "enable": false

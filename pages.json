@@ -5,7 +5,7 @@
 			"style": {
 				"navigationBarTitleText": "uni-app",
 				"enablePullDownRefresh": true
-					
+
 			}
 		},
 		{
@@ -25,16 +25,19 @@
 		}
 	],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationBarTextStyle": "black", // Hoặc dùng biến @navTxtColor
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "@navBgColor",
+
+		/* 1. Thay đổi màu nền window bằng biến để kích hoạt engine tốt hơn */
+		"backgroundColor": "@navBgColor",
+
 		"rpxCalcMaxDeviceWidth": 960,
-		
-		"usingComponts": true,
-		    "themeConfig": {
-		      "is  Support Dark": true
-		    }
+
+		/* 2. SỬA LẠI CHÍNH TẢ DÒNG NÀY */
+		"usingComponents": true
+
+		/* 3. XÓA ĐOẠN "themeConfig" BỊ SAI ĐI */
 	},
 	"uniIdRouter": {}
 }

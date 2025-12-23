@@ -3662,18 +3662,7 @@ if (uni.restoreGlobal) {
           this.isRange = newVal.indexOf("range") !== -1;
         }
       },
-      value: {
-        handler(newVal) {
-          if (this.isEmitValue) {
-            this.isEmitValue = false;
-            return;
-          }
-          this.initPicker(newVal);
-        },
-        immediate: true
-      },
-      // #endif
-      // #ifdef VUE3
+      // --- THÊM DÒNG DƯỚI ĐÂY ---
       modelValue: {
         immediate: true,
         handler(newVal) {
@@ -3684,7 +3673,6 @@ if (uni.restoreGlobal) {
           this.initPicker(newVal);
         }
       },
-      // #endif
       start: {
         immediate: true,
         handler(newVal) {
@@ -3849,7 +3837,9 @@ if (uni.restoreGlobal) {
           this.isPhone = navigator.userAgent.toLowerCase().indexOf("mobile") !== -1;
           return;
         }
-        const { windowWidth: windowWidth2 } = uni.getSystemInfoSync();
+        const {
+          windowWidth: windowWidth2
+        } = uni.getSystemInfoSync();
         this.isPhone = windowWidth2 <= 500;
         this.windowWidth = windowWidth2;
       },
@@ -3885,7 +3875,10 @@ if (uni.restoreGlobal) {
           }
           if (!this.isPhone && this.isRange && this.isFirstShow) {
             this.isFirstShow = false;
-            const { startDate, endDate } = this.calendarRange;
+            const {
+              startDate,
+              endDate
+            } = this.calendarRange;
             if (startDate && endDate) {
               if (this.diffDate(startDate, endDate) < 30) {
                 this.$refs.right.changeMonth("pre");
@@ -19060,14 +19053,21 @@ This will fail in production if not fixed.`);
         }
       };
       onLaunch((options) => {
-        formatAppLog("log", "at App.vue:113", " App Launch");
+        formatAppLog("log", "at App.vue:113", "🚀 App Launch");
+        uni.onThemeChange((res) => {
+          formatAppLog("log", "at App.vue:118", "🌗 THEME CHANGED DETECTED:", res.theme);
+        });
+        setTimeout(() => {
+          const info = uni.getSystemInfoSync();
+          formatAppLog("log", "at App.vue:124", "🕒 Delayed Check Theme:", info.theme || info.osTheme);
+        }, 1e3);
         handleNativeData("Launch", options);
       });
       onShow((options) => {
-        formatAppLog("log", "at App.vue:118", "App Show");
+        formatAppLog("log", "at App.vue:132", "App Show");
       });
       onHide(() => {
-        formatAppLog("log", "at App.vue:123", " App Hide");
+        formatAppLog("log", "at App.vue:137", " App Hide");
       });
       const __returned__ = { TEST_ENV, handleNativeData, get onLaunch() {
         return onLaunch;
