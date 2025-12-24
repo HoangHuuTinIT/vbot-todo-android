@@ -22,8 +22,8 @@ export const useListTodoController = () => {
 	const isLoading = ref<boolean>(false);
 	const isFilterOpen = ref<boolean>(false);
 	const authStore = useAuthStore();
-	const isQuickCompleteOpen = ref<boolean>(false); 
-	const quickTodos = ref<TodoItem[]>([]); 
+	const isQuickCompleteOpen = ref<boolean>(false);
+	const quickTodos = ref<TodoItem[]>([]);
 	const isLoadingQuick = ref<boolean>(false);
 	const showCustomerModal = ref(false);
 	const selectedCustomerName = ref('');
@@ -150,8 +150,8 @@ export const useListTodoController = () => {
 		try {
 			const data = await getTodos({
 				pageNo: 1,
-				pageSize: 100, 
-				status: '' 
+				pageSize: 100,
+				status: ''
 			});
 
 			if (Array.isArray(data)) {
@@ -179,7 +179,7 @@ export const useListTodoController = () => {
 				status: TODO_STATUS.DONE,
 				preFixCode: "TODO",
 				description: item.description || "",
-				files: "", 
+				files: "",
 				tagCodes: ""
 			};
 
@@ -348,8 +348,24 @@ export const useListTodoController = () => {
 		fetchCustomers({});
 	});
 	const goToDetail = (item : TodoItem) => {
+		// Tạo một object chứa các dữ liệu cơ bản đã có sẵn ở list
+		// Để bên detail có thể hiển thị NGAY LẬP TỨC mà không cần đợi API
+		const preloadData = {
+			id: item.id,
+			title: item.title,
+			code: item.code,
+			status: item.status,
+			dueDate: item.dueDate, // Timestamp
+			notificationReceivedAt: item.notificationReceivedAt,
+			assigneeId: item.assigneeId,
+			links: item.links // Source
+		};
+
+		// Encode dữ liệu để truyền qua URL an toàn
+		const jsonPreload = encodeURIComponent(JSON.stringify(preloadData));
+
 		uni.navigateTo({
-			url: `/pages/todo/todo_detail?id=${item.id}`
+			url: `/pages/todo/todo_detail?id=${item.id}&preload=${jsonPreload}`
 		});
 	};
 	return {

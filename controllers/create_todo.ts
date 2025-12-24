@@ -27,6 +27,7 @@ export const useCreateTodoController = () => {
 		if (!dateStr) return 0;
 		return new Date(dateStr.replace(/-/g, '/')).getTime();
 	};
+	const now = getCurrentDateTimeISO();
 	const {
 		customerList,
 		loadingCustomer,
@@ -42,8 +43,8 @@ export const useCreateTodoController = () => {
 		customer: '',
 		customerUid: '',
 		assignee: '',
-		dueDate: '',
-		notifyAt: ''
+		dueDate: now,   // Gán luôn giá trị ban đầu
+		notifyAt: now
 	});
 	const timestampToDateString = (ts : number) => {
 		const d = new Date(ts);
@@ -190,12 +191,12 @@ export const useCreateTodoController = () => {
 			form.value.desc = newContent;
 
 			const payload = buildCreateTodoPayload(form.value, {
-				projectCode: authStore.projectCode, 
+				projectCode: authStore.projectCode,
 				uid: authStore.uid,
 				link: selectedLink,
 				uploadedFiles: fileUrls.length > 0 ? fileUrls[0] : ''
 			});
-		
+
 			console.log("Payload Submit:", payload);
 			await createTodo(payload);
 
@@ -214,13 +215,14 @@ export const useCreateTodoController = () => {
 	};
 
 	onMounted(() => {
+		// Gọi API lấy dữ liệu bổ trợ (dropdown)
+		// Các hàm này sẽ update vào memberList/customerList khi xong
+		// UI dropdown sẽ tự reactive update, không cần chặn màn hình loading
 		fetchMembers();
 		fetchCustomers({});
-		setTimeout(() => {
-			const now = getCurrentDateTimeISO();
-			form.value.dueDate = now;
-			form.value.notifyAt = now;
-		}, 100);
+
+		// Xóa setTimeout 100ms cũ vì ta đã gán giá trị mặc định lúc init ref rồi
+		// Nếu cần đảm bảo cập nhật lại cho chính xác từng giây thì giữ lại nhưng không cần loading
 	});
 
 	return {

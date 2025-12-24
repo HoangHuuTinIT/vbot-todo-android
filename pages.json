@@ -12,7 +12,9 @@
 			"path": "pages/todo/create_todo",
 			"style": {
 				"navigationBarTitleText": "uni-app",
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"animationType": "slide-in-right",
+				"animationDuration": 300
 			}
 		},
 		{
@@ -20,7 +22,9 @@
 			"style": {
 				"navigationBarTitleText": "uni-app",
 				"enablePullDownRefresh": true,
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"animationType": "slide-in-right",
+				"animationDuration": 300
 			}
 		}
 	],
@@ -28,7 +32,6 @@
 		"navigationBarTextStyle": "@navTxtColor",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "@navBgColor",
-		"backgroundColor": "@navBgColor",
 		"rpxCalcMaxDeviceWidth": 960,
 		"usingComponents": true
 	},

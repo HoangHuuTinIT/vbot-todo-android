@@ -53,7 +53,7 @@ export const useTodoDetailController = () => {
 	const isHistoryOpen = ref(false);
 	const comments = ref<CommentItem[]>([]);
 	const isLoadingComments = ref(false);
-
+	const isFetchingRealDetail = ref(false);
 	const newCommentText = ref('');
 	const isSubmittingComment = ref(false);
 
@@ -830,9 +830,45 @@ export const useTodoDetailController = () => {
 		}
 	};
 	onLoad(async (options : any) => {
-		await fetchMembers();
-		if (options && options.id) {
-			fetchDetail(options.id);
+		// 1. Chạy việc lấy Member ngầm, KHÔNG await chặn UI ở đây để render cho nhanh
+		fetchMembers();
+
+		if (options) {
+			// 2. XỬ LÝ PRELOAD: Hiển thị ngay lập tức dữ liệu được truyền từ trang List
+			if (options.preload) {
+				try {
+					const preloadData = JSON.parse(decodeURIComponent(options.preload));
+					console.log("Preload Data:", preloadData);
+
+					// Map dữ liệu preload vào form ngay
+					const mapped = mapTodoDetailToForm(preloadData);
+					if (mapped) {
+						// Merge vào form hiện tại
+						form.value = {
+							...form.value,
+							...mapped,
+							// Giữ lại id để đảm bảo logic
+							id: preloadData.id
+						};
+
+						// Cập nhật status index ngay để UI hiển thị đúng dropdown
+						const currentStatus = mapped.raw.status;
+						const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
+						if (realIndex !== -1) {
+							form.value.statusIndex = realIndex;
+						}
+					}
+				} catch (e) {
+					console.error("Lỗi parse preload:", e);
+				}
+			}
+
+			// 3. Sau khi đã render UI từ preload, mới gọi API lấy chi tiết đầy đủ (Description, Files, Comments...)
+			if (options.id) {
+				// Set form id nếu chưa có (trường hợp ko có preload)
+				if (!form.value.id) form.value.id = options.id;
+				fetchDetail(options.id);
+			}
 		}
 	});
 
@@ -841,6 +877,8 @@ export const useTodoDetailController = () => {
 			const data = await getAllMembers();
 			memberList.value = data;
 			assigneeOptions.value = data.map(m => m.UserName || t('common.unknown_member'));
+
+			// Re-check assignee index sau khi list member load xong (trường hợp preload có ID nhưng chưa có list member)
 			if (form.value.assigneeId) {
 				const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
 				if (index !== -1) form.value.assigneeIndex = index;
@@ -871,11 +909,17 @@ export const useTodoDetailController = () => {
 		reloadDetail();
 	});
 	const fetchDetail = async (id : string | number) => {
+		// Nếu chưa có title (chưa preload), thì mới hiện loading toàn trang
+		// Nếu đã có title rồi (do preload), chỉ hiện loading bar nhỏ (isLoading)
 		if (!form.value.title) {
+			// Có thể dùng một biến loading khác nếu muốn chặn UI, 
+			// nhưng ở đây ta dùng isLoading cho LoadingBar trên cùng
 			isLoading.value = true;
 		} else {
-			uni.showNavigationBarLoading();
+			isLoading.value = true; // Vẫn bật loading bar nhưng UI đã có dữ liệu cũ
 		}
+
+		isFetchingRealDetail.value = true;
 
 		try {
 			const rawResponse = await getTodoDetail(id);
@@ -886,21 +930,23 @@ export const useTodoDetailController = () => {
 			const mappedData = mapTodoDetailToForm(realData);
 
 			if (mappedData) {
+				// Cập nhật lại toàn bộ form với dữ liệu mới nhất từ server
 				form.value = mappedData;
 
+				// Cập nhật lại index status/source
 				const currentStatus = mappedData.raw.status;
 				const realIndex = dynamicStatusOptions.value.findIndex(opt => opt.value === currentStatus);
-				if (realIndex !== -1) {
-					form.value.statusIndex = realIndex;
-				}
+				if (realIndex !== -1) form.value.statusIndex = realIndex;
 
+				// Cập nhật assignee index nếu memberList đã load xong
 				if (form.value.assigneeId && memberList.value.length > 0) {
 					const index = memberList.value.findIndex(m => m.memberUID === form.value.assigneeId);
 					if (index !== -1) form.value.assigneeIndex = index;
 				}
 
+				// Load các phần phụ (Comments, History, Customer Info)
+				// Các hàm này chạy bất đồng bộ, không chặn UI
 				fetchComments(id);
-
 				if (form.value.customerCode) {
 					fetchCustomerInfo(form.value.customerCode);
 					fetchHistoryLog(form.value.customerCode);
@@ -911,6 +957,7 @@ export const useTodoDetailController = () => {
 			showError(t('common.error_connection'));
 		} finally {
 			isLoading.value = false;
+			isFetchingRealDetail.value = false;
 			uni.hideNavigationBarLoading();
 		}
 	};
