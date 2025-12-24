@@ -5,34 +5,35 @@
 				class="shrink-0" :class="isReply ? 'mr-2' : 'mr-3'" />
 
 			<view class="flex-1 overflow-hidden">
-				<view class="bg-gray-50 rounded-2xl p-3 rounded-tl-none relative">
+				<view class="comment-bubble rounded-2xl p-3 rounded-tl-none relative">
 
 					<view class="flex flex-col items-start mb-2">
 						<view class="flex flex-wrap items-center gap-1">
-							<text class="font-bold text-sm text-gray-900">
+							<text class="font-bold text-sm sender-name">
 								{{ data.senderName }}
 							</text>
-							<text v-if="data.actionText" class="text-xs text-gray-500 font-normal">
+							<text v-if="data.actionText" class="text-xs action-text font-normal">
 								{{ data.actionText }}
 							</text>
 						</view>
 
 						<view class="flex items-center mt-1">
-							<text class="text-xs text-gray-400">{{ data.timeDisplay }}</text>
-							<text v-if="data.isEdited" class="text-xs text-gray-400 italic ml-1">
+							<text class="text-xs time-text">{{ data.timeDisplay }}</text>
+							<text v-if="data.isEdited" class="text-xs time-text italic ml-1">
 								• Đã sửa
 							</text>
 						</view>
 					</view>
+
 					<view v-if="parsedContent.isUpdate" class="content-body">
-						<text class="font-bold text-sm text-gray-700 block mb-1">
+						<text class="font-bold text-sm log-label block mb-1">
 							{{ parsedContent.label }}
 						</text>
 
 						<view class="change-flow">
 							<view class="part-container">
 								<mp-html :content="parsedContent.oldRaw" :copy-link="false" :tag-style="htmlStyles"
-									container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+									container-style="font-size: 14px; color: var(--text-primary); line-height: 1.5;"
 									@linktap="handleLinkTap" />
 							</view>
 
@@ -42,7 +43,7 @@
 
 							<view class="part-container">
 								<mp-html :content="parsedContent.newRaw" :copy-link="false" :tag-style="htmlStyles"
-									container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+									container-style="font-size: 14px; color: var(--text-primary); line-height: 1.5;"
 									@linktap="handleLinkTap" />
 							</view>
 						</view>
@@ -50,7 +51,7 @@
 
 					<view v-else class="content-body">
 						<mp-html :content="data.message" :copy-link="false" :tag-style="htmlStyles"
-							container-style="font-size: 14px; color: #374151; line-height: 1.5;"
+							container-style="font-size: 14px; color: var(--text-primary); line-height: 1.5;"
 							@linktap="handleLinkTap" />
 
 						<view v-if="data.files" class="mt-2">
@@ -101,7 +102,8 @@
 	import { computed } from 'vue';
 	import UserAvatar from '@/components/UserAvatar.vue';
 	import { useAuthStore } from '@/stores/auth';
-	import CommentItem from './CommentItem.vue';
+	// Lưu ý: Import chính nó để đệ quy (Recursive component)
+	import CommentItem from './CommentItem.vue'; 
 	import { openExternalLink } from '@/utils/linkHelper';
 	import mpHtml from 'mp-html/dist/uni-app/components/mp-html/mp-html.vue';
 
@@ -117,10 +119,11 @@
 		return props.data.isMe === true;
 	});
 
+	// SỬA: Dùng var(--text-primary) thay vì mã màu cứng để nội dung HTML tự đổi màu
 	const htmlStyles = {
-		p: 'font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;',
-		div: 'font-size: 14px; line-height: 1.5; color: #374151;',
-		span: 'font-size: 14px; line-height: 1.5; color: #374151;',
+		p: 'font-size: 14px; line-height: 1.5; color: var(--text-primary); margin: 0; margin-bottom: 2px;',
+		div: 'font-size: 14px; line-height: 1.5; color: var(--text-primary);',
+		span: 'font-size: 14px; line-height: 1.5; color: var(--text-primary);',
 		a: 'color: #007aff; text-decoration: none; font-size: 14px;',
 		img: 'max-width: 100%; border-radius: 6px; margin-top: 4px;'
 	};
@@ -177,127 +180,66 @@
 </script>
 
 <style scoped>
-	.flex-col {
-		display: flex;
-		flex-direction: column;
+	/* === UTILS LAYOUT (Giữ nguyên) === */
+	.flex-col { display: flex; flex-direction: column; }
+	.mb-2 { margin-bottom: 8px; }
+	.flex { display: flex; }
+	.flex-1 { flex: 1; }
+	.gap-1 { gap: 4px; }
+	.gap-3 { gap: 12px; }
+	.mb-1 { margin-bottom: 4px; }
+	.mb-4 { margin-bottom: 16px; }
+	.mt-1 { margin-top: 4px; }
+	.mt-2 { margin-top: 8px; }
+	.items-start { align-items: flex-start; }
+	.items-center { align-items: center; }
+	.justify-between { justify-content: space-between; }
+	.shrink-0 { flex-shrink: 0; }
+	.overflow-hidden { overflow: hidden; }
+	.rounded-2xl { border-radius: 16px; }
+	.rounded-tl-none { border-top-left-radius: 0; }
+	.p-3 { padding: 12px; }
+	.text-sm { font-size: 14px; }
+	.text-xs { font-size: 12px; }
+	.font-bold { font-weight: 700; }
+	.italic { font-style: italic; }
+	.ml-1 { margin-left: 4px; }
+	.mr-2 { margin-right: 8px; }
+	.mr-3 { margin-right: 12px; }
+	.pl-12 { padding-left: 48px; }
+
+	/* === THEME COLORS MAPPING === */
+
+	/* Bubble chat nền xám/tối */
+	.comment-bubble {
+		/* Thay #f9fafb (bg-gray-50) */
+		background-color: var(--bg-input); 
 	}
 
-	.mb-2 {
-		margin-bottom: 8px;
+	/* Tên người gửi */
+	.sender-name {
+		/* Thay #111827 (text-gray-900) */
+		color: var(--text-primary);
+	}
+	
+	/* Label trong log update */
+	.log-label {
+		/* Thay #374151 */
+		color: var(--text-primary);
 	}
 
-	.flex {
-		display: flex;
+	/* Text phụ (action, time) */
+	.action-text {
+		/* Thay #6b7280 (gray-500) */
+		color: var(--text-secondary);
 	}
 
-	.flex-1 {
-		flex: 1;
+	.time-text {
+		/* Thay #9ca3af (gray-400) */
+		color: var(--text-hint);
 	}
 
-	.gap-1 {
-		gap: 4px;
-	}
-
-	.gap-3 {
-		gap: 12px;
-	}
-
-	.mb-1 {
-		margin-bottom: 4px;
-	}
-
-	.mb-4 {
-		margin-bottom: 16px;
-	}
-
-	.mt-1 {
-		margin-top: 4px;
-	}
-
-	.mt-2 {
-		margin-top: 8px;
-	}
-
-	.items-start {
-		align-items: flex-start;
-	}
-
-	.items-center {
-		align-items: center;
-	}
-
-	.justify-between {
-		justify-content: space-between;
-	}
-
-	.shrink-0 {
-		flex-shrink: 0;
-	}
-
-	.overflow-hidden {
-		overflow: hidden;
-	}
-
-	.bg-gray-50 {
-		background-color: #f9fafb;
-	}
-
-	.rounded-2xl {
-		border-radius: 16px;
-	}
-
-	.rounded-tl-none {
-		border-top-left-radius: 0;
-	}
-
-	.p-3 {
-		padding: 12px;
-	}
-
-	.text-sm {
-		font-size: 14px;
-	}
-
-	.text-xs {
-		font-size: 12px;
-	}
-
-	.font-bold {
-		font-weight: 700;
-	}
-
-	.text-gray-900 {
-		color: #111827;
-	}
-
-	.text-gray-700 {
-		color: #374151;
-	}
-
-	.text-gray-400 {
-		color: #9ca3af;
-	}
-
-	.italic {
-		font-style: italic;
-	}
-
-	.ml-1 {
-		margin-left: 4px;
-	}
-
-	.mr-2 {
-		margin-right: 8px;
-	}
-
-	.mr-3 {
-		margin-right: 12px;
-	}
-
-	.pl-12 {
-		padding-left: 48px;
-	}
-
+	/* --- Footer Actions --- */
 	.c-footer-actions {
 		display: flex;
 		justify-content: space-between;
@@ -311,8 +253,12 @@
 	}
 
 	.emoji-tag {
-		background-color: #fff;
-		border: 1px solid #eee;
+		/* Thay #fff */
+		background-color: var(--bg-surface);
+		/* Thay #eee */
+		border: 1px solid var(--border-color);
+		/* Thêm màu chữ cho emoji */
+		color: var(--text-primary);
 		border-radius: 10px;
 		padding: 2px 6px;
 		font-size: 12px;
@@ -343,13 +289,16 @@
 	.icon-action {
 		width: 18px;
 		height: 18px;
+		/* QUAN TRỌNG: Đảo màu icon đen -> trắng khi dark mode */
+		filter: var(--icon-filter);
 	}
 
 	.comment-attachment-img {
 		max-width: 200px;
 		max-height: 300px;
 		border-radius: 8px;
-		border: 1px solid #eee;
+		/* Thay border cứng */
+		border: 1px solid var(--border-color);
 		display: block;
 	}
 
@@ -377,7 +326,8 @@
 
 	.arrow-text {
 		font-weight: bold;
-		color: #6b7280;
+		/* Thay #6b7280 */
+		color: var(--text-secondary);
 		font-size: 16px;
 	}
 

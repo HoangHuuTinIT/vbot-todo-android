@@ -13,11 +13,11 @@
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
 				</view>
 
-				<picker mode="multiSelector" :range="pickerRange" :value="pickerIndex" @change="bindMultiPickerChange">
-				    <text class="uni-calendar__header-text">
-				        {{ monthText + ' ' + (nowDate.month||'') + ' ' + yearText + ' ' + (nowDate.year||'') }}
-				    </text>
-				</picker>
+				<app-picker :range="pickerRange" :value="pickerIndex" @change="bindMultiPickerChange">
+					<text class="uni-calendar__header-text">
+						{{ monthText + ' ' + (nowDate.month||'') + ' ' + yearText + ' ' + (nowDate.year||'') }}
+					</text>
+				</app-picker>
 
 				<view class="uni-calendar__header-btn-box" @click.stop="changeMonth('next')">
 					<view class="uni-calendar__header-btn uni-calendar--right"></view>
@@ -61,8 +61,7 @@
 				<view class="uni-calendar__weeks" v-for="(item,weekIndex) in weeks" :key="weekIndex">
 					<view class="uni-calendar__weeks-item" v-for="(weeks,weeksIndex) in item" :key="weeksIndex">
 						<calendar-item class="uni-calendar-item--hook" :weeks="weeks" :calendar="calendar"
-							:selected="selected" :checkHover="range" @change="choiceDate"
-							@handleMouse="handleMouse">
+							:selected="selected" :checkHover="range" @change="choiceDate" @handleMouse="handleMouse">
 						</calendar-item>
 					</view>
 				</view>
@@ -103,10 +102,14 @@
 </template>
 
 <script>
-	import { Calendar, getDate, getTime } from './util.js';
+	import {
+		Calendar,
+		getDate,
+		getTime
+	} from './util.js';
 	import calendarItem from './calendar-item.vue'
 	import timePicker from './time-picker.vue'
-
+	import AppPicker from '@/components/AppPicker.vue'
 	// import { initVueI18n } from '@dcloudio/uni-i18n'
 	// import i18nMessages from './i18n/index.js'
 	// const { t } = initVueI18n(i18nMessages)
@@ -134,7 +137,8 @@
 	export default {
 		components: {
 			calendarItem,
-			timePicker
+			timePicker,
+			AppPicker
 		},
 		props: {
 			date: {
@@ -165,8 +169,8 @@
 				type: String,
 				default: ''
 			},
-      startPlaceholder: {
-        type: String,
+			startPlaceholder: {
+				type: String,
 				default: ''
 			},
 			endPlaceholder: {
@@ -212,10 +216,10 @@
 					}
 				}
 			},
-      defaultValue: {
-        type: [String, Object, Array],
-        default: ''
-      }
+			defaultValue: {
+				type: [String, Object, Array],
+				default: ''
+			}
 		},
 		data() {
 			return {
@@ -263,7 +267,7 @@
 			},
 			startDate(val) {
 				// 字节小程序 watch 早于 created
-				if(!this.cale){
+				if (!this.cale) {
 					return
 				}
 				this.cale.setStartDate(val)
@@ -272,7 +276,7 @@
 			},
 			endDate(val) {
 				// 字节小程序 watch 早于 created
-				if(!this.cale){
+				if (!this.cale) {
 					return
 				}
 				this.cale.setEndDate(val)
@@ -281,7 +285,7 @@
 			},
 			selected(newVal) {
 				// 字节小程序 watch 早于 created
-				if(!this.cale){
+				if (!this.cale) {
 					return
 				}
 				this.cale.setSelectInfo(this.nowDate.fullDate, newVal)
@@ -312,16 +316,16 @@
 								this.cale.lastHover = false
 							}
 						} else {
-              // 字节小程序 watch 早于 created
-              if(!this.cale){
-                return
-              }
+							// 字节小程序 watch 早于 created
+							if (!this.cale) {
+								return
+							}
 
 							this.cale.setDefaultMultiple(before, after)
 							if (which === 'left' && before) {
 								this.setDate(before)
 								this.weeks = this.cale.weeks
-							} else if(after) {
+							} else if (after) {
 								this.setDate(after)
 								this.weeks = this.cale.weeks
 							}
@@ -344,74 +348,74 @@
 			 * for i18n
 			 */
 			selectDateText() {
-			        return this.$t("uni-datetime-picker.selectDate")
-			    },
-			    startDateText() {
-			        return this.startPlaceholder || this.$t("uni-datetime-picker.startDate")
-			    },
-			    endDateText() {
-			        return this.endPlaceholder || this.$t("uni-datetime-picker.endDate")
-			    },
-			    okText() {
-			        return this.$t("uni-datetime-picker.ok")
-			    },
-			    yearText() {
-			        return this.$t("uni-datetime-picker.year")
-			    },
-			    monthText() {
-			        return this.$t("uni-datetime-picker.month")
-			    },
-			    MONText() {
-			        return this.$t("uni-calender.MON")
-			    },
-			    TUEText() {
-			        return this.$t("uni-calender.TUE")
-			    },
-			    WEDText() {
-			        return this.$t("uni-calender.WED")
-			    },
-			    THUText() {
-			        return this.$t("uni-calender.THU")
-			    },
-			    FRIText() {
-			        return this.$t("uni-calender.FRI")
-			    },
-			    SATText() {
-			        return this.$t("uni-calender.SAT")
-			    },
-			    SUNText() {
-			        return this.$t("uni-calender.SUN")
-			    },
-			    confirmText() {
-			        return this.$t("uni-calender.confirm")
-			    },
+				return this.$t("uni-datetime-picker.selectDate")
+			},
+			startDateText() {
+				return this.startPlaceholder || this.$t("uni-datetime-picker.startDate")
+			},
+			endDateText() {
+				return this.endPlaceholder || this.$t("uni-datetime-picker.endDate")
+			},
+			okText() {
+				return this.$t("uni-datetime-picker.ok")
+			},
+			yearText() {
+				return this.$t("uni-datetime-picker.year")
+			},
+			monthText() {
+				return this.$t("uni-datetime-picker.month")
+			},
+			MONText() {
+				return this.$t("uni-calender.MON")
+			},
+			TUEText() {
+				return this.$t("uni-calender.TUE")
+			},
+			WEDText() {
+				return this.$t("uni-calender.WED")
+			},
+			THUText() {
+				return this.$t("uni-calender.THU")
+			},
+			FRIText() {
+				return this.$t("uni-calender.FRI")
+			},
+			SATText() {
+				return this.$t("uni-calender.SAT")
+			},
+			SUNText() {
+				return this.$t("uni-calender.SUN")
+			},
+			confirmText() {
+				return this.$t("uni-calender.confirm")
+			},
 			pickerMonths() {
-			        return [
-			            this.$t('uni-calender.jan'), this.$t('uni-calender.feb'),
-			            this.$t('uni-calender.mar'), this.$t('uni-calender.apr'),
-			            this.$t('uni-calender.may'), this.$t('uni-calender.jun'),
-			            this.$t('uni-calender.jul'), this.$t('uni-calender.aug'),
-			            this.$t('uni-calender.sep'), this.$t('uni-calender.oct'),
-			            this.$t('uni-calender.nov'), this.$t('uni-calender.dec')
-			        ]
-			    },
-			    // Gom năm và tháng vào mảng cho picker hiển thị (Cột 0: Năm, Cột 1: Tháng)
-			    pickerRange() {
-			        return [this.pickerYears, this.pickerMonths];
-			    },
-			    // Tính toán vị trí hiển thị hiện tại
-			    pickerIndex() {
-			        if (!this.nowDate || !this.nowDate.year) return [0, 0];
-			        
-			        const yearStr = String(this.nowDate.year);
-			        const yearIdx = this.pickerYears.indexOf(yearStr);
-			        const monthIdx = parseInt(this.nowDate.month) - 1;
-			        
-			        return [
-			            yearIdx >= 0 ? yearIdx : 0, 
-			            monthIdx >= 0 ? monthIdx : 0
-			        ];
-			    },
+				return [
+					this.$t('uni-calender.jan'), this.$t('uni-calender.feb'),
+					this.$t('uni-calender.mar'), this.$t('uni-calender.apr'),
+					this.$t('uni-calender.may'), this.$t('uni-calender.jun'),
+					this.$t('uni-calender.jul'), this.$t('uni-calender.aug'),
+					this.$t('uni-calender.sep'), this.$t('uni-calender.oct'),
+					this.$t('uni-calender.nov'), this.$t('uni-calender.dec')
+				]
+			},
+			// Gom năm và tháng vào mảng cho picker hiển thị (Cột 0: Năm, Cột 1: Tháng)
+			pickerRange() {
+				return [this.pickerYears, this.pickerMonths];
+			},
+			// Tính toán vị trí hiển thị hiện tại
+			pickerIndex() {
+				if (!this.nowDate || !this.nowDate.year) return [0, 0];
+
+				const yearStr = String(this.nowDate.year);
+				const yearIdx = this.pickerYears.indexOf(yearStr);
+				const monthIdx = parseInt(this.nowDate.month) - 1;
+
+				return [
+					yearIdx >= 0 ? yearIdx : 0,
+					monthIdx >= 0 ? monthIdx : 0
+				];
+			},
 		},
 		created() {
 			// 获取日历方法实例
@@ -422,25 +426,25 @@
 				range: this.range,
 			})
 			const currentYear = new Date().getFullYear();
-			    for (let i = 1900; i <= currentYear + 100; i++) {
-			        this.pickerYears.push(String(i));
+			for (let i = 1900; i <= currentYear + 100; i++) {
+				this.pickerYears.push(String(i));
 			}
 			// 选中某一天
 			this.init(this.date)
 		},
 		methods: {
 			bindMultiPickerChange(e) {
-			        const [yearIndex, monthIndex] = e.detail.value;
-			        const year = this.pickerYears[yearIndex];
-			        const month = monthIndex + 1;
-			        
-			        // Tạo chuỗi ngày dạng YYYY-MM-DD để setDate xử lý
-			        // Luôn set về ngày mùng 1 để tránh lỗi ngày 31 của tháng này sang tháng kia không có
-			        const dateStr = `${year}-${month < 10 ? '0' + month : month}-01`;
-			        
-			        this.setDate(dateStr);
-			        this.monthSwitch(); // Kích hoạt sự kiện chuyển tháng
-			    },
+				const [yearIndex, monthIndex] = e.detail.value;
+				const year = this.pickerYears[yearIndex];
+				const month = monthIndex + 1;
+
+				// Tạo chuỗi ngày dạng YYYY-MM-DD để setDate xử lý
+				// Luôn set về ngày mùng 1 để tránh lỗi ngày 31 của tháng này sang tháng kia không có
+				const dateStr = `${year}-${month < 10 ? '0' + month : month}-01`;
+
+				this.setDate(dateStr);
+				this.monthSwitch(); // Kích hoạt sự kiện chuyển tháng
+			},
 			leaveCale() {
 				this.firstEnter = true
 			},
@@ -469,7 +473,7 @@
 			},
 			// 蒙版点击事件
 			maskClick() {
-        this.close()
+				this.close()
 				this.$emit('maskClose')
 			},
 
@@ -500,74 +504,76 @@
 			 * @param {Object} date
 			 */
 			init(date) {
-        // 字节小程序 watch 早于 created
-				if(!this.cale){
+				// 字节小程序 watch 早于 created
+				if (!this.cale) {
 					return
 				}
 				this.cale.setDate(date || new Date())
 				this.weeks = this.cale.weeks
 				this.nowDate = this.cale.getInfo(date)
-        this.calendar = {...this.nowDate}
-        if(!date){
-          // 优化date为空默认不选中今天
-          this.calendar.fullDate = ''
-          if(this.defaultValue && !this.range){
-            // 暂时只支持移动端非范围选择
-            const defaultDate = new Date(this.defaultValue)
-            const fullDate = getDate(defaultDate)
-            const year = defaultDate.getFullYear()
-            const month = defaultDate.getMonth()+1
-            const date = defaultDate.getDate()
-            const day = defaultDate.getDay()
-            this.calendar = {
-              fullDate,
-              year,
-              month,
-              date,
-              day
-            },
-            this.tempSingleDate = fullDate
-            this.time = getTime(defaultDate, this.hideSecond)
-          }
-        }
+				this.calendar = {
+					...this.nowDate
+				}
+				if (!date) {
+					// 优化date为空默认不选中今天
+					this.calendar.fullDate = ''
+					if (this.defaultValue && !this.range) {
+						// 暂时只支持移动端非范围选择
+						const defaultDate = new Date(this.defaultValue)
+						const fullDate = getDate(defaultDate)
+						const year = defaultDate.getFullYear()
+						const month = defaultDate.getMonth() + 1
+						const date = defaultDate.getDate()
+						const day = defaultDate.getDay()
+						this.calendar = {
+								fullDate,
+								year,
+								month,
+								date,
+								day
+							},
+							this.tempSingleDate = fullDate
+						this.time = getTime(defaultDate, this.hideSecond)
+					}
+				}
 			},
 			/**
 			 * 打开日历弹窗
 			 */
 			open() {
-			    // Nếu là chế độ popup và cần clear dữ liệu cũ
-			    if (this.clearDate && !this.insert) {
-			        this.cale.cleanMultipleStatus()
-			    }
-			
-			    // 1. Khởi tạo lại lịch để nhảy đúng đến tháng/năm của ngày đã chọn
-			    this.init(this.date)
-			
-			    // 2. Cập nhật ngày hiển thị trên tiêu đề popup
-			    if (!this.range && this.date) {
-			        this.tempSingleDate = this.date
-			    }
-			
-			    // 3. Cập nhật giờ hiển thị (QUAN TRỌNG: Ưu tiên lấy từ this.time nếu đã có, nếu không thì lấy defTime)
-			    // Sửa lỗi: Khi mở lại, nó phải hiện giờ hiện tại của item đó chứ không phải giờ mặc định ban đầu
-			    if (!this.range) {
-			        if (this.defTime) {
-			             this.time = this.defTime
-			        }
-			    } else {
-			        // Xử lý cho range (nếu cần)
-			        if (this.defTime && this.defTime.start) {
-			             this.timeRange.startTime = this.defTime.start
-			             this.timeRange.endTime = this.defTime.end
-			        }
-			    }
-			
-			    this.show = true
-			    this.$nextTick(() => {
-			        setTimeout(() => {
-			            this.aniMaskShow = true
-			        }, 50)
-			    })
+				// Nếu là chế độ popup và cần clear dữ liệu cũ
+				if (this.clearDate && !this.insert) {
+					this.cale.cleanMultipleStatus()
+				}
+
+				// 1. Khởi tạo lại lịch để nhảy đúng đến tháng/năm của ngày đã chọn
+				this.init(this.date)
+
+				// 2. Cập nhật ngày hiển thị trên tiêu đề popup
+				if (!this.range && this.date) {
+					this.tempSingleDate = this.date
+				}
+
+				// 3. Cập nhật giờ hiển thị (QUAN TRỌNG: Ưu tiên lấy từ this.time nếu đã có, nếu không thì lấy defTime)
+				// Sửa lỗi: Khi mở lại, nó phải hiện giờ hiện tại của item đó chứ không phải giờ mặc định ban đầu
+				if (!this.range) {
+					if (this.defTime) {
+						this.time = this.defTime
+					}
+				} else {
+					// Xử lý cho range (nếu cần)
+					if (this.defTime && this.defTime.start) {
+						this.timeRange.startTime = this.defTime.start
+						this.timeRange.endTime = this.defTime.end
+					}
+				}
+
+				this.show = true
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.aniMaskShow = true
+					}, 50)
+				})
 			},
 			/**
 			 * 关闭日历弹窗
@@ -613,13 +619,13 @@
 			 * @param {Object} name
 			 */
 			setEmit(name) {
-        if(!this.range){
-					if(!this.calendar.fullDate){
-					  this.calendar = this.cale.getInfo(new Date())
-					  this.tempSingleDate = this.calendar.fullDate
+				if (!this.range) {
+					if (!this.calendar.fullDate) {
+						this.calendar = this.cale.getInfo(new Date())
+						this.tempSingleDate = this.calendar.fullDate
 					}
-					if(this.hasTime && !this.time) {
-					  this.time = getTime(new Date(), this.hideSecond)
+					if (this.hasTime && !this.time) {
+						this.time = getTime(new Date(), this.hideSecond)
 					}
 				}
 				let {
@@ -663,17 +669,17 @@
 				}
 				this.change()
 			},
-      changeMonth(type) {
-        let newDate
-        if(type === 'pre') {
-          newDate = this.cale.getPreMonthObj(this.nowDate.fullDate).fullDate
-        } else if(type === 'next') {
-          newDate = this.cale.getNextMonthObj(this.nowDate.fullDate).fullDate
-        }
+			changeMonth(type) {
+				let newDate
+				if (type === 'pre') {
+					newDate = this.cale.getPreMonthObj(this.nowDate.fullDate).fullDate
+				} else if (type === 'next') {
+					newDate = this.cale.getNextMonthObj(this.nowDate.fullDate).fullDate
+				}
 
-        this.setDate(newDate)
+				this.setDate(newDate)
 				this.monthSwitch()
-      },
+			},
 			/**
 			 * 设置日期
 			 * @param {Object} date
@@ -687,7 +693,10 @@
 	}
 </script>
 
-<style lang="scss" >
+<style lang="scss">
+	/* 1. Import Theme */
+	@import '@/common/theme.scss';
+
 	$uni-primary: #007aff !default;
 
 	.uni-calendar {
@@ -734,7 +743,8 @@
 	}
 
 	.uni-calendar__content {
-		background-color: #fff;
+		/* Thay màu nền cứng */
+		background-color: var(--bg-surface);
 	}
 
 	.uni-calendar__content-mobile {
@@ -765,7 +775,8 @@
 		/* #endif */
 		flex-direction: row;
 		justify-content: space-between;
-		border-top-color: rgba(0, 0, 0, 0.4);
+		/* Thay border màu cứng */
+		border-top-color: var(--border-color);
 		border-top-style: solid;
 		border-top-width: 1px;
 	}
@@ -793,7 +804,8 @@
 		text-align: center;
 		width: 100px;
 		font-size: 15px;
-		color: #666;
+		/* Thay màu chữ */
+		color: var(--text-primary);
 	}
 
 	.uni-calendar__button-text {
@@ -820,10 +832,11 @@
 	.uni-calendar__header-btn {
 		width: 9px;
 		height: 9px;
-		border-left-color: #808080;
+		/* Thay màu border mũi tên để nhìn thấy trên nền tối */
+		border-left-color: var(--text-secondary);
 		border-left-style: solid;
 		border-left-width: 1px;
-		border-top-color: #555555;
+		border-top-color: var(--text-secondary);
 		border-top-style: solid;
 		border-top-width: 1px;
 	}
@@ -858,14 +871,16 @@
 		justify-content: center;
 		align-items: center;
 		height: 40px;
-		border-bottom-color: #F5F5F5;
+		/* Thay border dưới */
+		border-bottom-color: var(--border-color);
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 	}
 
 	.uni-calendar__weeks-day-text {
 		font-size: 12px;
-		color: #B2B2B2;
+		/* Thay màu chữ ngày trong tuần */
+		color: var(--text-hint);
 	}
 
 	.uni-calendar__box {
@@ -890,7 +905,8 @@
 	.uni-calendar__box-bg-text {
 		font-size: 200px;
 		font-weight: bold;
-		color: #999;
+		/* Thay màu watermark */
+		color: var(--text-hint);
 		opacity: 0.1;
 		text-align: center;
 		/* #ifndef APP-NVUE */
@@ -902,9 +918,10 @@
 		padding: 0 10px;
 		// line-height: 50px;
 		text-align: center;
-		color: #333;
-		border-top-color: #DCDCDC;
-		;
+		/* Thay màu chữ và border */
+		color: var(--text-primary);
+		border-top-color: var(--border-color);
+
 		border-top-style: solid;
 		border-top-width: 1px;
 		flex: 1;
@@ -923,17 +940,18 @@
 
 	.uni-date-changed--time-end {
 		/* #ifndef APP-NVUE */
-    display: flex;
+		display: flex;
 		/* #endif */
 		align-items: center;
 	}
 
 	.uni-date-changed--time-date {
-    color: #999;
+		/* Thay màu chữ */
+		color: var(--text-secondary);
 		line-height: 50px;
-    /* #ifdef MP-TOUTIAO */
-    font-size: 16px;
-    /* #endif */
+		/* #ifdef MP-TOUTIAO */
+		font-size: 16px;
+		/* #endif */
 		margin-right: 5px;
 		// opacity: 0.6;
 	}
@@ -968,7 +986,8 @@
 	.dialog-close-plus {
 		width: 16px;
 		height: 2px;
-		background-color: #737987;
+		/* Thay màu nút đóng */
+		background-color: var(--text-secondary);
 		border-radius: 2px;
 		transform: rotate(45deg);
 	}
@@ -992,5 +1011,6 @@
 	.uni-datetime-picker--btn:active {
 		opacity: 0.7;
 	}
+
 	/* #endif */
 </style>

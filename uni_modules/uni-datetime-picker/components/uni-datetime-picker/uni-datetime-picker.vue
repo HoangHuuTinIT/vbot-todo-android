@@ -12,12 +12,14 @@
 					<view v-else class="uni-date-x uni-date-range">
 						<uni-icons class="icon-calendar" type="calendar" color="#c0c4cc" size="22"></uni-icons>
 						<view class="uni-date__x-input text-center">
-							{{ displayRangeValue.startDate || startPlaceholderText }}</view>
+							{{ displayRangeValue.startDate || startPlaceholderText }}
+						</view>
 
 						<view class="range-separator">{{rangeSeparator}}</view>
 
 						<view class="uni-date__x-input text-center">
-							{{ displayRangeValue.endDate || endPlaceholderText }}</view>
+							{{ displayRangeValue.endDate || endPlaceholderText }}
+						</view>
 					</view>
 
 					<view v-if="showClearIcon" class="uni-date__icon-clear" @click.stop="clear">
@@ -89,8 +91,8 @@
 						@change="leftChange" @firstEnterCale="updateRightCale" style="padding: 0 8px;" />
 					<Calendar ref="right" :showMonth="false" :start-date="calendarRange.startDate"
 						:end-date="calendarRange.endDate" :range="true" @change="rightChange"
-						:pleStatus="startMultipleStatus" @firstEnterCale="updateLeftCale"
-						style="padding: 0 8px;border-left: 1px solid #F1F1F1;" />
+						:pleStatus="startMultipleStatus" @firstEnterCale="updateLeftCale" style="padding: 0 8px;"
+						class="calendar-right-border" />
 				</view>
 
 				<view v-if="hasTime" class="popup-x-footer">
@@ -848,6 +850,9 @@
 </script>
 
 <style lang="scss">
+	/* Import theme variable để sử dụng */
+	@import '@/common/theme.scss';
+
 	$uni-primary: #007aff !default;
 
 	.uni-date {
@@ -861,8 +866,9 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 4px;
-		background-color: #fff;
-		color: #666;
+		/* Thay màu cứng = biến */
+		background-color: var(--bg-input);
+		color: var(--text-secondary);
 		font-size: 14px;
 		flex: 1;
 
@@ -876,13 +882,15 @@
 			padding: 0 2px;
 			/* #endif */
 			line-height: 35px;
+			color: var(--text-secondary);
 		}
 	}
 
 	.uni-date-x--border {
 		box-sizing: border-box;
 		border-radius: 4px;
-		border: 1px solid #e5e5e5;
+		/* Thay màu border cứng */
+		border: 1px solid var(--border-input);
 	}
 
 	.uni-date-editor--x {
@@ -911,6 +919,8 @@
 		line-height: 35px;
 		font-size: 14px;
 		overflow: hidden;
+		/* Màu chữ input */
+		color: var(--text-primary);
 	}
 
 	.text-center {
@@ -922,6 +932,8 @@
 		width: 100%;
 		line-height: 40px;
 		font-size: 14px;
+		/* Màu chữ input trong popup */
+		color: var(--text-primary);
 	}
 
 	.uni-date-range__input {
@@ -945,21 +957,23 @@
 	}
 
 	.uni-date-single--x {
-		background-color: #fff;
+		/* Thay nền và border cho popup */
+		background-color: var(--bg-surface);
 		position: absolute;
 		top: 0;
 		z-index: 999;
-		border: 1px solid #EBEEF5;
+		border: 1px solid var(--border-color);
 		box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 		border-radius: 4px;
 	}
 
 	.uni-date-range--x {
-		background-color: #fff;
+		/* Thay nền và border cho popup */
+		background-color: var(--bg-surface);
 		position: absolute;
 		top: 0;
 		z-index: 999;
-		border: 1px solid #EBEEF5;
+		border: 1px solid var(--border-color);
 		box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 		border-radius: 4px;
 	}
@@ -995,14 +1009,18 @@
 		display: flex;
 	}
 
+	.calendar-right-border {
+		border-left: 1px solid var(--border-color) !important;
+	}
+
 	.popup-x-footer {
 		padding: 0 15px;
-		border-top-color: #F1F1F1;
+		border-top-color: var(--border-color);
 		border-top-style: solid;
 		border-top-width: 1px;
 		line-height: 40px;
 		text-align: right;
-		color: #666;
+		color: var(--text-secondary);
 	}
 
 	.popup-x-footer text:hover {
@@ -1018,8 +1036,8 @@
 
 	.uni-date-changed {
 		text-align: center;
-		color: #333;
-		border-bottom-color: #F1F1F1;
+		color: var(--text-primary);
+		border-bottom-color: var(--border-color);
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 	}
@@ -1034,7 +1052,7 @@
 	}
 
 	.uni-date-changed--time-date {
-		color: #333;
+		color: var(--text-secondary);
 		opacity: 0.6;
 	}
 
@@ -1042,7 +1060,7 @@
 		margin-right: 50px;
 	}
 
-	/* picker 弹出层通用的指示小三角, todo：扩展至上下左右方向定位 */
+	/* picker 弹出层通用的指示小三角 */
 	.uni-popper__arrow,
 	.uni-popper__arrow::after {
 		position: absolute;
@@ -1058,13 +1076,15 @@
 		top: -6px;
 		left: 10%;
 		margin-right: 3px;
-		border-bottom-color: #EBEEF5;
+		/* Mũi tên viền ngoài */
+		border-bottom-color: var(--border-color);
 	}
 
 	.uni-popper__arrow::after {
 		content: " ";
 		top: 1px;
 		margin-left: -6px;
-		border-bottom-color: #fff;
+		/* Mũi tên nền trong (phải trùng bg-surface) */
+		border-bottom-color: var(--bg-surface);
 	}
 </style>

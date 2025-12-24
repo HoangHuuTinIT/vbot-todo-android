@@ -8,46 +8,89 @@
 
 		<view class="picker-panel" :class="{ 'show': isVisible }">
 			<view class="picker-toolbar">
-				<text class="btn-cancel" @click="close">{{ $t('common.cancel') }}</text>
+				<text class="btn-cancel" @click="close">{{ $t('common.cancel') || 'Hủy' }}</text>
 				<text class="title">{{ title }}</text>
 				<text class="btn-confirm" @click="confirm">{{ $t('common.confirm') || 'Xong' }}</text>
 			</view>
 
 			<picker-view :value="pickerValue" @change="bindChange" class="picker-view-box"
-				indicator-style="height: 50px;">
-				<picker-view-column>
-					<view class="picker-item" v-for="(item, index) in range" :key="index">
-						{{ item }}
-					</view>
-				</picker-view-column>
+				:indicator-style="indicatorStyle" :mask-style="maskStyle">
+
+				<block v-if="isMultiColumn">
+					<picker-view-column v-for="(col, i) in range" :key="i">
+						<view class="picker-item" v-for="(item, k) in col" :key="k">
+							{{ item }}
+						</view>
+					</picker-view-column>
+				</block>
+
+				<block v-else>
+					<picker-view-column>
+						<view class="picker-item" v-for="(item, index) in range" :key="index">
+							{{ item }}
+						</view>
+					</picker-view-column>
+				</block>
+
 			</picker-view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="ts">
-	import { ref, watch } from 'vue';
+	import { ref, watch, computed } from 'vue';
 
 	const props = defineProps<{
-		range : string[];
-		value : number;
+		range : any[];
+		value : number | number[];
 		title ?: string;
 	}>();
 
 	const emit = defineEmits(['update:value', 'change']);
 
 	const isVisible = ref(false);
-	const pickerValue = ref([0]);
-	const tempIndex = ref(0);
+	const pickerValue = ref<number[]>([0]);
+	const tempValue = ref<any>(0);
+
+	// Style cho khung chọn ở giữa (Indicator)
+	// Dùng biến --border-color để đường kẻ tự đổi màu theo theme, z-index thấp để không che chữ
+	const indicatorStyle = `
+		height: 50px; 
+		border-top: 1px solid var(--border-color); 
+		border-bottom: 1px solid var(--border-color);
+		z-index: 0;
+	`;
+
+	// Style cho lớp mặt nạ mờ (Mask)
+	// QUAN TRỌNG: Sử dụng linear-gradient từ var(--bg-surface) (màu nền) đến trong suốt.
+	// Điều này giúp loại bỏ hiệu ứng "sương mù trắng" xấu xí trên nền tối.
+	const maskStyle = `
+		background-image: linear-gradient(to bottom, var(--bg-surface), rgba(0,0,0,0)), linear-gradient(to top, var(--bg-surface), rgba(0,0,0,0));
+		z-index: 0;
+	`;
+
+	const isMultiColumn = computed(() => {
+		return props.range.length > 0 && Array.isArray(props.range[0]);
+	});
 
 	watch(() => props.value, (val) => {
-		pickerValue.value = [val];
-		tempIndex.value = val;
+		if (Array.isArray(val)) {
+			pickerValue.value = val;
+			tempValue.value = [...val];
+		} else {
+			pickerValue.value = [val];
+			tempValue.value = val;
+		}
 	}, { immediate: true });
 
 	const open = () => {
-		tempIndex.value = props.value;
-		pickerValue.value = [props.value];
+		if (Array.isArray(props.value)) {
+			tempValue.value = [...props.value];
+			pickerValue.value = [...props.value];
+		} else {
+			tempValue.value = props.value;
+			pickerValue.value = [props.value];
+		}
 		isVisible.value = true;
 	};
 
@@ -57,12 +100,16 @@
 
 	const bindChange = (e : any) => {
 		const val = e.detail.value;
-		tempIndex.value = val[0];
+		if (isMultiColumn.value) {
+			tempValue.value = val;
+		} else {
+			tempValue.value = val[0];
+		}
 	};
 
 	const confirm = () => {
-		emit('change', { detail: { value: tempIndex.value } });
-		emit('update:value', tempIndex.value);
+		emit('change', { detail: { value: tempValue.value } });
+		emit('update:value', tempValue.value);
 		close();
 	};
 </script>
@@ -74,9 +121,11 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		/* Mask vẫn giữ màu tối mờ bất kể chế độ nào */
-		background: rgba(0, 0, 0, 0.4);
+		background: rgba(0, 0, 0, 0.6);
+		/* Tăng độ tối của mask nền một chút cho tập trung hơn */
 		z-index: 9998;
+		backdrop-filter: blur(2px);
+		/* Hiệu ứng mờ nền phía sau (nếu trình duyệt hỗ trợ) */
 	}
 
 	.picker-panel {
@@ -84,14 +133,15 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		/* SỬA: Dùng màu nền surface (Trắng ở Light, Xám đậm ở Dark) */
 		background-color: var(--bg-surface);
 		z-index: 9999;
 		transform: translateY(100%);
-		transition: transform 0.3s ease;
+		transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+		/* Hiệu ứng trượt mượt hơn */
 		padding-bottom: env(safe-area-inset-bottom);
-		border-top-left-radius: 12px;
-		border-top-right-radius: 12px;
+		border-top-left-radius: 16px;
+		/* Bo tròn nhiều hơn chút cho hiện đại */
+		border-top-right-radius: 16px;
 	}
 
 	.picker-panel.show {
@@ -102,48 +152,50 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		height: 44px;
-		/* SỬA: Border đổi theo theme */
+		height: 48px;
+		/* Tăng chiều cao toolbar chút cho thoáng */
 		border-bottom: 1px solid var(--border-color);
-		padding: 0 15px;
-		/* SỬA: Nền toolbar dùng bg-input để hơi khác màu nền chính 1 chút */
-		background-color: var(--bg-input);
-		border-top-left-radius: 12px;
-		border-top-right-radius: 12px;
+		padding: 0 16px;
+		background-color: var(--bg-surface);
+		/* Đồng bộ màu nền với panel để liền mạch */
+		border-top-left-radius: 16px;
+		border-top-right-radius: 16px;
 	}
 
 	.btn-cancel {
-		/* SỬA: Màu text phụ */
 		color: var(--text-secondary);
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	.btn-confirm {
-		/* Nút confirm thường là màu Brand, nếu chưa có biến brand thì giữ cứng hoặc thêm --text-highlight */
 		color: #007aff;
-		font-size: 15px;
-		font-weight: bold;
+		font-size: 16px;
+		font-weight: 600;
 	}
 
 	.title {
-		font-size: 15px;
-		font-weight: 500;
-		/* SỬA: Màu text chính */
+		font-size: 16px;
+		font-weight: 600;
 		color: var(--text-primary);
 	}
 
 	.picker-view-box {
 		width: 100%;
-		height: 250px;
-		/* SỬA: Nền vùng cuộn */
+		height: 240px;
 		background-color: var(--bg-surface);
 	}
 
 	.picker-item {
 		line-height: 50px;
 		text-align: center;
-		font-size: 16px;
-		/* SỬA: Màu text item trong vùng cuộn */
+		font-size: 17px;
+		/* Tăng size chữ lên xíu cho dễ đọc */
+		font-weight: 400;
 		color: var(--text-primary);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		z-index: 10;
+		/* Đảm bảo text nổi lên trên các lớp mask */
 	}
 </style>

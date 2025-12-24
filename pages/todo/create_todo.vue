@@ -70,8 +70,8 @@
 				<text class="arrow-icon">›</text>
 			</view>
 
-			<TodoDatePicker v-model:dueDate="form.dueDate" v-model:notifyAt="form.notifyAt" />
-
+			<TodoDatePicker :class="{ 'theme-dark': isDark }" v-model:dueDate="form.dueDate"
+				v-model:notifyAt="form.notifyAt" />
 			<view class="footer-action">
 				<view style="width: 35%">
 					<AppButton type="secondary" :label="$t('common.cancel_action')" @click="goBack" />
@@ -120,7 +120,9 @@
 	});
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	@import '@/common/theme.scss';
+
 	/* --- CONTAINER --- */
 	.container {
 		min-height: 100vh;
@@ -165,6 +167,17 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.picker-group-wrapper {
+		background-color: var(--bg-surface);
+		/* Lấy màu nền theo theme */
+		border-radius: 8px;
+		margin-bottom: 12px;
+		overflow: hidden;
+		border: 1px solid var(--border-color);
+		/* Đồng bộ viền với các item khác */
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 	}
 
 	.back-icon {

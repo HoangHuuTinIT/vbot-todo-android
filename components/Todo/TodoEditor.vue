@@ -583,6 +583,13 @@
 </script>
 
 <style lang="scss" scoped>
+	:deep(.ql-editor.ql-blank::before) {
+		/* Ép màu placeholder dùng biến text-hint */
+		color: var(--text-hint) !important;
+		font-style: italic;
+		/* (Tuỳ chọn) Chữ nghiêng cho đẹp */
+	}
+
 	/* --- CONTAINER CHÍNH --- */
 	.editor-container {
 		display: flex;
@@ -625,7 +632,7 @@
 		position: absolute;
 		z-index: 100;
 		/* Giữ màu tối cho tooltip vì nó cần nổi bật */
-		background-color: #333; 
+		background-color: #333;
 		border-radius: 8px;
 		padding: 8px 12px;
 		left: 50%;
@@ -722,10 +729,11 @@
 		align-items: center;
 		padding: 10px;
 		/* Thay #f1f3f5 */
-		background-color: var(--bg-input); 
+		background-color: var(--bg-input);
 		cursor: pointer;
-		border-bottom: 1px solid transparent; 
+		border-bottom: 1px solid transparent;
 	}
+
 	/* Khi mở list ra thì thêm border bottom cho header */
 	.link-section-header:has(+ .link-list-content) {
 		border-bottom-color: var(--border-color);
@@ -819,13 +827,14 @@
 		color: #007aff;
 		border: 1px solid #007aff;
 	}
-    
-    /* Riêng trong dark mode, màu active này có thể hơi chói, ta điều chỉnh nhẹ */
-    :global(.theme-dark) .tool-item.active {
-        background-color: rgba(0, 122, 255, 0.2); /* Xanh trong suốt */
-        color: #66b5ff;
-        border-color: #007aff;
-    }
+
+	/* Riêng trong dark mode, màu active này có thể hơi chói, ta điều chỉnh nhẹ */
+	:global(.theme-dark) .tool-item.active {
+		background-color: rgba(0, 122, 255, 0.2);
+		/* Xanh trong suốt */
+		color: #66b5ff;
+		border-color: #007aff;
+	}
 
 	.txt-icon {
 		font-size: 16px;
@@ -833,11 +842,11 @@
 		color: var(--text-secondary);
 		font-weight: 600;
 	}
-    
-    /* Khi active thì text icon đổi màu theo */
-    .tool-item.active .txt-icon {
-         color: inherit;
-    }
+
+	/* Khi active thì text icon đổi màu theo */
+	.tool-item.active .txt-icon {
+		color: inherit;
+	}
 
 	.txt-dynamic {
 		font-size: 14px;
@@ -854,7 +863,8 @@
 	.tool-divider {
 		width: 1px;
 		height: 20px;
-		background-color: var(--border-color); /* Thay #ddd */
+		background-color: var(--border-color);
+		/* Thay #ddd */
 		display: none;
 	}
 
@@ -1073,12 +1083,26 @@
 	}
 
 	@keyframes fadeIn {
-		from { opacity: 0; transform: scale(0.95); }
-		to { opacity: 1; transform: scale(1); }
+		from {
+			opacity: 0;
+			transform: scale(0.95);
+		}
+
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
 
 	@keyframes slideDown {
-		from { opacity: 0; transform: translateY(-5px); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(-5px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>

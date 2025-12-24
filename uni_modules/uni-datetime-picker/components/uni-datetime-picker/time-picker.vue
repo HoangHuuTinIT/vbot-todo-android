@@ -18,8 +18,8 @@
 				<text class="uni-datetime-picker-text">{{selectTimeText}}</text>
 			</view>
 			<view v-if="dateShow" class="uni-datetime-picker__container-box">
-				<picker-view class="uni-datetime-picker-view" :indicator-style="indicatorStyle" :value="ymd"
-					@change="bindDateChange">
+				<picker-view class="uni-datetime-picker-view" :indicator-style="indicatorStyle" :mask-style="maskStyle"
+					:value="ymd" @change="bindDateChange">
 					<picker-view-column>
 						<view class="uni-datetime-picker-item" v-for="(item,index) in years" :key="index">
 							<text class="uni-datetime-picker-item">{{lessThanTen(item)}}</text>
@@ -36,13 +36,12 @@
 						</view>
 					</picker-view-column>
 				</picker-view>
-				<!-- 兼容 nvue 不支持伪类 -->
 				<text class="uni-datetime-picker-sign sign-left">-</text>
 				<text class="uni-datetime-picker-sign sign-right">-</text>
 			</view>
 			<view v-if="timeShow" class="uni-datetime-picker__container-box">
 				<picker-view class="uni-datetime-picker-view" :class="[hideSecond ? 'time-hide-second' : '']"
-					:indicator-style="indicatorStyle" :value="hms" @change="bindTimeChange">
+					:indicator-style="indicatorStyle" :mask-style="maskStyle" :value="hms" @change="bindTimeChange">
 					<picker-view-column>
 						<view class="uni-datetime-picker-item" v-for="(item,index) in hours" :key="index">
 							<text class="uni-datetime-picker-item">{{lessThanTen(item)}}</text>
@@ -59,7 +58,6 @@
 						</view>
 					</picker-view-column>
 				</picker-view>
-				<!-- 兼容 nvue 不支持伪类 -->
 				<text class="uni-datetime-picker-sign" :class="[hideSecond ? 'sign-center' : 'sign-left']">:</text>
 				<text v-if="!hideSecond" class="uni-datetime-picker-sign sign-right">:</text>
 			</view>
@@ -84,7 +82,9 @@
 	// import { initVueI18n } from '@dcloudio/uni-i18n'
 	// import i18nMessages from './i18n/index.js'
 	// const {	t	} = initVueI18n(i18nMessages)
-  import { fixIosDateFormat } from './util'
+	import {
+		fixIosDateFormat
+	} from './util'
 
 	/**
 	 * DatetimePicker 时间选择器
@@ -104,6 +104,7 @@
 		data() {
 			return {
 				indicatorStyle: `height: 50px;`,
+				maskStyle: 'background-image: none;',
 				visible: false,
 				fixNvueBug: {},
 				dateShow: true,
@@ -176,11 +177,11 @@
 			// #ifndef VUE3
 			value: {
 				handler(newVal) {
-          if (newVal) {
-            this.parseValue(fixIosDateFormat(newVal))
+					if (newVal) {
+						this.parseValue(fixIosDateFormat(newVal))
 						this.initTime(false)
 					} else {
-            this.time = ''
+						this.time = ''
 						this.parseValue(Date.now())
 					}
 				},
@@ -189,8 +190,8 @@
 			// #endif
 			// #ifdef VUE3
 			modelValue: {
-        handler(newVal) {
-          if (newVal) {
+				handler(newVal) {
+					if (newVal) {
 						this.parseValue(fixIosDateFormat(newVal))
 						this.initTime(false)
 					} else {
@@ -421,17 +422,17 @@
 			 * for i18n
 			 */
 			selectTimeText() {
-			        return this.$t("uni-datetime-picker.selectTime") // Thêm this.
-			    },
-			    okText() {
-			        return this.$t("uni-datetime-picker.ok") // Thêm this.
-			    },
-			    clearText() {
-			        return this.$t("uni-datetime-picker.clear") // Thêm this.
-			    },
-			    cancelText() {
-			        return this.$t("uni-datetime-picker.cancel") // Thêm this.
-			    }
+				return this.$t("uni-datetime-picker.selectTime") // Thêm this.
+			},
+			okText() {
+				return this.$t("uni-datetime-picker.ok") // Thêm this.
+			},
+			clearText() {
+				return this.$t("uni-datetime-picker.clear") // Thêm this.
+			},
+			cancelText() {
+				return this.$t("uni-datetime-picker.cancel") // Thêm this.
+			}
 		},
 
 		mounted() {
@@ -773,8 +774,10 @@
 		}
 	}
 </script>
-
 <style lang="scss">
+	/* 1. Import Theme */
+	@import '@/common/theme.scss';
+
 	$uni-primary: #007aff !default;
 
 	.uni-datetime-picker {
@@ -796,6 +799,8 @@
 		line-height: 50px;
 		text-align: center;
 		font-size: 14px;
+		/* Thay màu chữ trong picker */
+		color: var(--text-primary);
 	}
 
 	.uni-datetime-picker-btn {
@@ -845,7 +850,8 @@
 		/* #ifdef APP-NVUE */
 		width: 330px;
 		/* #endif */
-		background-color: #fff;
+		/* Thay màu nền popup */
+		background-color: var(--bg-surface);
 		position: fixed;
 		top: 50%;
 		left: 50%;
@@ -861,7 +867,7 @@
 	}
 
 	.uni-datetime-picker-time {
-		color: grey;
+		color: var(--text-hint);
 	}
 
 	.uni-datetime-picker-column {
@@ -869,8 +875,8 @@
 	}
 
 	.uni-datetime-picker-timebox {
-
-		border: 1px solid #E5E5E5;
+		/* Thay màu border */
+		border: 1px solid var(--border-input);
 		border-radius: 5px;
 		padding: 7px 10px;
 		/* #ifndef APP-NVUE */
@@ -895,14 +901,17 @@
 
 	.uni-datetime-picker-text {
 		font-size: 14px;
-		line-height: 50px
+		line-height: 50px;
+		/* Thay màu chữ */
+		color: var(--text-primary);
 	}
 
 	.uni-datetime-picker-sign {
 		position: absolute;
 		top: 53px;
 		/* 减掉 10px 的元素高度，兼容nvue */
-		color: #999;
+		/* Thay màu dấu phân cách */
+		color: var(--text-hint);
 		/* #ifdef APP-NVUE */
 		font-size: 16px;
 		/* #endif */

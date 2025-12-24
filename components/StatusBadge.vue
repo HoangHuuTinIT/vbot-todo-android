@@ -1,15 +1,12 @@
-//components/StatusBadge.vue
 <template>
-	<view class="px-2 py-1 rounded-full text-xs font-bold inline-block text-center min-w-[80px]"
-		:class="badgeColorClass" :style="customStyle">
+	<view class="badge-base" :class="statusClass">
 		{{ badgeLabel }}
 	</view>
 </template>
 
 <script setup lang="ts">
 	import { computed } from 'vue';
-	import { TODO_STATUS, STATUS_LABELS } from '@/utils/constants';
-	import type { TodoStatusType } from '@/types/common';
+	import { TODO_STATUS } from '@/utils/constants';
 	import { useI18n } from 'vue-i18n';
 
 	const { t } = useI18n();
@@ -32,69 +29,97 @@
 		}
 	});
 
-	const badgeColorClass = computed(() => {
+	// Trả về tên class thay vì utility class của Tailwind
+	const statusClass = computed(() => {
 		switch (props.status) {
 			case TODO_STATUS.NEW:
-				return 'bg-gray-200 text-gray-600';
+				return 'status-new';
 			case TODO_STATUS.IN_PROGRESS:
-				return 'bg-orange-100 text-orange-600';
+				return 'status-progress';
 			case TODO_STATUS.DONE:
-				return 'bg-green-100 text-green-600';
+				return 'status-done';
 			case TODO_STATUS.OVERDUE:
-			      return 'bg-red-100 text-red-600';
+				return 'status-overdue';
 			default:
-				return 'bg-gray-100 text-gray-400';
-		}
-	});
-
-	const customStyle = computed(() => {
-		switch (props.status) {
-			case TODO_STATUS.NEW:
-				return { backgroundColor: '#e4e4e7', color: '#52525b' };
-			case TODO_STATUS.IN_PROGRESS:
-				return { backgroundColor: '#ffedd5', color: '#c2410c' };
-			case TODO_STATUS.DONE:
-				return { backgroundColor: '#dcfce7', color: '#15803d' };
-			case TODO_STATUS.OVERDUE:
-			      return { backgroundColor: '#fee2e2', color: '#dc2626' };
-			default:
-				return { backgroundColor: '#f4f4f5', color: '#a1a1aa' };
+				return 'status-default';
 		}
 	});
 </script>
 
-<style scoped>
-	.px-2 {
-		padding-left: 8px;
-		padding-right: 8px;
-	}
+<style lang="scss" scoped>
+	/* Import theme để có thể dùng các mixin hoặc biến global nếu cần */
+	@import '@/common/theme.scss';
 
-	.py-1 {
-		padding-top: 4px;
-		padding-bottom: 4px;
-	}
-
-	.rounded-full {
+	/* 1. Base Styles (Cấu trúc chung) */
+	.badge-base {
+		padding: 4px 8px;
 		border-radius: 9999px;
-	}
-
-	.text-xs {
 		font-size: 12px;
-	}
-
-	.font-bold {
 		font-weight: 700;
-	}
-
-	.inline-block {
 		display: inline-block;
-	}
-
-	.text-center {
 		text-align: center;
+		min-width: 80px;
+		line-height: 1.4;
+		transition: background-color 0.3s, color 0.3s;
 	}
 
-	.min-w-\[80px\] {
-		min-width: 80px;
+	/* 2. Định nghĩa màu sắc mặc định (Light Mode) */
+	/* Logic: Nền nhạt - Chữ đậm */
+	.status-new {
+		background-color: #e4e4e7;
+		color: #52525b;
+	}
+
+	.status-progress {
+		background-color: #ffedd5;
+		color: #c2410c;
+	}
+
+	.status-done {
+		background-color: #dcfce7;
+		color: #15803d;
+	}
+
+	.status-overdue {
+		background-color: #fee2e2;
+		color: #dc2626;
+	}
+
+	.status-default {
+		background-color: #f4f4f5;
+		color: #a1a1aa;
+	}
+
+	/* 3. Dark Mode Overrides */
+	/* Logic: Nền đậm - Chữ sáng (Pastel) để dễ đọc trên nền tối */
+
+	/* Sử dụng :global(.theme-dark) để bắt class từ thẻ cha (App/Page) */
+	:global(.theme-dark) .status-new {
+		background-color: #3f3f46;
+		color: #e4e4e7;
+		/* Xám đậm / Xám trắng */
+	}
+
+	:global(.theme-dark) .status-progress {
+		background-color: #7c2d12;
+		color: #ffedd5;
+		/* Cam nâu đậm / Cam nhạt */
+	}
+
+	:global(.theme-dark) .status-done {
+		background-color: #064e3b;
+		color: #d1fae5;
+		/* Xanh lá đậm / Xanh bạc hà */
+	}
+
+	:global(.theme-dark) .status-overdue {
+		background-color: #7f1d1d;
+		color: #fecaca;
+		/* Đỏ rượu / Hồng nhạt */
+	}
+
+	:global(.theme-dark) .status-default {
+		background-color: #27272a;
+		color: #a1a1aa;
 	}
 </style>
