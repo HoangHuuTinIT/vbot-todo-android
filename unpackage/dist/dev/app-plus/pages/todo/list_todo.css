@@ -1,24 +1,3 @@
-
-.shrink-0[data-v-7abf19e0] {
-  flex-shrink: 0;
-}
-.w-full[data-v-7abf19e0] { width: 100%;
-}
-.h-full[data-v-7abf19e0] { height: 100%;
-}
-.text-white[data-v-7abf19e0] { color: white;
-}
-.font-bold[data-v-7abf19e0] { font-weight: bold;
-}
-.flex[data-v-7abf19e0] { display: flex;
-}
-.items-center[data-v-7abf19e0] { align-items: center;
-}
-.justify-center[data-v-7abf19e0] { justify-content: center;
-}
-.overflow-hidden[data-v-7abf19e0] { overflow: hidden;
-}
-
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -551,6 +530,43 @@
   text-decoration: none;
   text-align: center;
 }
+
+.shrink-0[data-v-7abf19e0] {
+		flex-shrink: 0;
+}
+.w-full[data-v-7abf19e0] {
+		width: 100%;
+}
+.h-full[data-v-7abf19e0] {
+		height: 100%;
+}
+.flex[data-v-7abf19e0] {
+		display: flex;
+}
+.items-center[data-v-7abf19e0] {
+		align-items: center;
+}
+.justify-center[data-v-7abf19e0] {
+		justify-content: center;
+}
+.overflow-hidden[data-v-7abf19e0] {
+		overflow: hidden;
+}
+.font-bold[data-v-7abf19e0] {
+		font-weight: bold;
+}
+
+	/* Class màu chữ trắng cố định (dùng khi avatar có màu nền nổi bật) */
+.text-white[data-v-7abf19e0] {
+		color: white;
+}
+
+	/* Class màu chữ thay đổi theo theme (dùng khi avatar không có màu nền) */
+.text-adaptive[data-v-7abf19e0] {
+		/* Thay #666666 bằng biến text phụ */
+		color: var(--text-secondary);
+}
+
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -576,6 +592,59 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* 1. IMPORT THEME ĐỂ DÙNG BIẾN */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-3c762a01]:root, body[data-v-3c762a01] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-3c762a01] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .uni-calendar-item__weeks-box[data-v-3c762a01] {
   flex: 1;
   display: flex;
@@ -588,7 +657,8 @@
 .uni-calendar-item__weeks-box-text[data-v-3c762a01] {
   font-size: 14px;
   font-weight: bold;
-  color: #001833;
+  /* SỬA 1: Thay màu cứng darken(...) bằng biến text-primary */
+  color: var(--text-primary);
 }
 .uni-calendar-item__weeks-box-item[data-v-3c762a01] {
   position: relative;
@@ -612,7 +682,8 @@
   cursor: default;
 }
 .uni-calendar-item--disable .uni-calendar-item__weeks-box-text-disable[data-v-3c762a01] {
-  color: #D1D1D1;
+  /* SỬA 2: Thay màu xám cứng #D1D1D1 bằng biến text-hint (mờ) */
+  color: var(--text-hint);
 }
 .uni-calendar-item--today[data-v-3c762a01] {
   position: absolute;
@@ -632,22 +703,28 @@
   border-radius: 50%;
   box-sizing: border-box;
   border: 3px solid #fff;
+  /* SỬA 3: Khi theme tối, viền trắng quanh ô được chọn sẽ quá gắt, đổi thành viền theo màu nền surface */
+  border-color: var(--bg-surface);
 }
 .uni-calendar-item--checked .uni-calendar-item--checked-text[data-v-3c762a01] {
   color: #fff;
 }
 .uni-calendar-item--multiple .uni-calendar-item--checked-range-text[data-v-3c762a01] {
   color: #333;
+  /* SỬA 4: Màu text khi chọn range cũng phải đổi theo theme */
+  color: var(--text-primary);
 }
 .uni-calendar-item--multiple[data-v-3c762a01] {
-  background-color: #F6F7FC;
+  /* SỬA 5: Màu nền khi chọn khoảng (Range). #F6F7FC là màu sáng, cần đổi sang biến background phù hợp */
+  background-color: var(--bg-tag);
 }
 .uni-calendar-item--multiple .uni-calendar-item--before-checked[data-v-3c762a01],
 .uni-calendar-item--multiple .uni-calendar-item--after-checked[data-v-3c762a01] {
   background-color: #007aff;
   border-radius: 50%;
   box-sizing: border-box;
-  border: 3px solid #F6F7FC;
+  /* SỬA 6: Border trùng với màu nền range (đã sửa ở SỬA 5) */
+  border: 3px solid var(--bg-tag);
 }
 .uni-calendar-item--before-checked .uni-calendar-item--checked-text[data-v-3c762a01],
 .uni-calendar-item--after-checked .uni-calendar-item--checked-text[data-v-3c762a01] {
@@ -657,12 +734,14 @@
   border-top-left-radius: 50px;
   border-bottom-left-radius: 50px;
   box-sizing: border-box;
-  background-color: #F6F7FC;
+  /* SỬA 7: Màu nền range */
+  background-color: var(--bg-tag);
 }
 .uni-calendar-item--after-checked-x[data-v-3c762a01] {
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
-  background-color: #F6F7FC;
+  /* SỬA 8: Màu nền range */
+  background-color: var(--bg-tag);
 }
 /**
  * 这里是uni-app内置的常用样式变量
@@ -689,6 +768,59 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* 1. Import Theme */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-1d532b70]:root, body[data-v-1d532b70] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-1d532b70] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .uni-datetime-picker[data-v-1d532b70] {
   /* width: 100%; */
 }
@@ -702,6 +834,8 @@
   line-height: 50px;
   text-align: center;
   font-size: 14px;
+  /* Thay màu chữ trong picker */
+  color: var(--text-primary);
 }
 .uni-datetime-picker-btn[data-v-1d532b70] {
   margin-top: 60px;
@@ -735,7 +869,8 @@
   border-radius: 8px;
   padding: 30px;
   width: 270px;
-  background-color: #fff;
+  /* Thay màu nền popup */
+  background-color: var(--bg-surface);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -744,13 +879,14 @@
   z-index: 999;
 }
 .uni-datetime-picker-time[data-v-1d532b70] {
-  color: grey;
+  color: var(--text-hint);
 }
 .uni-datetime-picker-column[data-v-1d532b70] {
   height: 50px;
 }
 .uni-datetime-picker-timebox[data-v-1d532b70] {
-  border: 1px solid #E5E5E5;
+  /* Thay màu border */
+  border: 1px solid var(--border-input);
   border-radius: 5px;
   padding: 7px 10px;
   box-sizing: border-box;
@@ -765,12 +901,15 @@
 .uni-datetime-picker-text[data-v-1d532b70] {
   font-size: 14px;
   line-height: 50px;
+  /* Thay màu chữ */
+  color: var(--text-primary);
 }
 .uni-datetime-picker-sign[data-v-1d532b70] {
   position: absolute;
   top: 53px;
   /* 减掉 10px 的元素高度，兼容nvue */
-  color: #999;
+  /* Thay màu dấu phân cách */
+  color: var(--text-hint);
 }
 .sign-left[data-v-1d532b70] {
   left: 86px;
@@ -791,6 +930,84 @@
 .time-hide-second[data-v-1d532b70] {
   width: 180px;
 }
+
+.picker-mask[data-v-e6406d7a] {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.6);
+		/* Tăng độ tối của mask nền một chút cho tập trung hơn */
+		z-index: 9998;
+		-webkit-backdrop-filter: blur(2px);
+		        backdrop-filter: blur(2px);
+		/* Hiệu ứng mờ nền phía sau (nếu trình duyệt hỗ trợ) */
+}
+.picker-panel[data-v-e6406d7a] {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: var(--bg-surface);
+		z-index: 9999;
+		transform: translateY(100%);
+		transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+		/* Hiệu ứng trượt mượt hơn */
+		padding-bottom: env(safe-area-inset-bottom);
+		border-top-left-radius: 16px;
+		/* Bo tròn nhiều hơn chút cho hiện đại */
+		border-top-right-radius: 16px;
+}
+.picker-panel.show[data-v-e6406d7a] {
+		transform: translateY(0);
+}
+.picker-toolbar[data-v-e6406d7a] {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 48px;
+		/* Tăng chiều cao toolbar chút cho thoáng */
+		border-bottom: 1px solid var(--border-color);
+		padding: 0 16px;
+		background-color: var(--bg-surface);
+		/* Đồng bộ màu nền với panel để liền mạch */
+		border-top-left-radius: 16px;
+		border-top-right-radius: 16px;
+}
+.btn-cancel[data-v-e6406d7a] {
+		color: var(--text-secondary);
+		font-size: 16px;
+}
+.btn-confirm[data-v-e6406d7a] {
+		color: #007aff;
+		font-size: 16px;
+		font-weight: 600;
+}
+.title[data-v-e6406d7a] {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-primary);
+}
+.picker-view-box[data-v-e6406d7a] {
+		width: 100%;
+		height: 240px;
+		background-color: var(--bg-surface);
+}
+.picker-item[data-v-e6406d7a] {
+		line-height: 50px;
+		text-align: center;
+		font-size: 17px;
+		/* Tăng size chữ lên xíu cho dễ đọc */
+		font-weight: 400;
+		color: var(--text-primary);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		z-index: 10;
+		/* Đảm bảo text nổi lên trên các lớp mask */
+}
+
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -816,6 +1033,59 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* 1. Import Theme */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-1d379219]:root, body[data-v-1d379219] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-1d379219] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .uni-calendar[data-v-1d379219] {
   display: flex;
   flex-direction: column;
@@ -849,7 +1119,8 @@
   transform: translateY(0);
 }
 .uni-calendar__content[data-v-1d379219] {
-  background-color: #fff;
+  /* Thay màu nền cứng */
+  background-color: var(--bg-surface);
 }
 .uni-calendar__content-mobile[data-v-1d379219] {
   border-top-left-radius: 10px;
@@ -872,7 +1143,8 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-top-color: rgba(0, 0, 0, 0.4);
+  /* Thay border màu cứng */
+  border-top-color: var(--border-color);
   border-top-style: solid;
   border-top-width: 1px;
 }
@@ -897,7 +1169,8 @@
   text-align: center;
   width: 100px;
   font-size: 15px;
-  color: #666;
+  /* Thay màu chữ */
+  color: var(--text-primary);
 }
 .uni-calendar__button-text[data-v-1d379219] {
   text-align: center;
@@ -917,10 +1190,11 @@
 .uni-calendar__header-btn[data-v-1d379219] {
   width: 9px;
   height: 9px;
-  border-left-color: #808080;
+  /* Thay màu border mũi tên để nhìn thấy trên nền tối */
+  border-left-color: var(--text-secondary);
   border-left-style: solid;
   border-left-width: 1px;
-  border-top-color: #555555;
+  border-top-color: var(--text-secondary);
   border-top-style: solid;
   border-top-width: 1px;
 }
@@ -945,13 +1219,15 @@
   justify-content: center;
   align-items: center;
   height: 40px;
-  border-bottom-color: #F5F5F5;
+  /* Thay border dưới */
+  border-bottom-color: var(--border-color);
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
 .uni-calendar__weeks-day-text[data-v-1d379219] {
   font-size: 12px;
-  color: #B2B2B2;
+  /* Thay màu chữ ngày trong tuần */
+  color: var(--text-hint);
 }
 .uni-calendar__box[data-v-1d379219] {
   position: relative;
@@ -970,7 +1246,8 @@
 .uni-calendar__box-bg-text[data-v-1d379219] {
   font-size: 200px;
   font-weight: bold;
-  color: #999;
+  /* Thay màu watermark */
+  color: var(--text-hint);
   opacity: 0.1;
   text-align: center;
   line-height: 1;
@@ -978,8 +1255,9 @@
 .uni-date-changed[data-v-1d379219] {
   padding: 0 10px;
   text-align: center;
-  color: #333;
-  border-top-color: #DCDCDC;
+  /* Thay màu chữ và border */
+  color: var(--text-primary);
+  border-top-color: var(--border-color);
   border-top-style: solid;
   border-top-width: 1px;
   flex: 1;
@@ -996,7 +1274,8 @@
   align-items: center;
 }
 .uni-date-changed--time-date[data-v-1d379219] {
-  color: #999;
+  /* Thay màu chữ */
+  color: var(--text-secondary);
   line-height: 50px;
   margin-right: 5px;
 }
@@ -1022,7 +1301,8 @@
 .dialog-close-plus[data-v-1d379219] {
   width: 16px;
   height: 2px;
-  background-color: #737987;
+  /* Thay màu nút đóng */
+  background-color: var(--text-secondary);
   border-radius: 2px;
   transform: rotate(45deg);
 }
@@ -1067,6 +1347,59 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Import theme variable để sử dụng */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-9802168a]:root, body[data-v-9802168a] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-9802168a] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .uni-date[data-v-9802168a] {
   width: 100%;
   flex: 1;
@@ -1077,8 +1410,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  background-color: #fff;
-  color: #666;
+  /* Thay màu cứng = biến */
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
   font-size: 14px;
   flex: 1;
 }
@@ -1089,11 +1423,13 @@
   height: 35px;
   padding: 0 2px;
   line-height: 35px;
+  color: var(--text-secondary);
 }
 .uni-date-x--border[data-v-9802168a] {
   box-sizing: border-box;
   border-radius: 4px;
-  border: 1px solid #e5e5e5;
+  /* Thay màu border cứng */
+  border: 1px solid var(--border-input);
 }
 .uni-date-editor--x[data-v-9802168a] {
   display: flex;
@@ -1114,6 +1450,8 @@
   line-height: 35px;
   font-size: 14px;
   overflow: hidden;
+  /* Màu chữ input */
+  color: var(--text-primary);
 }
 .text-center[data-v-9802168a] {
   text-align: center;
@@ -1123,6 +1461,8 @@
   width: 100%;
   line-height: 40px;
   font-size: 14px;
+  /* Màu chữ input trong popup */
+  color: var(--text-primary);
 }
 .uni-date-range__input[data-v-9802168a] {
   text-align: center;
@@ -1142,20 +1482,22 @@
   z-index: 996;
 }
 .uni-date-single--x[data-v-9802168a] {
-  background-color: #fff;
+  /* Thay nền và border cho popup */
+  background-color: var(--bg-surface);
   position: absolute;
   top: 0;
   z-index: 999;
-  border: 1px solid #EBEEF5;
+  border: 1px solid var(--border-color);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
 .uni-date-range--x[data-v-9802168a] {
-  background-color: #fff;
+  /* Thay nền và border cho popup */
+  background-color: var(--bg-surface);
   position: absolute;
   top: 0;
   z-index: 999;
-  border: 1px solid #EBEEF5;
+  border: 1px solid var(--border-color);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
@@ -1168,7 +1510,6 @@
   height: 16px;
   vertical-align: middle;
 }
-
 /* 添加时间 */
 .popup-x-header[data-v-9802168a] {
   display: flex;
@@ -1182,14 +1523,17 @@
 .popup-x-body[data-v-9802168a] {
   display: flex;
 }
+.calendar-right-border[data-v-9802168a] {
+  border-left: 1px solid var(--border-color) !important;
+}
 .popup-x-footer[data-v-9802168a] {
   padding: 0 15px;
-  border-top-color: #F1F1F1;
+  border-top-color: var(--border-color);
   border-top-style: solid;
   border-top-width: 1px;
   line-height: 40px;
   text-align: right;
-  color: #666;
+  color: var(--text-secondary);
 }
 .popup-x-footer uni-text[data-v-9802168a]:hover {
   color: #007aff;
@@ -1202,8 +1546,8 @@
 }
 .uni-date-changed[data-v-9802168a] {
   text-align: center;
-  color: #333;
-  border-bottom-color: #F1F1F1;
+  color: var(--text-primary);
+  border-bottom-color: var(--border-color);
   border-bottom-style: solid;
   border-bottom-width: 1px;
 }
@@ -1215,14 +1559,13 @@
   flex: 1;
 }
 .uni-date-changed--time-date[data-v-9802168a] {
-  color: #333;
+  color: var(--text-secondary);
   opacity: 0.6;
 }
 .mr-50[data-v-9802168a] {
   margin-right: 50px;
 }
-
-/* picker 弹出层通用的指示小三角, todo：扩展至上下左右方向定位 */
+/* picker 弹出层通用的指示小三角 */
 .uni-popper__arrow[data-v-9802168a],
 .uni-popper__arrow[data-v-9802168a]::after {
   position: absolute;
@@ -1237,13 +1580,15 @@
   top: -6px;
   left: 10%;
   margin-right: 3px;
-  border-bottom-color: #EBEEF5;
+  /* Mũi tên viền ngoài */
+  border-bottom-color: var(--border-color);
 }
 .uni-popper__arrow[data-v-9802168a]::after {
   content: " ";
   top: 1px;
   margin-left: -6px;
-  border-bottom-color: #fff;
+  /* Mũi tên nền trong (phải trùng bg-surface) */
+  border-bottom-color: var(--bg-surface);
 }
 /**
  * 这里是uni-app内置的常用样式变量
@@ -1270,13 +1615,21 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Mapping biến màu:
+   - Border Top: #eee -> var(--border-color)
+   - Bg Input: #f8f9fa -> var(--bg-input)
+   - Border Input: #e0e0e0 -> var(--border-input)
+   - Text Value: #333 -> var(--text-primary)
+   - Text Placeholder: #999 -> var(--text-hint)
+*/
 .f-section-title[data-v-645c14d9] {
   margin-top: 20px;
   margin-bottom: 10px;
   font-weight: bold;
   font-size: 14px;
   color: #009688;
-  border-top: 1px dashed #eee;
+  /* Thay #eee */
+  border-top: 1px dashed var(--border-color);
   padding-top: 15px;
 }
 .f-row[data-v-645c14d9] {
@@ -1290,8 +1643,10 @@
   width: 48%;
 }
 .f-picker[data-v-645c14d9] {
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  /* Thay #f8f9fa */
+  background-color: var(--bg-input);
+  /* Thay #e0e0e0 */
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 10px;
   font-size: 14px;
@@ -1299,74 +1654,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  /* Thay #333 */
+  color: var(--text-primary);
 }
 .f-picker.placeholder[data-v-645c14d9] {
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
 }
-
-.picker-mask[data-v-e6406d7a] {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.4);
-		z-index: 9998;
-}
-.picker-panel[data-v-e6406d7a] {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background-color: #fff;
-		z-index: 9999;
-		transform: translateY(100%);
-		transition: transform 0.3s ease;
-		padding-bottom: env(safe-area-inset-bottom);
-		border-top-left-radius: 12px;
-		border-top-right-radius: 12px;
-}
-.picker-panel.show[data-v-e6406d7a] {
-		transform: translateY(0);
-}
-.picker-toolbar[data-v-e6406d7a] {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		height: 44px;
-		border-bottom: 1px solid #eee;
-		padding: 0 15px;
-		background-color: #f9f9f9;
-		border-top-left-radius: 12px;
-		border-top-right-radius: 12px;
-}
-.btn-cancel[data-v-e6406d7a] {
-		color: #666;
-		font-size: 15px;
-}
-.btn-confirm[data-v-e6406d7a] {
-		color: #007aff;
-		font-size: 15px;
-		font-weight: bold;
-}
-.title[data-v-e6406d7a] {
-		font-size: 15px;
-		font-weight: 500;
-		color: #333;
-}
-.picker-view-box[data-v-e6406d7a] {
-		width: 100%;
-		height: 250px;
-		background-color: #fff;
-}
-.picker-item[data-v-e6406d7a] {
-		line-height: 50px;
-		text-align: center;
-		font-size: 16px;
-		color: #333;
-}
-
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -1392,12 +1686,14 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* Chú ý: Dùng CSS Variables từ theme.scss */
 .modal-overlay[data-v-0c007ba7] {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  /* Giữ màu overlay tối mờ, không đổi theo theme */
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   display: flex;
@@ -1407,7 +1703,8 @@
 .modal-content[data-v-0c007ba7] {
   width: 90%;
   height: 80vh;
-  background-color: #fff;
+  /* Thay #fff */
+  background-color: var(--bg-surface);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -1415,16 +1712,18 @@
 }
 .modal-header[data-v-0c007ba7] {
   padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
+  /* Thay border và bg */
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff;
 }
 .modal-title[data-v-0c007ba7] {
   font-weight: bold;
   font-size: 16px;
-  color: #333;
+  /* Thay #333 */
+  color: var(--text-primary);
 }
 .header-actions[data-v-0c007ba7] {
   display: flex;
@@ -1438,46 +1737,43 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5f5f5;
+  /* Thay #f5f5f5 */
+  background-color: var(--bg-input);
   transition: all 0.2s;
 }
 .filter-toggle-btn.active[data-v-0c007ba7] {
-  background-color: #e0f2f1;
+  /* Khi active, vẫn giữ màu xanh brand, nhưng dùng rgba để nó không quá chói trên nền đen */
+  background-color: rgba(0, 150, 136, 0.15);
   border: 1px solid #009688;
 }
 .filter-icon-img[data-v-0c007ba7] {
   width: 20px;
   height: 20px;
   opacity: 0.7;
+  /* QUAN TRỌNG: Đảo màu icon đen -> trắng khi ở Dark Mode */
+  filter: var(--icon-filter);
 }
 .close-btn[data-v-0c007ba7] {
   font-size: 20px;
   padding: 5px;
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-secondary);
 }
 .filter-section[data-v-0c007ba7] {
   padding: 15px;
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
+  /* Thay bg và border */
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
-}
-@keyframes slideDown-0c007ba7 {
-from {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-to {
-    opacity: 1;
-    transform: translateY(0);
-}
 }
 .f-item[data-v-0c007ba7] {
   margin-bottom: 10px;
 }
 .f-input[data-v-0c007ba7],
 .f-picker-box[data-v-0c007ba7] {
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  /* Thay bg, border */
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   padding: 0 12px;
   font-size: 14px;
@@ -1486,19 +1782,29 @@ to {
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  /* Màu chữ khi nhập */
+  color: var(--text-primary);
+}
+
+/* Override màu placeholder style (cần dùng deep selector hoặc global class) */
+[data-v-0c007ba7] .ph-style {
+  color: var(--text-hint) !important;
 }
 .f-picker-box[data-v-0c007ba7] {
   justify-content: space-between;
 }
 .text-ph[data-v-0c007ba7] {
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
 }
 .text-val[data-v-0c007ba7] {
-  color: #333;
+  /* Thay #333 */
+  color: var(--text-primary);
 }
 .arrow[data-v-0c007ba7] {
   font-size: 10px;
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
 }
 .f-actions[data-v-0c007ba7] {
   display: flex;
@@ -1515,33 +1821,40 @@ to {
   border: none;
 }
 .btn-reset[data-v-0c007ba7] {
-  background-color: #f5f5f5;
-  color: #666;
+  /* Thay bg và text */
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
 }
 .btn-submit[data-v-0c007ba7] {
+  /* Giữ màu Brand, vì nút submit thường cần nổi bật */
   background-color: #009688;
   color: #fff;
 }
 .customer-list[data-v-0c007ba7] {
   flex: 1;
   height: 1px;
+  /* Đảm bảo nền list đúng màu */
+  background-color: var(--bg-surface);
 }
 .loading-state[data-v-0c007ba7],
 .empty-state[data-v-0c007ba7] {
   text-align: center;
   padding: 30px;
-  color: #888;
+  /* Thay #888 */
+  color: var(--text-hint);
   font-size: 14px;
 }
 .customer-item[data-v-0c007ba7] {
   display: flex;
   align-items: center;
   padding: 12px 15px;
-  border-bottom: 1px solid #f5f5f7;
-  background-color: #fff;
+  /* Thay border và bg */
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
 }
 .customer-item[data-v-0c007ba7]:active {
-  background-color: #f9f9f9;
+  /* Thay màu khi nhấn giữ */
+  background-color: var(--bg-input);
 }
 .mr-3[data-v-0c007ba7] {
   margin-right: 12px;
@@ -1556,7 +1869,8 @@ to {
 .name-text[data-v-0c007ba7] {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  /* Thay #333 */
+  color: var(--text-primary);
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -1564,7 +1878,8 @@ to {
 }
 .phone-text[data-v-0c007ba7] {
   font-size: 13px;
-  color: #666;
+  /* Thay #666 */
+  color: var(--text-secondary);
 }
 .date-column[data-v-0c007ba7] {
   margin-left: 10px;
@@ -1572,7 +1887,8 @@ to {
 }
 .date-text[data-v-0c007ba7] {
   font-size: 12px;
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
 }
 .loading-more-container[data-v-0c007ba7] {
   padding: 10px;
@@ -1582,36 +1898,148 @@ to {
 }
 .loading-more-text[data-v-0c007ba7] {
   font-size: 12px;
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
 }
-
-.px-2[data-v-7f144565] {
-		padding-left: 8px;
-		padding-right: 8px;
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+/* Import theme để có thể dùng các mixin hoặc biến global nếu cần */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-7f144565]:root, body[data-v-7f144565] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
 }
-.py-1[data-v-7f144565] {
-		padding-top: 4px;
-		padding-bottom: 4px;
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-7f144565] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
 }
-.rounded-full[data-v-7f144565] {
-		border-radius: 9999px;
+/* 1. Base Styles (Cấu trúc chung) */
+.badge-base[data-v-7f144565] {
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+  line-height: 1.4;
+  transition: background-color 0.3s, color 0.3s;
 }
-.text-xs[data-v-7f144565] {
-		font-size: 12px;
+/* 2. Định nghĩa màu sắc mặc định (Light Mode) */
+/* Logic: Nền nhạt - Chữ đậm */
+.status-new[data-v-7f144565] {
+  background-color: #e4e4e7;
+  color: #52525b;
 }
-.font-bold[data-v-7f144565] {
-		font-weight: 700;
+.status-progress[data-v-7f144565] {
+  background-color: #ffedd5;
+  color: #c2410c;
 }
-.inline-block[data-v-7f144565] {
-		display: inline-block;
+.status-done[data-v-7f144565] {
+  background-color: #dcfce7;
+  color: #15803d;
 }
-.text-center[data-v-7f144565] {
-		text-align: center;
+.status-overdue[data-v-7f144565] {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
-.min-w-\[80px\][data-v-7f144565] {
-		min-width: 80px;
+.status-default[data-v-7f144565] {
+  background-color: #f4f4f5;
+  color: #a1a1aa;
 }
-
+/* 3. Dark Mode Overrides */
+/* Logic: Nền đậm - Chữ sáng (Pastel) để dễ đọc trên nền tối */
+/* Sử dụng :global(.theme-dark) để bắt class từ thẻ cha (App/Page) */
+.theme-dark {
+  background-color: #3f3f46;
+  color: #e4e4e7;
+  /* Xám đậm / Xám trắng */
+}
+.theme-dark {
+  background-color: #7c2d12;
+  color: #ffedd5;
+  /* Cam nâu đậm / Cam nhạt */
+}
+.theme-dark {
+  background-color: #064e3b;
+  color: #d1fae5;
+  /* Xanh lá đậm / Xanh bạc hà */
+}
+.theme-dark {
+  background-color: #7f1d1d;
+  color: #fecaca;
+  /* Đỏ rượu / Hồng nhạt */
+}
+.theme-dark {
+  background-color: #27272a;
+  color: #a1a1aa;
+}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -1657,23 +2085,35 @@ to {
   opacity: 0.8;
   transform: scale(0.98);
 }
+
+/* PRIMARY: Giữ màu Brand, chữ trắng */
 .btn-primary[data-v-2f131dae] {
   background-color: #009688;
   color: #ffffff;
   border-color: #009688;
 }
+
+/* SECONDARY: Thay màu cứng bằng biến nền Input (Xám nhạt / Xám đậm) */
 .btn-secondary[data-v-2f131dae] {
-  background-color: #f5f5f5;
-  color: #666666;
-  border-color: #f5f5f5;
+  /* Thay #f5f5f5 */
+  background-color: var(--bg-input);
+  /* Thay #666666 */
+  color: var(--text-secondary);
+  /* Thay #f5f5f5 */
+  border-color: var(--bg-input);
 }
+
+/* DANGER: Dùng biến --text-danger (đỏ) từ theme */
 .btn-danger[data-v-2f131dae] {
-  background-color: #ff3b30;
+  background-color: var(--text-danger);
   color: #ffffff;
-  border-color: #ff3b30;
+  border-color: var(--text-danger);
 }
+
+/* OUTLINE: Nền thay đổi theo theme (Trắng / Đen xám) */
 .btn-outline[data-v-2f131dae] {
-  background-color: #ffffff;
+  /* Thay #ffffff */
+  background-color: var(--bg-surface);
   color: #009688;
   border-color: #009688;
 }
@@ -1683,18 +2123,25 @@ to {
   font-size: 12px;
   padding: 0 12px;
 }
+
+/* DISABLED: Dùng biến border/input cho nền, text-hint cho chữ */
 .is-disabled[data-v-2f131dae] {
   opacity: 0.6;
-  background-color: #e0e0e0 !important;
-  color: #999 !important;
-  border-color: #e0e0e0 !important;
+  /* Thay #e0e0e0 */
+  background-color: var(--bg-input) !important;
+  border-color: var(--bg-input) !important;
+  /* Thay #999 */
+  color: var(--text-hint) !important;
   pointer-events: none;
 }
 .loading-spinner[data-v-2f131dae] {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-top-color: #fff;
+  /* Sửa lại spinner để nó lấy màu theo màu chữ của nút (currentColor) */
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  /* Phần trong suốt để tạo hiệu ứng quay */
+  opacity: 0.6;
   border-radius: 50%;
   margin-right: 8px;
   animation: spin-2f131dae 0.8s linear infinite;
@@ -1729,6 +2176,58 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-2f57c33b]:root, body[data-v-2f57c33b] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-2f57c33b] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .global-message-container[data-v-2f57c33b] {
   position: fixed;
   top: auto;
@@ -1752,8 +2251,10 @@ to {
   padding: 10px 20px;
   border-radius: 50px;
   max-width: 85%;
+  /* Shadow nhẹ cho light mode */
   box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
   background-color: #fff;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 .msg-icon[data-v-2f57c33b] {
   width: 20px;
@@ -1767,6 +2268,7 @@ to {
   color: #333;
   line-height: 1.4;
 }
+/* --- LIGHT MODE COLORS (Mặc định) --- */
 .message-content.success[data-v-2f57c33b] {
   background-color: #ecfdf5;
   border: 1px solid #a7f3d0;
@@ -1795,6 +2297,60 @@ to {
 .message-content.warning .msg-text[data-v-2f57c33b] {
   color: #b45309;
 }
+/* --- DARK MODE OVERRIDES --- */
+/* Logic: Nền chuyển sang màu đậm, Border tối màu, Text chuyển sang màu sáng (pastel)
+      để dễ đọc trên nền tối.
+   */
+/* Global container dark logic */
+[data-v-2f57c33b] .theme-dark .message-content {
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.4);
+  /* Shadow đậm hơn */
+}
+/* Success Dark */
+[data-v-2f57c33b] .theme-dark .message-content.success {
+  background-color: #064e3b;
+  /* Xanh đậm */
+  border: 1px solid #065f46;
+}
+[data-v-2f57c33b] .theme-dark .message-content.success .msg-text {
+  color: #d1fae5;
+  /* Xanh nhạt */
+}
+/* Error Dark */
+[data-v-2f57c33b] .theme-dark .message-content.error {
+  background-color: #7f1d1d;
+  /* Đỏ đậm */
+  border: 1px solid #991b1b;
+}
+[data-v-2f57c33b] .theme-dark .message-content.error .msg-text {
+  color: #fecaca;
+  /* Đỏ nhạt */
+}
+/* Info Dark */
+[data-v-2f57c33b] .theme-dark .message-content.info {
+  background-color: #1e3a8a;
+  /* Xanh dương đậm */
+  border: 1px solid #172554;
+}
+[data-v-2f57c33b] .theme-dark .message-content.info .msg-text {
+  color: #bfdbfe;
+  /* Xanh dương nhạt */
+}
+/* Warning Dark */
+[data-v-2f57c33b] .theme-dark .message-content.warning {
+  background-color: #78350f;
+  /* Cam đậm */
+  border: 1px solid #451a03;
+}
+[data-v-2f57c33b] .theme-dark .message-content.warning .msg-text {
+  color: #fde68a;
+  /* Vàng nhạt */
+}
+/* Icon Brightness fix in Dark Mode */
+/* Vì icon là SVG cứng màu đậm, ta tăng độ sáng lên để nó nổi trên nền tối */
+[data-v-2f57c33b] .theme-dark .msg-icon {
+  filter: brightness(1.5) saturate(0.8);
+}
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -1820,6 +2376,59 @@ to {
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+/* 3. Import Theme */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-5d0d13a1]:root, body[data-v-5d0d13a1] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-5d0d13a1] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .modal-overlay[data-v-5d0d13a1] {
   position: fixed;
   top: 0;
@@ -1827,6 +2436,7 @@ to {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
+  /* Giữ nguyên overlay tối */
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -1834,11 +2444,14 @@ to {
 }
 .modal-container[data-v-5d0d13a1] {
   width: 80%;
-  background-color: #fff;
+  /* Thay #fff bằng biến nền */
+  background-color: var(--bg-surface);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   animation: popIn-5d0d13a1 0.2s ease-out;
+  /* Thêm transition để đổi màu mượt mà */
+  transition: background-color 0.3s;
 }
 @keyframes popIn-5d0d13a1 {
 from {
@@ -1852,24 +2465,28 @@ to {
 }
 .modal-header[data-v-5d0d13a1] {
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  /* Thay #eee bằng biến border */
+  border-bottom: 1px solid var(--border-color);
   text-align: center;
 }
 .modal-title[data-v-5d0d13a1] {
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  /* Thay #333 bằng biến text chính */
+  color: var(--text-primary);
 }
 .modal-body[data-v-5d0d13a1] {
   padding: 20px 15px;
   text-align: center;
   font-size: 15px;
-  color: #555;
+  /* Thay #555 bằng biến text phụ */
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 .modal-footer[data-v-5d0d13a1] {
   display: flex;
-  border-top: 1px solid #eee;
+  /* Thay #eee bằng biến border */
+  border-top: 1px solid var(--border-color);
   padding: 15px;
   gap: 10px;
 }
@@ -1903,10 +2520,12 @@ to {
 /* 文章场景相关 */
 .pagination-footer[data-v-813f2b74] {
   flex-shrink: 0;
-  background-color: #fff;
+  /* Thay #fff */
+  background-color: var(--bg-surface);
   padding: 10px 15px;
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
-  border-top: 1px solid #eee;
+  /* Thay #eee */
+  border-top: 1px solid var(--border-color);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
@@ -1915,23 +2534,27 @@ to {
 .page-size-selector[data-v-813f2b74] {
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  /* Thay #ddd và #f9f9f9 */
+  border: 1px solid var(--border-input);
+  background-color: var(--bg-input);
   border-radius: 4px;
   padding: 4px 8px;
-  background-color: #f9f9f9;
 }
 .size-text[data-v-813f2b74] {
   font-size: 12px;
-  color: #333;
+  /* Thay #333 */
+  color: var(--text-primary);
   margin-right: 4px;
 }
 .dropdown-arrow[data-v-813f2b74] {
   font-size: 10px;
-  color: #666;
+  /* Thay #666 */
+  color: var(--text-secondary);
 }
 .total-text[data-v-813f2b74] {
   font-size: 12px;
-  color: #999;
+  /* Thay #999 */
+  color: var(--text-hint);
   margin: 0 5px;
 }
 .pagination-controls[data-v-813f2b74] {
@@ -1941,7 +2564,8 @@ to {
 }
 .page-arrow[data-v-813f2b74] {
   font-size: 18px;
-  color: #666;
+  /* Thay #666 */
+  color: var(--text-secondary);
   padding: 0 10px;
   font-weight: bold;
   cursor: pointer;
@@ -1957,10 +2581,11 @@ to {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #ddd;
+  /* Thay border và màu chữ */
+  border: 1px solid var(--border-input);
+  color: var(--text-primary);
   border-radius: 4px;
   font-size: 12px;
-  color: #333;
 }
 .page-box.active[data-v-813f2b74] {
   background-color: #2dce89;
@@ -1968,14 +2593,91 @@ to {
   border-color: #2dce89;
   font-weight: bold;
 }
-
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+/* 5. Import Theme & Chuyển sang SCSS */
+/*common/theme.scss */
+/* 1. Mặc định là LIGHT MODE */
+[data-v-e3127153]:root, body[data-v-e3127153] {
+  /* Background */
+  --bg-page: #f0f2f5;
+  /* Màu nền tổng thể */
+  --bg-surface: #ffffff;
+  /* Màu nền các thẻ card, popup, header */
+  --bg-input: #f8f9fa;
+  /* Màu nền input */
+  --bg-tag: #f0f2f5;
+  /* Màu nền các tag code */
+  /* Text */
+  --text-primary: #333333;
+  /* Chữ chính */
+  --text-secondary: #666666;
+  /* Chữ phụ, label */
+  --text-hint: #999999;
+  /* Chữ mờ, placeholder */
+  --text-danger: #ff3b30;
+  /* Màu đỏ cảnh báo */
+  --text-highlight: #525f7f;
+  /* Màu text nổi bật (cho tag) */
+  /* Border & Divider */
+  --border-color: #eeeeee;
+  /* Đường viền */
+  --border-input: #e0e0e0;
+  /* Viền input */
+  /* Icons */
+  --icon-filter: none;
+  /* Icon mặc định không đảo màu */
+}
+/* 2. Khi có class .theme-dark thì ghi đè lại các biến trên */
+.theme-dark[data-v-e3127153] {
+  /* Background Tối */
+  --bg-page: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-input: #2c2c2c;
+  --bg-tag: #2c2c2c;
+  /* Text Tối (đảo sang sáng) */
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --text-hint: #666666;
+  --text-danger: #ff5e55;
+  --text-highlight: #b0c4de;
+  /* Border Tối */
+  --border-color: #333333;
+  --border-input: #444444;
+  /* Icons */
+  --icon-filter: invert(1);
+  /* Đảo màu icon đen sang trắng */
+}
 .notification-wrapper[data-v-e3127153] {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 9999;
-  pointer-events: none; 
+  pointer-events: none;
   transform: translateY(-100%);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
@@ -1988,28 +2690,46 @@ to {
   pointer-events: auto;
 }
 .notification-card[data-v-e3127153] {
-  background: #ffffff;
+  /* 6. Dùng biến nền surface */
+  background: var(--bg-surface);
   width: 100%;
   max-width: 600px;
   border-radius: 12px;
+  /* Giữ shadow nhưng có thể giảm opacity nếu cần, hoặc để nguyên */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   padding: 12px 16px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   border-left: 5px solid #007aff;
+  /* Thêm border mỏng cho dark mode để card nổi bật hơn trên nền tối */
+  border-top: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 }
-.notification-card.success[data-v-e3127153] { border-left-color: #4cd964;
+/* Tùy chỉnh border cho dark mode nếu cần thiết */
+[data-v-e3127153] .theme-dark .notification-card {
+  border-top-color: var(--border-color);
+  border-right-color: var(--border-color);
+  border-bottom-color: var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  /* Shadow đậm hơn chút ở dark mode */
 }
-.notification-card.warning[data-v-e3127153] { border-left-color: #ffcc00;
+.notification-card.success[data-v-e3127153] {
+  border-left-color: #4cd964;
 }
-.notification-card.error[data-v-e3127153] { border-left-color: #ff3b30;
+.notification-card.warning[data-v-e3127153] {
+  border-left-color: #ffcc00;
+}
+.notification-card.error[data-v-e3127153] {
+  border-left-color: #ff3b30;
 }
 .icon-box[data-v-e3127153] {
   flex-shrink: 0;
   padding-top: 2px;
 }
-.icon[data-v-e3127153] { font-size: 18px;
+.icon[data-v-e3127153] {
+  font-size: 18px;
 }
 .content-box[data-v-e3127153] {
   flex: 1;
@@ -2017,18 +2737,20 @@ to {
 }
 .close-btn[data-v-e3127153] {
   font-size: 14px;
-  color: #999;
+  /* 7. Dùng biến màu hint */
+  color: var(--text-hint);
   padding: 4px;
 }
+/* Các style deep cho nội dung rich-text */
 [data-v-e3127153] .highlight {
   color: #007aff;
   font-weight: bold;
 }
 [data-v-e3127153] b {
   font-weight: 600;
-  color: #000;
+  /* 8. Đổi màu thẻ bold từ #000 sang biến primary */
+  color: var(--text-primary);
 }
-
 /**
  * 这里是uni-app内置的常用样式变量
  *
@@ -2062,17 +2784,42 @@ to {
   overflow: hidden;
 }
 .header[data-v-1b4e60ea] {
-  height: 50px;
-  padding: 40px 20px 10px 20px;
   background-color: var(--bg-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  /* Quan trọng: Xếp dọc Spacer và Nav-Bar */
+  flex-shrink: 0;
+}
+
+/* 1. Class này để chiếm chỗ Status Bar (Tai thỏ) */
+.status-bar-spacer[data-v-1b4e60ea] {
+  width: 100%;
+  height: var(--status-bar-height);
+  /* Tự động lấy chiều cao tai thỏ */
+  background-color: transparent;
+  /* Hoặc cùng màu với header nếu muốn */
+}
+
+/* 2. Class này chứa nội dung (Back, Title, Icon) */
+.nav-bar[data-v-1b4e60ea] {
+  height: 50px;
+  /* Chiều cao cố định cho thanh điều hướng */
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-bottom: 1px solid var(--border-color);
+  padding: 0 10px 0 10px;
+  /* Padding trái phải */
+  box-sizing: border-box;
 }
 .header-left[data-v-1b4e60ea] {
-  width: 30px;
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 .header-title[data-v-1b4e60ea] {
   font-size: 20px;
@@ -2080,10 +2827,14 @@ to {
   color: var(--text-primary);
   flex: 1;
   text-align: center;
+  margin-right: 10px;
+  /* Cân bằng với nút back */
 }
 .header-right[data-v-1b4e60ea] {
-  width: 30px;
+  width: 60px;
+  height: 100%;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
 }
 .filter-icon[data-v-1b4e60ea] {

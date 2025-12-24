@@ -1,20 +1,27 @@
 <template>
 	<view class="container" :class="{ 'theme-dark': isDark }">
 		<view class="header">
-			<view class="header-left"></view>
+			<view class="status-bar-spacer" :style="{ height: statusBarHeight + 'px' }"></view>
 
-			<text class="header-title">{{ $t('todo.page_title') }}</text>
-
-			<view class="header-right">
-				<view class="icon-btn" @click="openQuickComplete" style="margin-right: 15px;">
-					<image src="/static/checked-checkbox.png" class="filter-icon" mode="aspectFit"></image>
+			<view class="nav-bar">
+				<view class="header-left" @click="onBack">
+					<uni-icons type="left" size="24" :color="isDark ? '#ffffff' : '#333333'"></uni-icons>
 				</view>
 
-				<view class="icon-btn" @click="openFilter">
-					<image src="/static/filter.png" class="filter-icon"></image>
+				<text class="header-title">{{ $t('todo.page_title') }}</text>
+
+				<view class="header-right">
+					<view class="icon-btn" @click="openQuickComplete" style="margin-right: 15px;">
+						<image src="/static/checked-checkbox.png" class="filter-icon" mode="aspectFit"></image>
+					</view>
+
+					<view class="icon-btn" @click="openFilter">
+						<image src="/static/filter.png" class="filter-icon"></image>
+					</view>
 				</view>
 			</view>
 		</view>
+
 		<view class="content">
 			<view class="list-container">
 				<view v-if="isLoading" class="loading-state">
@@ -80,6 +87,7 @@
 				</template>
 			</Pagination>
 		</view>
+
 		<view class="filter-overlay" v-if="isFilterOpen" @click.stop="closeFilter">
 			<view class="filter-panel" @click.stop>
 				<view class="filter-header">
@@ -230,11 +238,8 @@
 		<GlobalNotification />
 	</view>
 </template>
-
-
-
 <script setup lang="ts">
-	import { ref, computed } from 'vue';
+	import { ref, computed, watch, onMounted } from 'vue';
 	import CustomerModal from '@/components/Todo/CustomerModal.vue';
 	import { useListTodoController } from '@/controllers/list_todo';
 	import StatusBadge from '@/components/StatusBadge.vue';
@@ -249,6 +254,50 @@
 	import { useAuthStore } from '@/stores/auth';
 	const authStore = useAuthStore();
 	const isDark = computed(() => authStore.isDark);
+	const onBack = () => {
+		// Kiểm tra nếu có trang trước đó thì quay lại
+		const pages = getCurrentPages();
+		if (pages.length > 1) {
+			uni.navigateBack({
+				delta: 1
+			});
+		} else {
+			// Nếu đây là trang đầu tiên (ví dụ mở trực tiếp), có thể về trang chủ hoặc thoát app
+			// Ở đây để mặc định là hành vi native (thoát nếu là root)
+			/* #ifdef APP-PLUS */
+			plus.runtime.quit();
+			/* #endif */
+			/* #ifndef APP-PLUS */
+			history.back();
+			/* #endif */
+		}
+	};
+	const statusBarHeight = ref(20);
+	onMounted(() => {
+		// Gọi API lấy thông tin hệ thống để lấy chiều cao tai thỏ thực tế
+		const sysInfo = uni.getSystemInfoSync();
+		if (sysInfo.statusBarHeight) {
+			statusBarHeight.value = sysInfo.statusBarHeight;
+		}
+		updateStatusBar();
+	});
+	const updateStatusBar = () => {
+		if (isDark.value) {
+			uni.setNavigationBarColor({
+				frontColor: '#ffffff',
+				backgroundColor: '#000000'
+			});
+		} else {
+			uni.setNavigationBarColor({
+				frontColor: '#000000',
+				backgroundColor: '#ffffff'
+			});
+		}
+	};
+
+	watch(isDark, () => {
+		updateStatusBar();
+	});
 	const {
 		todos, isLoading, isFilterOpen, filter,
 		isConfirmDeleteOpen, itemToDelete,
@@ -306,18 +355,43 @@
 	}
 
 	.header {
-		height: 50px;
-		padding: 40px 20px 10px 20px;
 		background-color: var(--bg-surface);
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		border-bottom: 1px solid var(--border-color);
+		display: flex;
+		flex-direction: column;
+		/* Quan trọng: Xếp dọc Spacer và Nav-Bar */
+		flex-shrink: 0;
+	}
+
+	/* 1. Class này để chiếm chỗ Status Bar (Tai thỏ) */
+	.status-bar-spacer {
+		width: 100%;
+		height: var(--status-bar-height);
+		/* Tự động lấy chiều cao tai thỏ */
+		background-color: transparent;
+		/* Hoặc cùng màu với header nếu muốn */
+	}
+
+	/* 2. Class này chứa nội dung (Back, Title, Icon) */
+	.nav-bar {
+		height: 50px;
+		/* Chiều cao cố định cho thanh điều hướng */
+		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-		border-bottom: 1px solid var(--border-color);
+		padding: 0 10px 0 10px;
+		/* Padding trái phải */
+		box-sizing: border-box;
 	}
 
 	.header-left {
-		width: 30px;
+		width: 40px;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
 	}
 
 	.header-title {
@@ -326,11 +400,15 @@
 		color: var(--text-primary);
 		flex: 1;
 		text-align: center;
+		margin-right: 10px;
+		/* Cân bằng với nút back */
 	}
 
 	.header-right {
-		width: 30px;
+		width: 60px;
+		height: 100%;
 		display: flex;
+		align-items: center;
 		justify-content: flex-end;
 	}
 

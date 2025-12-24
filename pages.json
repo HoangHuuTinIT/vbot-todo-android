@@ -4,8 +4,8 @@
 			"path": "pages/todo/list_todo",
 			"style": {
 				"navigationBarTitleText": "uni-app",
-				"enablePullDownRefresh": true
-
+				"enablePullDownRefresh": true,
+				"navigationStyle": "custom"
 			}
 		},
 		{

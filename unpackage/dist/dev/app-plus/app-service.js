@@ -31,128 +31,6 @@ if (uni.restoreGlobal) {
 }
 (function(vue) {
   "use strict";
-  const ON_SHOW = "onShow";
-  const ON_HIDE = "onHide";
-  const ON_LAUNCH = "onLaunch";
-  const ON_LOAD = "onLoad";
-  const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
-  function formatAppLog(type, filename, ...args) {
-    if (uni.__log__) {
-      uni.__log__(type, filename, ...args);
-    } else {
-      console[type].apply(console, [...args, filename]);
-    }
-  }
-  function resolveEasycom(component, easycom) {
-    return typeof component === "string" ? easycom : component;
-  }
-  const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = vue.getCurrentInstance()) => {
-    !vue.isInSSRComponentSetup && vue.injectHook(lifecycle, hook, target);
-  };
-  const onShow = /* @__PURE__ */ createLifeCycleHook(
-    ON_SHOW,
-    1 | 2
-    /* HookFlags.PAGE */
-  );
-  const onHide = /* @__PURE__ */ createLifeCycleHook(
-    ON_HIDE,
-    1 | 2
-    /* HookFlags.PAGE */
-  );
-  const onLaunch = /* @__PURE__ */ createLifeCycleHook(
-    ON_LAUNCH,
-    1
-    /* HookFlags.APP */
-  );
-  const onLoad = /* @__PURE__ */ createLifeCycleHook(
-    ON_LOAD,
-    2
-    /* HookFlags.PAGE */
-  );
-  const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
-    ON_PULL_DOWN_REFRESH,
-    2
-    /* HookFlags.PAGE */
-  );
-  const _export_sfc = (sfc, props) => {
-    const target = sfc.__vccOpts || sfc;
-    for (const [key, val] of props) {
-      target[key] = val;
-    }
-    return target;
-  };
-  const _sfc_main$o = {
-    __name: "UserAvatar",
-    props: {
-      name: {
-        type: String,
-        default: ""
-      },
-      avatarUrl: {
-        type: String,
-        default: ""
-      },
-      avatarColor: {
-        type: String,
-        default: "#3b82f6"
-      },
-      size: {
-        type: Number,
-        default: 40
-      }
-    },
-    setup(__props, { expose: __expose }) {
-      __expose();
-      const props = __props;
-      const initialChar = vue.computed(() => {
-        if (!props.name)
-          return "?";
-        return props.name.trim().charAt(0).toUpperCase();
-      });
-      const __returned__ = { props, initialChar, computed: vue.computed };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  };
-  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock(
-      "view",
-      {
-        class: "rounded-full flex items-center justify-center overflow-hidden shrink-0",
-        style: vue.normalizeStyle({
-          width: $props.size + "px",
-          height: $props.size + "px",
-          backgroundColor: $props.avatarColor || "#e0e0e0",
-          borderRadius: "50%"
-        })
-      },
-      [
-        $props.avatarUrl ? (vue.openBlock(), vue.createElementBlock("image", {
-          key: 0,
-          src: $props.avatarUrl,
-          class: "w-full h-full",
-          mode: "aspectFill"
-        }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock(
-          "text",
-          {
-            key: 1,
-            class: "text-white font-bold flex items-center justify-center",
-            style: vue.normalizeStyle({
-              fontSize: $props.size * 0.45 + "px",
-              lineHeight: "1",
-              display: "flex"
-            })
-          },
-          vue.toDisplayString($setup.initialChar),
-          5
-          /* TEXT, STYLE */
-        ))
-      ],
-      4
-      /* STYLE */
-    );
-  }
-  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-3/components/UserAvatar.vue"]]);
   const icons = {
     "id": "2852637",
     "name": "uniui图标库",
@@ -1324,11 +1202,18 @@ if (uni.restoreGlobal) {
       }
     ]
   };
+  const _export_sfc = (sfc, props) => {
+    const target = sfc.__vccOpts || sfc;
+    for (const [key, val] of props) {
+      target[key] = val;
+    }
+    return target;
+  };
   const getVal = (val) => {
     const reg = /^[0-9]*$/g;
     return typeof val === "number" || reg.test(val) ? val + "px" : val;
   };
-  const _sfc_main$n = {
+  const _sfc_main$o = {
     name: "UniIcons",
     emits: ["click"],
     props: {
@@ -1372,7 +1257,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$n(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock(
       "text",
       {
@@ -1385,7 +1270,130 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const __easycom_0$1 = /* @__PURE__ */ _export_sfc(_sfc_main$o, [["render", _sfc_render$n], ["__scopeId", "data-v-d31e1c47"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const ON_SHOW = "onShow";
+  const ON_HIDE = "onHide";
+  const ON_LAUNCH = "onLaunch";
+  const ON_LOAD = "onLoad";
+  const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
+  function formatAppLog(type, filename, ...args) {
+    if (uni.__log__) {
+      uni.__log__(type, filename, ...args);
+    } else {
+      console[type].apply(console, [...args, filename]);
+    }
+  }
+  function resolveEasycom(component, easycom) {
+    return typeof component === "string" ? easycom : component;
+  }
+  const createLifeCycleHook = (lifecycle, flag = 0) => (hook, target = vue.getCurrentInstance()) => {
+    !vue.isInSSRComponentSetup && vue.injectHook(lifecycle, hook, target);
+  };
+  const onShow = /* @__PURE__ */ createLifeCycleHook(
+    ON_SHOW,
+    1 | 2
+    /* HookFlags.PAGE */
+  );
+  const onHide = /* @__PURE__ */ createLifeCycleHook(
+    ON_HIDE,
+    1 | 2
+    /* HookFlags.PAGE */
+  );
+  const onLaunch = /* @__PURE__ */ createLifeCycleHook(
+    ON_LAUNCH,
+    1
+    /* HookFlags.APP */
+  );
+  const onLoad = /* @__PURE__ */ createLifeCycleHook(
+    ON_LOAD,
+    2
+    /* HookFlags.PAGE */
+  );
+  const onPullDownRefresh = /* @__PURE__ */ createLifeCycleHook(
+    ON_PULL_DOWN_REFRESH,
+    2
+    /* HookFlags.PAGE */
+  );
+  const _sfc_main$n = {
+    __name: "UserAvatar",
+    props: {
+      name: {
+        type: String,
+        default: ""
+      },
+      avatarUrl: {
+        type: String,
+        default: ""
+      },
+      avatarColor: {
+        type: String,
+        // Nếu bạn muốn mặc định là một màu cụ thể thì để mã màu.
+        // Nếu muốn mặc định ăn theo theme thì để chuỗi rỗng ''.
+        default: "#3b82f6"
+      },
+      size: {
+        type: Number,
+        default: 40
+      }
+    },
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const props = __props;
+      const initialChar = vue.computed(() => {
+        if (!props.name)
+          return "?";
+        return props.name.trim().charAt(0).toUpperCase();
+      });
+      const finalBgColor = vue.computed(() => {
+        return props.avatarColor ? props.avatarColor : "var(--bg-input)";
+      });
+      const textColorClass = vue.computed(() => {
+        return props.avatarColor ? "text-white" : "text-adaptive";
+      });
+      const __returned__ = { props, initialChar, finalBgColor, textColorClass, computed: vue.computed };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  };
+  function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: "rounded-full flex items-center justify-center overflow-hidden shrink-0",
+        style: vue.normalizeStyle({
+          width: $props.size + "px",
+          height: $props.size + "px",
+          backgroundColor: $setup.finalBgColor,
+          borderRadius: "50%"
+        })
+      },
+      [
+        $props.avatarUrl ? (vue.openBlock(), vue.createElementBlock("image", {
+          key: 0,
+          src: $props.avatarUrl,
+          class: "w-full h-full",
+          mode: "aspectFill"
+        }, null, 8, ["src"])) : (vue.openBlock(), vue.createElementBlock(
+          "text",
+          {
+            key: 1,
+            class: vue.normalizeClass(["font-bold flex items-center justify-center", $setup.textColorClass]),
+            style: vue.normalizeStyle({
+              fontSize: $props.size * 0.45 + "px",
+              lineHeight: "1",
+              display: "flex"
+            })
+          },
+          vue.toDisplayString($setup.initialChar),
+          7
+          /* TEXT, CLASS, STYLE */
+        ))
+      ],
+      4
+      /* STYLE */
+    );
+  }
+  const UserAvatar = /* @__PURE__ */ _export_sfc(_sfc_main$n, [["render", _sfc_render$m], ["__scopeId", "data-v-7abf19e0"], ["__file", "D:/uni_app/vbot-todo-android-3/components/UserAvatar.vue"]]);
   let Calendar$1 = class Calendar {
     constructor({
       selected,
@@ -1831,6 +1839,7 @@ if (uni.restoreGlobal) {
     data() {
       return {
         indicatorStyle: `height: 50px;`,
+        maskStyle: "background-image: none;",
         visible: false,
         fixNvueBug: {},
         dateShow: true,
@@ -2501,6 +2510,7 @@ if (uni.restoreGlobal) {
             vue.createElementVNode("picker-view", {
               class: "uni-datetime-picker-view",
               "indicator-style": $data.indicatorStyle,
+              "mask-style": $data.maskStyle,
               value: $options.ymd,
               onChange: _cache[2] || (_cache[2] = (...args) => $options.bindDateChange && $options.bindDateChange(...args))
             }, [
@@ -2570,7 +2580,7 @@ if (uni.restoreGlobal) {
                   /* KEYED_FRAGMENT */
                 ))
               ])
-            ], 40, ["indicator-style", "value"]),
+            ], 40, ["indicator-style", "mask-style", "value"]),
             vue.createElementVNode("text", { class: "uni-datetime-picker-sign sign-left" }, "-"),
             vue.createElementVNode("text", { class: "uni-datetime-picker-sign sign-right" }, "-")
           ])) : vue.createCommentVNode("v-if", true),
@@ -2581,6 +2591,7 @@ if (uni.restoreGlobal) {
             vue.createElementVNode("picker-view", {
               class: vue.normalizeClass(["uni-datetime-picker-view", [$props.hideSecond ? "time-hide-second" : ""]]),
               "indicator-style": $data.indicatorStyle,
+              "mask-style": $data.maskStyle,
               value: $options.hms,
               onChange: _cache[3] || (_cache[3] = (...args) => $options.bindTimeChange && $options.bindTimeChange(...args))
             }, [
@@ -2650,7 +2661,7 @@ if (uni.restoreGlobal) {
                   /* KEYED_FRAGMENT */
                 ))
               ])) : vue.createCommentVNode("v-if", true)
-            ], 42, ["indicator-style", "value"]),
+            ], 42, ["indicator-style", "mask-style", "value"]),
             vue.createElementVNode(
               "text",
               {
@@ -2710,10 +2721,192 @@ if (uni.restoreGlobal) {
     ]);
   }
   const TimePicker = /* @__PURE__ */ _export_sfc(_sfc_main$l, [["render", _sfc_render$k], ["__scopeId", "data-v-1d532b70"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/time-picker.vue"]]);
-  const _sfc_main$k = {
+  const indicatorStyle = `
+		height: 50px; 
+		border-top: 1px solid var(--border-color); 
+		border-bottom: 1px solid var(--border-color);
+		z-index: 0;
+	`;
+  const maskStyle = `
+		background-image: linear-gradient(to bottom, var(--bg-surface), rgba(0,0,0,0)), linear-gradient(to top, var(--bg-surface), rgba(0,0,0,0));
+		z-index: 0;
+	`;
+  const _sfc_main$k = /* @__PURE__ */ vue.defineComponent({
+    __name: "AppPicker",
+    props: {
+      range: { type: Array, required: true },
+      value: { type: [Number, Array], required: true },
+      title: { type: String, required: false }
+    },
+    emits: ["update:value", "change"],
+    setup(__props, { expose: __expose, emit: __emit }) {
+      __expose();
+      const props = __props;
+      const emit = __emit;
+      const isVisible = vue.ref(false);
+      const pickerValue = vue.ref([0]);
+      const tempValue = vue.ref(0);
+      const isMultiColumn = vue.computed(() => {
+        return props.range.length > 0 && Array.isArray(props.range[0]);
+      });
+      vue.watch(() => props.value, (val) => {
+        if (Array.isArray(val)) {
+          pickerValue.value = val;
+          tempValue.value = [...val];
+        } else {
+          pickerValue.value = [val];
+          tempValue.value = val;
+        }
+      }, { immediate: true });
+      const open2 = () => {
+        if (Array.isArray(props.value)) {
+          tempValue.value = [...props.value];
+          pickerValue.value = [...props.value];
+        } else {
+          tempValue.value = props.value;
+          pickerValue.value = [props.value];
+        }
+        isVisible.value = true;
+      };
+      const close = () => {
+        isVisible.value = false;
+      };
+      const bindChange = (e) => {
+        const val = e.detail.value;
+        if (isMultiColumn.value) {
+          tempValue.value = val;
+        } else {
+          tempValue.value = val[0];
+        }
+      };
+      const confirm = () => {
+        emit("change", { detail: { value: tempValue.value } });
+        emit("update:value", tempValue.value);
+        close();
+      };
+      const __returned__ = { props, emit, isVisible, pickerValue, tempValue, indicatorStyle, maskStyle, isMultiColumn, open: open2, close, bindChange, confirm };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
+    }
+  });
+  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", null, [
+      vue.createElementVNode("view", { onClick: $setup.open }, [
+        vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
+      ]),
+      $setup.isVisible ? (vue.openBlock(), vue.createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: vue.normalizeClass(["picker-mask", { "show": $setup.isVisible }]),
+          onClick: $setup.close
+        },
+        null,
+        2
+        /* CLASS */
+      )) : vue.createCommentVNode("v-if", true),
+      vue.createElementVNode(
+        "view",
+        {
+          class: vue.normalizeClass(["picker-panel", { "show": $setup.isVisible }])
+        },
+        [
+          vue.createElementVNode("view", { class: "picker-toolbar" }, [
+            vue.createElementVNode(
+              "text",
+              {
+                class: "btn-cancel",
+                onClick: $setup.close
+              },
+              vue.toDisplayString(_ctx.$t("common.cancel") || "Hủy"),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "text",
+              { class: "title" },
+              vue.toDisplayString($props.title),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode(
+              "text",
+              {
+                class: "btn-confirm",
+                onClick: $setup.confirm
+              },
+              vue.toDisplayString(_ctx.$t("common.confirm") || "Xong"),
+              1
+              /* TEXT */
+            )
+          ]),
+          vue.createElementVNode("picker-view", {
+            value: $setup.pickerValue,
+            onChange: $setup.bindChange,
+            class: "picker-view-box",
+            "indicator-style": $setup.indicatorStyle,
+            "mask-style": $setup.maskStyle
+          }, [
+            $setup.isMultiColumn ? (vue.openBlock(true), vue.createElementBlock(
+              vue.Fragment,
+              { key: 0 },
+              vue.renderList($props.range, (col, i) => {
+                return vue.openBlock(), vue.createElementBlock("picker-view-column", { key: i }, [
+                  (vue.openBlock(true), vue.createElementBlock(
+                    vue.Fragment,
+                    null,
+                    vue.renderList(col, (item, k) => {
+                      return vue.openBlock(), vue.createElementBlock(
+                        "view",
+                        {
+                          class: "picker-item",
+                          key: k
+                        },
+                        vue.toDisplayString(item),
+                        1
+                        /* TEXT */
+                      );
+                    }),
+                    128
+                    /* KEYED_FRAGMENT */
+                  ))
+                ]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            )) : (vue.openBlock(), vue.createElementBlock("picker-view-column", { key: 1 }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($props.range, (item, index) => {
+                  return vue.openBlock(), vue.createElementBlock(
+                    "view",
+                    {
+                      class: "picker-item",
+                      key: index
+                    },
+                    vue.toDisplayString(item),
+                    1
+                    /* TEXT */
+                  );
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ]))
+          ], 40, ["value"])
+        ],
+        2
+        /* CLASS */
+      )
+    ]);
+  }
+  const AppPicker = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-e6406d7a"], ["__file", "D:/uni_app/vbot-todo-android-3/components/AppPicker.vue"]]);
+  const _sfc_main$j = {
     components: {
       calendarItem,
-      timePicker: TimePicker
+      timePicker: TimePicker,
+      AppPicker
     },
     props: {
       date: {
@@ -3079,7 +3272,9 @@ if (uni.restoreGlobal) {
         this.cale.setDate(date || /* @__PURE__ */ new Date());
         this.weeks = this.cale.weeks;
         this.nowDate = this.cale.getInfo(date);
-        this.calendar = { ...this.nowDate };
+        this.calendar = {
+          ...this.nowDate
+        };
         if (!date) {
           this.calendar.fullDate = "";
           if (this.defaultValue && !this.range) {
@@ -3244,7 +3439,8 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_app_picker = vue.resolveComponent("app-picker");
     const _component_calendar_item = vue.resolveComponent("calendar-item");
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
@@ -3252,7 +3448,7 @@ if (uni.restoreGlobal) {
       "view",
       {
         class: "uni-calendar",
-        onMouseleave: _cache[9] || (_cache[9] = (...args) => $options.leaveCale && $options.leaveCale(...args))
+        onMouseleave: _cache[8] || (_cache[8] = (...args) => $options.leaveCale && $options.leaveCale(...args))
       },
       [
         !$props.insert && $data.show ? (vue.openBlock(), vue.createElementBlock(
@@ -3285,30 +3481,33 @@ if (uni.restoreGlobal) {
                 }, [
                   vue.createElementVNode("view", { class: "uni-calendar__header-btn uni-calendar--left" })
                 ]),
-                vue.createElementVNode("picker", {
-                  mode: "multiSelector",
+                vue.createVNode(_component_app_picker, {
                   range: $options.pickerRange,
                   value: $options.pickerIndex,
-                  onChange: _cache[2] || (_cache[2] = (...args) => $options.bindMultiPickerChange && $options.bindMultiPickerChange(...args))
-                }, [
-                  vue.createElementVNode(
-                    "text",
-                    { class: "uni-calendar__header-text" },
-                    vue.toDisplayString($options.monthText + " " + ($data.nowDate.month || "") + " " + $options.yearText + " " + ($data.nowDate.year || "")),
-                    1
-                    /* TEXT */
-                  )
-                ], 40, ["range", "value"]),
+                  onChange: $options.bindMultiPickerChange
+                }, {
+                  default: vue.withCtx(() => [
+                    vue.createElementVNode(
+                      "text",
+                      { class: "uni-calendar__header-text" },
+                      vue.toDisplayString($options.monthText + " " + ($data.nowDate.month || "") + " " + $options.yearText + " " + ($data.nowDate.year || "")),
+                      1
+                      /* TEXT */
+                    )
+                  ]),
+                  _: 1
+                  /* STABLE */
+                }, 8, ["range", "value", "onChange"]),
                 vue.createElementVNode("view", {
                   class: "uni-calendar__header-btn-box",
-                  onClick: _cache[3] || (_cache[3] = vue.withModifiers(($event) => $options.changeMonth("next"), ["stop"]))
+                  onClick: _cache[2] || (_cache[2] = vue.withModifiers(($event) => $options.changeMonth("next"), ["stop"]))
                 }, [
                   vue.createElementVNode("view", { class: "uni-calendar__header-btn uni-calendar--right" })
                 ]),
                 !$props.insert ? (vue.openBlock(), vue.createElementBlock("view", {
                   key: 0,
                   class: "dialog-close",
-                  onClick: _cache[4] || (_cache[4] = (...args) => $options.close && $options.close(...args))
+                  onClick: _cache[3] || (_cache[3] = (...args) => $options.close && $options.close(...args))
                 }, [
                   vue.createElementVNode("view", {
                     class: "dialog-close-plus",
@@ -3457,7 +3656,7 @@ if (uni.restoreGlobal) {
                 start: $options.timepickerStartTime,
                 end: $options.timepickerEndTime,
                 modelValue: $data.time,
-                "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $data.time = $event),
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $data.time = $event),
                 disabled: !$data.tempSingleDate,
                 border: false,
                 "hide-second": $props.hideSecond,
@@ -3480,7 +3679,7 @@ if (uni.restoreGlobal) {
                   type: "time",
                   start: $options.timepickerStartTime,
                   modelValue: $data.timeRange.startTime,
-                  "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => $data.timeRange.startTime = $event),
+                  "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $data.timeRange.startTime = $event),
                   border: false,
                   "hide-second": $props.hideSecond,
                   disabled: !$data.tempRange.before,
@@ -3505,7 +3704,7 @@ if (uni.restoreGlobal) {
                   type: "time",
                   end: $options.timepickerEndTime,
                   modelValue: $data.timeRange.endTime,
-                  "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => $data.timeRange.endTime = $event),
+                  "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => $data.timeRange.endTime = $event),
                   border: false,
                   "hide-second": $props.hideSecond,
                   disabled: !$data.tempRange.after,
@@ -3521,7 +3720,7 @@ if (uni.restoreGlobal) {
                 "view",
                 {
                   class: "uni-datetime-picker--btn",
-                  onClick: _cache[8] || (_cache[8] = (...args) => $options.confirm && $options.confirm(...args))
+                  onClick: _cache[7] || (_cache[7] = (...args) => $options.confirm && $options.confirm(...args))
                 },
                 vue.toDisplayString($options.confirmText),
                 1
@@ -3537,8 +3736,8 @@ if (uni.restoreGlobal) {
       /* NEED_HYDRATION */
     );
   }
-  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$k, [["render", _sfc_render$j], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
-  const _sfc_main$j = {
+  const Calendar = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-1d379219"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/calendar.vue"]]);
+  const _sfc_main$i = {
     name: "UniDatetimePicker",
     options: {
       virtualHost: true
@@ -4196,7 +4395,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_Calendar = vue.resolveComponent("Calendar");
@@ -4479,7 +4678,8 @@ if (uni.restoreGlobal) {
                   onChange: $options.rightChange,
                   pleStatus: $data.startMultipleStatus,
                   onFirstEnterCale: $options.updateLeftCale,
-                  style: { "padding": "0 8px", "border-left": "1px solid #F1F1F1" }
+                  style: { "padding": "0 8px" },
+                  class: "calendar-right-border"
                 }, null, 8, ["start-date", "end-date", "onChange", "pleStatus", "onFirstEnterCale"])
               ]),
               $data.hasTime ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -4539,7 +4739,7 @@ if (uni.restoreGlobal) {
       }, null, 8, ["date", "defTime", "start-date", "end-date", "selectableTimes", "startPlaceholder", "endPlaceholder", "default-value", "pleStatus", "range", "hasTime", "hideSecond", "onConfirm", "onMaskClose"])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$j, [["render", _sfc_render$i], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
+  const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-9802168a"], ["__file", "D:/uni_app/vbot-todo-android-3/uni_modules/uni-datetime-picker/components/uni-datetime-picker/uni-datetime-picker.vue"]]);
   const formatRelativeTime = (timestamp, t) => {
     if (!timestamp)
       return "";
@@ -8175,7 +8375,7 @@ ${codeFrame}` : message);
     target.__INTLIFY__ = true;
     setDevToolsHook(target.__INTLIFY_DEVTOOLS_GLOBAL_HOOK__);
   }
-  const _sfc_main$i = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
     __name: "DateRangeFilter",
     props: {
       title: { type: String, required: false },
@@ -8201,7 +8401,7 @@ ${codeFrame}` : message);
       return __returned__;
     }
   });
-  function _sfc_render$h(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_datetime_picker = resolveEasycom(vue.resolveDynamicComponent("uni-datetime-picker"), __easycom_0);
     return vue.openBlock(), vue.createElementBlock("view", { class: "date-filter-block" }, [
       $props.title ? (vue.openBlock(), vue.createElementBlock(
@@ -8264,133 +8464,7 @@ ${codeFrame}` : message);
       ])
     ]);
   }
-  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$i, [["render", _sfc_render$h], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-3/components/DateRangeFilter.vue"]]);
-  const _sfc_main$h = /* @__PURE__ */ vue.defineComponent({
-    __name: "AppPicker",
-    props: {
-      range: { type: Array, required: true },
-      value: { type: Number, required: true },
-      title: { type: String, required: false }
-    },
-    emits: ["update:value", "change"],
-    setup(__props, { expose: __expose, emit: __emit }) {
-      __expose();
-      const props = __props;
-      const emit = __emit;
-      const isVisible = vue.ref(false);
-      const pickerValue = vue.ref([0]);
-      const tempIndex = vue.ref(0);
-      vue.watch(() => props.value, (val) => {
-        pickerValue.value = [val];
-        tempIndex.value = val;
-      }, { immediate: true });
-      const open2 = () => {
-        tempIndex.value = props.value;
-        pickerValue.value = [props.value];
-        isVisible.value = true;
-      };
-      const close = () => {
-        isVisible.value = false;
-      };
-      const bindChange = (e) => {
-        const val = e.detail.value;
-        tempIndex.value = val[0];
-      };
-      const confirm = () => {
-        emit("change", { detail: { value: tempIndex.value } });
-        emit("update:value", tempIndex.value);
-        close();
-      };
-      const __returned__ = { props, emit, isVisible, pickerValue, tempIndex, open: open2, close, bindChange, confirm };
-      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-      return __returned__;
-    }
-  });
-  function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", null, [
-      vue.createElementVNode("view", { onClick: $setup.open }, [
-        vue.renderSlot(_ctx.$slots, "default", {}, void 0, true)
-      ]),
-      $setup.isVisible ? (vue.openBlock(), vue.createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: vue.normalizeClass(["picker-mask", { "show": $setup.isVisible }]),
-          onClick: $setup.close
-        },
-        null,
-        2
-        /* CLASS */
-      )) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode(
-        "view",
-        {
-          class: vue.normalizeClass(["picker-panel", { "show": $setup.isVisible }])
-        },
-        [
-          vue.createElementVNode("view", { class: "picker-toolbar" }, [
-            vue.createElementVNode(
-              "text",
-              {
-                class: "btn-cancel",
-                onClick: $setup.close
-              },
-              vue.toDisplayString(_ctx.$t("common.cancel")),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "text",
-              { class: "title" },
-              vue.toDisplayString($props.title),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "text",
-              {
-                class: "btn-confirm",
-                onClick: $setup.confirm
-              },
-              vue.toDisplayString(_ctx.$t("common.confirm") || "Xong"),
-              1
-              /* TEXT */
-            )
-          ]),
-          vue.createElementVNode("picker-view", {
-            value: $setup.pickerValue,
-            onChange: $setup.bindChange,
-            class: "picker-view-box",
-            "indicator-style": "height: 50px;"
-          }, [
-            vue.createElementVNode("picker-view-column", null, [
-              (vue.openBlock(true), vue.createElementBlock(
-                vue.Fragment,
-                null,
-                vue.renderList($props.range, (item, index) => {
-                  return vue.openBlock(), vue.createElementBlock(
-                    "view",
-                    {
-                      class: "picker-item",
-                      key: index
-                    },
-                    vue.toDisplayString(item),
-                    1
-                    /* TEXT */
-                  );
-                }),
-                128
-                /* KEYED_FRAGMENT */
-              ))
-            ])
-          ], 40, ["value"])
-        ],
-        2
-        /* CLASS */
-      )
-    ]);
-  }
-  const AppPicker = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-e6406d7a"], ["__file", "D:/uni_app/vbot-todo-android-3/components/AppPicker.vue"]]);
+  const DateRangeFilter = /* @__PURE__ */ _export_sfc(_sfc_main$h, [["render", _sfc_render$g], ["__scopeId", "data-v-645c14d9"], ["__file", "D:/uni_app/vbot-todo-android-3/components/DateRangeFilter.vue"]]);
   const _sfc_main$g = /* @__PURE__ */ vue.defineComponent({
     __name: "CustomerModal",
     props: {
@@ -8416,7 +8490,6 @@ ${codeFrame}` : message);
         endDate: ""
       });
       const onScrollToLower = () => {
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:111", "Cuộn xuống đáy -> Load more");
         emit("loadMore");
       };
       const managerDisplayOptions = vue.computed(() => {
@@ -8448,7 +8521,6 @@ ${codeFrame}` : message);
         filter.startDate = "";
         filter.endDate = "";
         applyFilter();
-        formatAppLog("log", "at components/Todo/CustomerModal.vue:148", "Đã đặt lại bộ lọc");
       };
       const applyFilter = () => {
         emit("filter", {
@@ -11350,16 +11422,16 @@ This will fail in production if not fixed.`);
           const sysInfo = uni.getSystemInfoSync();
           this.isActualDark = sysInfo.osTheme === "dark" || sysInfo.hostTheme === "dark";
         }
-        formatAppLog("log", "at stores/auth.ts:77", `🎨 Theme applied: Mode=${mode}, ActualDark=${this.isActualDark}`);
+        formatAppLog("log", "at stores/auth.ts:76", `🎨 Theme applied: Mode=${mode}, ActualDark=${this.isActualDark}`);
       },
       async initFromNative(nativeData) {
-        formatAppLog("log", "at stores/auth.ts:80", "Store: Nhận dữ liệu từ Native Android", nativeData);
+        formatAppLog("log", "at stores/auth.ts:79", "Store: Nhận dữ liệu từ Native Android", nativeData);
         if (!nativeData || !nativeData.uid || !nativeData.access_token) {
-          formatAppLog("error", "at stores/auth.ts:83", "Dữ liệu từ Native bị thiếu!");
+          formatAppLog("error", "at stores/auth.ts:82", "Dữ liệu từ Native bị thiếu!");
           return;
         }
         if (nativeData.language) {
-          formatAppLog("log", "at stores/auth.ts:87", "🌍 Native yêu cầu ngôn ngữ:", nativeData.language);
+          formatAppLog("log", "at stores/auth.ts:86", "🌍 Native yêu cầu ngôn ngữ:", nativeData.language);
           if (nativeData.language === "en" || nativeData.language === "vi") {
             changeLanguage(nativeData.language);
           }
@@ -11368,7 +11440,7 @@ This will fail in production if not fixed.`);
           this.applyTheme(nativeData.themeMode);
         }
         if (this.rootToken && this.rootToken !== nativeData.access_token) {
-          formatAppLog("warn", "at stores/auth.ts:96", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
+          formatAppLog("warn", "at stores/auth.ts:95", "Store: Phát hiện Token gốc thay đổi -> Đang dọn dẹp dữ liệu phiên cũ...");
           const socketStore = useSocketStore();
           socketStore.disconnect();
           this.todoToken = "";
@@ -11389,10 +11461,10 @@ This will fail in production if not fixed.`);
       async fetchModuleTokens() {
         try {
           if (!this.rootToken || !this.projectCode || !this.uid) {
-            formatAppLog("error", "at stores/auth.ts:118", "Thiếu thông tin để lấy Module Token");
+            formatAppLog("error", "at stores/auth.ts:117", "Thiếu thông tin để lấy Module Token");
             return;
           }
-          formatAppLog("log", "at stores/auth.ts:122", "Store: Đang lấy Token cho Todo và CRM...");
+          formatAppLog("log", "at stores/auth.ts:121", "Store: Đang lấy Token cho Todo và CRM...");
           const [newTodoToken, newCrmToken] = await Promise.all([
             getTodoToken(this.rootToken, this.projectCode, this.uid),
             getCrmToken(this.projectCode, this.uid)
@@ -11401,9 +11473,9 @@ This will fail in production if not fixed.`);
             todoToken: newTodoToken,
             crmToken: newCrmToken
           });
-          formatAppLog("log", "at stores/auth.ts:134", "Store: Đã lấy đủ Token (Todo & CRM).");
+          formatAppLog("log", "at stores/auth.ts:133", "Store: Đã lấy đủ Token (Todo & CRM).");
         } catch (error) {
-          formatAppLog("error", "at stores/auth.ts:136", "Store: Lỗi lấy module tokens:", error);
+          formatAppLog("error", "at stores/auth.ts:135", "Store: Lỗi lấy module tokens:", error);
           this.logout();
           throw error;
         }
@@ -11418,7 +11490,7 @@ This will fail in production if not fixed.`);
         return this.refreshPromise;
       },
       logout() {
-        formatAppLog("log", "at stores/auth.ts:152", "Store: Đăng xuất...");
+        formatAppLog("log", "at stores/auth.ts:151", "Store: Đăng xuất...");
         const socketStore = useSocketStore();
         socketStore.disconnect();
         this.rootToken = "";
@@ -12265,35 +12337,21 @@ This will fail in production if not fixed.`);
             return props.status || "Unknown";
         }
       });
-      const badgeColorClass = vue.computed(() => {
+      const statusClass = vue.computed(() => {
         switch (props.status) {
           case TODO_STATUS.NEW:
-            return "bg-gray-200 text-gray-600";
+            return "status-new";
           case TODO_STATUS.IN_PROGRESS:
-            return "bg-orange-100 text-orange-600";
+            return "status-progress";
           case TODO_STATUS.DONE:
-            return "bg-green-100 text-green-600";
+            return "status-done";
           case TODO_STATUS.OVERDUE:
-            return "bg-red-100 text-red-600";
+            return "status-overdue";
           default:
-            return "bg-gray-100 text-gray-400";
+            return "status-default";
         }
       });
-      const customStyle = vue.computed(() => {
-        switch (props.status) {
-          case TODO_STATUS.NEW:
-            return { backgroundColor: "#e4e4e7", color: "#52525b" };
-          case TODO_STATUS.IN_PROGRESS:
-            return { backgroundColor: "#ffedd5", color: "#c2410c" };
-          case TODO_STATUS.DONE:
-            return { backgroundColor: "#dcfce7", color: "#15803d" };
-          case TODO_STATUS.OVERDUE:
-            return { backgroundColor: "#fee2e2", color: "#dc2626" };
-          default:
-            return { backgroundColor: "#f4f4f5", color: "#a1a1aa" };
-        }
-      });
-      const __returned__ = { t, props, badgeLabel, badgeColorClass, customStyle };
+      const __returned__ = { t, props, badgeLabel, statusClass };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12302,12 +12360,11 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
-        class: vue.normalizeClass(["px-2 py-1 rounded-full text-xs font-bold inline-block text-center min-w-[80px]", $setup.badgeColorClass]),
-        style: vue.normalizeStyle($setup.customStyle)
+        class: vue.normalizeClass(["badge-base", $setup.statusClass])
       },
       vue.toDisplayString($setup.badgeLabel),
-      7
-      /* TEXT, CLASS, STYLE */
+      3
+      /* TEXT, CLASS */
     );
   }
   const StatusBadge = /* @__PURE__ */ _export_sfc(_sfc_main$f, [["render", _sfc_render$e], ["__scopeId", "data-v-7f144565"], ["__file", "D:/uni_app/vbot-todo-android-3/components/StatusBadge.vue"]]);
@@ -12367,6 +12424,8 @@ This will fail in production if not fixed.`);
     setup(__props, { expose: __expose }) {
       __expose();
       const { t } = useI18n();
+      const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const isVisible = vue.ref(false);
       const msgContent = vue.ref("");
       const msgType = vue.ref("success");
@@ -12421,7 +12480,7 @@ This will fail in production if not fixed.`);
       vue.onUnmounted(() => {
         uni.$off("app-toast-show", handleShowToast);
       });
-      const __returned__ = { t, isVisible, msgContent, msgType, safeAreaBottom, get timer() {
+      const __returned__ = { t, authStore, isDark, isVisible, msgContent, msgType, safeAreaBottom, get timer() {
         return timer;
       }, set timer(v) {
         timer = v;
@@ -12434,7 +12493,7 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
-        class: vue.normalizeClass(["global-message-container", { "show": $setup.isVisible }]),
+        class: vue.normalizeClass(["global-message-container", { "show": $setup.isVisible, "theme-dark": $setup.isDark }]),
         style: vue.normalizeStyle({ paddingBottom: $setup.safeAreaBottom + 20 + "px" })
       },
       [
@@ -12481,6 +12540,8 @@ This will fail in production if not fixed.`);
       __expose();
       const props = __props;
       const emit = __emit;
+      const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const onCancel = () => {
         emit("update:visible", false);
         emit("cancel");
@@ -12488,58 +12549,64 @@ This will fail in production if not fixed.`);
       const onConfirm = () => {
         emit("confirm");
       };
-      const __returned__ = { props, emit, onCancel, onConfirm, AppButton };
+      const __returned__ = { props, emit, authStore, isDark, onCancel, onConfirm, AppButton };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   function _sfc_render$b(_ctx, _cache, $props, $setup, $data, $options) {
-    return $props.visible ? (vue.openBlock(), vue.createElementBlock("view", {
-      key: 0,
-      class: "modal-overlay",
-      onClick: $setup.onCancel
-    }, [
-      vue.createElementVNode("view", {
-        class: "modal-container",
-        onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
-        }, ["stop"]))
-      }, [
-        vue.createElementVNode("view", { class: "modal-header" }, [
-          vue.createElementVNode(
-            "text",
-            { class: "modal-title" },
-            vue.toDisplayString($props.title),
-            1
-            /* TEXT */
-          )
-        ]),
-        vue.createElementVNode("view", { class: "modal-body" }, [
-          vue.renderSlot(_ctx.$slots, "default", {}, () => [
+    return $props.visible ? (vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        key: 0,
+        class: vue.normalizeClass(["modal-overlay", { "theme-dark": $setup.isDark }]),
+        onClick: $setup.onCancel
+      },
+      [
+        vue.createElementVNode("view", {
+          class: "modal-container",
+          onClick: _cache[0] || (_cache[0] = vue.withModifiers(() => {
+          }, ["stop"]))
+        }, [
+          vue.createElementVNode("view", { class: "modal-header" }, [
             vue.createElementVNode(
               "text",
-              null,
-              vue.toDisplayString($props.message),
+              { class: "modal-title" },
+              vue.toDisplayString($props.title),
               1
               /* TEXT */
             )
-          ], true)
-        ]),
-        vue.createElementVNode("view", { class: "modal-footer" }, [
-          vue.createVNode($setup["AppButton"], {
-            type: "secondary",
-            label: $props.cancelLabel,
-            class: "flex-1",
-            onClick: $setup.onCancel
-          }, null, 8, ["label"]),
-          vue.createVNode($setup["AppButton"], {
-            type: $props.confirmType,
-            label: $props.confirmLabel,
-            class: "flex-1",
-            onClick: $setup.onConfirm
-          }, null, 8, ["type", "label"])
+          ]),
+          vue.createElementVNode("view", { class: "modal-body" }, [
+            vue.renderSlot(_ctx.$slots, "default", {}, () => [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString($props.message),
+                1
+                /* TEXT */
+              )
+            ], true)
+          ]),
+          vue.createElementVNode("view", { class: "modal-footer" }, [
+            vue.createVNode($setup["AppButton"], {
+              type: "secondary",
+              label: $props.cancelLabel,
+              class: "flex-1",
+              onClick: $setup.onCancel
+            }, null, 8, ["label"]),
+            vue.createVNode($setup["AppButton"], {
+              type: $props.confirmType,
+              label: $props.confirmLabel,
+              class: "flex-1",
+              onClick: $setup.onConfirm
+            }, null, 8, ["type", "label"])
+          ])
         ])
-      ])
-    ])) : vue.createCommentVNode("v-if", true);
+      ],
+      2
+      /* CLASS */
+    )) : vue.createCommentVNode("v-if", true);
   }
   const ConfirmModal = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["render", _sfc_render$b], ["__scopeId", "data-v-5d0d13a1"], ["__file", "D:/uni_app/vbot-todo-android-3/components/ConfirmModal.vue"]]);
   const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
@@ -12670,6 +12737,8 @@ This will fail in production if not fixed.`);
     setup(__props, { expose: __expose }) {
       __expose();
       const notificationStore = useNotificationStore();
+      const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const statusBarHeight = vue.ref(0);
       uni.getSystemInfo({
         success: (res) => {
@@ -12677,16 +12746,16 @@ This will fail in production if not fixed.`);
         }
       });
       const formattedMessage = vue.computed(() => {
-        return `<div style="font-size: 14px; line-height: 1.4; color: #333;">${notificationStore.message}</div>`;
+        return `<div style="font-size: 14px; line-height: 1.4; color: var(--text-primary);">${notificationStore.message}</div>`;
       });
       const close = () => {
         notificationStore.hide();
       };
       const handleTap = () => {
-        formatAppLog("log", "at components/GlobalNotification.vue:41", "Click vào thông báo");
+        formatAppLog("log", "at components/GlobalNotification.vue:51", "Click vào thông báo");
         close();
       };
-      const __returned__ = { notificationStore, statusBarHeight, formattedMessage, close, handleTap };
+      const __returned__ = { notificationStore, authStore, isDark, statusBarHeight, formattedMessage, close, handleTap };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12695,7 +12764,7 @@ This will fail in production if not fixed.`);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
-        class: vue.normalizeClass(["notification-wrapper", { "show": $setup.notificationStore.visible }]),
+        class: vue.normalizeClass(["notification-wrapper", { "show": $setup.notificationStore.visible, "theme-dark": $setup.isDark }]),
         style: vue.normalizeStyle({ paddingTop: $setup.statusBarHeight + "px" })
       },
       [
@@ -12744,6 +12813,40 @@ This will fail in production if not fixed.`);
       __expose();
       const authStore = useAuthStore();
       const isDark = vue.computed(() => authStore.isDark);
+      const onBack = () => {
+        const pages = getCurrentPages();
+        if (pages.length > 1) {
+          uni.navigateBack({
+            delta: 1
+          });
+        } else {
+          plus.runtime.quit();
+        }
+      };
+      const statusBarHeight = vue.ref(20);
+      vue.onMounted(() => {
+        const sysInfo = uni.getSystemInfoSync();
+        if (sysInfo.statusBarHeight) {
+          statusBarHeight.value = sysInfo.statusBarHeight;
+        }
+        updateStatusBar();
+      });
+      const updateStatusBar = () => {
+        if (isDark.value) {
+          uni.setNavigationBarColor({
+            frontColor: "#ffffff",
+            backgroundColor: "#000000"
+          });
+        } else {
+          uni.setNavigationBarColor({
+            frontColor: "#000000",
+            backgroundColor: "#ffffff"
+          });
+        }
+      };
+      vue.watch(isDark, () => {
+        updateStatusBar();
+      });
       const {
         todos,
         isLoading,
@@ -12816,7 +12919,7 @@ This will fail in production if not fixed.`);
           isConfirmDeleteOpen.value = true;
         }
       };
-      const __returned__ = { authStore, isDark, todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification, AppPicker };
+      const __returned__ = { authStore, isDark, onBack, statusBarHeight, updateStatusBar, todos, isLoading, isFilterOpen, filter, isConfirmDeleteOpen, itemToDelete, pageSizeOptions, pageSizeIndex, currentPage, totalPages, onPageSizeChange, changePage, statusOptions, statusIndex, onStatusChange, creatorOptions, creatorIndex, onCreatorChange, customerOptions, customerIndex, onCustomerChange, assigneeOptions, assigneeIndex, onAssigneeChange, sourceOptions, sourceIndex, onSourceChange, addNewTask, openFilter, closeFilter, resetFilter, applyFilter, showActionMenu, cancelDelete, confirmDelete, goToDetail, showCustomerModal, loadingCustomer, customerList, selectedCustomerName, openCustomerPopup, onCustomerSelect, onFilterCustomerInModal, pageNo, pageSize, totalCount, onChangePage, onUpdatePageSize, rawMemberList, loadingMore, loadMoreCustomers, isQuickCompleteOpen, quickTodos, isLoadingQuick, openQuickComplete, closeQuickComplete, handleQuickMarkDone, showCustomActionSheet, selectedItemForAction, openCustomMenu, handleCustomAction, CustomerModal, StatusBadge, DateRangeFilter, AppButton, GlobalMessage, ConfirmModal, Pagination, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -12827,6 +12930,7 @@ This will fail in production if not fixed.`);
   const _imports_4$1 = "/static/due-time.png";
   const _imports_5$1 = "/static/notify-time.png";
   function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$1);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -12834,34 +12938,55 @@ This will fail in production if not fixed.`);
       },
       [
         vue.createElementVNode("view", { class: "header" }, [
-          vue.createElementVNode("view", { class: "header-left" }),
           vue.createElementVNode(
-            "text",
-            { class: "header-title" },
-            vue.toDisplayString(_ctx.$t("todo.page_title")),
-            1
-            /* TEXT */
+            "view",
+            {
+              class: "status-bar-spacer",
+              style: vue.normalizeStyle({ height: $setup.statusBarHeight + "px" })
+            },
+            null,
+            4
+            /* STYLE */
           ),
-          vue.createElementVNode("view", { class: "header-right" }, [
+          vue.createElementVNode("view", { class: "nav-bar" }, [
             vue.createElementVNode("view", {
-              class: "icon-btn",
-              onClick: _cache[0] || (_cache[0] = (...args) => $setup.openQuickComplete && $setup.openQuickComplete(...args)),
-              style: { "margin-right": "15px" }
+              class: "header-left",
+              onClick: $setup.onBack
             }, [
-              vue.createElementVNode("image", {
-                src: _imports_1$2,
-                class: "filter-icon",
-                mode: "aspectFit"
-              })
+              vue.createVNode(_component_uni_icons, {
+                type: "left",
+                size: "24",
+                color: $setup.isDark ? "#ffffff" : "#333333"
+              }, null, 8, ["color"])
             ]),
-            vue.createElementVNode("view", {
-              class: "icon-btn",
-              onClick: _cache[1] || (_cache[1] = (...args) => $setup.openFilter && $setup.openFilter(...args))
-            }, [
-              vue.createElementVNode("image", {
-                src: _imports_1$3,
-                class: "filter-icon"
-              })
+            vue.createElementVNode(
+              "text",
+              { class: "header-title" },
+              vue.toDisplayString(_ctx.$t("todo.page_title")),
+              1
+              /* TEXT */
+            ),
+            vue.createElementVNode("view", { class: "header-right" }, [
+              vue.createElementVNode("view", {
+                class: "icon-btn",
+                onClick: _cache[0] || (_cache[0] = (...args) => $setup.openQuickComplete && $setup.openQuickComplete(...args)),
+                style: { "margin-right": "15px" }
+              }, [
+                vue.createElementVNode("image", {
+                  src: _imports_1$2,
+                  class: "filter-icon",
+                  mode: "aspectFit"
+                })
+              ]),
+              vue.createElementVNode("view", {
+                class: "icon-btn",
+                onClick: _cache[1] || (_cache[1] = (...args) => $setup.openFilter && $setup.openFilter(...args))
+              }, [
+                vue.createElementVNode("image", {
+                  src: _imports_1$3,
+                  class: "filter-icon"
+                })
+              ])
             ])
           ])
         ]),
@@ -14777,8 +14902,10 @@ This will fail in production if not fixed.`);
                     1
                     /* TEXT */
                   ),
-                  vue.createTextVNode(
-                    " " + vue.toDisplayString($props.dueDate ? $setup.formatDateTimeDisplay($props.dueDate) : _ctx.$t("todo.select_date")),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "picker-value" },
+                    vue.toDisplayString($props.dueDate ? $setup.formatDateTimeDisplay($props.dueDate) : _ctx.$t("todo.select_date")),
                     1
                     /* TEXT */
                   )
@@ -14815,8 +14942,10 @@ This will fail in production if not fixed.`);
                     1
                     /* TEXT */
                   ),
-                  vue.createTextVNode(
-                    " " + vue.toDisplayString($props.notifyAt ? $setup.formatDateTimeDisplay($props.notifyAt) : _ctx.$t("todo.select_date")),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "picker-value" },
+                    vue.toDisplayString($props.notifyAt ? $setup.formatDateTimeDisplay($props.notifyAt) : _ctx.$t("todo.select_date")),
                     1
                     /* TEXT */
                   )
@@ -14837,6 +14966,8 @@ This will fail in production if not fixed.`);
     __name: "create_todo",
     setup(__props, { expose: __expose }) {
       __expose();
+      const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const {
         loading,
         form,
@@ -14864,186 +14995,196 @@ This will fail in production if not fixed.`);
         const idx = memberList.value.findIndex((m) => m.memberUID === form.value.assignee);
         return idx !== -1 ? idx : 0;
       });
-      const __returned__ = { loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, memberIndex, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage, GlobalNotification, AppPicker };
+      const __returned__ = { authStore, isDark, loading, form, goBack, submitForm, memberOptions, onMemberChange, currentAssigneeName, showCustomerModal, loadingCustomer, customerList, openCustomerPopup, onCustomerSelect, sourceOptions, sourceIndex, onSourceChange, memberList, onCustomerFilter, loadingMore, loadMoreCustomers, memberIndex, TodoEditor, TodoDatePicker, CustomerModal, AppButton, GlobalMessage, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   });
   const _imports_0$1 = "/static/expand-arrow.png";
   function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      vue.createElementVNode("view", { class: "custom-header" }, [
-        vue.createElementVNode("view", {
-          onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
-          class: "back-btn"
-        }, [
-          vue.createElementVNode("image", {
-            src: _imports_0$1,
-            class: "back-icon"
-          })
-        ]),
-        vue.createElementVNode(
-          "text",
-          { class: "header-title" },
-          vue.toDisplayString(_ctx.$t("todo.create_page_title")),
-          1
-          /* TEXT */
-        ),
-        vue.createElementVNode("view", { class: "header-right" })
-      ]),
-      vue.createElementVNode("view", { class: "content-body" }, [
-        vue.createElementVNode("view", { class: "flat-item title-input-group" }, [
-          vue.createElementVNode("view", { class: "item-left" }, [
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: vue.normalizeClass(["container", { "theme-dark": $setup.isDark }])
+      },
+      [
+        vue.createElementVNode("view", { class: "custom-header" }, [
+          vue.createElementVNode("view", {
+            onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
+            class: "back-btn"
+          }, [
             vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/edit--v1.png",
-              class: "item-icon"
+              src: _imports_0$1,
+              class: "back-icon"
             })
-          ]),
-          vue.withDirectives(vue.createElementVNode("textarea", {
-            class: "item-input title-textarea",
-            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.name = $event),
-            placeholder: _ctx.$t("todo.enter_task_name"),
-            maxlength: "256",
-            "auto-height": ""
-          }, null, 8, ["placeholder"]), [
-            [vue.vModelText, $setup.form.name]
           ]),
           vue.createElementVNode(
             "text",
-            { class: "char-count" },
-            vue.toDisplayString(
-              _ctx.$t("todo.char_count").replace("{current}", String($setup.form.name ? $setup.form.name.length : 0)).replace("{max}", "256")
-            ),
+            { class: "header-title" },
+            vue.toDisplayString(_ctx.$t("todo.create_page_title")),
             1
             /* TEXT */
-          )
-        ]),
-        vue.createVNode($setup["TodoEditor"], {
-          modelValue: $setup.form.desc,
-          "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event),
-          placeholder: _ctx.$t("editor.placeholder")
-        }, null, 8, ["modelValue", "placeholder"]),
-        vue.createElementVNode("view", {
-          class: "flat-item",
-          onClick: _cache[3] || (_cache[3] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args))
-        }, [
-          vue.createElementVNode("view", { class: "item-left" }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/price-tag.png",
-              class: "item-icon"
-            })
-          ]),
-          vue.createElementVNode(
-            "view",
-            {
-              class: vue.normalizeClass(["input-trigger", { "placeholder": !$setup.form.customer }])
-            },
-            vue.toDisplayString($setup.form.customer || _ctx.$t("todo.select_customer")),
-            3
-            /* TEXT, CLASS */
           ),
-          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+          vue.createElementVNode("view", { class: "header-right" })
         ]),
-        vue.createVNode($setup["CustomerModal"], {
-          visible: $setup.showCustomerModal,
-          loading: $setup.loadingCustomer,
-          loadingMore: $setup.loadingMore,
-          customers: $setup.customerList,
-          managers: $setup.memberList,
-          onClose: _cache[4] || (_cache[4] = ($event) => $setup.showCustomerModal = false),
-          onSelect: $setup.onCustomerSelect,
-          onFilter: $setup.onCustomerFilter,
-          onLoadMore: $setup.loadMoreCustomers
-        }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
-        vue.createElementVNode("view", { class: "flat-item" }, [
-          vue.createElementVNode("view", { class: "item-left" }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/internet.png",
-              class: "item-icon"
-            })
-          ]),
-          vue.createVNode($setup["AppPicker"], {
-            range: $setup.sourceOptions,
-            value: $setup.sourceIndex > -1 ? $setup.sourceIndex : 0,
-            onChange: $setup.onSourceChange,
-            class: "full-width-picker",
-            title: _ctx.$t("todo.source")
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                {
-                  class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
-                },
-                vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
-                3
-                /* TEXT, CLASS */
-              )
+        vue.createElementVNode("view", { class: "content-body" }, [
+          vue.createElementVNode("view", { class: "flat-item title-input-group" }, [
+            vue.createElementVNode("view", { class: "item-left" }, [
+              vue.createElementVNode("image", {
+                src: "https://img.icons8.com/ios/50/666666/edit--v1.png",
+                class: "item-icon"
+              })
             ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["range", "value", "onChange", "title"]),
-          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
-        ]),
-        vue.createElementVNode("view", { class: "flat-item" }, [
-          vue.createElementVNode("view", { class: "item-left" }, [
-            vue.createElementVNode("image", {
-              src: "https://img.icons8.com/ios/50/666666/user.png",
-              class: "item-icon"
-            })
-          ]),
-          vue.createVNode($setup["AppPicker"], {
-            range: $setup.memberOptions,
-            value: $setup.memberIndex,
-            onChange: $setup.onMemberChange,
-            class: "full-width-picker",
-            title: _ctx.$t("todo.assignee")
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                {
-                  class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
-                },
-                vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
-                3
-                /* TEXT, CLASS */
-              )
+            vue.withDirectives(vue.createElementVNode("textarea", {
+              class: "item-input title-textarea",
+              "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.name = $event),
+              placeholder: _ctx.$t("todo.enter_task_name"),
+              maxlength: "256",
+              "auto-height": "",
+              "placeholder-class": "input-placeholder"
+            }, null, 8, ["placeholder"]), [
+              [vue.vModelText, $setup.form.name]
             ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["range", "value", "onChange", "title"]),
-          vue.createElementVNode("text", { class: "arrow-icon" }, "›")
-        ]),
-        vue.createVNode($setup["TodoDatePicker"], {
-          dueDate: $setup.form.dueDate,
-          "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
-          notifyAt: $setup.form.notifyAt,
-          "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event)
-        }, null, 8, ["dueDate", "notifyAt"]),
-        vue.createElementVNode("view", { class: "footer-action" }, [
-          vue.createElementVNode("view", { style: { "width": "35%" } }, [
-            vue.createVNode($setup["AppButton"], {
-              type: "secondary",
-              label: _ctx.$t("common.cancel_action"),
-              onClick: $setup.goBack
-            }, null, 8, ["label", "onClick"])
+            vue.createElementVNode(
+              "text",
+              { class: "char-count" },
+              vue.toDisplayString(
+                _ctx.$t("todo.char_count").replace("{current}", String($setup.form.name ? $setup.form.name.length : 0)).replace("{max}", "256")
+              ),
+              1
+              /* TEXT */
+            )
           ]),
-          vue.createElementVNode("view", { style: { "width": "60%" } }, [
-            vue.createVNode($setup["AppButton"], {
-              type: "primary",
-              label: $setup.loading ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
-              loading: $setup.loading,
-              onClick: $setup.submitForm
-            }, null, 8, ["label", "loading", "onClick"])
+          vue.createVNode($setup["TodoEditor"], {
+            modelValue: $setup.form.desc,
+            "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $setup.form.desc = $event),
+            placeholder: _ctx.$t("editor.placeholder")
+          }, null, 8, ["modelValue", "placeholder"]),
+          vue.createElementVNode("view", {
+            class: "flat-item",
+            onClick: _cache[3] || (_cache[3] = (...args) => $setup.openCustomerPopup && $setup.openCustomerPopup(...args))
+          }, [
+            vue.createElementVNode("view", { class: "item-left" }, [
+              vue.createElementVNode("image", {
+                src: "https://img.icons8.com/ios/50/666666/price-tag.png",
+                class: "item-icon"
+              })
+            ]),
+            vue.createElementVNode(
+              "view",
+              {
+                class: vue.normalizeClass(["input-trigger", { "placeholder": !$setup.form.customer }])
+              },
+              vue.toDisplayString($setup.form.customer || _ctx.$t("todo.select_customer")),
+              3
+              /* TEXT, CLASS */
+            ),
+            vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+          ]),
+          vue.createVNode($setup["CustomerModal"], {
+            visible: $setup.showCustomerModal,
+            loading: $setup.loadingCustomer,
+            loadingMore: $setup.loadingMore,
+            customers: $setup.customerList,
+            managers: $setup.memberList,
+            onClose: _cache[4] || (_cache[4] = ($event) => $setup.showCustomerModal = false),
+            onSelect: $setup.onCustomerSelect,
+            onFilter: $setup.onCustomerFilter,
+            onLoadMore: $setup.loadMoreCustomers
+          }, null, 8, ["visible", "loading", "loadingMore", "customers", "managers", "onSelect", "onFilter", "onLoadMore"]),
+          vue.createElementVNode("view", { class: "flat-item" }, [
+            vue.createElementVNode("view", { class: "item-left" }, [
+              vue.createElementVNode("image", {
+                src: "https://img.icons8.com/ios/50/666666/internet.png",
+                class: "item-icon"
+              })
+            ]),
+            vue.createVNode($setup["AppPicker"], {
+              range: $setup.sourceOptions,
+              value: $setup.sourceIndex > -1 ? $setup.sourceIndex : 0,
+              onChange: $setup.onSourceChange,
+              class: "full-width-picker",
+              title: _ctx.$t("todo.source")
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode(
+                  "view",
+                  {
+                    class: vue.normalizeClass(["picker-display", { "placeholder-color": $setup.sourceIndex === -1 }])
+                  },
+                  vue.toDisplayString($setup.sourceIndex > -1 ? $setup.sourceOptions[$setup.sourceIndex] : _ctx.$t("todo.select_source")),
+                  3
+                  /* TEXT, CLASS */
+                )
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["range", "value", "onChange", "title"]),
+            vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+          ]),
+          vue.createElementVNode("view", { class: "flat-item" }, [
+            vue.createElementVNode("view", { class: "item-left" }, [
+              vue.createElementVNode("image", {
+                src: "https://img.icons8.com/ios/50/666666/user.png",
+                class: "item-icon"
+              })
+            ]),
+            vue.createVNode($setup["AppPicker"], {
+              range: $setup.memberOptions,
+              value: $setup.memberIndex,
+              onChange: $setup.onMemberChange,
+              class: "full-width-picker",
+              title: _ctx.$t("todo.assignee")
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode(
+                  "view",
+                  {
+                    class: vue.normalizeClass(["picker-display", { "placeholder-color": !$setup.currentAssigneeName }])
+                  },
+                  vue.toDisplayString($setup.currentAssigneeName ? $setup.currentAssigneeName : _ctx.$t("todo.assignee")),
+                  3
+                  /* TEXT, CLASS */
+                )
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["range", "value", "onChange", "title"]),
+            vue.createElementVNode("text", { class: "arrow-icon" }, "›")
+          ]),
+          vue.createVNode($setup["TodoDatePicker"], {
+            class: vue.normalizeClass({ "theme-dark": $setup.isDark }),
+            dueDate: $setup.form.dueDate,
+            "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
+            notifyAt: $setup.form.notifyAt,
+            "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event)
+          }, null, 8, ["class", "dueDate", "notifyAt"]),
+          vue.createElementVNode("view", { class: "footer-action" }, [
+            vue.createElementVNode("view", { style: { "width": "35%" } }, [
+              vue.createVNode($setup["AppButton"], {
+                type: "secondary",
+                label: _ctx.$t("common.cancel_action"),
+                onClick: $setup.goBack
+              }, null, 8, ["label", "onClick"])
+            ]),
+            vue.createElementVNode("view", { style: { "width": "60%" } }, [
+              vue.createVNode($setup["AppButton"], {
+                type: "primary",
+                label: $setup.loading ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
+                loading: $setup.loading,
+                onClick: $setup.submitForm
+              }, null, 8, ["label", "loading", "onClick"])
+            ])
           ])
-        ])
-      ]),
-      vue.createVNode($setup["GlobalMessage"]),
-      vue.createVNode($setup["GlobalNotification"])
-    ]);
+        ]),
+        vue.createVNode($setup["GlobalMessage"]),
+        vue.createVNode($setup["GlobalNotification"])
+      ],
+      2
+      /* CLASS */
+    );
   }
-  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/create_todo.vue"]]);
+  const PagesTodoCreateTodo = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-4d5a6d0e"], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/create_todo.vue"]]);
   const timestampToDateTimeStr = (ts) => {
     if (!ts || ts <= 0)
       return "";
@@ -17949,16 +18090,16 @@ This will fail in production if not fixed.`);
         return props.data.isMe === true;
       });
       const htmlStyles = {
-        p: "font-size: 14px; line-height: 1.5; color: #374151; margin: 0; margin-bottom: 2px;",
-        div: "font-size: 14px; line-height: 1.5; color: #374151;",
-        span: "font-size: 14px; line-height: 1.5; color: #374151;",
+        p: "font-size: 14px; line-height: 1.5; color: var(--text-primary); margin: 0; margin-bottom: 2px;",
+        div: "font-size: 14px; line-height: 1.5; color: var(--text-primary);",
+        span: "font-size: 14px; line-height: 1.5; color: var(--text-primary);",
         a: "color: #007aff; text-decoration: none; font-size: 14px;",
         img: "max-width: 100%; border-radius: 6px; margin-top: 4px;"
       };
       const handleLinkTap = (e) => {
         const url = e.href || e["data-src"] || e.src;
         if (url) {
-          formatAppLog("log", "at components/Todo/CommentItem.vue:131", "Mở link:", url);
+          formatAppLog("log", "at components/Todo/CommentItem.vue:134", "Mở link:", url);
           openExternalLink(url);
         }
       };
@@ -18017,12 +18158,12 @@ This will fail in production if not fixed.`);
           class: vue.normalizeClass(["shrink-0", $props.isReply ? "mr-2" : "mr-3"])
         }, null, 8, ["name", "avatar-color", "size", "class"]),
         vue.createElementVNode("view", { class: "flex-1 overflow-hidden" }, [
-          vue.createElementVNode("view", { class: "bg-gray-50 rounded-2xl p-3 rounded-tl-none relative" }, [
+          vue.createElementVNode("view", { class: "comment-bubble rounded-2xl p-3 rounded-tl-none relative" }, [
             vue.createElementVNode("view", { class: "flex flex-col items-start mb-2" }, [
               vue.createElementVNode("view", { class: "flex flex-wrap items-center gap-1" }, [
                 vue.createElementVNode(
                   "text",
-                  { class: "font-bold text-sm text-gray-900" },
+                  { class: "font-bold text-sm sender-name" },
                   vue.toDisplayString($props.data.senderName),
                   1
                   /* TEXT */
@@ -18031,7 +18172,7 @@ This will fail in production if not fixed.`);
                   "text",
                   {
                     key: 0,
-                    class: "text-xs text-gray-500 font-normal"
+                    class: "text-xs action-text font-normal"
                   },
                   vue.toDisplayString($props.data.actionText),
                   1
@@ -18041,14 +18182,14 @@ This will fail in production if not fixed.`);
               vue.createElementVNode("view", { class: "flex items-center mt-1" }, [
                 vue.createElementVNode(
                   "text",
-                  { class: "text-xs text-gray-400" },
+                  { class: "text-xs time-text" },
                   vue.toDisplayString($props.data.timeDisplay),
                   1
                   /* TEXT */
                 ),
                 $props.data.isEdited ? (vue.openBlock(), vue.createElementBlock("text", {
                   key: 0,
-                  class: "text-xs text-gray-400 italic ml-1"
+                  class: "text-xs time-text italic ml-1"
                 }, " • Đã sửa ")) : vue.createCommentVNode("v-if", true)
               ])
             ]),
@@ -18058,7 +18199,7 @@ This will fail in production if not fixed.`);
             }, [
               vue.createElementVNode(
                 "text",
-                { class: "font-bold text-sm text-gray-700 block mb-1" },
+                { class: "font-bold text-sm log-label block mb-1" },
                 vue.toDisplayString($setup.parsedContent.label),
                 1
                 /* TEXT */
@@ -18069,7 +18210,7 @@ This will fail in production if not fixed.`);
                     content: $setup.parsedContent.oldRaw,
                     "copy-link": false,
                     "tag-style": $setup.htmlStyles,
-                    "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
+                    "container-style": "font-size: 14px; color: var(--text-primary); line-height: 1.5;",
                     onLinktap: $setup.handleLinkTap
                   }, null, 8, ["content"])
                 ]),
@@ -18081,7 +18222,7 @@ This will fail in production if not fixed.`);
                     content: $setup.parsedContent.newRaw,
                     "copy-link": false,
                     "tag-style": $setup.htmlStyles,
-                    "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
+                    "container-style": "font-size: 14px; color: var(--text-primary); line-height: 1.5;",
                     onLinktap: $setup.handleLinkTap
                   }, null, 8, ["content"])
                 ])
@@ -18094,7 +18235,7 @@ This will fail in production if not fixed.`);
                 content: $props.data.message,
                 "copy-link": false,
                 "tag-style": $setup.htmlStyles,
-                "container-style": "font-size: 14px; color: #374151; line-height: 1.5;",
+                "container-style": "font-size: 14px; color: var(--text-primary); line-height: 1.5;",
                 onLinktap: $setup.handleLinkTap
               }, null, 8, ["content"]),
               $props.data.files ? (vue.openBlock(), vue.createElementBlock("view", {
@@ -18217,6 +18358,8 @@ This will fail in production if not fixed.`);
     __name: "todo_detail",
     setup(__props, { expose: __expose }) {
       __expose();
+      const authStore = useAuthStore();
+      const isDark = vue.computed(() => authStore.isDark);
       const {
         isLoading,
         isLoadingCustomer,
@@ -18314,7 +18457,7 @@ This will fail in production if not fixed.`);
         onRequestEditComment(data.id);
         scrollToInput();
       };
-      const __returned__ = { isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, goBack, isDone, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification, AppPicker };
+      const __returned__ = { authStore, isDark, isLoading, isLoadingCustomer, isLoadingHistory, historyList, form, statusOptions, sourceOptions, assigneeOptions, onStatusChange, onSourceChange, onAssigneeChange, saveTodo, historyFilterOptions, historyFilterIndex, onHistoryFilterChange, comments, isLoadingComments, newCommentText, isSubmittingComment, submitComment, isConfirmDeleteCommentOpen, onRequestDeleteComment, confirmDeleteComment, cancelDeleteComment, currentUserId, isEditingComment, onRequestEditComment, submitUpdateComment, onCancelEditComment, isConfirmCancelEditOpen, continueEditing, confirmCancelEdit, editingMemberName, isEmojiPickerOpen, emojiList, onToggleEmojiPicker, closeEmojiPicker, selectEmoji, isReplying, replyingMemberName, replyingCommentData, onRequestReply, onCancelReply, submitReply, isConfirmCancelReplyOpen, continueReplying, confirmCancelReply, commentFilterIndex, commentFilterOptions, onCommentFilterChange, isSavingDescription, onSaveDescription, onDateUpdate, isStatusDisabled, onSaveTitle, replyingMessagePreview, isHistoryOpen, toggleHistory, goBack, isDone, isCommentsOpen, scrollTarget, toggleComments, todoEditorRef, scrollToInput, handleReply, handleEdit, TodoEditor, TodoDatePicker, CommentItem, AppButton, GlobalMessage, ConfirmModal, GlobalNotification, AppPicker };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -18325,688 +18468,697 @@ This will fail in production if not fixed.`);
   const _imports_5 = "/static/phone.png";
   const _imports_6 = "/static/manager.png";
   function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
-      $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 0,
-        class: "loading-bar"
-      })) : vue.createCommentVNode("v-if", true),
-      vue.createElementVNode("view", { class: "custom-header" }, [
-        vue.createElementVNode("view", {
-          onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
-          class: "back-btn"
-        }, [
-          vue.createElementVNode("image", {
-            src: _imports_0$1,
-            class: "back-icon"
-          })
-        ]),
-        vue.createElementVNode(
-          "text",
-          { class: "header-title" },
-          vue.toDisplayString(_ctx.$t("todo.todo_detail_title")),
-          1
-          /* TEXT */
-        ),
-        vue.createElementVNode("view", { class: "header-right" })
-      ]),
-      vue.createElementVNode("view", { class: "detail-header-content" }, [
-        vue.createElementVNode("view", { class: "header-top" }, [
+    return vue.openBlock(), vue.createElementBlock(
+      "view",
+      {
+        class: vue.normalizeClass(["container", { "theme-dark": $setup.isDark }])
+      },
+      [
+        $setup.isLoading ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 0,
+          class: "loading-bar"
+        })) : vue.createCommentVNode("v-if", true),
+        vue.createElementVNode("view", { class: "custom-header" }, [
+          vue.createElementVNode("view", {
+            onClick: _cache[0] || (_cache[0] = (...args) => $setup.goBack && $setup.goBack(...args)),
+            class: "back-btn"
+          }, [
+            vue.createElementVNode("image", {
+              src: _imports_0$1,
+              class: "back-icon"
+            })
+          ]),
           vue.createElementVNode(
             "text",
-            { class: "header-code" },
-            "#" + vue.toDisplayString($setup.form.code || "..."),
+            { class: "header-title" },
+            vue.toDisplayString(_ctx.$t("todo.todo_detail_title")),
             1
             /* TEXT */
-          )
+          ),
+          vue.createElementVNode("view", { class: "header-right" })
         ]),
-        vue.withDirectives(vue.createElementVNode("textarea", {
-          class: "header-title-input",
-          "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.title = $event),
-          placeholder: _ctx.$t("todo.header_loading"),
-          "auto-height": "",
-          maxlength: "256",
-          "confirm-type": "done",
-          disabled: $setup.isDone,
-          onConfirm: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
-          onBlur: _cache[3] || (_cache[3] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args))
-        }, null, 40, ["placeholder", "disabled"]), [
-          [vue.vModelText, $setup.form.title]
-        ])
-      ]),
-      vue.createElementVNode("view", { class: "detail-body" }, [
-        vue.createElementVNode(
-          "view",
-          { class: "section-title" },
-          vue.toDisplayString(_ctx.$t("todo.desc_section")),
-          1
-          /* TEXT */
-        ),
-        vue.createElementVNode("view", { class: "section-block" }, [
-          vue.createVNode($setup["TodoEditor"], {
-            modelValue: $setup.form.desc,
-            "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.form.desc = $event),
-            placeholder: _ctx.$t("todo.desc_placeholder"),
-            "read-only": $setup.isDone
-          }, null, 8, ["modelValue", "placeholder", "read-only"]),
-          !$setup.isDone ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "input-actions",
-            style: { "margin-top": "10px" }
-          }, [
-            vue.createVNode($setup["AppButton"], {
-              type: "primary",
-              size: "small",
-              loading: $setup.isSavingDescription,
-              label: $setup.isSavingDescription ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
-              onClick: $setup.onSaveDescription
-            }, null, 8, ["loading", "label", "onClick"])
-          ])) : vue.createCommentVNode("v-if", true)
-        ]),
-        vue.createElementVNode(
-          "view",
-          { class: "section-title" },
-          vue.toDisplayString(_ctx.$t("todo.info_section")),
-          1
-          /* TEXT */
-        ),
-        vue.createElementVNode(
-          "view",
-          {
-            class: vue.normalizeClass(["info-group", { "disabled-group": $setup.isDone }])
-          },
-          [
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_1$2,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.status")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item-picker-box" }, [
-                vue.createVNode($setup["AppPicker"], {
-                  range: $setup.statusOptions,
-                  value: $setup.form.statusIndex,
-                  onChange: $setup.onStatusChange,
-                  title: _ctx.$t("todo.status")
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createElementVNode(
-                      "view",
-                      {
-                        class: vue.normalizeClass(["picker-text", { "disabled-text": $setup.isStatusDisabled }])
-                      },
-                      [
-                        vue.createTextVNode(
-                          vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || _ctx.$t("common.loading")) + " ",
-                          1
-                          /* TEXT */
-                        ),
-                        !$setup.isStatusDisabled ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "▾")) : vue.createCommentVNode("v-if", true)
-                      ],
-                      2
-                      /* CLASS */
-                    )
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["range", "value", "onChange", "title"])
-              ])
-            ]),
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_2,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.source")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item-picker-box" }, [
-                vue.createElementVNode(
-                  "view",
-                  { class: "picker-text disabled-text" },
-                  vue.toDisplayString($setup.sourceOptions[$setup.form.sourceIndex] || "..."),
-                  1
-                  /* TEXT */
-                )
-              ])
-            ]),
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_3,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.assignee")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "item-picker-box" }, [
-                vue.createVNode($setup["AppPicker"], {
-                  range: $setup.assigneeOptions,
-                  value: $setup.form.assigneeIndex,
-                  onChange: $setup.onAssigneeChange,
-                  title: _ctx.$t("todo.assignee")
-                }, {
-                  default: vue.withCtx(() => [
-                    vue.createElementVNode(
-                      "view",
-                      { class: "picker-text" },
-                      vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : _ctx.$t("common.loading")) + " ▾ ",
-                      1
-                      /* TEXT */
-                    )
-                  ]),
-                  _: 1
-                  /* STABLE */
-                }, 8, ["range", "value", "onChange", "title"])
-              ])
-            ]),
-            vue.createVNode($setup["TodoDatePicker"], {
-              dueDate: $setup.form.dueDate,
-              "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
-              notifyAt: $setup.form.notifyAt,
-              "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event),
-              onChange: $setup.onDateUpdate
-            }, null, 8, ["dueDate", "notifyAt", "onChange"])
-          ],
-          2
-          /* CLASS */
-        ),
-        vue.createElementVNode(
-          "view",
-          { class: "section-title" },
-          vue.toDisplayString(_ctx.$t("todo.customer_section")),
-          1
-          /* TEXT */
-        ),
-        vue.createElementVNode("view", { class: "info-group customer-block" }, [
-          $setup.isLoadingCustomer ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "loading-row"
-          }, [
+        vue.createElementVNode("view", { class: "detail-header-content" }, [
+          vue.createElementVNode("view", { class: "header-top" }, [
             vue.createElementVNode(
               "text",
-              { class: "loading-text" },
-              vue.toDisplayString(_ctx.$t("todo.loading_crm")),
+              { class: "header-code" },
+              "#" + vue.toDisplayString($setup.form.code || "..."),
               1
               /* TEXT */
-            )
-          ])) : !$setup.form.customerCode ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 1,
-            class: "empty-row"
-          }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(_ctx.$t("todo.no_customer_attached")),
-              1
-              /* TEXT */
-            )
-          ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_4,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.customer_name_label")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode(
-                "view",
-                { class: "item-right-text" },
-                vue.toDisplayString($setup.form.customerName),
-                1
-                /* TEXT */
-              )
-            ]),
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_5,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.customer_phone_label")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode(
-                "view",
-                { class: "item-right-text phone-text" },
-                vue.toDisplayString($setup.form.customerPhone),
-                1
-                /* TEXT */
-              )
-            ]),
-            vue.createElementVNode("view", { class: "flat-item" }, [
-              vue.createElementVNode("view", { class: "item-left" }, [
-                vue.createElementVNode("image", {
-                  src: _imports_6,
-                  class: "item-icon"
-                }),
-                vue.createElementVNode(
-                  "text",
-                  { class: "item-label" },
-                  vue.toDisplayString(_ctx.$t("todo.customer_manager_label")),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode(
-                "view",
-                { class: "item-right-text highlight-text" },
-                vue.toDisplayString($setup.form.customerManagerName || _ctx.$t("todo.manager_none")),
-                1
-                /* TEXT */
-              )
-            ])
-          ]))
-        ]),
-        vue.createElementVNode("view", { class: "section-header-row" }, [
-          vue.createElementVNode("view", {
-            class: "toggle-header",
-            onClick: $setup.toggleComments
-          }, [
-            vue.createElementVNode(
-              "text",
-              { class: "section-title no-margin" },
-              vue.toDisplayString(_ctx.$t("todo.comments_activities")),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "image",
-              {
-                src: _imports_0$1,
-                class: vue.normalizeClass(["toggle-icon", { "open": $setup.isCommentsOpen }])
-              },
-              null,
-              2
-              /* CLASS */
             )
           ]),
-          vue.createVNode($setup["AppPicker"], {
-            range: $setup.commentFilterOptions,
-            value: $setup.commentFilterIndex,
-            onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
-            }, ["stop"])),
-            onChange: $setup.onCommentFilterChange,
-            title: _ctx.$t("common.filter")
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                { class: "filter-badge" },
-                vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾",
-                1
-                /* TEXT */
-              )
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["range", "value", "onChange", "title"])
+          vue.withDirectives(vue.createElementVNode("textarea", {
+            class: "header-title-input",
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => $setup.form.title = $event),
+            placeholder: _ctx.$t("todo.header_loading"),
+            "auto-height": "",
+            maxlength: "256",
+            "confirm-type": "done",
+            disabled: $setup.isDone,
+            onConfirm: _cache[2] || (_cache[2] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
+            onBlur: _cache[3] || (_cache[3] = (...args) => $setup.onSaveTitle && $setup.onSaveTitle(...args)),
+            "placeholder-class": "input-placeholder"
+          }, null, 40, ["placeholder", "disabled"]), [
+            [vue.vModelText, $setup.form.title]
+          ])
         ]),
-        $setup.isCommentsOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 0,
-          class: "comments-section"
-        }, [
-          vue.createElementVNode("view", {
-            class: "comment-input-block",
-            id: "comment-input-anchor"
-          }, [
-            vue.createElementVNode("view", { class: "editor-container" }, [
-              vue.createVNode($setup["TodoEditor"], {
-                ref: "todoEditorRef",
-                modelValue: $setup.newCommentText,
-                "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => $setup.newCommentText = $event),
-                placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
-              }, null, 8, ["modelValue", "placeholder"])
-            ]),
-            $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
+        vue.createElementVNode("view", { class: "detail-body" }, [
+          vue.createElementVNode(
+            "view",
+            { class: "section-title" },
+            vue.toDisplayString(_ctx.$t("todo.desc_section")),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("view", { class: "section-block" }, [
+            vue.createVNode($setup["TodoEditor"], {
+              modelValue: $setup.form.desc,
+              "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.form.desc = $event),
+              placeholder: _ctx.$t("todo.desc_placeholder"),
+              "read-only": $setup.isDone
+            }, null, 8, ["modelValue", "placeholder", "read-only"]),
+            !$setup.isDone ? (vue.openBlock(), vue.createElementBlock("view", {
               key: 0,
-              class: "editing-alert"
+              class: "input-actions",
+              style: { "margin-top": "10px" }
             }, [
-              vue.createElementVNode("text", { class: "editing-text" }, [
-                vue.createTextVNode(
-                  vue.toDisplayString(_ctx.$t("todo.editing_alert")) + " ",
-                  1
-                  /* TEXT */
-                ),
-                vue.createElementVNode(
-                  "text",
-                  { class: "editing-name" },
-                  vue.toDisplayString($setup.editingMemberName),
-                  1
-                  /* TEXT */
-                )
-              ])
-            ])) : vue.createCommentVNode("v-if", true),
-            $setup.isReplying && $setup.replyingCommentData ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 1,
-              class: "reply-alert"
-            }, [
-              vue.createElementVNode("view", { class: "reply-info" }, [
-                vue.createElementVNode(
-                  "text",
-                  { class: "reply-label" },
-                  vue.toDisplayString(_ctx.$t("todo.replying_alert")),
-                  1
-                  /* TEXT */
-                ),
-                vue.createElementVNode(
-                  "text",
-                  { class: "reply-name" },
-                  vue.toDisplayString($setup.replyingMemberName),
-                  1
-                  /* TEXT */
-                )
-              ]),
-              vue.createElementVNode("view", { class: "reply-quote" }, [
-                vue.createElementVNode("text", { class: "quote-icon" }, "“"),
-                vue.createElementVNode("rich-text", {
-                  nodes: $setup.replyingMessagePreview,
-                  class: "quote-content"
-                }, null, 8, ["nodes"]),
-                vue.createElementVNode("text", { class: "quote-icon" }, "”")
-              ])
-            ])) : vue.createCommentVNode("v-if", true),
-            vue.createElementVNode("view", { class: "input-actions" }, [
-              !$setup.isEditingComment && !$setup.isReplying ? (vue.openBlock(), vue.createBlock($setup["AppButton"], {
-                key: 0,
+              vue.createVNode($setup["AppButton"], {
                 type: "primary",
                 size: "small",
-                loading: $setup.isSubmittingComment,
-                label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
-                onClick: $setup.submitComment
-              }, null, 8, ["loading", "label", "onClick"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 1,
-                class: "edit-actions-row"
-              }, [
-                vue.createVNode($setup["AppButton"], {
-                  type: "secondary",
-                  size: "small",
-                  label: _ctx.$t("common.cancel"),
-                  disabled: $setup.isSubmittingComment,
-                  onClick: $setup.onCancelEditComment
-                }, null, 8, ["label", "disabled", "onClick"]),
-                vue.createVNode($setup["AppButton"], {
-                  type: "primary",
-                  size: "small",
-                  loading: $setup.isSubmittingComment,
-                  label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.update_btn"),
-                  onClick: $setup.submitUpdateComment
-                }, null, 8, ["loading", "label", "onClick"])
-              ])) : $setup.isReplying ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 2,
-                class: "edit-actions-row"
-              }, [
-                vue.createVNode($setup["AppButton"], {
-                  type: "secondary",
-                  size: "small",
-                  label: _ctx.$t("common.cancel"),
-                  disabled: $setup.isSubmittingComment,
-                  onClick: $setup.onCancelReply
-                }, null, 8, ["label", "disabled", "onClick"]),
-                vue.createVNode($setup["AppButton"], {
-                  type: "primary",
-                  size: "small",
-                  loading: $setup.isSubmittingComment,
-                  label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.reply_btn"),
-                  onClick: $setup.submitReply
-                }, null, 8, ["loading", "label", "onClick"])
-              ])) : vue.createCommentVNode("v-if", true)
-            ])
+                loading: $setup.isSavingDescription,
+                label: $setup.isSavingDescription ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
+                onClick: $setup.onSaveDescription
+              }, null, 8, ["loading", "label", "onClick"])
+            ])) : vue.createCommentVNode("v-if", true)
           ]),
-          vue.createElementVNode("view", { class: "divider-line" }),
-          $setup.isLoadingComments ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "loading-row"
-          }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(_ctx.$t("todo.loading_comments")),
-              1
-              /* TEXT */
-            )
-          ])) : $setup.comments.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 1,
-            class: "empty-row"
-          }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(_ctx.$t("todo.no_comments")),
-              1
-              /* TEXT */
-            )
-          ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
-            (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.comments, (item) => {
-                return vue.openBlock(), vue.createBlock($setup["CommentItem"], {
-                  key: item.id,
-                  data: item,
-                  onReact: $setup.onToggleEmojiPicker,
-                  onReply: _cache[9] || (_cache[9] = (data) => $setup.handleReply(data)),
-                  onEdit: _cache[10] || (_cache[10] = (data) => $setup.handleEdit(data)),
-                  onDelete: _cache[11] || (_cache[11] = (id) => $setup.onRequestDeleteComment(id))
-                }, null, 8, ["data", "onReact"]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ]))
-        ])) : vue.createCommentVNode("v-if", true),
-        vue.createElementVNode("view", { class: "section-header-row" }, [
-          vue.createElementVNode("view", {
-            class: "toggle-header",
-            onClick: _cache[12] || (_cache[12] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
-          }, [
-            vue.createElementVNode(
-              "text",
-              { class: "section-title no-margin" },
-              vue.toDisplayString(_ctx.$t("todo.history_section")),
-              1
-              /* TEXT */
-            ),
-            vue.createElementVNode(
-              "image",
-              {
-                src: _imports_0$1,
-                class: vue.normalizeClass(["toggle-icon", { "open": $setup.isHistoryOpen }])
-              },
-              null,
-              2
-              /* CLASS */
-            )
-          ]),
-          vue.createVNode($setup["AppPicker"], {
-            range: $setup.historyFilterOptions,
-            value: $setup.historyFilterIndex,
-            onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
-            }, ["stop"])),
-            onChange: $setup.onHistoryFilterChange,
-            title: _ctx.$t("common.filter")
-          }, {
-            default: vue.withCtx(() => [
-              vue.createElementVNode(
-                "view",
-                { class: "filter-badge" },
-                vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾",
-                1
-                /* TEXT */
-              )
-            ]),
-            _: 1
-            /* STABLE */
-          }, 8, ["range", "value", "onChange", "title"])
-        ]),
-        $setup.isHistoryOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-          key: 1,
-          class: "history-container"
-        }, [
-          $setup.isLoadingHistory ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 0,
-            class: "loading-row"
-          }, [
-            vue.createElementVNode(
-              "text",
-              { class: "loading-text" },
-              vue.toDisplayString(_ctx.$t("todo.loading_history")),
-              1
-              /* TEXT */
-            )
-          ])) : $setup.historyList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
-            key: 1,
-            class: "empty-row"
-          }, [
-            vue.createElementVNode(
-              "text",
-              null,
-              vue.toDisplayString(_ctx.$t("todo.no_history")),
-              1
-              /* TEXT */
-            )
-          ])) : (vue.openBlock(), vue.createElementBlock("view", {
-            key: 2,
-            class: "timeline-list"
-          }, [
-            (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.historyList, (item, index) => {
-                return vue.openBlock(), vue.createElementBlock("view", {
-                  key: item.id,
-                  class: "timeline-item"
-                }, [
-                  index !== $setup.historyList.length - 1 ? (vue.openBlock(), vue.createElementBlock("view", {
-                    key: 0,
-                    class: "timeline-line"
-                  })) : vue.createCommentVNode("v-if", true),
-                  vue.createElementVNode("view", { class: "timeline-dot" }),
-                  vue.createElementVNode("view", { class: "timeline-content" }, [
-                    vue.createElementVNode("view", { class: "timeline-header" }, [
+          vue.createElementVNode(
+            "view",
+            { class: "section-title" },
+            vue.toDisplayString(_ctx.$t("todo.info_section")),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode(
+            "view",
+            {
+              class: vue.normalizeClass(["info-group", { "disabled-group": $setup.isDone }])
+            },
+            [
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_1$2,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.status")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode("view", { class: "item-picker-box" }, [
+                  vue.createVNode($setup["AppPicker"], {
+                    range: $setup.statusOptions,
+                    value: $setup.form.statusIndex,
+                    onChange: $setup.onStatusChange,
+                    title: _ctx.$t("todo.status")
+                  }, {
+                    default: vue.withCtx(() => [
                       vue.createElementVNode(
-                        "text",
-                        { class: "t-actor" },
-                        vue.toDisplayString(item.actorName),
-                        1
-                        /* TEXT */
-                      ),
+                        "view",
+                        {
+                          class: vue.normalizeClass(["picker-text", { "disabled-text": $setup.isStatusDisabled }])
+                        },
+                        [
+                          vue.createTextVNode(
+                            vue.toDisplayString($setup.statusOptions[$setup.form.statusIndex] || _ctx.$t("common.loading")) + " ",
+                            1
+                            /* TEXT */
+                          ),
+                          !$setup.isStatusDisabled ? (vue.openBlock(), vue.createElementBlock("text", { key: 0 }, "▾")) : vue.createCommentVNode("v-if", true)
+                        ],
+                        2
+                        /* CLASS */
+                      )
+                    ]),
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["range", "value", "onChange", "title"])
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_2,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.source")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode("view", { class: "item-picker-box" }, [
+                  vue.createElementVNode(
+                    "view",
+                    { class: "picker-text disabled-text" },
+                    vue.toDisplayString($setup.sourceOptions[$setup.form.sourceIndex] || "..."),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ]),
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_3,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.assignee")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode("view", { class: "item-picker-box" }, [
+                  vue.createVNode($setup["AppPicker"], {
+                    range: $setup.assigneeOptions,
+                    value: $setup.form.assigneeIndex,
+                    onChange: $setup.onAssigneeChange,
+                    title: _ctx.$t("todo.assignee")
+                  }, {
+                    default: vue.withCtx(() => [
                       vue.createElementVNode(
-                        "text",
-                        { class: "t-time" },
-                        vue.toDisplayString(item.timeStr),
+                        "view",
+                        { class: "picker-text" },
+                        vue.toDisplayString($setup.assigneeOptions.length > 0 && $setup.form.assigneeIndex > -1 ? $setup.assigneeOptions[$setup.form.assigneeIndex] : _ctx.$t("common.loading")) + " ▾ ",
                         1
                         /* TEXT */
                       )
                     ]),
-                    vue.createElementVNode(
-                      "text",
-                      { class: "t-action" },
-                      vue.toDisplayString(item.content),
-                      1
-                      /* TEXT */
-                    )
-                  ])
-                ]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ]))
-        ])) : vue.createCommentVNode("v-if", true),
-        vue.createElementVNode("view", { style: { "height": "50px" } })
-      ]),
-      vue.createVNode($setup["ConfirmModal"], {
-        visible: $setup.isConfirmCancelEditOpen,
-        "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelEditOpen = $event),
-        title: _ctx.$t("todo.cancel_edit_title"),
-        message: _ctx.$t("todo.cancel_edit_msg"),
-        "cancel-label": _ctx.$t("todo.continue_edit"),
-        "confirm-label": _ctx.$t("common.cancel_action"),
-        "confirm-type": "danger",
-        onCancel: $setup.continueEditing,
-        onConfirm: $setup.confirmCancelEdit
-      }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
-      vue.createVNode($setup["ConfirmModal"], {
-        visible: $setup.isConfirmCancelReplyOpen,
-        "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
-        title: _ctx.$t("todo.cancel_reply_title"),
-        message: _ctx.$t("todo.cancel_reply_msg"),
-        "cancel-label": _ctx.$t("todo.continue_reply"),
-        "confirm-label": _ctx.$t("common.cancel_action"),
-        "confirm-type": "danger",
-        onCancel: $setup.continueReplying,
-        onConfirm: $setup.confirmCancelReply
-      }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
-      vue.createVNode($setup["ConfirmModal"], {
-        visible: $setup.isConfirmDeleteCommentOpen,
-        "onUpdate:visible": _cache[16] || (_cache[16] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
-        title: _ctx.$t("todo.delete_comment_title"),
-        message: _ctx.$t("todo.delete_comment_msg"),
-        "confirm-type": "danger",
-        onConfirm: $setup.confirmDeleteComment,
-        onCancel: $setup.cancelDeleteComment
-      }, null, 8, ["visible", "title", "message", "onConfirm", "onCancel"]),
-      $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
-        key: 1,
-        class: "modal-overlay",
-        onClick: _cache[18] || (_cache[18] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
-      }, [
-        vue.createElementVNode("view", {
-          class: "emoji-picker-container",
-          onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
-          }, ["stop"]))
+                    _: 1
+                    /* STABLE */
+                  }, 8, ["range", "value", "onChange", "title"])
+                ])
+              ]),
+              vue.createVNode($setup["TodoDatePicker"], {
+                dueDate: $setup.form.dueDate,
+                "onUpdate:dueDate": _cache[5] || (_cache[5] = ($event) => $setup.form.dueDate = $event),
+                notifyAt: $setup.form.notifyAt,
+                "onUpdate:notifyAt": _cache[6] || (_cache[6] = ($event) => $setup.form.notifyAt = $event),
+                onChange: $setup.onDateUpdate
+              }, null, 8, ["dueDate", "notifyAt", "onChange"])
+            ],
+            2
+            /* CLASS */
+          ),
+          vue.createElementVNode(
+            "view",
+            { class: "section-title" },
+            vue.toDisplayString(_ctx.$t("todo.customer_section")),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("view", { class: "info-group customer-block" }, [
+            $setup.isLoadingCustomer ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "loading-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "loading-text" },
+                vue.toDisplayString(_ctx.$t("todo.loading_crm")),
+                1
+                /* TEXT */
+              )
+            ])) : !$setup.form.customerCode ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "empty-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString(_ctx.$t("todo.no_customer_attached")),
+                1
+                /* TEXT */
+              )
+            ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_4,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.customer_name_label")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode(
+                  "view",
+                  { class: "item-right-text" },
+                  vue.toDisplayString($setup.form.customerName),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_5,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.customer_phone_label")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode(
+                  "view",
+                  { class: "item-right-text phone-text" },
+                  vue.toDisplayString($setup.form.customerPhone),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              vue.createElementVNode("view", { class: "flat-item" }, [
+                vue.createElementVNode("view", { class: "item-left" }, [
+                  vue.createElementVNode("image", {
+                    src: _imports_6,
+                    class: "item-icon"
+                  }),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "item-label" },
+                    vue.toDisplayString(_ctx.$t("todo.customer_manager_label")),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode(
+                  "view",
+                  { class: "item-right-text highlight-text" },
+                  vue.toDisplayString($setup.form.customerManagerName || _ctx.$t("todo.manager_none")),
+                  1
+                  /* TEXT */
+                )
+              ])
+            ]))
+          ]),
+          vue.createElementVNode("view", { class: "section-header-row" }, [
+            vue.createElementVNode("view", {
+              class: "toggle-header",
+              onClick: $setup.toggleComments
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "section-title no-margin" },
+                vue.toDisplayString(_ctx.$t("todo.comments_activities")),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "image",
+                {
+                  src: _imports_0$1,
+                  class: vue.normalizeClass(["toggle-icon", { "open": $setup.isCommentsOpen }])
+                },
+                null,
+                2
+                /* CLASS */
+              )
+            ]),
+            vue.createVNode($setup["AppPicker"], {
+              range: $setup.commentFilterOptions,
+              value: $setup.commentFilterIndex,
+              onClick: _cache[7] || (_cache[7] = vue.withModifiers(() => {
+              }, ["stop"])),
+              onChange: $setup.onCommentFilterChange,
+              title: _ctx.$t("common.filter")
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode(
+                  "view",
+                  { class: "filter-badge" },
+                  vue.toDisplayString($setup.commentFilterOptions[$setup.commentFilterIndex]) + " ▾",
+                  1
+                  /* TEXT */
+                )
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["range", "value", "onChange", "title"])
+          ]),
+          $setup.isCommentsOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 0,
+            class: "comments-section"
+          }, [
+            vue.createElementVNode("view", {
+              class: "comment-input-block",
+              id: "comment-input-anchor"
+            }, [
+              vue.createElementVNode("view", { class: "editor-container" }, [
+                vue.createVNode($setup["TodoEditor"], {
+                  ref: "todoEditorRef",
+                  modelValue: $setup.newCommentText,
+                  "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => $setup.newCommentText = $event),
+                  placeholder: $setup.isEditingComment ? _ctx.$t("todo.comment_placeholder_edit") : $setup.isReplying ? _ctx.$t("todo.comment_placeholder_reply") : _ctx.$t("todo.comment_placeholder_write")
+                }, null, 8, ["modelValue", "placeholder"])
+              ]),
+              $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
+                class: "editing-alert"
+              }, [
+                vue.createElementVNode("text", { class: "editing-text" }, [
+                  vue.createTextVNode(
+                    vue.toDisplayString(_ctx.$t("todo.editing_alert")) + " ",
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "editing-name" },
+                    vue.toDisplayString($setup.editingMemberName),
+                    1
+                    /* TEXT */
+                  )
+                ])
+              ])) : vue.createCommentVNode("v-if", true),
+              $setup.isReplying && $setup.replyingCommentData ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "reply-alert"
+              }, [
+                vue.createElementVNode("view", { class: "reply-info" }, [
+                  vue.createElementVNode(
+                    "text",
+                    { class: "reply-label" },
+                    vue.toDisplayString(_ctx.$t("todo.replying_alert")),
+                    1
+                    /* TEXT */
+                  ),
+                  vue.createElementVNode(
+                    "text",
+                    { class: "reply-name" },
+                    vue.toDisplayString($setup.replyingMemberName),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                vue.createElementVNode("view", { class: "reply-quote" }, [
+                  vue.createElementVNode("text", { class: "quote-icon" }, "“"),
+                  vue.createElementVNode("rich-text", {
+                    nodes: $setup.replyingMessagePreview,
+                    class: "quote-content"
+                  }, null, 8, ["nodes"]),
+                  vue.createElementVNode("text", { class: "quote-icon" }, "”")
+                ])
+              ])) : vue.createCommentVNode("v-if", true),
+              vue.createElementVNode("view", { class: "input-actions" }, [
+                !$setup.isEditingComment && !$setup.isReplying ? (vue.openBlock(), vue.createBlock($setup["AppButton"], {
+                  key: 0,
+                  type: "primary",
+                  size: "small",
+                  loading: $setup.isSubmittingComment,
+                  label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("common.save"),
+                  onClick: $setup.submitComment
+                }, null, 8, ["loading", "label", "onClick"])) : $setup.isEditingComment ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 1,
+                  class: "edit-actions-row"
+                }, [
+                  vue.createVNode($setup["AppButton"], {
+                    type: "secondary",
+                    size: "small",
+                    label: _ctx.$t("common.cancel"),
+                    disabled: $setup.isSubmittingComment,
+                    onClick: $setup.onCancelEditComment
+                  }, null, 8, ["label", "disabled", "onClick"]),
+                  vue.createVNode($setup["AppButton"], {
+                    type: "primary",
+                    size: "small",
+                    loading: $setup.isSubmittingComment,
+                    label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.update_btn"),
+                    onClick: $setup.submitUpdateComment
+                  }, null, 8, ["loading", "label", "onClick"])
+                ])) : $setup.isReplying ? (vue.openBlock(), vue.createElementBlock("view", {
+                  key: 2,
+                  class: "edit-actions-row"
+                }, [
+                  vue.createVNode($setup["AppButton"], {
+                    type: "secondary",
+                    size: "small",
+                    label: _ctx.$t("common.cancel"),
+                    disabled: $setup.isSubmittingComment,
+                    onClick: $setup.onCancelReply
+                  }, null, 8, ["label", "disabled", "onClick"]),
+                  vue.createVNode($setup["AppButton"], {
+                    type: "primary",
+                    size: "small",
+                    loading: $setup.isSubmittingComment,
+                    label: $setup.isSubmittingComment ? _ctx.$t("common.saving") : _ctx.$t("todo.reply_btn"),
+                    onClick: $setup.submitReply
+                  }, null, 8, ["loading", "label", "onClick"])
+                ])) : vue.createCommentVNode("v-if", true)
+              ])
+            ]),
+            vue.createElementVNode("view", { class: "divider-line" }),
+            $setup.isLoadingComments ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "loading-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString(_ctx.$t("todo.loading_comments")),
+                1
+                /* TEXT */
+              )
+            ])) : $setup.comments.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "empty-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString(_ctx.$t("todo.no_comments")),
+                1
+                /* TEXT */
+              )
+            ])) : (vue.openBlock(), vue.createElementBlock("view", { key: 2 }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.comments, (item) => {
+                  return vue.openBlock(), vue.createBlock($setup["CommentItem"], {
+                    key: item.id,
+                    data: item,
+                    onReact: $setup.onToggleEmojiPicker,
+                    onReply: _cache[9] || (_cache[9] = (data) => $setup.handleReply(data)),
+                    onEdit: _cache[10] || (_cache[10] = (data) => $setup.handleEdit(data)),
+                    onDelete: _cache[11] || (_cache[11] = (id) => $setup.onRequestDeleteComment(id))
+                  }, null, 8, ["data", "onReact"]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ]))
+          ])) : vue.createCommentVNode("v-if", true),
+          vue.createElementVNode("view", { class: "section-header-row" }, [
+            vue.createElementVNode("view", {
+              class: "toggle-header",
+              onClick: _cache[12] || (_cache[12] = (...args) => $setup.toggleHistory && $setup.toggleHistory(...args))
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "section-title no-margin" },
+                vue.toDisplayString(_ctx.$t("todo.history_section")),
+                1
+                /* TEXT */
+              ),
+              vue.createElementVNode(
+                "image",
+                {
+                  src: _imports_0$1,
+                  class: vue.normalizeClass(["toggle-icon", { "open": $setup.isHistoryOpen }])
+                },
+                null,
+                2
+                /* CLASS */
+              )
+            ]),
+            vue.createVNode($setup["AppPicker"], {
+              range: $setup.historyFilterOptions,
+              value: $setup.historyFilterIndex,
+              onClick: _cache[13] || (_cache[13] = vue.withModifiers(() => {
+              }, ["stop"])),
+              onChange: $setup.onHistoryFilterChange,
+              title: _ctx.$t("common.filter")
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode(
+                  "view",
+                  { class: "filter-badge" },
+                  vue.toDisplayString($setup.historyFilterOptions[$setup.historyFilterIndex]) + " ▾",
+                  1
+                  /* TEXT */
+                )
+              ]),
+              _: 1
+              /* STABLE */
+            }, 8, ["range", "value", "onChange", "title"])
+          ]),
+          $setup.isHistoryOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+            key: 1,
+            class: "history-container"
+          }, [
+            $setup.isLoadingHistory ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
+              class: "loading-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                { class: "loading-text" },
+                vue.toDisplayString(_ctx.$t("todo.loading_history")),
+                1
+                /* TEXT */
+              )
+            ])) : $setup.historyList.length === 0 ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "empty-row"
+            }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString(_ctx.$t("todo.no_history")),
+                1
+                /* TEXT */
+              )
+            ])) : (vue.openBlock(), vue.createElementBlock("view", {
+              key: 2,
+              class: "timeline-list"
+            }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.historyList, (item, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: item.id,
+                    class: "timeline-item"
+                  }, [
+                    index !== $setup.historyList.length - 1 ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 0,
+                      class: "timeline-line"
+                    })) : vue.createCommentVNode("v-if", true),
+                    vue.createElementVNode("view", { class: "timeline-dot" }),
+                    vue.createElementVNode("view", { class: "timeline-content" }, [
+                      vue.createElementVNode("view", { class: "timeline-header" }, [
+                        vue.createElementVNode(
+                          "text",
+                          { class: "t-actor" },
+                          vue.toDisplayString(item.actorName),
+                          1
+                          /* TEXT */
+                        ),
+                        vue.createElementVNode(
+                          "text",
+                          { class: "t-time" },
+                          vue.toDisplayString(item.timeStr),
+                          1
+                          /* TEXT */
+                        )
+                      ]),
+                      vue.createElementVNode(
+                        "text",
+                        { class: "t-action" },
+                        vue.toDisplayString(item.content),
+                        1
+                        /* TEXT */
+                      )
+                    ])
+                  ]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ]))
+          ])) : vue.createCommentVNode("v-if", true),
+          vue.createElementVNode("view", { style: { "height": "50px" } })
+        ]),
+        vue.createVNode($setup["ConfirmModal"], {
+          visible: $setup.isConfirmCancelEditOpen,
+          "onUpdate:visible": _cache[14] || (_cache[14] = ($event) => $setup.isConfirmCancelEditOpen = $event),
+          title: _ctx.$t("todo.cancel_edit_title"),
+          message: _ctx.$t("todo.cancel_edit_msg"),
+          "cancel-label": _ctx.$t("todo.continue_edit"),
+          "confirm-label": _ctx.$t("common.cancel_action"),
+          "confirm-type": "danger",
+          onCancel: $setup.continueEditing,
+          onConfirm: $setup.confirmCancelEdit
+        }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
+        vue.createVNode($setup["ConfirmModal"], {
+          visible: $setup.isConfirmCancelReplyOpen,
+          "onUpdate:visible": _cache[15] || (_cache[15] = ($event) => $setup.isConfirmCancelReplyOpen = $event),
+          title: _ctx.$t("todo.cancel_reply_title"),
+          message: _ctx.$t("todo.cancel_reply_msg"),
+          "cancel-label": _ctx.$t("todo.continue_reply"),
+          "confirm-label": _ctx.$t("common.cancel_action"),
+          "confirm-type": "danger",
+          onCancel: $setup.continueReplying,
+          onConfirm: $setup.confirmCancelReply
+        }, null, 8, ["visible", "title", "message", "cancel-label", "confirm-label", "onCancel", "onConfirm"]),
+        vue.createVNode($setup["ConfirmModal"], {
+          visible: $setup.isConfirmDeleteCommentOpen,
+          "onUpdate:visible": _cache[16] || (_cache[16] = ($event) => $setup.isConfirmDeleteCommentOpen = $event),
+          title: _ctx.$t("todo.delete_comment_title"),
+          message: _ctx.$t("todo.delete_comment_msg"),
+          "confirm-type": "danger",
+          onConfirm: $setup.confirmDeleteComment,
+          onCancel: $setup.cancelDeleteComment
+        }, null, 8, ["visible", "title", "message", "onConfirm", "onCancel"]),
+        $setup.isEmojiPickerOpen ? (vue.openBlock(), vue.createElementBlock("view", {
+          key: 1,
+          class: "modal-overlay",
+          onClick: _cache[18] || (_cache[18] = (...args) => $setup.closeEmojiPicker && $setup.closeEmojiPicker(...args))
         }, [
-          vue.createElementVNode("view", { class: "emoji-grid" }, [
-            (vue.openBlock(true), vue.createElementBlock(
-              vue.Fragment,
-              null,
-              vue.renderList($setup.emojiList, (emoji, index) => {
-                return vue.openBlock(), vue.createElementBlock("view", {
-                  key: index,
-                  class: "emoji-item",
-                  onClick: ($event) => $setup.selectEmoji(emoji)
-                }, vue.toDisplayString(emoji), 9, ["onClick"]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
+          vue.createElementVNode("view", {
+            class: "emoji-picker-container",
+            onClick: _cache[17] || (_cache[17] = vue.withModifiers(() => {
+            }, ["stop"]))
+          }, [
+            vue.createElementVNode("view", { class: "emoji-grid" }, [
+              (vue.openBlock(true), vue.createElementBlock(
+                vue.Fragment,
+                null,
+                vue.renderList($setup.emojiList, (emoji, index) => {
+                  return vue.openBlock(), vue.createElementBlock("view", {
+                    key: index,
+                    class: "emoji-item",
+                    onClick: ($event) => $setup.selectEmoji(emoji)
+                  }, vue.toDisplayString(emoji), 9, ["onClick"]);
+                }),
+                128
+                /* KEYED_FRAGMENT */
+              ))
+            ])
           ])
-        ])
-      ])) : vue.createCommentVNode("v-if", true),
-      vue.createVNode($setup["GlobalMessage"]),
-      vue.createVNode($setup["GlobalNotification"])
-    ]);
+        ])) : vue.createCommentVNode("v-if", true),
+        vue.createVNode($setup["GlobalMessage"]),
+        vue.createVNode($setup["GlobalNotification"])
+      ],
+      2
+      /* CLASS */
+    );
   }
   const PagesTodoTodoDetail = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-9f96c8fe"], ["__file", "D:/uni_app/vbot-todo-android-3/pages/todo/todo_detail.vue"]]);
   __definePage("pages/todo/list_todo", PagesTodoListTodo);
